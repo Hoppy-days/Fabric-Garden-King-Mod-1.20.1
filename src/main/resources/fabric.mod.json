@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "gardenkingmod",
+	"version": "${version}",
+	"name": "Garden King Mod",
+	"description": "Become rich from you garden!",
+	"authors": [
+		"Jeremy McLain!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/gardenkingmod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.jeremy.gardenkingmod.GardenKingMod"
+		],
+        "client": [
+            "net.jeremy.gardenkingmod.GardenKingModClient"
+        ],
+		"fabric-datagen": [
+			"net.jeremy.gardenkingmod.GardenKingModDataGenerator"
+		]
+	},
+	"mixins": [
+		"gardenkingmod.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.2",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
