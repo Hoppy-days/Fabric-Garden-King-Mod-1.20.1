@@ -2,9 +2,11 @@
 	"required": true,
 	"package": "net.jeremy.gardenkingmod.mixin",
 	"compatibilityLevel": "JAVA_17",
-	"mixins": [
-		"ExampleMixin"
-	],
+        "mixins": [
+                "ExampleMixin",
+                "PlayerEntityMixin",
+                "ServerPlayerEntityMixin"
+        ],
 	"injectors": {
 		"defaultRequire": 1
 	},

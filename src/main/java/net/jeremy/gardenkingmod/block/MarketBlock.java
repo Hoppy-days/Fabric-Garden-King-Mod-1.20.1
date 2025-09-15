@@ -49,8 +49,11 @@ public class MarketBlock extends Block {
                 }
 
                 if (player instanceof ServerPlayerEntity serverPlayer) {
-                        ModScoreboards.addCurrency(serverPlayer, soldCount);
-                        serverPlayer.sendMessage(Text.literal("Sold " + soldCount + " Croptopia crops for " + soldCount + " coins."), true);
+                        int lifetimeTotal = ModScoreboards.addCurrency(serverPlayer, soldCount);
+                        Text message = lifetimeTotal >= 0
+                                        ? Text.translatable("message.gardenkingmod.market.sold.lifetime", soldCount, soldCount, lifetimeTotal)
+                                        : Text.translatable("message.gardenkingmod.market.sold", soldCount, soldCount);
+                        serverPlayer.sendMessage(message, true);
                 }
 
                 world.playSound(null, pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.75f, 1.0f);
