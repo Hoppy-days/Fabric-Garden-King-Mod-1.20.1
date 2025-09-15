@@ -13,6 +13,8 @@ public class GardenKingMod implements ModInitializer {
         public void onInitialize() {
                 ModItems.registerModItems();
                 ModBlocks.registerModBlocks();
+                ModBlockEntities.registerBlockEntities();
+                ModScreenHandlers.registerScreenHandlers();
                 ModScoreboards.registerScoreboards();
 
                 LOGGER.info("Garden King Mod initialized");

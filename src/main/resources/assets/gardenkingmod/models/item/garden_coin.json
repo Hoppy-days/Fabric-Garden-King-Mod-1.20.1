@@ -1,6 +1,6 @@
 {
-"parent": "minecraft:item/generated",
-"textures": {
-"layer0": "gardenkingmod:item/garden_coin"
-}
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "gardenkingmod:item/garden_coin"
+  }
 }

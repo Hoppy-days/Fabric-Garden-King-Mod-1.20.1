@@ -1,6 +1,11 @@
 {
+"block.gardenkingmod.market_block": "Garden Market",
 "item.gardenkingmod.garden_coin": "Garden Coin",
+"container.gardenkingmod.market": "Garden Market",
+"screen.gardenkingmod.market.sell": "Sell",
 "message.gardenkingmod.market.sold": "Sold %1$s Croptopia crops for %2$s coins.",
 "message.gardenkingmod.market.sold.lifetime": "Sold %1$s Croptopia crops for %2$s coins. Lifetime earnings: %3$s coins.",
+"message.gardenkingmod.market.empty": "There are no crops to sell.",
+"message.gardenkingmod.market.invalid": "Only Croptopia crops can be sold here!",
 "scoreboard.gardenkingmod.garden_currency": "Garden Coins"
 }
