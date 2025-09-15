@@ -36,7 +36,7 @@ public final class ModScoreboards {
                 }
 
                 ScoreboardPlayerScore score = scoreboard.getPlayerScore(player.getEntityName(), objective);
-                score.add(amount);
+                score.setScore(score.getScore() + amount);            
         }
 
         private static ScoreboardObjective ensureObjective(Scoreboard scoreboard) {
