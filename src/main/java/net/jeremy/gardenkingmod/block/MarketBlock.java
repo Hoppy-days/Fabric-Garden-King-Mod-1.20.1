@@ -1,63 +1,67 @@
 package net.jeremy.gardenkingmod.block;
 
-import net.jeremy.gardenkingmod.ModItems;
-import net.jeremy.gardenkingmod.ModScoreboards;
-import net.minecraft.block.Block;
+import net.jeremy.gardenkingmod.block.entity.MarketBlockEntity;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemScatterer;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class MarketBlock extends Block {
+public class MarketBlock extends BlockWithEntity {
         public MarketBlock(Settings settings) {
                 super(settings);
         }
 
         @Override
+        public BlockRenderType getRenderType(BlockState state) {
+                return BlockRenderType.MODEL;
+        }
+
+        @Override
         public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-                ItemStack heldStack = player.getStackInHand(hand);
-                if (heldStack.isEmpty()) {
-                        return ActionResult.PASS;
+                if (!world.isClient) {
+                        BlockEntity blockEntity = world.getBlockEntity(pos);
+                        if (blockEntity instanceof MarketBlockEntity marketBlockEntity) {
+                                player.openHandledScreen(marketBlockEntity);
+                        }
                 }
-
-                Identifier itemId = Registries.ITEM.getId(heldStack.getItem());
-                if (itemId == null || !"croptopia".equals(itemId.getNamespace())) {
-                        return ActionResult.PASS;
-                }
-
-                if (world.isClient) {
-                        return ActionResult.SUCCESS;
-                }
-
-                int soldCount = heldStack.getCount();
-                player.setStackInHand(hand, ItemStack.EMPTY);
-
-                ItemStack currencyStack = new ItemStack(ModItems.GARDEN_COIN, soldCount);
-                boolean fullyInserted = player.getInventory().insertStack(currencyStack);
-                if (!fullyInserted) {
-                        player.dropItem(currencyStack, false);
-                }
-
-                if (player instanceof ServerPlayerEntity serverPlayer) {
-                        int lifetimeTotal = ModScoreboards.addCurrency(serverPlayer, soldCount);
-                        Text message = lifetimeTotal >= 0
-                                        ? Text.translatable("message.gardenkingmod.market.sold.lifetime", soldCount, soldCount, lifetimeTotal)
-                                        : Text.translatable("message.gardenkingmod.market.sold", soldCount, soldCount);
-                        serverPlayer.sendMessage(message, true);
-                }
-
-                world.playSound(null, pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.75f, 1.0f);
 
                 return ActionResult.SUCCESS;
+        }
+
+        @Override
+        public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+                if (state.getBlock() != newState.getBlock()) {
+                        BlockEntity blockEntity = world.getBlockEntity(pos);
+                        if (blockEntity instanceof Inventory inventory) {
+                                ItemScatterer.spawn(world, pos, inventory);
+                                world.updateComparators(pos, this);
+                        }
+
+                        super.onStateReplaced(state, world, pos, newState, moved);
+                }
+        }
+
+        @Override
+        public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+                return new MarketBlockEntity(pos, state);
+        }
+
+        @Override
+        public boolean hasComparatorOutput(BlockState state) {
+                return true;
+        }
+
+        @Override
+        public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+                return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
         }
 }
