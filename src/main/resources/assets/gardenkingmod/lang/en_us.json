@@ -1,0 +1,6 @@
+{
+"item.gardenkingmod.garden_coin": "Garden Coin",
+"message.gardenkingmod.market.sold": "Sold %1$s Croptopia crops for %2$s coins.",
+"message.gardenkingmod.market.sold.lifetime": "Sold %1$s Croptopia crops for %2$s coins. Lifetime earnings: %3$s coins.",
+"scoreboard.gardenkingmod.garden_currency": "Garden Coins"
+}
