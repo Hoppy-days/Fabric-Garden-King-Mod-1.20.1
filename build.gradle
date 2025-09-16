@@ -37,6 +37,8 @@ dependencies {
 
         modImplementation "curse.maven:croptopia-415438:4997461"
 
+        modImplementation "curse.maven:epherolib-885449:4949797"
+
 }
 
 processResources {
