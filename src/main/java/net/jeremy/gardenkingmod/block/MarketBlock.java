@@ -7,7 +7,7 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemScatterer;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
