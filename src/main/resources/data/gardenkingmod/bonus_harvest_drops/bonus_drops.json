@@ -12,5 +12,12 @@
       "chance": 1.0,
       "count": {"min": 1, "max": 8}
     }
+  ],
+  "croptopia:tomato_crop": [
+    {
+      "item": "minecraft:iron_ingot",
+      "chance": 1.0,
+      "count": {"min": 1, "max": 9}
+    }
   ]
 }
