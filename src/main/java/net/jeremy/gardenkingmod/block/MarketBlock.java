@@ -91,11 +91,14 @@ public class MarketBlock extends BlockWithEntity {
         @Override
         public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
                 return MarketBlockPart.getShape(MarketBlockPart.Part.CENTER, state.get(FACING));
+
         }
 
         @Override
         public float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
                 return 1.0F;
+
+
         }
 
         @Override
