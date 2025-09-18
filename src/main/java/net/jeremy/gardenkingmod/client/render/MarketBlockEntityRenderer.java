@@ -13,6 +13,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 
@@ -36,7 +37,8 @@ public class MarketBlockEntityRenderer implements BlockEntityRenderer<MarketBloc
                 World world = entity.getWorld();
                 int combinedLight = LightmapTextureManager.MAX_LIGHT_COORDINATE;
                 if (world != null) {
-                        combinedLight = WorldRenderer.getLightmapCoordinates(world, entity.getPos());
+                        BlockPos exposedPos = entity.getPos().up();
+                        combinedLight = WorldRenderer.getLightmapCoordinates(world, exposedPos);
                 }
 
                 VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
