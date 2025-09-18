@@ -31,7 +31,8 @@ public final class GardenKingModGameTest implements FabricGameTest {
                                 return;
                         }
 
-                        blockEntity.setStack(MarketBlockEntity.INPUT_SLOT, new ItemStack(tomatoOptional.get(), 64));
+                        blockEntity.setStack(0, new ItemStack(tomatoOptional.get(), 64));
+                        blockEntity.setStack(1, new ItemStack(tomatoOptional.get(), 32));
 
                         ServerPlayerEntity player = helper.spawnPlayer(BlockPos.ORIGIN.up());
                         boolean sold = blockEntity.sell(player);
@@ -41,9 +42,12 @@ public final class GardenKingModGameTest implements FabricGameTest {
                         }
 
                         int coinCount = 0;
+                        int tomatoCount = 0;
                         for (ItemStack inventoryStack : player.getInventory().main) {
                                 if (inventoryStack.isOf(ModItems.GARDEN_COIN)) {
                                         coinCount += inventoryStack.getCount();
+                                } else if (inventoryStack.isOf(tomatoOptional.get())) {
+                                        tomatoCount += inventoryStack.getCount();
                                 }
                         }
 
@@ -52,8 +56,18 @@ public final class GardenKingModGameTest implements FabricGameTest {
                                 return;
                         }
 
-                        if (!blockEntity.getStack(MarketBlockEntity.INPUT_SLOT).isEmpty()) {
+                        if (!blockEntity.getStack(0).isEmpty()) {
                                 helper.fail("Market input slot should be cleared after selling tomatoes");
+                                return;
+                        }
+
+                        if (!blockEntity.getStack(1).isEmpty()) {
+                                helper.fail("Market should clear all processed slots after selling tomatoes");
+                                return;
+                        }
+
+                        if (tomatoCount != 32) {
+                                helper.fail("Player should receive the partial stack of tomatoes back after selling");
                                 return;
                         }
 
