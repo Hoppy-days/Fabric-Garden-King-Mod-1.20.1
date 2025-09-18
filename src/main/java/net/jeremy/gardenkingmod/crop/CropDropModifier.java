@@ -1,29 +1,34 @@
 package net.jeremy.gardenkingmod.crop;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.fabricmc.fabric.api.loot.v2.FabricLootTableBuilder;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
+import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager.BonusDropEntry;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTables;
 import net.minecraft.loot.condition.LootCondition;
+import net.minecraft.loot.condition.RandomChanceLootCondition;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameter;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunctionType;
 import net.minecraft.loot.function.LootFunctionTypes;
 import net.minecraft.loot.function.SetCountLootFunction;
+import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.provider.number.LootNumberProvider;
 import net.minecraft.loot.provider.number.LootNumberProviderType;
 import net.minecraft.loot.provider.number.LootNumberProviderTypes;
+import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -45,6 +50,28 @@ public final class CropDropModifier {
 
         public static void register() {
                 LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+                        FabricLootTableBuilder fabricBuilder = (FabricLootTableBuilder) (Object) tableBuilder;
+
+                        List<BonusDropEntry> bonusDrops = BonusHarvestDropManager.getInstance().getBonusDrops(id);
+                        AtomicBoolean bonusApplied = new AtomicBoolean(false);
+                        if (!bonusDrops.isEmpty()) {
+                                fabricBuilder.modifyPools(poolBuilder -> {
+                                        if (bonusApplied.compareAndSet(false, true)) {
+                                                for (BonusDropEntry bonusDrop : bonusDrops) {
+                                                        poolBuilder.with(ItemEntry.builder(bonusDrop.item())
+                                                                        .conditionally(RandomChanceLootCondition.builder(bonusDrop.chance()))
+                                                                        .apply(SetCountLootFunction.builder(UniformLootNumberProvider.create((float) bonusDrop.minCount(), (float) bonusDrop.maxCount()))));
+                                                }
+                                        }
+                                });
+
+                                if (bonusApplied.get()) {
+                                        GardenKingMod.LOGGER.debug("Applied {} bonus harvest drops to loot table {}", bonusDrops.size(), id);
+                                } else {
+                                        GardenKingMod.LOGGER.warn("Failed to attach bonus harvest drops to loot table {} because it has no pools", id);
+                                }
+                        }
+
                         Optional<TierScalingData> scalingData = resolveScaling(id);
                         if (scalingData.isEmpty()) {
                                 return;
@@ -56,7 +83,6 @@ public final class CropDropModifier {
                                 return;
                         }
 
-                        FabricLootTableBuilder fabricBuilder = (FabricLootTableBuilder) (Object) tableBuilder;
                         fabricBuilder.modifyPools(poolBuilder -> {
                                 poolBuilder.apply(CaptureStackFunction.builder());
                                 poolBuilder.apply(SetCountLootFunction.builder(new TierScaledCountProvider(id, multiplier)));
