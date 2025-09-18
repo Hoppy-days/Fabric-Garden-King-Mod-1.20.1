@@ -29,7 +29,7 @@ public class MarketScreenHandler extends ScreenHandler {
                 checkSize(this.inventory, MarketBlockEntity.INVENTORY_SIZE);
                 this.inventory.onOpen(playerInventory.player);
 
-                this.addSlot(new Slot(this.inventory, MarketBlockEntity.INPUT_SLOT, 80, 35) {
+                this.addSlot(new Slot(this.inventory, MarketBlockEntity.INPUT_SLOT, 79, 34) {
                         @Override
                         public boolean canInsert(ItemStack stack) {
                                 return MarketBlockEntity.isSellable(stack);
@@ -111,7 +111,7 @@ public class MarketScreenHandler extends ScreenHandler {
         }
 
         private void addPlayerInventory(PlayerInventory playerInventory) {
-                final int baseY = 139;
+                final int baseY = 140;
                 for (int row = 0; row < 3; ++row) {
                         for (int column = 0; column < 9; ++column) {
                                 this.addSlot(new Slot(playerInventory, column + row * 9 + 9, 8 + column * 18,
@@ -121,7 +121,7 @@ public class MarketScreenHandler extends ScreenHandler {
         }
 
         private void addPlayerHotbar(PlayerInventory playerInventory) {
-                final int hotbarY = 197;
+                final int hotbarY = 198;
                 for (int slot = 0; slot < 9; ++slot) {
                         this.addSlot(new Slot(playerInventory, slot, 8 + slot * 18, hotbarY));
                 }
