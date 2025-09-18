@@ -14,17 +14,20 @@
 	"license": "CC0-1.0",
 	"icon": "assets/gardenkingmod/icon.png",
 	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"net.jeremy.gardenkingmod.GardenKingMod"
-		],
-        "client": [
-            "net.jeremy.gardenkingmod.GardenKingModClient"
-        ],
-		"fabric-datagen": [
-			"net.jeremy.gardenkingmod.GardenKingModDataGenerator"
-		]
-	},
+        "entrypoints": {
+                "main": [
+                        "net.jeremy.gardenkingmod.GardenKingMod"
+                ],
+                "client": [
+                        "net.jeremy.gardenkingmod.GardenKingModClient"
+                ],
+                "gametest": [
+                        "net.jeremy.gardenkingmod.GardenKingModGameTest"
+                ],
+                "fabric-datagen": [
+                        "net.jeremy.gardenkingmod.GardenKingModDataGenerator"
+                ]
+        },
 	"mixins": [
 		"gardenkingmod.mixins.json"
 	],

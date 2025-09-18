@@ -6,9 +6,12 @@ import java.util.Optional;
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.AliasedBlockItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
@@ -29,6 +32,12 @@ public final class CropTierRegistry {
         public static final TagKey<Block> TIER_3 = TagKey.of(RegistryKeys.BLOCK, TIER_3_ID);
         public static final TagKey<Block> TIER_4 = TagKey.of(RegistryKeys.BLOCK, TIER_4_ID);
         public static final TagKey<Block> TIER_5 = TagKey.of(RegistryKeys.BLOCK, TIER_5_ID);
+
+        private static final TagKey<Item> TIER_1_ITEM = TagKey.of(RegistryKeys.ITEM, TIER_1_ID);
+        private static final TagKey<Item> TIER_2_ITEM = TagKey.of(RegistryKeys.ITEM, TIER_2_ID);
+        private static final TagKey<Item> TIER_3_ITEM = TagKey.of(RegistryKeys.ITEM, TIER_3_ID);
+        private static final TagKey<Item> TIER_4_ITEM = TagKey.of(RegistryKeys.ITEM, TIER_4_ID);
+        private static final TagKey<Item> TIER_5_ITEM = TagKey.of(RegistryKeys.ITEM, TIER_5_ID);
 
         private static Map<Identifier, CropTier> tiers = Map.of();
         private static boolean initialized = false;
@@ -77,8 +86,33 @@ public final class CropTierRegistry {
         }
 
         public static Optional<CropTier> get(Item item) {
+                if (item == null) {
+                        return Optional.empty();
+                }
+
                 if (item instanceof BlockItem blockItem) {
                         return get(blockItem.getBlock().getDefaultState());
+                }
+
+                if (item instanceof AliasedBlockItem aliasedBlockItem) {
+                        return get(aliasedBlockItem.getBlock().getDefaultState());
+                }
+
+                RegistryEntry<Item> entry = Registries.ITEM.getEntry(item);
+                if (entry.isIn(TIER_1_ITEM)) {
+                        return get(TIER_1_ID);
+                }
+                if (entry.isIn(TIER_2_ITEM)) {
+                        return get(TIER_2_ID);
+                }
+                if (entry.isIn(TIER_3_ITEM)) {
+                        return get(TIER_3_ID);
+                }
+                if (entry.isIn(TIER_4_ITEM)) {
+                        return get(TIER_4_ID);
+                }
+                if (entry.isIn(TIER_5_ITEM)) {
+                        return get(TIER_5_ID);
                 }
 
                 return Optional.empty();
