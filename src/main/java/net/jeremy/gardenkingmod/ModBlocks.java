@@ -1,12 +1,14 @@
 package net.jeremy.gardenkingmod;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.jeremy.gardenkingmod.block.MarketBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
@@ -28,5 +30,6 @@ public final class ModBlocks {
 
         public static void registerModBlocks() {
                 GardenKingMod.LOGGER.info("Registering mod blocks for {}", GardenKingMod.MOD_ID);
+                ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.add(MARKET_BLOCK));
         }
 }
