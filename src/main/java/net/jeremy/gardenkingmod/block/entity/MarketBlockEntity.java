@@ -132,6 +132,19 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
         }
 
         @Override
+        public void onClose(PlayerEntity player) {
+                Inventory.super.onClose(player);
+                if (!(player instanceof ServerPlayerEntity)) {
+                        return;
+                }
+
+                ItemStack remainingStack = removeStack(INPUT_SLOT);
+                if (!remainingStack.isEmpty()) {
+                        insertOrDrop(player, remainingStack);
+                }
+        }
+
+        @Override
         public void markDirty() {
                 super.markDirty();
                 World world = getWorld();
@@ -185,10 +198,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 if (remainderCount > 0) {
                         ItemStack remainderStack = stack.copy();
                         remainderStack.setCount(remainderCount);
-                        boolean remainderInserted = player.getInventory().insertStack(remainderStack);
-                        if (!remainderInserted && !remainderStack.isEmpty()) {
-                                player.dropItem(remainderStack, false);
-                        }
+                        insertOrDrop(player, remainderStack);
                 }
 
                 items.set(INPUT_SLOT, ItemStack.EMPTY);
@@ -229,5 +239,16 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 case "crop_tiers/tier_5" -> 5;
                 default -> 0;
                 };
+        }
+
+        private static void insertOrDrop(PlayerEntity player, ItemStack stack) {
+                if (stack.isEmpty()) {
+                        return;
+                }
+
+                boolean fullyInserted = player.getInventory().insertStack(stack);
+                if (!fullyInserted && !stack.isEmpty()) {
+                        player.dropItem(stack, false);
+                }
         }
 }
