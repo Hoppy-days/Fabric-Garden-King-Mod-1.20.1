@@ -2,6 +2,7 @@ package net.jeremy.gardenkingmod;
 
 import net.fabricmc.api.ModInitializer;
 
+import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ public class GardenKingMod implements ModInitializer {
                 ModScoreboards.registerScoreboards();
 
                 CropTierRegistry.init();
+                CropDropModifier.register();
 
                 LOGGER.info("Garden King Mod initialized");
         }
