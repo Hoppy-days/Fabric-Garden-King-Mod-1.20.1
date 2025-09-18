@@ -111,17 +111,19 @@ public class MarketScreenHandler extends ScreenHandler {
         }
 
         private void addPlayerInventory(PlayerInventory playerInventory) {
+                final int baseY = 139;
                 for (int row = 0; row < 3; ++row) {
                         for (int column = 0; column < 9; ++column) {
                                 this.addSlot(new Slot(playerInventory, column + row * 9 + 9, 8 + column * 18,
-                                                84 + row * 18));
+                                                baseY + row * 18));
                         }
                 }
         }
 
         private void addPlayerHotbar(PlayerInventory playerInventory) {
+                final int hotbarY = 197;
                 for (int slot = 0; slot < 9; ++slot) {
-                        this.addSlot(new Slot(playerInventory, slot, 8 + slot * 18, 142));
+                        this.addSlot(new Slot(playerInventory, slot, 8 + slot * 18, hotbarY));
                 }
         }
 }
