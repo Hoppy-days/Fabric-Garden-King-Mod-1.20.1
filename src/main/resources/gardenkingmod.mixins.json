@@ -5,7 +5,9 @@
         "mixins": [
                 "ExampleMixin",
                 "PlayerEntityMixin",
-                "ServerPlayerEntityMixin"
+                "ServerPlayerEntityMixin",
+                "CropBlockMixin",
+                "CroptopiaCropBlockMixin"
         ],
 	"injectors": {
 		"defaultRequire": 1
