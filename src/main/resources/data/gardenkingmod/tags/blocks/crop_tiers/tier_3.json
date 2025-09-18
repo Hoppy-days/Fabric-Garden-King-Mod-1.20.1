@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:sugar_cane",
+    "minecraft:sweet_berry_bush",
+    "minecraft:cocoa",
+    "minecraft:cave_vines",
+    "minecraft:cave_vines_plant",
+    { "id": "croptopia:example_tier_3_crop", "required": false }
+  ]
+}

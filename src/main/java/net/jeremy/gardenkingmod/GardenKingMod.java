@@ -2,6 +2,8 @@ package net.jeremy.gardenkingmod;
 
 import net.fabricmc.api.ModInitializer;
 
+import net.jeremy.gardenkingmod.crop.CropTierRegistry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +18,8 @@ public class GardenKingMod implements ModInitializer {
                 ModBlockEntities.registerBlockEntities();
                 ModScreenHandlers.registerScreenHandlers();
                 ModScoreboards.registerScoreboards();
+
+                CropTierRegistry.init();
 
                 LOGGER.info("Garden King Mod initialized");
         }
