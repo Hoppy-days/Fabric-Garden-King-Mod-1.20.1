@@ -34,10 +34,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
-        public static final int INVENTORY_SIZE = 1;
-        public static final int INPUT_SLOT = 0;
+        public static final int INVENTORY_SIZE = 45;
 
-        private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
+        private DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
         public MarketBlockEntity(BlockPos pos, BlockState state) {
                 super(ModBlockEntities.MARKET_BLOCK_ENTITY, pos, state);
@@ -126,24 +125,28 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
         @Override
         public boolean isValid(int slot, ItemStack stack) {
-                return slot == INPUT_SLOT && (stack.isEmpty() || isSellable(stack));
+                return stack.isEmpty() || isSellable(stack);
         }
 
         @Override
         public void clear() {
-                items.clear();
+                for (int slot = 0; slot < items.size(); slot++) {
+                        items.set(slot, ItemStack.EMPTY);
+                }
         }
 
         @Override
         public void onClose(PlayerEntity player) {
                 Inventory.super.onClose(player);
-                if (!(player instanceof ServerPlayerEntity)) {
+                if (!(player instanceof ServerPlayerEntity serverPlayer)) {
                         return;
                 }
 
-                ItemStack remainingStack = removeStack(INPUT_SLOT);
-                if (!remainingStack.isEmpty()) {
-                        insertOrDrop(player, remainingStack);
+                for (int slot = 0; slot < size(); slot++) {
+                        ItemStack remainingStack = removeStack(slot);
+                        if (!remainingStack.isEmpty()) {
+                                insertOrDrop(serverPlayer, remainingStack);
+                        }
                 }
         }
 
@@ -166,69 +169,128 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
         @Override
         public void readNbt(NbtCompound nbt) {
                 super.readNbt(nbt);
+                items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
                 Inventories.readNbt(nbt, items);
         }
 
         public boolean sell(ServerPlayerEntity player) {
-                ItemStack stack = getStack(INPUT_SLOT);
-                if (stack.isEmpty()) {
+                if (isEmpty()) {
                         player.sendMessage(Text.translatable("message.gardenkingmod.market.empty"), true);
                         return false;
                 }
 
-                if (!isSellable(stack)) {
+                int inventorySize = items.size();
+                int totalItemsSold = 0;
+                int totalPayout = 0;
+                boolean hasSellableStack = false;
+
+                for (int slot = 0; slot < inventorySize; slot++) {
+                        ItemStack stack = items.get(slot);
+                        if (stack.isEmpty()) {
+                                continue;
+                        }
+
+                        if (!isSellable(stack)) {
+                                continue;
+                        }
+
+                        Optional<CropTier> optionalTier = CropTierRegistry.get(stack.getItem());
+                        if (optionalTier.isEmpty()) {
+                                continue;
+                        }
+
+                        int coinsPerStack = getCoinsPerStack(optionalTier.get());
+                        if (coinsPerStack <= 0) {
+                                continue;
+                        }
+
+                        int maxStackSize = stack.getMaxCount();
+                        if (maxStackSize <= 0) {
+                                continue;
+                        }
+
+                        hasSellableStack = true;
+
+                        int fullStacks = stack.getCount() / maxStackSize;
+                        if (fullStacks > 0) {
+                                totalItemsSold += fullStacks * maxStackSize;
+                                totalPayout += fullStacks * coinsPerStack;
+                        }
+                }
+
+                if (!hasSellableStack) {
                         player.sendMessage(Text.translatable("message.gardenkingmod.market.invalid"), true);
                         return false;
                 }
 
-                Optional<CropTier> optionalTier = CropTierRegistry.get(stack.getItem());
-                if (optionalTier.isEmpty()) {
-                        player.sendMessage(Text.translatable("message.gardenkingmod.market.invalid"), true);
+                boolean changed = false;
+
+                for (int slot = 0; slot < inventorySize; slot++) {
+                        ItemStack stack = items.get(slot);
+                        if (stack.isEmpty()) {
+                                continue;
+                        }
+
+                        if (!isSellable(stack)) {
+                                continue;
+                        }
+
+                        Optional<CropTier> optionalTier = CropTierRegistry.get(stack.getItem());
+                        if (optionalTier.isEmpty()) {
+                                continue;
+                        }
+
+                        int coinsPerStack = getCoinsPerStack(optionalTier.get());
+                        if (coinsPerStack <= 0) {
+                                continue;
+                        }
+
+                        int maxStackSize = stack.getMaxCount();
+                        if (maxStackSize <= 0) {
+                                continue;
+                        }
+
+                        int fullStacks = stack.getCount() / maxStackSize;
+                        int remainder = stack.getCount() - fullStacks * maxStackSize;
+
+                        if (remainder > 0) {
+                                ItemStack remainderStack = stack.copy();
+                                remainderStack.setCount(remainder);
+                                insertOrDrop(player, remainderStack);
+                        }
+
+                        items.set(slot, ItemStack.EMPTY);
+                        changed = true;
+                }
+
+                if (!changed) {
+                        player.sendMessage(Text.translatable("message.gardenkingmod.market.empty"), true);
                         return false;
                 }
 
-                int coinsPerStack = getCoinsPerStack(optionalTier.get());
-                if (coinsPerStack <= 0) {
-                        player.sendMessage(Text.translatable("message.gardenkingmod.market.invalid"), true);
-                        return false;
-                }
-
-                int totalCount = stack.getCount();
-                int fullStacks = totalCount / 64;
-                int itemsSold = fullStacks * 64;
-                int remainderCount = totalCount - itemsSold;
-
-                if (remainderCount > 0) {
-                        ItemStack remainderStack = stack.copy();
-                        remainderStack.setCount(remainderCount);
-                        insertOrDrop(player, remainderStack);
-                }
-
-                items.set(INPUT_SLOT, ItemStack.EMPTY);
                 markDirty();
 
-                int payout = fullStacks * coinsPerStack;
-                if (payout > 0) {
-                        ItemStack currencyStack = new ItemStack(ModItems.GARDEN_COIN, payout);
+                if (totalPayout > 0) {
+                        ItemStack currencyStack = new ItemStack(ModItems.GARDEN_COIN, totalPayout);
                         boolean fullyInserted = player.getInventory().insertStack(currencyStack);
                         if (!fullyInserted && !currencyStack.isEmpty()) {
                                 player.dropItem(currencyStack, false);
                         }
                 }
 
-                int lifetimeTotal = ModScoreboards.addCurrency(player, payout);
+                int lifetimeTotal = ModScoreboards.addCurrency(player, totalPayout);
 
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeBlockPos(pos);
-                buf.writeVarInt(itemsSold);
-                buf.writeVarInt(payout);
+                buf.writeVarInt(totalItemsSold);
+                buf.writeVarInt(totalPayout);
                 buf.writeVarInt(lifetimeTotal);
                 ServerPlayNetworking.send(player, ModPackets.MARKET_SALE_RESULT_PACKET, buf);
 
                 Text message = lifetimeTotal >= 0
-                                ? Text.translatable("message.gardenkingmod.market.sold.lifetime", itemsSold, payout,
-                                                lifetimeTotal)
-                                : Text.translatable("message.gardenkingmod.market.sold", itemsSold, payout);
+                                ? Text.translatable("message.gardenkingmod.market.sold.lifetime", totalItemsSold,
+                                                totalPayout, lifetimeTotal)
+                                : Text.translatable("message.gardenkingmod.market.sold", totalItemsSold, totalPayout);
                 player.sendMessage(message, true);
 
                 World world = getWorld();
