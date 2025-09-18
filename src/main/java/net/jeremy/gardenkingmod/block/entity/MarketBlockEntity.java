@@ -2,10 +2,13 @@ package net.jeremy.gardenkingmod.block.entity;
 
 import java.util.Optional;
 
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.ModScoreboards;
+import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.crop.CropTier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.screen.MarketScreenHandler;
@@ -214,6 +217,14 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 }
 
                 int lifetimeTotal = ModScoreboards.addCurrency(player, payout);
+
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeBlockPos(pos);
+                buf.writeVarInt(itemsSold);
+                buf.writeVarInt(payout);
+                buf.writeVarInt(lifetimeTotal);
+                ServerPlayNetworking.send(player, ModPackets.MARKET_SALE_RESULT_PACKET, buf);
+
                 Text message = lifetimeTotal >= 0
                                 ? Text.translatable("message.gardenkingmod.market.sold.lifetime", itemsSold, payout,
                                                 lifetimeTotal)
