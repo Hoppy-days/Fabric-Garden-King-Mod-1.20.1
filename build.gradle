@@ -21,9 +21,20 @@ repositories {
 }
 
 fabricApi {
-	configureDataGeneration {
-		client = true
-	}
+        configureDataGeneration {
+                client = true
+        }
+}
+
+loom {
+        runs {
+                gametest {
+                        server()
+                        name "Game Test"
+                        vmArg "-Dfabric-api.gametest"
+                        vmArg "-Dfabric-api.gametest.report-file=${project.buildDir}/reports/gametest/test-results.txt"
+                }
+        }
 }
 
 dependencies {
