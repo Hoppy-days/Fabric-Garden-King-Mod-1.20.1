@@ -20,8 +20,6 @@ public final class ModBlocks {
                         new MarketBlock(
                                         FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).strength(2.5f).nonOpaque()));
 
-                        new MarketBlock(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).strength(2.5f)));
-
         public static final Block MARKET_BLOCK_PART = registerBlockWithoutItem("market_block_part",
                         new MarketBlockPart(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).dropsNothing().nonOpaque()));
 

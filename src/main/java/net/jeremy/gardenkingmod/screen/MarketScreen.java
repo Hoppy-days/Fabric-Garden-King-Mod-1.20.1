@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class MarketScreen extends HandledScreen<MarketScreenHandler> {
-        private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/market.png");
+        private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/market_gui.png");
 
         private ButtonWidget sellButton;
 
