@@ -9,8 +9,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.AliasedBlockItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -120,5 +120,36 @@ public final class CropTierRegistry {
 
         public static Optional<CropTier> get(Identifier id) {
                 return Optional.ofNullable(tiers.get(id));
+        }
+
+        /**
+         * Applies the configured growth multiplier for the provided block state to the
+         * supplied base growth chance value. The multiplier is clamped to a sane range
+         * so that crops always retain a minimum random tick frequency, which keeps
+         * bonemeal and farmland hydration mechanics behaving as expected.
+         *
+         * @param state the block state being ticked
+         * @param baseChance the vanilla moisture-based growth chance value
+         * @return the scaled growth chance value respecting Garden King's crop tier
+         *         configuration
+         */
+        public static float scaleGrowthChance(BlockState state, float baseChance) {
+                if (baseChance <= 0.0f) {
+                        return baseChance;
+                }
+
+                float multiplier = get(state)
+                                .map(CropTier::growthMultiplier)
+                                .orElse(1.0f);
+
+                if (Float.isNaN(multiplier) || multiplier <= 0.0f) {
+                        return baseChance;
+                }
+
+                float scaledChance = baseChance * multiplier;
+
+                // Ensure the returned value still results in at least one random tick in
+                // reasonable time to keep hydration/bonemeal behaviour intact.
+                return Math.max(0.001f, scaledChance);
         }
 }
