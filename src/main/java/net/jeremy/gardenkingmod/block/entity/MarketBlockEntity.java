@@ -1,9 +1,13 @@
 package net.jeremy.gardenkingmod.block.entity;
 
+import java.util.Optional;
+
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.ModScoreboards;
+import net.jeremy.gardenkingmod.crop.CropTier;
+import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.screen.MarketScreenHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -161,21 +165,49 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                         return false;
                 }
 
-                int soldCount = stack.getCount();
+                Optional<CropTier> optionalTier = CropTierRegistry.get(stack.getItem());
+                if (optionalTier.isEmpty()) {
+                        player.sendMessage(Text.translatable("message.gardenkingmod.market.invalid"), true);
+                        return false;
+                }
+
+                int coinsPerStack = getCoinsPerStack(optionalTier.get());
+                if (coinsPerStack <= 0) {
+                        player.sendMessage(Text.translatable("message.gardenkingmod.market.invalid"), true);
+                        return false;
+                }
+
+                int totalCount = stack.getCount();
+                int fullStacks = totalCount / 64;
+                int itemsSold = fullStacks * 64;
+                int remainderCount = totalCount - itemsSold;
+
+                if (remainderCount > 0) {
+                        ItemStack remainderStack = stack.copy();
+                        remainderStack.setCount(remainderCount);
+                        boolean remainderInserted = player.getInventory().insertStack(remainderStack);
+                        if (!remainderInserted && !remainderStack.isEmpty()) {
+                                player.dropItem(remainderStack, false);
+                        }
+                }
+
                 items.set(INPUT_SLOT, ItemStack.EMPTY);
                 markDirty();
 
-                ItemStack currencyStack = new ItemStack(ModItems.GARDEN_COIN, soldCount);
-                boolean fullyInserted = player.getInventory().insertStack(currencyStack);
-                if (!fullyInserted && !currencyStack.isEmpty()) {
-                        player.dropItem(currencyStack, false);
+                int payout = fullStacks * coinsPerStack;
+                if (payout > 0) {
+                        ItemStack currencyStack = new ItemStack(ModItems.GARDEN_COIN, payout);
+                        boolean fullyInserted = player.getInventory().insertStack(currencyStack);
+                        if (!fullyInserted && !currencyStack.isEmpty()) {
+                                player.dropItem(currencyStack, false);
+                        }
                 }
 
-                int lifetimeTotal = ModScoreboards.addCurrency(player, soldCount);
+                int lifetimeTotal = ModScoreboards.addCurrency(player, payout);
                 Text message = lifetimeTotal >= 0
-                                ? Text.translatable("message.gardenkingmod.market.sold.lifetime", soldCount, soldCount,
+                                ? Text.translatable("message.gardenkingmod.market.sold.lifetime", itemsSold, payout,
                                                 lifetimeTotal)
-                                : Text.translatable("message.gardenkingmod.market.sold", soldCount, soldCount);
+                                : Text.translatable("message.gardenkingmod.market.sold", itemsSold, payout);
                 player.sendMessage(message, true);
 
                 World world = getWorld();
@@ -185,5 +217,17 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 }
 
                 return true;
+        }
+
+        private static int getCoinsPerStack(CropTier tier) {
+                String path = tier.id().getPath();
+                return switch (path) {
+                case "crop_tiers/tier_1" -> 1;
+                case "crop_tiers/tier_2" -> 2;
+                case "crop_tiers/tier_3" -> 3;
+                case "crop_tiers/tier_4" -> 4;
+                case "crop_tiers/tier_5" -> 5;
+                default -> 0;
+                };
         }
 }
