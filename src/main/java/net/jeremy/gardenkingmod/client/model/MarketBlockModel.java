@@ -16,6 +16,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 
 public class MarketBlockModel extends EntityModel<Entity> {
+    public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(
+            new Identifier(GardenKingMod.MOD_ID, "market_block"),
+            "main"
+    );
+
     private final ModelPart bone;
     private final ModelPart bb_main;
     public MarketBlockModel(ModelPart root) {
