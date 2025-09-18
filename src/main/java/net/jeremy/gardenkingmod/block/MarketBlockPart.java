@@ -107,6 +107,14 @@ public class MarketBlockPart extends Block {
         }
 
         @Override
+
+        public float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
+                return 1.0F;
+        }
+
+        @Override
+
+
         public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
                 return ItemStack.EMPTY;
         }

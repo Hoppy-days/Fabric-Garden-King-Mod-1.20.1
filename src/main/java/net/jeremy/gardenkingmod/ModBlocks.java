@@ -16,7 +16,12 @@ import net.minecraft.util.Identifier;
 
 public final class ModBlocks {
         public static final Block MARKET_BLOCK = registerBlock("market_block",
+
+                        new MarketBlock(
+                                        FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).strength(2.5f).nonOpaque()));
+
                         new MarketBlock(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).strength(2.5f)));
+
         public static final Block MARKET_BLOCK_PART = registerBlockWithoutItem("market_block_part",
                         new MarketBlockPart(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).dropsNothing().nonOpaque()));
 
