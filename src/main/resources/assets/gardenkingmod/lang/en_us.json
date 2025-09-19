@@ -9,5 +9,11 @@
 "message.gardenkingmod.market.sold.lifetime": "Sold %1$s Croptopia crops for %2$s coins. Lifetime earnings: %3$s coins.",
 "message.gardenkingmod.market.empty": "There are no crops to sell.",
 "message.gardenkingmod.market.invalid": "Only Croptopia crops can be sold here!",
-"scoreboard.gardenkingmod.garden_currency": "Garden Coins"
+"scoreboard.gardenkingmod.garden_currency": "Garden Coins",
+"tooltip.gardenkingmod.crop_tier": "Tier: %s",
+"tooltip.gardenkingmod.crop_tier.tier_1": "Tier 1",
+"tooltip.gardenkingmod.crop_tier.tier_2": "Tier 2",
+"tooltip.gardenkingmod.crop_tier.tier_3": "Tier 3",
+"tooltip.gardenkingmod.crop_tier.tier_4": "Tier 4",
+"tooltip.gardenkingmod.crop_tier.tier_5": "Tier 5"
 }
