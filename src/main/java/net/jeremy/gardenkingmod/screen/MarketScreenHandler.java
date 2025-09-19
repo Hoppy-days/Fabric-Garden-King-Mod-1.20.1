@@ -39,7 +39,7 @@ public class MarketScreenHandler extends ScreenHandler {
                 final int slotsPerRow = 9;
                 final int slotSize = 18;
                 final int startX = 8;
-                final int startY = 18;
+                final int startY = 54;
 
                 for (int slotIndex = 0; slotIndex < MarketBlockEntity.INVENTORY_SIZE; ++slotIndex) {
                         int column = slotIndex % slotsPerRow;

@@ -17,6 +17,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BACKGROUND_WIDTH = 176;
         private static final int BACKGROUND_HEIGHT = 222;
         private static final int PLAYER_INVENTORY_LABEL_Y = BACKGROUND_HEIGHT - 94;
+        private static final int TITLE_LABEL_Y = 42;
         private static final int SELL_BUTTON_WIDTH = 52;
         private static final int SELL_BUTTON_HEIGHT = 20;
         private static final int SCOREBOARD_BAND_TOP = 107;
@@ -36,6 +37,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 this.backgroundWidth = BACKGROUND_WIDTH;
                 this.backgroundHeight = BACKGROUND_HEIGHT;
                 this.playerInventoryTitleY = PLAYER_INVENTORY_LABEL_Y;
+                this.titleY = TITLE_LABEL_Y;
                 this.lastItemsSold = -1;
                 this.lastPayout = 0;
                 this.lastLifetimeTotal = -1;
