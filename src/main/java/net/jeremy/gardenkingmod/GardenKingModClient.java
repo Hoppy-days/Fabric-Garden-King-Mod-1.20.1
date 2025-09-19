@@ -1,5 +1,8 @@
 package net.jeremy.gardenkingmod;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -11,8 +14,11 @@ import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.screen.MarketScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
 public class GardenKingModClient implements ClientModInitializer {
     @Override
@@ -29,10 +35,22 @@ public class GardenKingModClient implements ClientModInitializer {
                         int payout = buf.readVarInt();
                         int lifetimeTotal = buf.readVarInt();
                         Text feedback = buf.readText();
+                        int soldItemEntries = buf.readVarInt();
+                        Map<Item, Integer> soldItemCounts = new LinkedHashMap<>();
+                        for (int index = 0; index < soldItemEntries; index++) {
+                                Identifier itemId = buf.readIdentifier();
+                                int count = buf.readVarInt();
+                                if (count <= 0) {
+                                        continue;
+                                }
+                                Registries.ITEM.getOrEmpty(itemId)
+                                                .ifPresent(item -> soldItemCounts.merge(item, count, Integer::sum));
+                        }
 
                         client.execute(() -> {
                                 if (client.currentScreen instanceof MarketScreen marketScreen) {
-                                        marketScreen.updateSaleResult(success, itemsSold, payout, lifetimeTotal, feedback);
+                                        marketScreen.updateSaleResult(success, itemsSold, payout, lifetimeTotal, feedback,
+                                                        soldItemCounts);
                                 }
                         });
                 });
