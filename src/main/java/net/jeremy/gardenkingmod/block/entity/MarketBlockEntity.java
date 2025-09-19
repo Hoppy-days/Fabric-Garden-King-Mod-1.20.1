@@ -34,7 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
-        public static final int INVENTORY_SIZE = 45;
+        public static final int INVENTORY_SIZE = 27;
 
         private DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
