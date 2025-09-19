@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
+import net.jeremy.gardenkingmod.crop.RottenCropDefinitions;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -122,8 +123,15 @@ public final class RottenHarvestManager extends JsonDataLoader implements Identi
 
                         Optional<Item> itemOptional = Registries.ITEM.getOrEmpty(itemId);
                         if (itemOptional.isEmpty()) {
-                                GardenKingMod.LOGGER.warn("Unknown item {} referenced in {} for loot table {}", itemId, fileId, lootTableId);
+                                GardenKingMod.LOGGER.warn("Unknown item {} referenced in {} for loot table {}", itemId, fileId,
+                                                lootTableId);
                                 return null;
+                        }
+
+                        if (RottenCropDefinitions.findByRottenItemId(itemId).isEmpty()) {
+                                GardenKingMod.LOGGER.warn(
+                                                "Item {} referenced in {} for loot table {} is not a registered rotten crop",
+                                                itemId, fileId, lootTableId);
                         }
 
                         float extraNoDropChance = 0.0f;
