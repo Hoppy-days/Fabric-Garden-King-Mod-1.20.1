@@ -7,6 +7,7 @@ import java.util.Optional;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.ModScoreboards;
@@ -26,6 +27,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -38,6 +41,9 @@ import net.minecraft.world.World;
 
 public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
         public static final int INVENTORY_SIZE = 27;
+        public static final TagKey<Item> MARKET_UNSELLABLE =
+                        TagKey.of(RegistryKeys.ITEM,
+                                        new Identifier(GardenKingMod.MOD_ID, "market_unsellable"));
 
         private DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
@@ -47,6 +53,10 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
         public static boolean isSellable(ItemStack stack) {
                 if (stack.isEmpty()) {
+                        return false;
+                }
+
+                if (Registries.ITEM.getEntry(stack.getItem()).isIn(MARKET_UNSELLABLE)) {
                         return false;
                 }
 
