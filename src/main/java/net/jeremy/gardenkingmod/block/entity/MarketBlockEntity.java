@@ -48,7 +48,12 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 }
 
                 Identifier identifier = Registries.ITEM.getId(stack.getItem());
-                return identifier != null && "croptopia".equals(identifier.getNamespace());
+                if (identifier == null) {
+                        return false;
+                }
+
+                String namespace = identifier.getNamespace();
+                return "croptopia".equals(namespace) || "minecraft".equals(namespace);
         }
 
         @Override
