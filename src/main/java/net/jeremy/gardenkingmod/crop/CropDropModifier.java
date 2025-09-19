@@ -1,5 +1,6 @@
 package net.jeremy.gardenkingmod.crop;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,8 +13,11 @@ import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager.BonusDropEntry;
+import net.jeremy.gardenkingmod.crop.RottenHarvestManager;
+import net.jeremy.gardenkingmod.crop.RottenHarvestManager.RottenHarvestEntry;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTables;
 import net.minecraft.loot.condition.LootCondition;
@@ -79,17 +83,27 @@ public final class CropDropModifier {
 
                         CropTier tier = scalingData.get().tier();
                         float multiplier = tier.dropMultiplier();
-                        float noDropChance = MathHelper.clamp(tier.noDropChance(), 0.0f, 1.0f);
-                        boolean applyScaling = multiplier > 1.0001f;
-                        boolean applyNoDrop = noDropChance > 0.0f;
+                        float baseNoDropChance = MathHelper.clamp(tier.noDropChance(), 0.0f, 1.0f);
+                        float baseRottenChance = MathHelper.clamp(tier.rottenChance(), 0.0f, 1.0f);
 
-                        if (!applyScaling && !applyNoDrop) {
+                        Optional<RottenHarvestEntry> rottenEntry = RottenHarvestManager.getInstance().getRottenHarvest(id);
+                        float extraNoDropChance = rottenEntry.map(RottenHarvestEntry::extraNoDropChance).orElse(0.0f);
+                        float combinedNoDropChance = MathHelper.clamp(baseNoDropChance + extraNoDropChance, 0.0f, 1.0f);
+                        float combinedRottenChance = MathHelper.clamp(
+                                        baseRottenChance + RottenHarvestManager.getInstance().getExtraRottenChance(id), 0.0f,
+                                        1.0f);
+
+                        boolean applyScaling = multiplier > 1.0001f;
+                        boolean applyNoDrop = combinedNoDropChance > 0.0f;
+                        boolean applyRotten = rottenEntry.isPresent() && combinedRottenChance > 0.0f;
+
+                        if (!applyScaling && !applyNoDrop && !applyRotten) {
                                 return;
                         }
 
                         fabricBuilder.modifyPools(poolBuilder -> {
                                 if (applyNoDrop) {
-                                        poolBuilder.conditionally(RandomChanceLootCondition.builder(1.0f - noDropChance));
+                                        poolBuilder.conditionally(RandomChanceLootCondition.builder(1.0f - combinedNoDropChance));
                                 }
 
                                 if (applyScaling) {
@@ -97,18 +111,30 @@ public final class CropDropModifier {
                                         poolBuilder.apply(
                                                         SetCountLootFunction.builder(new TierScaledCountProvider(id, multiplier)));
                                 }
+
+                                if (applyRotten) {
+                                        poolBuilder.apply(ApplyRottenHarvestFunction.builder(id, rottenEntry.get().rottenItem(),
+                                                        combinedRottenChance));
+                                }
                         });
 
-                        if (applyScaling && applyNoDrop) {
-                                GardenKingMod.LOGGER.debug(
-                                                "Applied drop scaling (x{}) and no-drop chance ({}%) to loot table {} using tier {}",
-                                                multiplier, noDropChance * 100.0f, id, tier.id());
-                        } else if (applyScaling) {
-                                GardenKingMod.LOGGER.debug("Applied drop scaling (x{}) to loot table {} using tier {}",
-                                                multiplier, id, tier.id());
-                        } else {
-                                GardenKingMod.LOGGER.debug("Applied no-drop chance ({}%) to loot table {} using tier {}",
-                                                noDropChance * 100.0f, id, tier.id());
+                        List<String> appliedEffects = new ArrayList<>();
+                        if (applyScaling) {
+                                appliedEffects.add(String.format("drop scaling (x%.3f)", multiplier));
+                        }
+                        if (applyNoDrop) {
+                                appliedEffects
+                                                .add(String.format("no-drop chance (%.2f%%)", combinedNoDropChance * 100.0f));
+                        }
+                        if (applyRotten) {
+                                Identifier rottenItemId = Registries.ITEM.getId(rottenEntry.get().rottenItem());
+                                appliedEffects.add(String.format("rotten conversion (%.2f%% -> %s)",
+                                                combinedRottenChance * 100.0f, rottenItemId));
+                        }
+
+                        if (!appliedEffects.isEmpty()) {
+                                GardenKingMod.LOGGER.debug("Applied {} to loot table {} using tier {}",
+                                                String.join(", ", appliedEffects), id, tier.id());
                         }
                 });
 
@@ -203,6 +229,53 @@ public final class CropDropModifier {
                 protected ItemStack process(ItemStack stack, LootContext context) {
                         CAPTURED_STACK.set(new CapturedStackInfo(stack.getCount(), stack.getMaxCount()));
                         return stack;
+                }
+        }
+
+        private static final class ApplyRottenHarvestFunction extends ConditionalLootFunction {
+                private final Identifier lootTableId;
+                private final Item rottenItem;
+                private final float rottenChance;
+
+                ApplyRottenHarvestFunction(LootCondition[] conditions, Identifier lootTableId, Item rottenItem,
+                                float rottenChance) {
+                        super(conditions);
+                        this.lootTableId = lootTableId;
+                        this.rottenItem = rottenItem;
+                        this.rottenChance = rottenChance;
+                }
+
+                static ConditionalLootFunction.Builder<?> builder(Identifier lootTableId, Item rottenItem,
+                                float rottenChance) {
+                        return ConditionalLootFunction.builder(
+                                        conditions -> new ApplyRottenHarvestFunction(conditions, lootTableId, rottenItem,
+                                                        rottenChance));
+                }
+
+                @Override
+                public LootFunctionType getType() {
+                        return LootFunctionTypes.SET_COUNT;
+                }
+
+                @Override
+                protected ItemStack process(ItemStack stack, LootContext context) {
+                        if (stack.isEmpty() || rottenChance <= 0.0f) {
+                                return stack;
+                        }
+
+                        if (context.getRandom().nextFloat() >= rottenChance) {
+                                return stack;
+                        }
+
+                        ItemStack rottenStack = new ItemStack(rottenItem, stack.getCount());
+                        if (rottenStack.isEmpty()) {
+                                GardenKingMod.LOGGER.debug(
+                                                "Rotten harvest for loot table {} produced an empty stack; preserving original drop",
+                                                lootTableId);
+                                return stack;
+                        }
+
+                        return rottenStack;
                 }
         }
 
