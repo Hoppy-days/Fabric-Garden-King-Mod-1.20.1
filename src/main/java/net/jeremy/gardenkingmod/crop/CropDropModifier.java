@@ -79,16 +79,37 @@ public final class CropDropModifier {
 
                         CropTier tier = scalingData.get().tier();
                         float multiplier = tier.dropMultiplier();
-                        if (multiplier <= 1.0001f) {
+                        float noDropChance = MathHelper.clamp(tier.noDropChance(), 0.0f, 1.0f);
+                        boolean applyScaling = multiplier > 1.0001f;
+                        boolean applyNoDrop = noDropChance > 0.0f;
+
+                        if (!applyScaling && !applyNoDrop) {
                                 return;
                         }
 
                         fabricBuilder.modifyPools(poolBuilder -> {
-                                poolBuilder.apply(CaptureStackFunction.builder());
-                                poolBuilder.apply(SetCountLootFunction.builder(new TierScaledCountProvider(id, multiplier)));
+                                if (applyNoDrop) {
+                                        poolBuilder.conditionally(RandomChanceLootCondition.builder(1.0f - noDropChance));
+                                }
+
+                                if (applyScaling) {
+                                        poolBuilder.apply(CaptureStackFunction.builder());
+                                        poolBuilder.apply(
+                                                        SetCountLootFunction.builder(new TierScaledCountProvider(id, multiplier)));
+                                }
                         });
 
-                        GardenKingMod.LOGGER.debug("Applied drop scaling (x{}) to loot table {} using tier {}", multiplier, id, tier.id());
+                        if (applyScaling && applyNoDrop) {
+                                GardenKingMod.LOGGER.debug(
+                                                "Applied drop scaling (x{}) and no-drop chance ({}%) to loot table {} using tier {}",
+                                                multiplier, noDropChance * 100.0f, id, tier.id());
+                        } else if (applyScaling) {
+                                GardenKingMod.LOGGER.debug("Applied drop scaling (x{}) to loot table {} using tier {}",
+                                                multiplier, id, tier.id());
+                        } else {
+                                GardenKingMod.LOGGER.debug("Applied no-drop chance ({}%) to loot table {} using tier {}",
+                                                noDropChance * 100.0f, id, tier.id());
+                        }
                 });
 
                 LootTableEvents.ALL_LOADED.register((resourceManager, lootManager) -> {
