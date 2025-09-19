@@ -22,7 +22,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int SELL_BUTTON_HEIGHT = 20;
         private static final int SCOREBOARD_BAND_TOP = 107;
         private static final int SCOREBOARD_BAND_BOTTOM = 138;
-        private static final int RESULT_TEXT_TOP_OFFSET = -20;
+        private static final int RESULT_TEXT_TOP_OFFSET = -5;
         private static final int RESULT_TEXT_LINE_SPACING = 12;
 
         private ButtonWidget sellButton;
