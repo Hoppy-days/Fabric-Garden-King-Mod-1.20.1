@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier;
 
 public final class ModItems {
         public static final Item GARDEN_COIN = registerItem("garden_coin", new Item(new FabricItemSettings()));
+        public static final Item ROTTEN_WHEAT = registerItem("rotten_wheat", new Item(new FabricItemSettings()));
 
         private ModItems() {
         }
@@ -20,6 +21,10 @@ public final class ModItems {
 
         public static void registerModItems() {
                 GardenKingMod.LOGGER.info("Registering mod items for {}", GardenKingMod.MOD_ID);
-                ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> entries.add(GARDEN_COIN));
+                ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
+                                .register(entries -> {
+                                        entries.add(GARDEN_COIN);
+                                        entries.add(ROTTEN_WHEAT);
+                                });
         }
 }
