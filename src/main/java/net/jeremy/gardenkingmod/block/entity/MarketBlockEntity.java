@@ -1,5 +1,7 @@
 package net.jeremy.gardenkingmod.block.entity;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -19,6 +21,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -180,7 +183,8 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
         public boolean sell(ServerPlayerEntity player) {
                 if (isEmpty()) {
-                        sendSaleResult(player, false, 0, 0, -1, Text.translatable("message.gardenkingmod.market.empty"));
+                        sendSaleResult(player, false, 0, 0, -1,
+                                        Text.translatable("message.gardenkingmod.market.empty"), Map.of());
                         return false;
                 }
 
@@ -188,6 +192,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 int totalItemsSold = 0;
                 int totalPayout = 0;
                 boolean hasSellableStack = false;
+                Map<Item, Integer> soldItemCounts = new LinkedHashMap<>();
 
                 for (int slot = 0; slot < inventorySize; slot++) {
                         ItemStack stack = items.get(slot);
@@ -220,11 +225,13 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                         if (fullStacks > 0) {
                                 totalItemsSold += fullStacks * maxStackSize;
                                 totalPayout += fullStacks * coinsPerStack;
+                                soldItemCounts.merge(stack.getItem(), fullStacks * maxStackSize, Integer::sum);
                         }
                 }
 
                 if (!hasSellableStack) {
-                        sendSaleResult(player, false, 0, 0, -1, Text.translatable("message.gardenkingmod.market.invalid"));
+                        sendSaleResult(player, false, 0, 0, -1,
+                                        Text.translatable("message.gardenkingmod.market.invalid"), Map.of());
                         return false;
                 }
 
@@ -269,7 +276,8 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 }
 
                 if (!changed) {
-                        sendSaleResult(player, false, 0, 0, -1, Text.translatable("message.gardenkingmod.market.empty"));
+                        sendSaleResult(player, false, 0, 0, -1,
+                                        Text.translatable("message.gardenkingmod.market.empty"), Map.of());
                         return false;
                 }
 
@@ -285,7 +293,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
                 int lifetimeTotal = ModScoreboards.addCurrency(player, totalPayout);
 
-                sendSaleResult(player, true, totalItemsSold, totalPayout, lifetimeTotal, Text.empty());
+                sendSaleResult(player, true, totalItemsSold, totalPayout, lifetimeTotal, Text.empty(), soldItemCounts);
 
                 World world = getWorld();
                 if (world != null) {
@@ -309,7 +317,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
         }
 
         private void sendSaleResult(ServerPlayerEntity player, boolean success, int totalItemsSold, int totalPayout,
-                        int lifetimeTotal, Text feedback) {
+                        int lifetimeTotal, Text feedback, Map<Item, Integer> soldItemCounts) {
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeBlockPos(pos);
                 buf.writeBoolean(success);
@@ -317,6 +325,14 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 buf.writeVarInt(totalPayout);
                 buf.writeVarInt(lifetimeTotal);
                 buf.writeText(feedback);
+                buf.writeVarInt(soldItemCounts.size());
+                soldItemCounts.forEach((item, count) -> {
+                        Identifier itemId = Registries.ITEM.getId(item);
+                        if (itemId != null) {
+                                buf.writeIdentifier(itemId);
+                                buf.writeVarInt(count);
+                        }
+                });
                 ServerPlayNetworking.send(player, ModPackets.MARKET_SALE_RESULT_PACKET, buf);
         }
 

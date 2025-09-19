@@ -1,12 +1,18 @@
 package net.jeremy.gardenkingmod.screen;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -74,16 +80,25 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 drawMouseoverTooltip(context, mouseX, mouseY);
         }
 
-        public void updateSaleResult(boolean success, int itemsSold, int payout, int lifetimeTotal, Text feedback) {
+        public void updateSaleResult(boolean success, int itemsSold, int payout, int lifetimeTotal, Text feedback,
+                        Map<Item, Integer> soldItemCounts) {
                 this.lastItemsSold = itemsSold;
                 this.lastPayout = payout;
                 this.lastLifetimeTotal = success && lifetimeTotal >= 0 ? lifetimeTotal : -1;
 
                 if (success) {
                         MutableText payoutText = Text.literal(Integer.toString(payout)).formatted(Formatting.GREEN);
-                        this.saleResultLine = Text
-                                        .translatable("screen.gardenkingmod.market.sale_result", itemsSold, payoutText)
-                                        .formatted(Formatting.YELLOW);
+                        if (soldItemCounts != null && !soldItemCounts.isEmpty()) {
+                                Text soldItemsText = buildSoldItemsText(soldItemCounts);
+                                this.saleResultLine = Text.translatable(
+                                                "screen.gardenkingmod.market.sale_result_detailed", soldItemsText,
+                                                payoutText).formatted(Formatting.YELLOW);
+                        } else {
+                                this.saleResultLine = Text
+                                                .translatable("screen.gardenkingmod.market.sale_result", itemsSold,
+                                                                payoutText)
+                                                .formatted(Formatting.YELLOW);
+                        }
 
                         if (this.lastLifetimeTotal >= 0) {
                                 MutableText lifetimeText = Text.literal(Integer.toString(this.lastLifetimeTotal))
@@ -103,6 +118,23 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         }
                         this.lifetimeResultLine = Text.empty();
                 }
+        }
+
+        private Text buildSoldItemsText(Map<Item, Integer> soldItemCounts) {
+                List<Text> entries = new ArrayList<>();
+                soldItemCounts.forEach((item, count) -> {
+                        if (count <= 0) {
+                                return;
+                        }
+                        Text itemName = Text.translatable(item.getTranslationKey());
+                        entries.add(Text.translatable("screen.gardenkingmod.market.sale_result_item", count, itemName));
+                });
+
+                if (entries.isEmpty()) {
+                        return Text.literal(Integer.toString(Math.max(this.lastItemsSold, 0)));
+                }
+
+                return Texts.join(entries, Text.literal(", "));
         }
 
         @Override
