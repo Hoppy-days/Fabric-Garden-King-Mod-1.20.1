@@ -14,14 +14,17 @@ import net.jeremy.gardenkingmod.datagen.RottenLanguageProvider;
 import net.jeremy.gardenkingmod.ModItems;
 
 public class GardenKingModDataGenerator implements DataGeneratorEntrypoint {
-        @Override
-        public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
-                FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
-                ModItems.getRottenItems();
-                List<RottenCropDefinition> definitions = RottenCropDefinitions.all();
+	@Override
+	public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
+		FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
+		RottenCropDefinitions.reload();
+		if (!ModItems.initializeRottenItems()) {
+			GardenKingMod.LOGGER.warn("No rotten crop definitions were available during data generation");
+		}
+		List<RottenCropDefinition> definitions = RottenCropDefinitions.all();
 
-                pack.addProvider((FabricDataOutput output) -> new RottenItemModelProvider(output, definitions));
-                pack.addProvider((FabricDataOutput output) -> new RottenLanguageProvider(output, definitions));
-                pack.addProvider((FabricDataOutput output) -> new RottenHarvestJsonProvider(output, definitions));
-        }
+		pack.addProvider((FabricDataOutput output) -> new RottenItemModelProvider(output, definitions));
+		pack.addProvider((FabricDataOutput output) -> new RottenLanguageProvider(output, definitions));
+		pack.addProvider((FabricDataOutput output) -> new RottenHarvestJsonProvider(output, definitions));
+	}
 }

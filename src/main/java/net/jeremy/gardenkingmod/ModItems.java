@@ -20,54 +20,71 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public final class ModItems {
-        public static final Item GARDEN_COIN = registerItem("garden_coin", new Item(new FabricItemSettings()));
+	public static final Item GARDEN_COIN = registerItem("garden_coin", new Item(new FabricItemSettings()));
 
-        private static final Map<Identifier, Item> ROTTEN_ITEMS_BY_CROP;
-        private static final Map<Identifier, Item> ROTTEN_ITEMS_BY_TARGET;
-        private static final List<Item> ROTTEN_ITEMS;
+	private static Map<Identifier, Item> rottenItemsByCrop = Collections.emptyMap();
+	private static Map<Identifier, Item> rottenItemsByTarget = Collections.emptyMap();
+	private static List<Item> rottenItems = List.of();
+	private static boolean rottenItemsRegistered;
 
-        static {
-                Map<Identifier, Item> byCrop = new LinkedHashMap<>();
-                Map<Identifier, Item> byTarget = new LinkedHashMap<>();
-                List<Item> items = new ArrayList<>();
+	private ModItems() {
+	}
 
-                for (RottenCropDefinition definition : RottenCropDefinitions.all()) {
-                        Item item = registerItem(definition.rottenItemId().getPath(), new Item(new FabricItemSettings()));
-                        byCrop.put(definition.cropId(), item);
-                        byTarget.put(definition.targetId(), item);
-                        items.add(item);
-                }
+	private static Item registerItem(String name, Item item) {
+		return Registry.register(Registries.ITEM, new Identifier(GardenKingMod.MOD_ID, name), item);
+	}
 
-                ROTTEN_ITEMS_BY_CROP = Collections.unmodifiableMap(byCrop);
-                ROTTEN_ITEMS_BY_TARGET = Collections.unmodifiableMap(byTarget);
-                ROTTEN_ITEMS = List.copyOf(items);
-        }
+	public static synchronized boolean initializeRottenItems() {
+		if (rottenItemsRegistered) {
+			return true;
+		}
 
-        private ModItems() {
-        }
+		RottenCropDefinitions.reload();
+		List<RottenCropDefinition> definitions = RottenCropDefinitions.all();
+		if (definitions.isEmpty()) {
+			return false;
+		}
 
-        private static Item registerItem(String name, Item item) {
-                return Registry.register(Registries.ITEM, new Identifier(GardenKingMod.MOD_ID, name), item);
-        }
+		Map<Identifier, Item> byCrop = new LinkedHashMap<>();
+		Map<Identifier, Item> byTarget = new LinkedHashMap<>();
+		List<Item> items = new ArrayList<>();
 
-        public static Item getRottenItemForCrop(Identifier cropId) {
-                return ROTTEN_ITEMS_BY_CROP.get(cropId);
-        }
+		for (RottenCropDefinition definition : definitions) {
+			Item item = registerItem(definition.rottenItemId().getPath(), new Item(new FabricItemSettings()));
+			byCrop.put(definition.cropId(), item);
+			byTarget.put(definition.targetId(), item);
+			items.add(item);
+		}
 
-        public static Item getRottenItemForTarget(Identifier targetId) {
-                return ROTTEN_ITEMS_BY_TARGET.get(targetId);
-        }
+		rottenItemsByCrop = Collections.unmodifiableMap(byCrop);
+		rottenItemsByTarget = Collections.unmodifiableMap(byTarget);
+		rottenItems = List.copyOf(items);
+		rottenItemsRegistered = true;
+		return true;
+	}
 
-        public static Collection<Item> getRottenItems() {
-                return ROTTEN_ITEMS;
-        }
+	public static Item getRottenItemForCrop(Identifier cropId) {
+		return initializeRottenItems() ? rottenItemsByCrop.get(cropId) : null;
+	}
 
-        public static void registerModItems() {
-                GardenKingMod.LOGGER.info("Registering mod items for {}", GardenKingMod.MOD_ID);
-                ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
-                                .register(entries -> {
-                                        entries.add(GARDEN_COIN);
-                                        ROTTEN_ITEMS.forEach(entries::add);
-                                });
-        }
+	public static Item getRottenItemForTarget(Identifier targetId) {
+		return initializeRottenItems() ? rottenItemsByTarget.get(targetId) : null;
+	}
+
+	public static Collection<Item> getRottenItems() {
+		initializeRottenItems();
+		return rottenItems;
+	}
+
+	public static void registerModItems() {
+		GardenKingMod.LOGGER.info("Registering mod items for {}", GardenKingMod.MOD_ID);
+		if (!initializeRottenItems()) {
+			GardenKingMod.LOGGER.warn("Skipping rotten item registration until crop definitions are available");
+		}
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
+			.register(entries -> {
+				entries.add(GARDEN_COIN);
+				rottenItems.forEach(entries::add);
+			});
+	}
 }
