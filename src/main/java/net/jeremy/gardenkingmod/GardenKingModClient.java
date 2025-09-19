@@ -42,7 +42,7 @@ public class GardenKingModClient implements ClientModInitializer {
                         Text tierName = Text
                                         .translatable("tooltip." + tier.id().getNamespace() + ".crop_tier." + suffix);
                         lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_tier", tierName)
-                                        .formatted(Formatting.GRAY));
+                                        .formatted(Formatting.GREEN));
                 }));
     }
 }
