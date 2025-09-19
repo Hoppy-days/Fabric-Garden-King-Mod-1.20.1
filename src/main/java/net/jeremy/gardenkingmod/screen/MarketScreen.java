@@ -22,8 +22,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int SELL_BUTTON_HEIGHT = 20;
         private static final int SCOREBOARD_BAND_TOP = 107;
         private static final int SCOREBOARD_BAND_BOTTOM = 138;
-        private static final int SCOREBOARD_TEXT_PADDING = 7;
-        private static final int SCOREBOARD_TEXT_LINE_SPACING = 12;
+        private static final int RESULT_TEXT_TOP_OFFSET = -20;
+        private static final int RESULT_TEXT_LINE_SPACING = 12;
 
         private ButtonWidget sellButton;
         private int lastItemsSold;
@@ -103,16 +103,12 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         return;
                 }
 
-                if (sellButton == null) {
-                        return;
-                }
-
-                int firstLineY = sellButton.getY() - this.y + SELL_BUTTON_HEIGHT + SCOREBOARD_TEXT_PADDING;
+                int firstLineY = RESULT_TEXT_TOP_OFFSET;
                 int firstLineX = (backgroundWidth - textRenderer.getWidth(saleResultLine)) / 2;
                 context.drawText(textRenderer, saleResultLine, firstLineX, firstLineY, 0xFFFFFF, false);
 
                 if (lastLifetimeTotal >= 0 && lifetimeResultLine != null && !lifetimeResultLine.getString().isEmpty()) {
-                        int secondLineY = firstLineY + SCOREBOARD_TEXT_LINE_SPACING;
+                        int secondLineY = firstLineY + RESULT_TEXT_LINE_SPACING;
                         int secondLineX = (backgroundWidth - textRenderer.getWidth(lifetimeResultLine)) / 2;
                         context.drawText(textRenderer, lifetimeResultLine, secondLineX, secondLineY, 0xFFFFFF, false);
                 }
