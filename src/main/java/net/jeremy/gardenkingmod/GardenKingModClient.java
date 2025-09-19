@@ -24,13 +24,15 @@ public class GardenKingModClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.MARKET_SALE_RESULT_PACKET,
                 (client, handler, buf, responseSender) -> {
                         buf.readBlockPos();
+                        boolean success = buf.readBoolean();
                         int itemsSold = buf.readVarInt();
                         int payout = buf.readVarInt();
                         int lifetimeTotal = buf.readVarInt();
+                        Text feedback = buf.readText();
 
                         client.execute(() -> {
                                 if (client.currentScreen instanceof MarketScreen marketScreen) {
-                                        marketScreen.updateSaleResult(itemsSold, payout, lifetimeTotal);
+                                        marketScreen.updateSaleResult(success, itemsSold, payout, lifetimeTotal, feedback);
                                 }
                         });
                 });

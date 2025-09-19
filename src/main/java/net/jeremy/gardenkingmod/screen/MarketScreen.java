@@ -74,23 +74,33 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 drawMouseoverTooltip(context, mouseX, mouseY);
         }
 
-        public void updateSaleResult(int itemsSold, int payout, int lifetimeTotal) {
+        public void updateSaleResult(boolean success, int itemsSold, int payout, int lifetimeTotal, Text feedback) {
                 this.lastItemsSold = itemsSold;
                 this.lastPayout = payout;
-                this.lastLifetimeTotal = lifetimeTotal >= 0 ? lifetimeTotal : -1;
+                this.lastLifetimeTotal = success && lifetimeTotal >= 0 ? lifetimeTotal : -1;
 
-                MutableText payoutText = Text.literal(Integer.toString(payout)).formatted(Formatting.GREEN);
-                this.saleResultLine = Text
-                                .translatable("screen.gardenkingmod.market.sale_result", itemsSold, payoutText)
-                                .formatted(Formatting.YELLOW);
-
-                if (this.lastLifetimeTotal >= 0) {
-                        MutableText lifetimeText = Text.literal(Integer.toString(this.lastLifetimeTotal))
-                                        .formatted(Formatting.GREEN);
-                        this.lifetimeResultLine = Text
-                                        .translatable("screen.gardenkingmod.market.lifetime", lifetimeText)
+                if (success) {
+                        MutableText payoutText = Text.literal(Integer.toString(payout)).formatted(Formatting.GREEN);
+                        this.saleResultLine = Text
+                                        .translatable("screen.gardenkingmod.market.sale_result", itemsSold, payoutText)
                                         .formatted(Formatting.YELLOW);
+
+                        if (this.lastLifetimeTotal >= 0) {
+                                MutableText lifetimeText = Text.literal(Integer.toString(this.lastLifetimeTotal))
+                                                .formatted(Formatting.GREEN);
+                                this.lifetimeResultLine = Text
+                                                .translatable("screen.gardenkingmod.market.lifetime", lifetimeText)
+                                                .formatted(Formatting.YELLOW);
+                        } else {
+                                this.lifetimeResultLine = Text.empty();
+                        }
                 } else {
+                        MutableText feedbackLine = feedback.copy();
+                        if (!feedbackLine.getString().isEmpty()) {
+                                this.saleResultLine = feedbackLine.formatted(Formatting.RED);
+                        } else {
+                                this.saleResultLine = Text.empty();
+                        }
                         this.lifetimeResultLine = Text.empty();
                 }
         }

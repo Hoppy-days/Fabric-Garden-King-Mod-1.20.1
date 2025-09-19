@@ -180,7 +180,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
         public boolean sell(ServerPlayerEntity player) {
                 if (isEmpty()) {
-                        player.sendMessage(Text.translatable("message.gardenkingmod.market.empty"), true);
+                        sendSaleResult(player, false, 0, 0, -1, Text.translatable("message.gardenkingmod.market.empty"));
                         return false;
                 }
 
@@ -224,7 +224,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 }
 
                 if (!hasSellableStack) {
-                        player.sendMessage(Text.translatable("message.gardenkingmod.market.invalid"), true);
+                        sendSaleResult(player, false, 0, 0, -1, Text.translatable("message.gardenkingmod.market.invalid"));
                         return false;
                 }
 
@@ -269,7 +269,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 }
 
                 if (!changed) {
-                        player.sendMessage(Text.translatable("message.gardenkingmod.market.empty"), true);
+                        sendSaleResult(player, false, 0, 0, -1, Text.translatable("message.gardenkingmod.market.empty"));
                         return false;
                 }
 
@@ -285,18 +285,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
                 int lifetimeTotal = ModScoreboards.addCurrency(player, totalPayout);
 
-                PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeBlockPos(pos);
-                buf.writeVarInt(totalItemsSold);
-                buf.writeVarInt(totalPayout);
-                buf.writeVarInt(lifetimeTotal);
-                ServerPlayNetworking.send(player, ModPackets.MARKET_SALE_RESULT_PACKET, buf);
-
-                Text message = lifetimeTotal >= 0
-                                ? Text.translatable("message.gardenkingmod.market.sold.lifetime", totalItemsSold,
-                                                totalPayout, lifetimeTotal)
-                                : Text.translatable("message.gardenkingmod.market.sold", totalItemsSold, totalPayout);
-                player.sendMessage(message, true);
+                sendSaleResult(player, true, totalItemsSold, totalPayout, lifetimeTotal, Text.empty());
 
                 World world = getWorld();
                 if (world != null) {
@@ -317,6 +306,18 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 case "crop_tiers/tier_5" -> 5;
                 default -> 0;
                 };
+        }
+
+        private void sendSaleResult(ServerPlayerEntity player, boolean success, int totalItemsSold, int totalPayout,
+                        int lifetimeTotal, Text feedback) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeBlockPos(pos);
+                buf.writeBoolean(success);
+                buf.writeVarInt(totalItemsSold);
+                buf.writeVarInt(totalPayout);
+                buf.writeVarInt(lifetimeTotal);
+                buf.writeText(feedback);
+                ServerPlayNetworking.send(player, ModPackets.MARKET_SALE_RESULT_PACKET, buf);
         }
 
         private static void insertOrDrop(PlayerEntity player, ItemStack stack) {
