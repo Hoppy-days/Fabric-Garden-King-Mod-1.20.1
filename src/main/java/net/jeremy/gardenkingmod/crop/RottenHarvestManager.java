@@ -56,12 +56,11 @@ public final class RottenHarvestManager extends JsonDataLoader implements Identi
 
         /**
          * Returns any additional rotten chance supplied by datapacks for the provided
-         * loot table. The current schema does not expose extra rotten odds, so the
-         * method always returns {@code 0.0f} but remains available for future
-         * compatibility.
+         * loot table.
          */
         public float getExtraRottenChance(Identifier lootTableId) {
-                return 0.0f;
+                RottenHarvestEntry entry = rottenHarvests.get(lootTableId);
+                return entry == null ? 0.0f : entry.extraRottenChance();
         }
 
         @Override
@@ -132,7 +131,12 @@ public final class RottenHarvestManager extends JsonDataLoader implements Identi
                                 extraNoDropChance = MathHelper.clamp(JsonHelper.getFloat(object, "extra_no_drop_chance"), 0.0f, 1.0f);
                         }
 
-                        return new RottenHarvestEntry(itemOptional.get(), extraNoDropChance);
+                        float extraRottenChance = 0.0f;
+                        if (object.has("extra_rotten_chance")) {
+                                extraRottenChance = MathHelper.clamp(JsonHelper.getFloat(object, "extra_rotten_chance"), 0.0f, 1.0f);
+                        }
+
+                        return new RottenHarvestEntry(itemOptional.get(), extraNoDropChance, extraRottenChance);
                 } catch (IllegalArgumentException exception) {
                         GardenKingMod.LOGGER.warn("Failed to parse rotten harvest entry for {} in {}", lootTableId, fileId, exception);
                         return null;
@@ -170,6 +174,6 @@ public final class RottenHarvestManager extends JsonDataLoader implements Identi
                 return identifier;
         }
 
-        public record RottenHarvestEntry(Item rottenItem, float extraNoDropChance) {
+        public record RottenHarvestEntry(Item rottenItem, float extraNoDropChance, float extraRottenChance) {
         }
 }

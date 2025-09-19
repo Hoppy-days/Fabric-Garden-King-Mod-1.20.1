@@ -88,10 +88,9 @@ public final class CropDropModifier {
 
                         Optional<RottenHarvestEntry> rottenEntry = RottenHarvestManager.getInstance().getRottenHarvest(id);
                         float extraNoDropChance = rottenEntry.map(RottenHarvestEntry::extraNoDropChance).orElse(0.0f);
+                        float extraRottenChance = rottenEntry.map(RottenHarvestEntry::extraRottenChance).orElse(0.0f);
                         float combinedNoDropChance = MathHelper.clamp(baseNoDropChance + extraNoDropChance, 0.0f, 1.0f);
-                        float combinedRottenChance = MathHelper.clamp(
-                                        baseRottenChance + RottenHarvestManager.getInstance().getExtraRottenChance(id), 0.0f,
-                                        1.0f);
+                        float combinedRottenChance = MathHelper.clamp(baseRottenChance + extraRottenChance, 0.0f, 1.0f);
 
                         boolean applyScaling = multiplier > 1.0001f;
                         boolean applyNoDrop = combinedNoDropChance > 0.0f;
