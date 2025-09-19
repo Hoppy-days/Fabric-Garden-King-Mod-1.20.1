@@ -1,14 +1,18 @@
 package net.jeremy.gardenkingmod;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.jeremy.gardenkingmod.client.model.MarketBlockModel;
 import net.jeremy.gardenkingmod.client.render.MarketBlockEntityRenderer;
+import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.screen.MarketScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 public class GardenKingModClient implements ClientModInitializer {
     @Override
@@ -30,5 +34,15 @@ public class GardenKingModClient implements ClientModInitializer {
                                 }
                         });
                 });
+
+        ItemTooltipCallback.EVENT.register((stack, context, lines) -> CropTierRegistry.get(stack.getItem())
+                .ifPresent(tier -> {
+                        String path = tier.id().getPath();
+                        String suffix = path.contains("/") ? path.substring(path.lastIndexOf('/') + 1) : path;
+                        Text tierName = Text
+                                        .translatable("tooltip." + tier.id().getNamespace() + ".crop_tier." + suffix);
+                        lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_tier", tierName)
+                                        .formatted(Formatting.GRAY));
+                }));
     }
 }
