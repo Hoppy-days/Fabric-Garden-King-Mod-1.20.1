@@ -66,23 +66,13 @@ public final class CropTierRegistry {
                         return Optional.empty();
                 }
 
-                if (state.isIn(TIER_1)) {
-                        return get(TIER_1_ID);
-                }
-                if (state.isIn(TIER_2)) {
-                        return get(TIER_2_ID);
-                }
-                if (state.isIn(TIER_3)) {
-                        return get(TIER_3_ID);
-                }
-                if (state.isIn(TIER_4)) {
-                        return get(TIER_4_ID);
-                }
-                if (state.isIn(TIER_5)) {
-                        return get(TIER_5_ID);
+                Optional<CropTier> tier = resolveTier(state::isIn);
+                if (tier.isPresent()) {
+                        return tier;
                 }
 
-                return Optional.empty();
+                RegistryEntry<Block> entry = Registries.BLOCK.getEntry(state.getBlock());
+                return resolveTier(entry::isIn);
         }
 
         public static Optional<CropTier> get(Item item) {
@@ -151,5 +141,30 @@ public final class CropTierRegistry {
                 // Ensure the returned value still results in at least one random tick in
                 // reasonable time to keep hydration/bonemeal behaviour intact.
                 return Math.max(0.001f, scaledChance);
+        }
+
+        private static Optional<CropTier> resolveTier(TierMembership membership) {
+                if (membership.isIn(TIER_1)) {
+                        return get(TIER_1_ID);
+                }
+                if (membership.isIn(TIER_2)) {
+                        return get(TIER_2_ID);
+                }
+                if (membership.isIn(TIER_3)) {
+                        return get(TIER_3_ID);
+                }
+                if (membership.isIn(TIER_4)) {
+                        return get(TIER_4_ID);
+                }
+                if (membership.isIn(TIER_5)) {
+                        return get(TIER_5_ID);
+                }
+
+                return Optional.empty();
+        }
+
+        @FunctionalInterface
+        private interface TierMembership {
+                boolean isIn(TagKey<Block> tag);
         }
 }
