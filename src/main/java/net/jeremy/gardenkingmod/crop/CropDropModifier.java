@@ -148,6 +148,8 @@ public final class CropDropModifier {
         }
 
         private static Optional<TierScalingData> lookupScalingData(Identifier lootTableId) {
+                List<Identifier> matchingBlocks = new ArrayList<>();
+
                 for (Block block : Registries.BLOCK) {
                         Identifier blockLootTable = block.getLootTableId();
                         if (LootTables.EMPTY.equals(blockLootTable)) {
@@ -159,14 +161,19 @@ public final class CropDropModifier {
                         }
 
                         Identifier blockId = Registries.BLOCK.getId(block);
+                        matchingBlocks.add(blockId);
+
                         Optional<CropTier> tier = CropTierRegistry.get(block.getDefaultState());
 
                         if (tier.isPresent()) {
                                 return Optional.of(new TierScalingData(blockId, tier.get()));
                         }
+                }
 
-                        GardenKingMod.LOGGER.debug("Loot table {} (block {}) is not assigned to a crop tier; using vanilla drop counts", lootTableId, blockId);
-                        return Optional.empty();
+                if (!matchingBlocks.isEmpty()) {
+                        GardenKingMod.LOGGER.debug(
+                                        "Loot table {} is not assigned to a crop tier; using vanilla drop counts (owners: {})",
+                                        lootTableId, matchingBlocks);
                 }
 
                 return Optional.empty();
