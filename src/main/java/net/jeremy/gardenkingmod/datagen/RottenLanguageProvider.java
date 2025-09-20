@@ -18,9 +18,10 @@ public final class RottenLanguageProvider extends FabricLanguageProvider {
                 this.definitions = definitions;
         }
 
-        @Override
-        public void generateTranslations(TranslationBuilder translationBuilder) {
-                definitions.forEach(definition -> translationBuilder.add(definition.rottenItemId(),
-                                "Rotten " + definition.displayName()));
-        }
+    @Override
+    public void generateTranslations(TranslationBuilder translationBuilder) {
+                definitions.forEach(definition -> translationBuilder.add(
+                        definition.rottenItemId().toTranslationKey("item"),
+                        "Rotten " + definition.displayName()));
+    }
 }
