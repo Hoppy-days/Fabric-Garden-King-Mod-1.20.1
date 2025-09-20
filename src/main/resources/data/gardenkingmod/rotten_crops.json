@@ -1,0 +1,9 @@
+{
+  "entries": [
+    {
+      "target": "minecraft:wheat",
+      "crop": "minecraft:wheat",
+      "rotten_item": "gardenkingmod:rotten_wheat"
+    }
+  ]
+}
