@@ -20,6 +20,10 @@ import net.minecraft.block.GourdBlock;
 import net.minecraft.block.NetherWartBlock;
 import net.minecraft.block.PitcherCropBlock;
 import net.minecraft.block.SweetBerryBushBlock;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.loot.LootTables;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
@@ -127,8 +131,7 @@ public final class RottenCropDefinitions {
 
                         RottenCropOverride override = overrides.get(blockId);
                         Identifier targetId = override != null && override.targetId() != null ? override.targetId() : blockId;
-                        Identifier cropId = override != null && override.cropId() != null ? override.cropId()
-                                        : createCropIdentifier(blockId);
+                        Identifier cropId = resolveCropIdentifier(block, blockId, override);
                         Identifier resolvedLootTable = override != null && override.lootTableId() != null ? override.lootTableId()
                                         : lootTableId;
                         float extraNoDropChance = override != null ? override.extraNoDropChance() : 0.0f;
@@ -145,15 +148,6 @@ public final class RottenCropDefinitions {
                 List<RottenCropDefinition> definitions = new ArrayList<>(definitionsByTarget.values());
                 definitions.sort(Comparator.comparing(definition -> definition.rottenItemId().toString()));
                 return List.copyOf(definitions);
-        }
-
-        private static Identifier createCropIdentifier(Identifier blockId) {
-                String sanitizedPath = RottenCropDefinition.sanitizedPath(blockId.getPath());
-                if (sanitizedPath.isEmpty()) {
-                        sanitizedPath = blockId.getPath();
-                }
-
-                return new Identifier(blockId.getNamespace(), sanitizedPath);
         }
 
         private static String uniqueRottenPath(String basePath, Identifier blockId, Set<String> usedPaths) {
@@ -211,7 +205,73 @@ public final class RottenCropDefinitions {
         }
 
         private static Map<Identifier, RottenCropOverride> createOverrides() {
-                return Collections.emptyMap();
+                Map<Identifier, RottenCropOverride> overrides = new LinkedHashMap<>();
+
+                overrides.put(Registries.BLOCK.getId(Blocks.COCOA), new RottenCropOverride(
+                                Registries.ITEM.getId(Items.COCOA_BEANS), null, null, 0.0f, 0.0f));
+                overrides.put(Registries.BLOCK.getId(Blocks.SWEET_BERRY_BUSH), new RottenCropOverride(
+                                Registries.ITEM.getId(Items.SWEET_BERRIES), null, null, 0.0f, 0.0f));
+                overrides.put(Registries.BLOCK.getId(Blocks.PITCHER_CROP), new RottenCropOverride(
+                                Registries.ITEM.getId(Items.PITCHER_POD), null, null, 0.0f, 0.0f));
+
+                return Map.copyOf(overrides);
+        }
+
+        private static Identifier resolveCropIdentifier(Block block, Identifier blockId, RottenCropOverride override) {
+                if (override != null && override.cropId() != null) {
+                        return override.cropId();
+                }
+
+                Identifier pickStackId = resolvePickStackIdentifier(block);
+                if (pickStackId != null) {
+                        return pickStackId;
+                }
+
+                Identifier blockItemId = resolveItemIdentifier(block.asItem());
+                if (blockItemId != null) {
+                        return blockItemId;
+                }
+
+                return createCropIdentifier(blockId);
+        }
+
+        private static Identifier resolvePickStackIdentifier(Block block) {
+                try {
+                        ItemStack pickStack = block.getPickStack(null, null, block.getDefaultState());
+                        return resolveItemIdentifier(pickStack);
+                } catch (Exception exception) {
+                        return null;
+                }
+        }
+
+        private static Identifier resolveItemIdentifier(ItemStack stack) {
+                if (stack == null || stack.isEmpty()) {
+                        return null;
+                }
+
+                return resolveItemIdentifier(stack.getItem());
+        }
+
+        private static Identifier resolveItemIdentifier(Item item) {
+                if (item == null || item == Items.AIR) {
+                        return null;
+                }
+
+                Identifier itemId = Registries.ITEM.getId(item);
+                if (itemId == null || itemId.equals(Registries.ITEM.getDefaultId())) {
+                        return null;
+                }
+
+                return itemId;
+        }
+
+        private static Identifier createCropIdentifier(Identifier blockId) {
+                String sanitizedPath = RottenCropDefinition.sanitizedPath(blockId.getPath());
+                if (sanitizedPath.isEmpty()) {
+                        sanitizedPath = blockId.getPath();
+                }
+
+                return new Identifier(blockId.getNamespace(), sanitizedPath);
         }
 
         private record RottenCropOverride(Identifier cropId, Identifier targetId, Identifier lootTableId,
