@@ -2,7 +2,7 @@
   "minecraft:wheat": [
     {
       "item": "minecraft:diamond",
-      "chance": 0.05,
+      "chance": 1.0,
       "count": {"min": 1, "max": 3}
     }
   ],
