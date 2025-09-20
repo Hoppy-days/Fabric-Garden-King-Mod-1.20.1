@@ -1,5 +1,9 @@
 package net.jeremy.gardenkingmod.crop;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,23 +15,23 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+
 import net.jeremy.gardenkingmod.GardenKingMod;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.CocoaBlock;
-import net.minecraft.block.CropBlock;
-import net.minecraft.block.GourdBlock;
-import net.minecraft.block.NetherWartBlock;
-import net.minecraft.block.PitcherCropBlock;
-import net.minecraft.block.SweetBerryBushBlock;
-import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootTables;
 import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonHelper;
+import net.minecraft.util.math.MathHelper;
 
 /**
  * Builds the list of {@link RottenCropDefinition definitions} that power both
@@ -99,50 +103,37 @@ public final class RottenCropDefinitions {
 		return Collections.unmodifiableMap(map);
 	}
 
-	private static List<RottenCropDefinition> createDefinitions() {
-                Map<Identifier, RottenCropDefinition> definitionsByTarget = new LinkedHashMap<>();
-                Set<String> usedRottenPaths = new HashSet<>();
+        private static final String RESOURCE_PATH = "/data/" + GardenKingMod.MOD_ID + "/rotten_crops.json";
 
-                for (RottenCropDefinition definition : manualDefinitions()) {
-                        definitionsByTarget.put(definition.targetId(), definition);
-                        usedRottenPaths.add(definition.rottenItemId().getPath());
+        private static List<RottenCropDefinition> createDefinitions() {
+                List<RottenCropDefinition> manualList = manualDefinitions();
+                if (manualList.isEmpty()) {
+                        return List.of();
                 }
 
-                Map<Identifier, RottenCropOverride> overrides = createOverrides();
+                Map<Identifier, RottenCropDefinition> definitionsByTarget = new LinkedHashMap<>();
+                Set<Identifier> usedRottenIds = new HashSet<>();
 
-                for (Identifier blockId : Registries.BLOCK.getIds()) {
-                        if (GardenKingMod.MOD_ID.equals(blockId.getNamespace())) {
+                for (RottenCropDefinition definition : manualList) {
+                        Identifier targetId = definition.targetId();
+                        Identifier rottenItemId = definition.rottenItemId();
+
+                        if (definitionsByTarget.containsKey(targetId)) {
+                                GardenKingMod.LOGGER.warn(
+                                                "Duplicate rotten crop target {} found while reading {}. Skipping later entry.",
+                                                targetId, RESOURCE_PATH);
                                 continue;
                         }
 
-                        if (definitionsByTarget.containsKey(blockId)) {
+                        if (usedRottenIds.contains(rottenItemId)) {
+                                GardenKingMod.LOGGER.warn(
+                                                "Duplicate rotten item {} found while reading {}. Skipping entry for {}.",
+                                                rottenItemId, RESOURCE_PATH, targetId);
                                 continue;
                         }
 
-                        Block block = Registries.BLOCK.get(blockId);
-                        if (!isEligibleBlock(block, blockId)) {
-                                continue;
-                        }
-
-                        Identifier lootTableId = block.getLootTableId();
-                        if (LootTables.EMPTY.equals(lootTableId)) {
-                                continue;
-                        }
-
-                        RottenCropOverride override = overrides.get(blockId);
-                        Identifier targetId = override != null && override.targetId() != null ? override.targetId() : blockId;
-                        Identifier cropId = resolveCropIdentifier(block, blockId, override);
-                        Identifier resolvedLootTable = override != null && override.lootTableId() != null ? override.lootTableId()
-                                        : lootTableId;
-                        float extraNoDropChance = override != null ? override.extraNoDropChance() : 0.0f;
-                        float extraRottenChance = override != null ? override.extraRottenChance() : 0.0f;
-
-                        String rottenItemPath = uniqueRottenPath(cropId.getPath(), blockId, usedRottenPaths);
-                        usedRottenPaths.add(rottenItemPath);
-
-                        RottenCropDefinition definition = new RottenCropDefinition(cropId, targetId, resolvedLootTable,
-                                        rottenItemPath, extraNoDropChance, extraRottenChance);
                         definitionsByTarget.put(targetId, definition);
+                        usedRottenIds.add(rottenItemId);
                 }
 
                 List<RottenCropDefinition> definitions = new ArrayList<>(definitionsByTarget.values());
@@ -150,78 +141,194 @@ public final class RottenCropDefinitions {
                 return List.copyOf(definitions);
         }
 
-        private static String uniqueRottenPath(String basePath, Identifier blockId, Set<String> usedPaths) {
-                String candidate = "rotten_" + basePath;
-
-                if (usedPaths.contains(candidate)) {
-                        if (!"minecraft".equals(blockId.getNamespace())) {
-                                String namespaced = "rotten_" + blockId.getNamespace() + "_" + basePath;
-                                if (!usedPaths.contains(namespaced)) {
-                                        return namespaced;
-                                }
-                        }
-
-                        int attempt = 2;
-                        while (true) {
-                                String numbered = "rotten_" + basePath + "_" + attempt;
-                                if (!usedPaths.contains(numbered)) {
-                                        return numbered;
-                                }
-
-                                attempt++;
-                        }
-                }
-
-                return candidate;
-        }
-
-        private static boolean isEligibleBlock(Block block, Identifier blockId) {
-                if (block == null) {
-                        return false;
-                }
-
-                if (block.getDefaultState().isIn(BlockTags.CROPS)) {
-                        return true;
-                }
-
-                if (block instanceof CropBlock || block instanceof GourdBlock || block instanceof NetherWartBlock
-                                || block instanceof CocoaBlock || block instanceof SweetBerryBushBlock
-                                || block instanceof PitcherCropBlock) {
-                        return true;
-                }
-
-                String className = block.getClass().getName();
-                if (className.startsWith("com.epherical.croptopia.blocks.")
-                                && (className.endsWith("CroptopiaCropBlock") || className.endsWith("TallCropBlock")
-                                                || className.endsWith("LeafCropBlock"))) {
-                        return true;
-                }
-
-                return false;
-        }
-
         private static List<RottenCropDefinition> manualDefinitions() {
-                return List.of();
+                return loadDefinitionsFromResource();
         }
 
-        private static Map<Identifier, RottenCropOverride> createOverrides() {
-                Map<Identifier, RottenCropOverride> overrides = new LinkedHashMap<>();
-
-                overrides.put(Registries.BLOCK.getId(Blocks.COCOA), new RottenCropOverride(
-                                Registries.ITEM.getId(Items.COCOA_BEANS), null, null, 0.0f, 0.0f));
-                overrides.put(Registries.BLOCK.getId(Blocks.SWEET_BERRY_BUSH), new RottenCropOverride(
-                                Registries.ITEM.getId(Items.SWEET_BERRIES), null, null, 0.0f, 0.0f));
-                overrides.put(Registries.BLOCK.getId(Blocks.PITCHER_CROP), new RottenCropOverride(
-                                Registries.ITEM.getId(Items.PITCHER_POD), null, null, 0.0f, 0.0f));
-
-                return Map.copyOf(overrides);
-        }
-
-        private static Identifier resolveCropIdentifier(Block block, Identifier blockId, RottenCropOverride override) {
-                if (override != null && override.cropId() != null) {
-                        return override.cropId();
+        private static List<RottenCropDefinition> loadDefinitionsFromResource() {
+                InputStream stream = RottenCropDefinitions.class.getResourceAsStream(RESOURCE_PATH);
+                if (stream == null) {
+                        GardenKingMod.LOGGER.info("No rotten crop list found at {}. Add the file to register custom rotten items.",
+                                        RESOURCE_PATH);
+                        return List.of();
                 }
 
+                List<RottenCropDefinition> definitions = new ArrayList<>();
+
+                try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                        JsonElement root = JsonParser.parseReader(reader);
+                        JsonArray entries = extractEntriesArray(root);
+                        if (entries == null) {
+                                GardenKingMod.LOGGER.warn("Expected an array of rotten crop entries in {}.", RESOURCE_PATH);
+                                return List.of();
+                        }
+
+                        for (int index = 0; index < entries.size(); index++) {
+                                JsonElement element = entries.get(index);
+                                if (!element.isJsonObject()) {
+                                        GardenKingMod.LOGGER.warn(
+                                                        "Ignoring non-object entry at index {} while reading {}.", index,
+                                                        RESOURCE_PATH);
+                                        continue;
+                                }
+
+                                RottenCropDefinition definition = parseDefinition(element.getAsJsonObject(), index);
+                                if (definition != null) {
+                                        definitions.add(definition);
+                                }
+                        }
+                } catch (JsonParseException | IOException exception) {
+                        GardenKingMod.LOGGER.error("Failed to read rotten crop definitions from {}", RESOURCE_PATH, exception);
+                        return List.of();
+                }
+
+                return List.copyOf(definitions);
+        }
+
+        private static JsonArray extractEntriesArray(JsonElement root) {
+                if (root == null || root.isJsonNull()) {
+                        return null;
+                }
+
+                if (root.isJsonArray()) {
+                        return root.getAsJsonArray();
+                }
+
+                if (root.isJsonObject()) {
+                        JsonObject object = root.getAsJsonObject();
+                        if (object.has("entries")) {
+                                JsonElement entries = object.get("entries");
+                                if (entries.isJsonArray()) {
+                                        return entries.getAsJsonArray();
+                                }
+                        }
+
+                        if (object.has("crops")) {
+                                JsonElement entries = object.get("crops");
+                                if (entries.isJsonArray()) {
+                                        return entries.getAsJsonArray();
+                                }
+                        }
+                }
+
+                return null;
+        }
+
+        private static RottenCropDefinition parseDefinition(JsonObject object, int index) {
+                Identifier rottenItemId = parseIdentifier(object, "rotten_item", "entry " + index);
+                if (rottenItemId == null) {
+                        return null;
+                }
+
+                String entryLabel = rottenItemId.toString();
+
+                if (!GardenKingMod.MOD_ID.equals(rottenItemId.getNamespace())) {
+                        GardenKingMod.LOGGER.warn(
+                                        "Skipping rotten crop entry {} because rotten_item {} must use the {} namespace.",
+                                        entryLabel, rottenItemId, GardenKingMod.MOD_ID);
+                        return null;
+                }
+
+                Identifier targetId = parseIdentifier(object, "target", entryLabel);
+                if (targetId == null) {
+                        return null;
+                }
+
+                Optional<Block> blockOptional = Registries.BLOCK.getOrEmpty(targetId);
+                if (blockOptional.isEmpty()) {
+                        GardenKingMod.LOGGER.warn(
+                                        "Skipping rotten crop entry {} because target block {} is not registered.",
+                                        entryLabel, targetId);
+                        return null;
+                }
+
+                Block block = blockOptional.get();
+
+                Identifier cropId;
+                if (object.has("crop")) {
+                        cropId = parseIdentifier(object, "crop", entryLabel);
+                        if (cropId == null) {
+                                return null;
+                        }
+                } else {
+                        cropId = resolveCropIdentifier(block, targetId);
+                        if (cropId == null) {
+                                GardenKingMod.LOGGER.warn(
+                                                "Skipping rotten crop entry {} because the crop item could not be determined.",
+                                                entryLabel);
+                                return null;
+                        }
+                }
+
+                if (Registries.ITEM.getOrEmpty(cropId).isEmpty()) {
+                        GardenKingMod.LOGGER.warn(
+                                        "Crop item {} referenced by rotten crop entry {} is not registered. The rotten item will be created regardless.",
+                                        cropId, entryLabel);
+                }
+
+                Identifier lootTableId;
+                if (object.has("loot_table")) {
+                        lootTableId = parseIdentifier(object, "loot_table", entryLabel);
+                        if (lootTableId == null) {
+                                return null;
+                        }
+                } else {
+                        lootTableId = block.getLootTableId();
+                        if (LootTables.EMPTY.equals(lootTableId)) {
+                                GardenKingMod.LOGGER.warn(
+                                                "Skipping rotten crop entry {} because target {} does not have a loot table. Specify one with 'loot_table'.",
+                                                entryLabel, targetId);
+                                return null;
+                        }
+                }
+
+                float extraNoDropChance = readChance(object, "extra_no_drop_chance", entryLabel);
+                float extraRottenChance = readChance(object, "extra_rotten_chance", entryLabel);
+
+                return new RottenCropDefinition(cropId, targetId, lootTableId, rottenItemId.getPath(), extraNoDropChance,
+                                extraRottenChance);
+        }
+
+        private static Identifier parseIdentifier(JsonObject object, String key, String entryLabel) {
+                if (!object.has(key)) {
+                        GardenKingMod.LOGGER.warn("Missing '{}' in rotten crop entry {}.", key, entryLabel);
+                        return null;
+                }
+
+                try {
+                        String raw = JsonHelper.getString(object, key);
+                        Identifier identifier = Identifier.tryParse(raw);
+                        if (identifier == null) {
+                                GardenKingMod.LOGGER.warn(
+                                                "Invalid identifier '{}' for '{}' in rotten crop entry {}.", raw, key,
+                                                entryLabel);
+                                return null;
+                        }
+
+                        return identifier;
+                } catch (Exception exception) {
+                        GardenKingMod.LOGGER.warn("Failed to parse '{}' in rotten crop entry {}.", key, entryLabel,
+                                        exception);
+                        return null;
+                }
+        }
+
+        private static float readChance(JsonObject object, String key, String entryLabel) {
+                if (!object.has(key)) {
+                        return 0.0f;
+                }
+
+                try {
+                        return MathHelper.clamp(JsonHelper.getFloat(object, key), 0.0f, 1.0f);
+                } catch (Exception exception) {
+                        GardenKingMod.LOGGER.warn(
+                                        "Invalid value for '{}' in rotten crop entry {}. Defaulting to 0.", key,
+                                        entryLabel, exception);
+                        return 0.0f;
+                }
+        }
+
+        private static Identifier resolveCropIdentifier(Block block, Identifier blockId) {
                 Identifier pickStackId = resolvePickStackIdentifier(block);
                 if (pickStackId != null) {
                         return pickStackId;
@@ -272,9 +379,5 @@ public final class RottenCropDefinitions {
                 }
 
                 return new Identifier(blockId.getNamespace(), sanitizedPath);
-        }
-
-        private record RottenCropOverride(Identifier cropId, Identifier targetId, Identifier lootTableId,
-                        float extraNoDropChance, float extraRottenChance) {
         }
 }
