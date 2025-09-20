@@ -30,46 +30,72 @@ import net.minecraft.util.Identifier;
  * runtime registration and data generation.
  */
 public final class RottenCropDefinitions {
-        private static final List<RottenCropDefinition> ALL = createDefinitions();
-        private static final Map<Identifier, RottenCropDefinition> BY_TARGET = indexBy(RottenCropDefinition::targetId);
-        private static final Map<Identifier, RottenCropDefinition> BY_CROP = indexBy(RottenCropDefinition::cropId);
-        private static final Map<Identifier, RottenCropDefinition> BY_LOOT_TABLE = indexBy(RottenCropDefinition::lootTableId);
-        private static final Map<Identifier, RottenCropDefinition> BY_ROTTEN_ITEM = indexBy(RottenCropDefinition::rottenItemId);
+	private static List<RottenCropDefinition> allDefinitions = List.of();
+	private static Map<Identifier, RottenCropDefinition> definitionsByTarget = Map.of();
+	private static Map<Identifier, RottenCropDefinition> definitionsByCrop = Map.of();
+	private static Map<Identifier, RottenCropDefinition> definitionsByLootTable = Map.of();
+	private static Map<Identifier, RottenCropDefinition> definitionsByRottenItem = Map.of();
+	private static boolean initialized;
 
-        private RottenCropDefinitions() {
-        }
+	private RottenCropDefinitions() {
+	}
 
-        public static List<RottenCropDefinition> all() {
-                return ALL;
-        }
+	public static List<RottenCropDefinition> all() {
+		ensureLoaded();
+		return allDefinitions;
+	}
 
-        public static Optional<RottenCropDefinition> findByTargetId(Identifier identifier) {
-                return Optional.ofNullable(BY_TARGET.get(identifier));
-        }
+	public static boolean hasDefinitions() {
+		return initialized && !allDefinitions.isEmpty();
+	}
 
-        public static Optional<RottenCropDefinition> findByCropId(Identifier identifier) {
-                return Optional.ofNullable(BY_CROP.get(identifier));
-        }
+	public static Optional<RottenCropDefinition> findByTargetId(Identifier identifier) {
+		ensureLoaded();
+		return Optional.ofNullable(definitionsByTarget.get(identifier));
+	}
 
-        public static Optional<RottenCropDefinition> findByLootTableId(Identifier identifier) {
-                return Optional.ofNullable(BY_LOOT_TABLE.get(identifier));
-        }
+	public static Optional<RottenCropDefinition> findByCropId(Identifier identifier) {
+		ensureLoaded();
+		return Optional.ofNullable(definitionsByCrop.get(identifier));
+	}
 
-        public static Optional<RottenCropDefinition> findByRottenItemId(Identifier identifier) {
-                return Optional.ofNullable(BY_ROTTEN_ITEM.get(identifier));
-        }
+	public static Optional<RottenCropDefinition> findByLootTableId(Identifier identifier) {
+		ensureLoaded();
+		return Optional.ofNullable(definitionsByLootTable.get(identifier));
+	}
 
-        private static Map<Identifier, RottenCropDefinition> indexBy(
-                        Function<RottenCropDefinition, Identifier> keyExtractor) {
-                Map<Identifier, RottenCropDefinition> map = new LinkedHashMap<>();
-                for (RottenCropDefinition definition : ALL) {
-                        map.put(keyExtractor.apply(definition), definition);
-                }
+	public static Optional<RottenCropDefinition> findByRottenItemId(Identifier identifier) {
+		ensureLoaded();
+		return Optional.ofNullable(definitionsByRottenItem.get(identifier));
+	}
 
-                return Collections.unmodifiableMap(map);
-        }
+	public static synchronized void reload() {
+		List<RottenCropDefinition> definitions = createDefinitions();
+		allDefinitions = definitions;
+		definitionsByTarget = indexBy(definitions, RottenCropDefinition::targetId);
+		definitionsByCrop = indexBy(definitions, RottenCropDefinition::cropId);
+		definitionsByLootTable = indexBy(definitions, RottenCropDefinition::lootTableId);
+		definitionsByRottenItem = indexBy(definitions, RottenCropDefinition::rottenItemId);
+		initialized = true;
+	}
 
-        private static List<RottenCropDefinition> createDefinitions() {
+	private static void ensureLoaded() {
+		if (!initialized) {
+			reload();
+		}
+	}
+
+	private static Map<Identifier, RottenCropDefinition> indexBy(List<RottenCropDefinition> definitions,
+			Function<RottenCropDefinition, Identifier> keyExtractor) {
+		Map<Identifier, RottenCropDefinition> map = new LinkedHashMap<>();
+		for (RottenCropDefinition definition : definitions) {
+			map.put(keyExtractor.apply(definition), definition);
+		}
+
+		return Collections.unmodifiableMap(map);
+	}
+
+	private static List<RottenCropDefinition> createDefinitions() {
                 Map<Identifier, RottenCropDefinition> definitionsByTarget = new LinkedHashMap<>();
                 Set<String> usedRottenPaths = new HashSet<>();
 
