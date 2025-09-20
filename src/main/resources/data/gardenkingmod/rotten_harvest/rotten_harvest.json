@@ -1,7 +1,0 @@
-{
-  "minecraft:wheat": {
-    "rotten_item": "minecraft:rotten_flesh",
-    "extra_no_drop_chance": 0.05,
-    "extra_rotten_chance": 0.1
-  }
-}
