@@ -36,13 +36,8 @@ public final class RottenHarvestJsonProvider implements DataProvider {
                         JsonObject entry = new JsonObject();
                         entry.addProperty("rotten_item", definition.rottenItemId().toString());
 
-                        if (definition.hasExtraNoDropChance()) {
-                                entry.addProperty("extra_no_drop_chance", definition.extraNoDropChance());
-                        }
-
-                        if (definition.hasExtraRottenChance()) {
-                                entry.addProperty("extra_rotten_chance", definition.extraRottenChance());
-                        }
+                        entry.addProperty("extra_no_drop_chance", definition.extraNoDropChance());
+                        entry.addProperty("extra_rotten_chance", definition.extraRottenChance());
 
                         root.add(definition.targetId().toString(), entry);
                 });
