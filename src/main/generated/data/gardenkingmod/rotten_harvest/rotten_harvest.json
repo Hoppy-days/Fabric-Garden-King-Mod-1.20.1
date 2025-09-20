@@ -471,7 +471,7 @@
   },
   "minecraft:wheat": {
     "extra_no_drop_chance": 0.0,
-    "extra_rotten_chance": 0.0,
-    "rotten_item": "gardenkingmod:rotten_wheat_seeds"
+    "extra_rotten_chance": 1.0,
+    "rotten_item": "gardenkingmod:rotten_wheat"
   }
 }
