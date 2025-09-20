@@ -36,6 +36,10 @@ fabricApi {
 
 loom {
         runs {
+                client {
+                        client()
+                        vmArg "-Dfabric.log.level=debug"
+                }
                 gametest {
                         server()
                         name "Game Test"
