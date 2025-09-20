@@ -42,6 +42,9 @@ loom {
                         vmArg "-Dfabric-api.gametest"
                         vmArg "-Dfabric-api.gametest.report-file=${project.buildDir}/reports/gametest/test-results.txt"
                 }
+                datagen {
+                    programArgs "--mod", "gardenkingmod", "--mod", "croptopia"
+            }
         }
 }
 
