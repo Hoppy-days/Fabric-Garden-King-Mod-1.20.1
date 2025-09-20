@@ -54,9 +54,15 @@ public final class CropDropModifier {
 
         public static void register() {
                 LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+                        BonusHarvestDropManager bonusManager = BonusHarvestDropManager.getInstance();
+                        RottenHarvestManager rottenManager = RottenHarvestManager.getInstance();
+
+                        bonusManager.ensureLoaded(resourceManager);
+                        rottenManager.ensureLoaded(resourceManager);
+
                         FabricLootTableBuilder fabricBuilder = (FabricLootTableBuilder) (Object) tableBuilder;
 
-                        List<BonusDropEntry> bonusDrops = BonusHarvestDropManager.getInstance().getBonusDrops(id);
+                        List<BonusDropEntry> bonusDrops = bonusManager.getBonusDrops(id);
                         AtomicBoolean bonusApplied = new AtomicBoolean(false);
                         if (!bonusDrops.isEmpty()) {
                                 fabricBuilder.modifyPools(poolBuilder -> {
@@ -86,7 +92,7 @@ public final class CropDropModifier {
                         float baseNoDropChance = MathHelper.clamp(tier.noDropChance(), 0.0f, 1.0f);
                         float baseRottenChance = MathHelper.clamp(tier.rottenChance(), 0.0f, 1.0f);
 
-                        Optional<RottenHarvestEntry> rottenEntry = RottenHarvestManager.getInstance().getRottenHarvest(id);
+                        Optional<RottenHarvestEntry> rottenEntry = rottenManager.getRottenHarvest(id);
                         float extraNoDropChance = rottenEntry.map(RottenHarvestEntry::extraNoDropChance).orElse(0.0f);
                         float extraRottenChance = rottenEntry.map(RottenHarvestEntry::extraRottenChance).orElse(0.0f);
                         float combinedNoDropChance = MathHelper.clamp(baseNoDropChance + extraNoDropChance, 0.0f, 1.0f);
@@ -148,6 +154,8 @@ public final class CropDropModifier {
         }
 
         private static Optional<TierScalingData> lookupScalingData(Identifier lootTableId) {
+                List<Identifier> matchingBlocks = new ArrayList<>();
+
                 for (Block block : Registries.BLOCK) {
                         Identifier blockLootTable = block.getLootTableId();
                         if (LootTables.EMPTY.equals(blockLootTable)) {
@@ -159,14 +167,19 @@ public final class CropDropModifier {
                         }
 
                         Identifier blockId = Registries.BLOCK.getId(block);
+                        matchingBlocks.add(blockId);
+
                         Optional<CropTier> tier = CropTierRegistry.get(block.getDefaultState());
 
                         if (tier.isPresent()) {
                                 return Optional.of(new TierScalingData(blockId, tier.get()));
                         }
+                }
 
-                        GardenKingMod.LOGGER.debug("Loot table {} (block {}) is not assigned to a crop tier; using vanilla drop counts", lootTableId, blockId);
-                        return Optional.empty();
+                if (!matchingBlocks.isEmpty()) {
+                        GardenKingMod.LOGGER.debug(
+                                        "Loot table {} is not assigned to a crop tier; using vanilla drop counts (owners: {})",
+                                        lootTableId, matchingBlocks);
                 }
 
                 return Optional.empty();
