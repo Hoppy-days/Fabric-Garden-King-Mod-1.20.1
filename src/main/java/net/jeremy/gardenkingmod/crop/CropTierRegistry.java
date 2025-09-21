@@ -50,6 +50,8 @@ public final class CropTierRegistry {
 
         private static Map<Identifier, CropTier> tiers = Map.of();
         private static volatile Map<Block, CropTier> blockTierLookup = Map.of();
+        private static volatile ResourceManager lastResourceManager;
+        private static final Object LOOKUP_LOCK = new Object();
         private static final Identifier BLOCK_LOOKUP_RELOAD_ID = new Identifier(GardenKingMod.MOD_ID,
                         "crop_tier_block_lookup");
         private static boolean initialized = false;
@@ -155,6 +157,34 @@ public final class CropTierRegistry {
                 return Optional.ofNullable(tiers.get(id));
         }
 
+        public static void ensureBlockLookup(ResourceManager manager) {
+                boolean needsRebuild = blockTierLookup.isEmpty();
+                if (!needsRebuild && manager != null && manager != lastResourceManager) {
+                        needsRebuild = true;
+                }
+
+                if (!needsRebuild) {
+                        return;
+                }
+
+                synchronized (LOOKUP_LOCK) {
+                        boolean rebuild = blockTierLookup.isEmpty();
+                        if (!rebuild && manager != null && manager != lastResourceManager) {
+                                rebuild = true;
+                        }
+
+                        if (!rebuild) {
+                                return;
+                        }
+
+                        if (manager != null) {
+                                lastResourceManager = manager;
+                        }
+
+                        rebuildBlockLookup();
+                }
+        }
+
         /**
          * Applies the configured growth multiplier for the provided block state to the
          * supplied base growth chance value. The multiplier is clamped to a sane range
@@ -254,7 +284,10 @@ public final class CropTierRegistry {
 
                 @Override
                 public void reload(ResourceManager manager) {
-                        rebuildBlockLookup();
+                        synchronized (LOOKUP_LOCK) {
+                                lastResourceManager = manager;
+                                rebuildBlockLookup();
+                        }
                 }
 
                 @Override
