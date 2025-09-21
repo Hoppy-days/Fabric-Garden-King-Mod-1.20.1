@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.loot.v2.FabricLootTableBuilder;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
+import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager.BonusDropEntry;
 import net.jeremy.gardenkingmod.crop.RottenHarvestManager;
 import net.jeremy.gardenkingmod.crop.RottenHarvestManager.RottenHarvestEntry;
@@ -87,19 +88,36 @@ public final class CropDropModifier {
                         float multiplier = tier.map(CropTier::dropMultiplier).orElse(1.0f);
                         float baseNoDropChance = MathHelper.clamp(tier.map(CropTier::noDropChance).orElse(0.0f), 0.0f, 1.0f);
                         float baseRottenChance = MathHelper.clamp(tier.map(CropTier::rottenChance).orElse(0.0f), 0.0f, 1.0f);
+                        Item baselineRottenItem = scalingData
+                                        .map(TierScalingData::blockId)
+                                        .map(ModItems::getRottenItemForTarget)
+                                        .orElse(null);
 
                         Optional<RottenHarvestEntry> rottenEntry = rottenManager.getRottenHarvest(id);
+                        Optional<Item> rottenOverride = rottenEntry.flatMap(RottenHarvestEntry::rottenItemOverride);
                         float extraNoDropChance = rottenEntry.map(RottenHarvestEntry::extraNoDropChance).orElse(0.0f);
                         float extraRottenChance = rottenEntry.map(RottenHarvestEntry::extraRottenChance).orElse(0.0f);
                         float combinedNoDropChance = MathHelper.clamp(baseNoDropChance + extraNoDropChance, 0.0f, 1.0f);
                         float combinedRottenChance = MathHelper.clamp(baseRottenChance + extraRottenChance, 0.0f, 1.0f);
+                        Item rottenItem = rottenOverride.orElse(baselineRottenItem);
 
                         boolean applyScaling = multiplier > 1.0001f;
                         boolean applyNoDrop = combinedNoDropChance > 0.0f;
-                        boolean applyRotten = rottenEntry.isPresent() && combinedRottenChance > 0.0f;
+                        boolean applyRotten = rottenItem != null && combinedRottenChance > 0.0f;
 
                         if (!applyScaling && !applyNoDrop && !applyRotten) {
                                 return;
+                        }
+
+                        if (!applyRotten && combinedRottenChance > 0.0f) {
+                                String baselineLabel = baselineRottenItem == null ? "none"
+                                                : Registries.ITEM.getId(baselineRottenItem).toString();
+                                String overrideLabel = rottenOverride.map(Registries.ITEM::getId)
+                                                .map(Identifier::toString)
+                                                .orElse("none");
+                                GardenKingMod.LOGGER.debug(
+                                                "Skipping rotten conversion for loot table {} because no rotten item is available (baseline candidate: {}, datapack override: {})",
+                                                id, baselineLabel, overrideLabel);
                         }
 
                         fabricBuilder.modifyPools(poolBuilder -> {
@@ -114,7 +132,7 @@ public final class CropDropModifier {
                                 }
 
                                 if (applyRotten) {
-                                        poolBuilder.apply(ApplyRottenHarvestFunction.builder(id, rottenEntry.get().rottenItem(),
+                                        poolBuilder.apply(ApplyRottenHarvestFunction.builder(id, rottenItem,
                                                         combinedRottenChance));
                                 }
                         });
@@ -128,9 +146,10 @@ public final class CropDropModifier {
                                                 .add(String.format("no-drop chance (%.2f%%)", combinedNoDropChance * 100.0f));
                         }
                         if (applyRotten) {
-                                Identifier rottenItemId = Registries.ITEM.getId(rottenEntry.get().rottenItem());
-                                appliedEffects.add(String.format("rotten conversion (%.2f%% -> %s)",
-                                                combinedRottenChance * 100.0f, rottenItemId));
+                                Identifier rottenItemId = Registries.ITEM.getId(rottenItem);
+                                String rottenOrigin = rottenOverride.isPresent() ? "datapack override" : "baseline definition";
+                                appliedEffects.add(String.format("rotten conversion (%.2f%% -> %s, %s)",
+                                                combinedRottenChance * 100.0f, rottenItemId, rottenOrigin));
                         }
 
                         if (!appliedEffects.isEmpty()) {

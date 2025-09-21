@@ -158,28 +158,34 @@ public final class RottenHarvestManager extends JsonDataLoader implements Identi
 
         private RottenHarvestEntry parseEntry(Identifier fileId, Identifier lootTableId, JsonObject object) {
                 try {
-                        String itemIdString = JsonHelper.getString(object, "rotten_item");
-                        Identifier itemId = parseIdentifier(itemIdString, fileId);
-                        if (itemId == null) {
-                                return null;
-                        }
+                        Optional<Item> overrideItem = Optional.empty();
+                        if (object.has("rotten_item")) {
+                                String itemIdString = JsonHelper.getString(object, "rotten_item");
+                                Identifier itemId = parseIdentifier(itemIdString, fileId);
+                                if (itemId == null) {
+                                        return null;
+                                }
 
-                        Optional<Item> itemOptional = Registries.ITEM.getOrEmpty(itemId);
-                        if (itemOptional.isEmpty()) {
-                                GardenKingMod.LOGGER.warn("Unknown item {} referenced in {} for loot table {}", itemId, fileId,
-                                                lootTableId);
-                                return null;
-                        }
+                                Optional<Item> itemOptional = Registries.ITEM.getOrEmpty(itemId);
+                                if (itemOptional.isEmpty()) {
+                                        GardenKingMod.LOGGER.warn("Unknown item {} referenced in {} for loot table {}", itemId, fileId,
+                                                        lootTableId);
+                                        return null;
+                                }
 
-                        if (RottenCropDefinitions.findByRottenItemId(itemId).isEmpty()) {
-                                GardenKingMod.LOGGER.warn(
-                                                "Item {} referenced in {} for loot table {} is not a registered rotten crop",
-                                                itemId, fileId, lootTableId);
+                                if (RottenCropDefinitions.findByRottenItemId(itemId).isEmpty()) {
+                                        GardenKingMod.LOGGER.warn(
+                                                        "Item {} referenced in {} for loot table {} is not a registered rotten crop",
+                                                        itemId, fileId, lootTableId);
+                                }
+
+                                overrideItem = itemOptional;
                         }
 
                         float extraNoDropChance = 0.0f;
                         if (object.has("extra_no_drop_chance")) {
-                                extraNoDropChance = MathHelper.clamp(JsonHelper.getFloat(object, "extra_no_drop_chance"), 0.0f, 1.0f);
+                                extraNoDropChance = MathHelper.clamp(JsonHelper.getFloat(object, "extra_no_drop_chance"), 0.0f,
+                                                1.0f);
                         }
 
                         float extraRottenChance = 0.0f;
@@ -187,13 +193,12 @@ public final class RottenHarvestManager extends JsonDataLoader implements Identi
                                 extraRottenChance = MathHelper.clamp(JsonHelper.getFloat(object, "extra_rotten_chance"), 0.0f, 1.0f);
                         }
 
-                        return new RottenHarvestEntry(itemOptional.get(), extraNoDropChance, extraRottenChance);
+                        return new RottenHarvestEntry(overrideItem, extraNoDropChance, extraRottenChance);
                 } catch (IllegalArgumentException exception) {
                         GardenKingMod.LOGGER.warn("Failed to parse rotten harvest entry for {} in {}", lootTableId, fileId, exception);
                         return null;
                 }
         }
-
         private Identifier resolveTarget(Identifier candidate) {
                 Optional<Block> block = Registries.BLOCK.getOrEmpty(candidate);
                 if (block.isPresent()) {
@@ -225,6 +230,9 @@ public final class RottenHarvestManager extends JsonDataLoader implements Identi
                 return identifier;
         }
 
-        public record RottenHarvestEntry(Item rottenItem, float extraNoDropChance, float extraRottenChance) {
+        public record RottenHarvestEntry(Optional<Item> rottenItemOverride, float extraNoDropChance, float extraRottenChance) {
+                public RottenHarvestEntry {
+                        rottenItemOverride = rottenItemOverride == null ? Optional.empty() : rottenItemOverride;
+                }
         }
 }
