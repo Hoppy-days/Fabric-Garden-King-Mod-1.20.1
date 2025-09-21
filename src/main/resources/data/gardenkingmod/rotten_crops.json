@@ -13,6 +13,13 @@
       "rotten_item": "gardenkingmod:rotten_carrot",
       "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "minecraft:potatoes",
+      "crop": "minecraft:potato",
+      "rotten_item": "gardenkingmod:rotten_potato",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
     }
   ]
 }
