@@ -5,6 +5,7 @@
     "minecraft:carrots",
     "minecraft:potatoes",
     "minecraft:beetroots",
+    "croptopia:tomato_crop",
     { "id": "croptopia:example_tier_1_crop", "required": false }
   ]
 }
