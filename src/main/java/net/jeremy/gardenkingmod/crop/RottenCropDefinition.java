@@ -8,8 +8,8 @@ import net.jeremy.gardenkingmod.GardenKingMod;
 import net.minecraft.util.Identifier;
 
 /**
- * Captures the data needed to register a rotten crop item and generate the
- * resources that power {@link RottenHarvestManager}.
+ * Captures the data needed to register a rotten crop item and configure
+ * harvesting behaviour adjustments.
  */
 public record RottenCropDefinition(
                 Identifier cropId,
@@ -47,6 +47,10 @@ public record RottenCropDefinition(
 
         public boolean hasExtraRottenChance() {
                 return extraRottenChance > 0.0f;
+        }
+
+        public boolean hasDropAdjustments() {
+                return hasExtraNoDropChance() || hasExtraRottenChance();
         }
 
         public String displayName() {
