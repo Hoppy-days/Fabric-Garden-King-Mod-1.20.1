@@ -53,6 +53,8 @@ public final class CropDropModifier {
 
         public static void register() {
                 LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+                        CropTierRegistry.ensureBlockLookup(resourceManager);
+
                         BonusHarvestDropManager bonusManager = BonusHarvestDropManager.getInstance();
 
                         bonusManager.ensureLoaded(resourceManager);
