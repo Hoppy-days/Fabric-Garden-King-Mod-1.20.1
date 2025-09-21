@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 
 import net.jeremy.gardenkingmod.crop.RottenCropDefinition;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinitions;
-import net.jeremy.gardenkingmod.datagen.RottenHarvestJsonProvider;
 import net.jeremy.gardenkingmod.datagen.RottenItemModelProvider;
 import net.jeremy.gardenkingmod.datagen.RottenLanguageProvider;
 import net.jeremy.gardenkingmod.ModItems;
@@ -23,8 +22,7 @@ public class GardenKingModDataGenerator implements DataGeneratorEntrypoint {
 		}
 		List<RottenCropDefinition> definitions = RottenCropDefinitions.all();
 
-		pack.addProvider((FabricDataOutput output) -> new RottenItemModelProvider(output, definitions));
-		pack.addProvider((FabricDataOutput output) -> new RottenLanguageProvider(output, definitions));
-		pack.addProvider((FabricDataOutput output) -> new RottenHarvestJsonProvider(output, definitions));
+                pack.addProvider((FabricDataOutput output) -> new RottenItemModelProvider(output, definitions));
+                pack.addProvider((FabricDataOutput output) -> new RottenLanguageProvider(output, definitions));
 	}
 }

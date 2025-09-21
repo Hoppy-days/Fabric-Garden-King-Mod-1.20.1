@@ -3,7 +3,8 @@
     {
       "target": "minecraft:wheat",
       "crop": "minecraft:wheat",
-      "rotten_item": "gardenkingmod:rotten_wheat"
+      "rotten_item": "gardenkingmod:rotten_wheat",
+      "extra_rotten_chance": 1.0
     }
   ]
 }

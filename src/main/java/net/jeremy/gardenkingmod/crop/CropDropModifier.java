@@ -14,8 +14,6 @@ import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager.BonusDropEntry;
-import net.jeremy.gardenkingmod.crop.RottenHarvestManager;
-import net.jeremy.gardenkingmod.crop.RottenHarvestManager.RottenHarvestEntry;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -56,10 +54,8 @@ public final class CropDropModifier {
         public static void register() {
                 LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
                         BonusHarvestDropManager bonusManager = BonusHarvestDropManager.getInstance();
-                        RottenHarvestManager rottenManager = RottenHarvestManager.getInstance();
 
                         bonusManager.ensureLoaded(resourceManager);
-                        rottenManager.ensureLoaded(resourceManager);
 
                         FabricLootTableBuilder fabricBuilder = (FabricLootTableBuilder) (Object) tableBuilder;
 
@@ -93,13 +89,16 @@ public final class CropDropModifier {
                                         .map(ModItems::getRottenItemForTarget)
                                         .orElse(null);
 
-                        Optional<RottenHarvestEntry> rottenEntry = rottenManager.getRottenHarvest(id);
-                        Optional<Item> rottenOverride = rottenEntry.flatMap(RottenHarvestEntry::rottenItemOverride);
-                        float extraNoDropChance = rottenEntry.map(RottenHarvestEntry::extraNoDropChance).orElse(0.0f);
-                        float extraRottenChance = rottenEntry.map(RottenHarvestEntry::extraRottenChance).orElse(0.0f);
+                        Optional<RottenCropDefinition> rottenDefinition = RottenCropDefinitions.findByLootTableId(id);
+                        float extraNoDropChance = rottenDefinition.map(RottenCropDefinition::extraNoDropChance).orElse(0.0f);
+                        float extraRottenChance = rottenDefinition.map(RottenCropDefinition::extraRottenChance).orElse(0.0f);
+                        Item definitionRottenItem = rottenDefinition
+                                        .map(RottenCropDefinition::targetId)
+                                        .map(ModItems::getRottenItemForTarget)
+                                        .orElse(null);
                         float combinedNoDropChance = MathHelper.clamp(baseNoDropChance + extraNoDropChance, 0.0f, 1.0f);
                         float combinedRottenChance = MathHelper.clamp(baseRottenChance + extraRottenChance, 0.0f, 1.0f);
-                        Item rottenItem = rottenOverride.orElse(baselineRottenItem);
+                        Item rottenItem = definitionRottenItem != null ? definitionRottenItem : baselineRottenItem;
 
                         boolean applyScaling = multiplier > 1.0001f;
                         boolean applyNoDrop = combinedNoDropChance > 0.0f;
@@ -112,12 +111,13 @@ public final class CropDropModifier {
                         if (!applyRotten && combinedRottenChance > 0.0f) {
                                 String baselineLabel = baselineRottenItem == null ? "none"
                                                 : Registries.ITEM.getId(baselineRottenItem).toString();
-                                String overrideLabel = rottenOverride.map(Registries.ITEM::getId)
+                                String definitionLabel = rottenDefinition
+                                                .map(RottenCropDefinition::rottenItemId)
                                                 .map(Identifier::toString)
                                                 .orElse("none");
                                 GardenKingMod.LOGGER.debug(
-                                                "Skipping rotten conversion for loot table {} because no rotten item is available (baseline candidate: {}, datapack override: {})",
-                                                id, baselineLabel, overrideLabel);
+                                                "Skipping rotten conversion for loot table {} because no rotten item is available (definition candidate: {}, tier fallback: {})",
+                                                id, definitionLabel, baselineLabel);
                         }
 
                         fabricBuilder.modifyPools(poolBuilder -> {
@@ -147,7 +147,7 @@ public final class CropDropModifier {
                         }
                         if (applyRotten) {
                                 Identifier rottenItemId = Registries.ITEM.getId(rottenItem);
-                                String rottenOrigin = rottenOverride.isPresent() ? "datapack override" : "baseline definition";
+                                String rottenOrigin = definitionRottenItem != null ? "definition" : "tier fallback";
                                 appliedEffects.add(String.format("rotten conversion (%.2f%% -> %s, %s)",
                                                 combinedRottenChance * 100.0f, rottenItemId, rottenOrigin));
                         }
@@ -170,7 +170,7 @@ public final class CropDropModifier {
         }
 
         private static Optional<TierScalingData> resolveScaling(Identifier lootTableId) {
-                        return CACHE.computeIfAbsent(lootTableId, CropDropModifier::lookupScalingData);
+                return CACHE.computeIfAbsent(lootTableId, CropDropModifier::lookupScalingData);
         }
 
         private static Optional<TierScalingData> lookupScalingData(Identifier lootTableId) {
