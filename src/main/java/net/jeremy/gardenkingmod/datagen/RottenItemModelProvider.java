@@ -5,13 +5,13 @@ import java.util.List;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 
-import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinition;
 
 import net.minecraft.data.client.BlockStateModelGenerator;
 import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.Models;
-import net.minecraft.item.Item;
+import net.minecraft.data.client.TextureMap;
+import net.minecraft.util.Identifier;
 
 /**
  * Generates simple generated item models for every rotten crop item.
@@ -32,10 +32,11 @@ public final class RottenItemModelProvider extends FabricModelProvider {
         @Override
         public void generateItemModels(ItemModelGenerator itemModelGenerator) {
                 definitions.forEach(definition -> {
-                        Item rottenItem = ModItems.getRottenItemForTarget(definition.targetId());
-                        if (rottenItem != null) {
-                                itemModelGenerator.register(rottenItem, Models.GENERATED);
-                        }
+                        Identifier rottenItemId = definition.rottenItemId();
+                        Identifier textureId = new Identifier(rottenItemId.getNamespace(),
+                                        "item/" + rottenItemId.getPath());
+                        Models.GENERATED.upload(rottenItemId, TextureMap.layer0(textureId),
+                                        itemModelGenerator.writer);
                 });
         }
 }
