@@ -189,7 +189,7 @@ public final class CropDropModifier {
                         Identifier blockId = Registries.BLOCK.getId(block);
                         matchingBlocks.add(blockId);
 
-                        Optional<CropTier> tier = CropTierRegistry.get(block.getDefaultState());
+                        Optional<CropTier> tier = CropTierRegistry.get(block);
 
                         if (tier.isPresent()) {
                                 return Optional.of(new TierScalingData(blockId, tier.get()));
