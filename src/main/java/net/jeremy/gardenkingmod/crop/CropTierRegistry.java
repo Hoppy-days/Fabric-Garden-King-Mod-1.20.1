@@ -19,9 +19,12 @@ import net.minecraft.item.Item;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.TagGroupLoader;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.registry.tag.TagManagerLoader;
 import net.minecraft.util.Identifier;
 
 /**
@@ -177,11 +180,13 @@ public final class CropTierRegistry {
                                 return;
                         }
 
-                        if (manager != null) {
-                                lastResourceManager = manager;
+                        Map<Block, CropTier> rebuilt = rebuildBlockLookup(manager);
+                        if (rebuilt != null) {
+                                blockTierLookup = rebuilt;
+                                if (manager != null) {
+                                        lastResourceManager = manager;
+                                }
                         }
-
-                        rebuildBlockLookup();
                 }
         }
 
@@ -241,39 +246,65 @@ public final class CropTierRegistry {
                 boolean isIn(TagKey<Block> tag);
         }
 
-        private static void rebuildBlockLookup() {
+        private static Map<Block, CropTier> rebuildBlockLookup(ResourceManager manager) {
+                if (manager == null) {
+                        GardenKingMod.LOGGER.warn("Cannot rebuild crop tier lookup without a resource manager instance");
+                        return null;
+                }
+
+                TagGroupLoader<RegistryEntry<Block>> loader = new TagGroupLoader<>(
+                                id -> Registries.BLOCK.getEntry(RegistryKey.of(RegistryKeys.BLOCK, id)),
+                                TagManagerLoader.getPath(RegistryKeys.BLOCK));
+
+                Map<Identifier, Collection<RegistryEntry<Block>>> loadedTags;
+                try {
+                        loadedTags = loader.load(manager);
+                } catch (Exception exception) {
+                        GardenKingMod.LOGGER.error("Failed to build crop tier lookup from tag data", exception);
+                        return null;
+                }
+
                 Map<Block, CropTier> resolved = new IdentityHashMap<>();
                 int registered = 0;
 
-                registered += registerTierMembers(TIER_1, get(TIER_1_ID), resolved);
-                registered += registerTierMembers(TIER_2, get(TIER_2_ID), resolved);
-                registered += registerTierMembers(TIER_3, get(TIER_3_ID), resolved);
-                registered += registerTierMembers(TIER_4, get(TIER_4_ID), resolved);
-                registered += registerTierMembers(TIER_5, get(TIER_5_ID), resolved);
-
-                blockTierLookup = resolved.isEmpty() ? Map.of() : Map.copyOf(resolved);
+                registered += registerTierMembers(loadedTags, TIER_1, get(TIER_1_ID), resolved);
+                registered += registerTierMembers(loadedTags, TIER_2, get(TIER_2_ID), resolved);
+                registered += registerTierMembers(loadedTags, TIER_3, get(TIER_3_ID), resolved);
+                registered += registerTierMembers(loadedTags, TIER_4, get(TIER_4_ID), resolved);
+                registered += registerTierMembers(loadedTags, TIER_5, get(TIER_5_ID), resolved);
 
                 GardenKingMod.LOGGER.debug("Built crop tier lookup for {} blocks", registered);
+
+                return resolved.isEmpty() ? Map.of() : Map.copyOf(resolved);
         }
 
-        private static int registerTierMembers(TagKey<Block> tag, Optional<CropTier> tierOptional,
-                        Map<Block, CropTier> destination) {
+        private static int registerTierMembers(Map<Identifier, Collection<RegistryEntry<Block>>> loadedTags, TagKey<Block> tag,
+                        Optional<CropTier> tierOptional, Map<Block, CropTier> destination) {
                 if (tierOptional.isEmpty()) {
                         return 0;
                 }
 
+                Collection<RegistryEntry<Block>> entries = loadedTags.getOrDefault(tag.id(), Collections.emptyList());
+                if (entries.isEmpty()) {
+                        return 0;
+                }
+
                 CropTier tier = tierOptional.get();
-                return Registries.BLOCK.getEntryList(tag)
-                                .map(entryList -> {
-                                        int count = 0;
-                                        for (RegistryEntry<Block> entry : entryList.stream().toList()) {
-                                                Block block = entry.value();
-                                                destination.put(block, tier);
-                                                count++;
-                                        }
-                                        return count;
-                                })
-                                .orElse(0);
+                int count = 0;
+
+                for (RegistryEntry<Block> entry : entries) {
+                        Block block = entry.value();
+                        CropTier previous = destination.put(block, tier);
+                        if (previous != null && previous != tier) {
+                                Identifier blockId = Registries.BLOCK.getId(block);
+                                GardenKingMod.LOGGER.warn(
+                                                "Block {} appears in multiple crop tier tags ({} and {}); using the last value",
+                                                blockId, previous.id(), tier.id());
+                        }
+                        count++;
+                }
+
+                return count;
         }
 
         private static final class BlockTierLookupReloader implements SimpleSynchronousResourceReloadListener {
@@ -285,8 +316,11 @@ public final class CropTierRegistry {
                 @Override
                 public void reload(ResourceManager manager) {
                         synchronized (LOOKUP_LOCK) {
-                                lastResourceManager = manager;
-                                rebuildBlockLookup();
+                                Map<Block, CropTier> rebuilt = rebuildBlockLookup(manager);
+                                if (rebuilt != null) {
+                                        blockTierLookup = rebuilt;
+                                        lastResourceManager = manager;
+                                }
                         }
                 }
 
