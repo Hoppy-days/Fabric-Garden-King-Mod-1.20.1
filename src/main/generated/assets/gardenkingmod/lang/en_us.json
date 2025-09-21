@@ -18,6 +18,8 @@
   "tooltip.gardenkingmod.crop_tier.tier_3": "Tier 3",
   "tooltip.gardenkingmod.crop_tier.tier_4": "Tier 4",
   "tooltip.gardenkingmod.crop_tier.tier_5": "Tier 5",
-  "item.gardenkingmod.rotten_wheat": "Rotten Wheat",
-  "item.gardenkingmod.rotten_carrot": "Rotten Carrot"
+  "item.gardenkingmod.rotten_carrot": "Rotten Carrot",
+  "item.gardenkingmod.rotten_potato": "Rotten Potato",
+  "item.gardenkingmod.rotten_tomato": "Rotten Tomato",
+  "item.gardenkingmod.rotten_wheat": "Rotten Wheat"
 }
