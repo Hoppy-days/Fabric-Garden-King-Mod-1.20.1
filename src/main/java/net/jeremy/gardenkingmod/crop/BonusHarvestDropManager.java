@@ -26,6 +26,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.profiler.DummyProfiler;
 import net.minecraft.util.profiler.Profiler;
 
 /**
@@ -39,6 +40,9 @@ public final class BonusHarvestDropManager extends JsonDataLoader implements Ide
         private static final BonusHarvestDropManager INSTANCE = new BonusHarvestDropManager();
 
         private final Map<Identifier, List<BonusDropEntry>> bonusDrops = new ConcurrentHashMap<>();
+        private final Object reloadLock = new Object();
+        private volatile ResourceManager lastSeenManager;
+        private volatile boolean appliedForManager;
 
         private BonusHarvestDropManager() {
                 super(GSON, DIRECTORY);
@@ -64,8 +68,47 @@ public final class BonusHarvestDropManager extends JsonDataLoader implements Ide
                 return entries != null ? entries : Collections.emptyList();
         }
 
+        public void ensureLoaded(ResourceManager resourceManager) {
+                if (resourceManager == null) {
+                        return;
+                }
+
+                boolean needsLoad;
+                synchronized (reloadLock) {
+                        if (resourceManager != lastSeenManager) {
+                                lastSeenManager = resourceManager;
+                                appliedForManager = false;
+                        }
+
+                        needsLoad = !appliedForManager;
+                }
+
+                if (!needsLoad) {
+                        return;
+                }
+
+                Map<Identifier, JsonElement> prepared = prepare(resourceManager, DummyProfiler.INSTANCE);
+
+                synchronized (reloadLock) {
+                        if (resourceManager != lastSeenManager || appliedForManager) {
+                                return;
+                        }
+
+                        loadFromPrepared(prepared);
+                        appliedForManager = true;
+                }
+        }
+
         @Override
         protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, Profiler profiler) {
+                synchronized (reloadLock) {
+                        lastSeenManager = manager;
+                        loadFromPrepared(prepared);
+                        appliedForManager = true;
+                }
+        }
+
+        private void loadFromPrepared(Map<Identifier, JsonElement> prepared) {
                 Map<Identifier, List<BonusDropEntry>> parsed = new HashMap<>();
 
                 for (Map.Entry<Identifier, JsonElement> entry : prepared.entrySet()) {
