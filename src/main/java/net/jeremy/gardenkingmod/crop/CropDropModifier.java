@@ -83,14 +83,10 @@ public final class CropDropModifier {
                         }
 
                         Optional<TierScalingData> scalingData = resolveScaling(id);
-                        if (scalingData.isEmpty()) {
-                                return;
-                        }
-
-                        CropTier tier = scalingData.get().tier();
-                        float multiplier = tier.dropMultiplier();
-                        float baseNoDropChance = MathHelper.clamp(tier.noDropChance(), 0.0f, 1.0f);
-                        float baseRottenChance = MathHelper.clamp(tier.rottenChance(), 0.0f, 1.0f);
+                        Optional<CropTier> tier = scalingData.map(TierScalingData::tier);
+                        float multiplier = tier.map(CropTier::dropMultiplier).orElse(1.0f);
+                        float baseNoDropChance = MathHelper.clamp(tier.map(CropTier::noDropChance).orElse(0.0f), 0.0f, 1.0f);
+                        float baseRottenChance = MathHelper.clamp(tier.map(CropTier::rottenChance).orElse(0.0f), 0.0f, 1.0f);
 
                         Optional<RottenHarvestEntry> rottenEntry = rottenManager.getRottenHarvest(id);
                         float extraNoDropChance = rottenEntry.map(RottenHarvestEntry::extraNoDropChance).orElse(0.0f);
@@ -138,8 +134,13 @@ public final class CropDropModifier {
                         }
 
                         if (!appliedEffects.isEmpty()) {
-                                GardenKingMod.LOGGER.debug("Applied {} to loot table {} using tier {}",
-                                                String.join(", ", appliedEffects), id, tier.id());
+                                if (tier.isPresent()) {
+                                        GardenKingMod.LOGGER.debug("Applied {} to loot table {} using tier {}",
+                                                        String.join(", ", appliedEffects), id, tier.get().id());
+                                } else {
+                                        GardenKingMod.LOGGER.debug("Applied {} to loot table {} without tier scaling",
+                                                        String.join(", ", appliedEffects), id);
+                                }
                         }
                 });
 
@@ -180,6 +181,10 @@ public final class CropDropModifier {
                         GardenKingMod.LOGGER.debug(
                                         "Loot table {} is not assigned to a crop tier; using vanilla drop counts (owners: {})",
                                         lootTableId, matchingBlocks);
+                } else {
+                        GardenKingMod.LOGGER.debug(
+                                        "Loot table {} is not associated with a block owner; skipping crop tier scaling",
+                                        lootTableId);
                 }
 
                 return Optional.empty();
