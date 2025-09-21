@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "gardenkingmod:rotten_wheat"
+    "gardenkingmod:rotten_wheat",
+    "gardenkingmod:rotten_carrot"
   ]
 }

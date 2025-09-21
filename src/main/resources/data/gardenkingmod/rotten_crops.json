@@ -4,6 +4,14 @@
       "target": "minecraft:wheat",
       "crop": "minecraft:wheat",
       "rotten_item": "gardenkingmod:rotten_wheat",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "minecraft:carrots",
+      "crop": "minecraft:carrot",
+      "rotten_item": "gardenkingmod:rotten_carrot",
+      "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
     }
   ]
