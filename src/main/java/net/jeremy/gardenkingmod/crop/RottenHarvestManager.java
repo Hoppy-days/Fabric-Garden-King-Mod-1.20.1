@@ -24,6 +24,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.profiler.DummyProfiler;
 import net.minecraft.util.profiler.Profiler;
 
 /**
@@ -37,6 +38,9 @@ public final class RottenHarvestManager extends JsonDataLoader implements Identi
         private static final RottenHarvestManager INSTANCE = new RottenHarvestManager();
 
         private final Map<Identifier, RottenHarvestEntry> rottenHarvests = new ConcurrentHashMap<>();
+        private final Object reloadLock = new Object();
+        private volatile ResourceManager lastSeenManager;
+        private volatile boolean appliedForManager;
 
         private RottenHarvestManager() {
                 super(GSON, DIRECTORY);
@@ -64,8 +68,47 @@ public final class RottenHarvestManager extends JsonDataLoader implements Identi
                 return entry == null ? 0.0f : entry.extraRottenChance();
         }
 
+        public void ensureLoaded(ResourceManager resourceManager) {
+                if (resourceManager == null) {
+                        return;
+                }
+
+                boolean needsLoad;
+                synchronized (reloadLock) {
+                        if (resourceManager != lastSeenManager) {
+                                lastSeenManager = resourceManager;
+                                appliedForManager = false;
+                        }
+
+                        needsLoad = !appliedForManager;
+                }
+
+                if (!needsLoad) {
+                        return;
+                }
+
+                Map<Identifier, JsonElement> prepared = prepare(resourceManager, DummyProfiler.INSTANCE);
+
+                synchronized (reloadLock) {
+                        if (resourceManager != lastSeenManager || appliedForManager) {
+                                return;
+                        }
+
+                        loadFromPrepared(prepared);
+                        appliedForManager = true;
+                }
+        }
+
         @Override
         protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, Profiler profiler) {
+                synchronized (reloadLock) {
+                        lastSeenManager = manager;
+                        loadFromPrepared(prepared);
+                        appliedForManager = true;
+                }
+        }
+
+        private void loadFromPrepared(Map<Identifier, JsonElement> prepared) {
                 Map<Identifier, RottenHarvestEntry> parsed = new HashMap<>();
 
                 for (Map.Entry<Identifier, JsonElement> entry : prepared.entrySet()) {

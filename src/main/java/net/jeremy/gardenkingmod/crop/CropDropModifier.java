@@ -54,9 +54,15 @@ public final class CropDropModifier {
 
         public static void register() {
                 LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+                        BonusHarvestDropManager bonusManager = BonusHarvestDropManager.getInstance();
+                        RottenHarvestManager rottenManager = RottenHarvestManager.getInstance();
+
+                        bonusManager.ensureLoaded(resourceManager);
+                        rottenManager.ensureLoaded(resourceManager);
+
                         FabricLootTableBuilder fabricBuilder = (FabricLootTableBuilder) (Object) tableBuilder;
 
-                        List<BonusDropEntry> bonusDrops = BonusHarvestDropManager.getInstance().getBonusDrops(id);
+                        List<BonusDropEntry> bonusDrops = bonusManager.getBonusDrops(id);
                         AtomicBoolean bonusApplied = new AtomicBoolean(false);
                         if (!bonusDrops.isEmpty()) {
                                 fabricBuilder.modifyPools(poolBuilder -> {
@@ -86,7 +92,7 @@ public final class CropDropModifier {
                         float baseNoDropChance = MathHelper.clamp(tier.noDropChance(), 0.0f, 1.0f);
                         float baseRottenChance = MathHelper.clamp(tier.rottenChance(), 0.0f, 1.0f);
 
-                        Optional<RottenHarvestEntry> rottenEntry = RottenHarvestManager.getInstance().getRottenHarvest(id);
+                        Optional<RottenHarvestEntry> rottenEntry = rottenManager.getRottenHarvest(id);
                         float extraNoDropChance = rottenEntry.map(RottenHarvestEntry::extraNoDropChance).orElse(0.0f);
                         float extraRottenChance = rottenEntry.map(RottenHarvestEntry::extraRottenChance).orElse(0.0f);
                         float combinedNoDropChance = MathHelper.clamp(baseNoDropChance + extraNoDropChance, 0.0f, 1.0f);
