@@ -235,14 +235,14 @@ public final class RottenCropDefinitions {
                 }
 
                 Optional<Block> blockOptional = Registries.BLOCK.getOrEmpty(targetId);
-                if (blockOptional.isEmpty()) {
+                Block block = blockOptional.orElse(null);
+
+                if (block == null && !object.has("crop")) {
                         GardenKingMod.LOGGER.warn(
                                         "Skipping rotten crop entry {} because target block {} is not registered.",
                                         entryLabel, targetId);
                         return null;
                 }
-
-                Block block = blockOptional.get();
 
                 Identifier cropId;
                 if (object.has("crop")) {
@@ -250,7 +250,7 @@ public final class RottenCropDefinitions {
                         if (cropId == null) {
                                 return null;
                         }
-                } else {
+                } else if (block != null) {
                         cropId = resolveCropIdentifier(block, targetId);
                         if (cropId == null) {
                                 GardenKingMod.LOGGER.warn(
@@ -258,6 +258,11 @@ public final class RottenCropDefinitions {
                                                 entryLabel);
                                 return null;
                         }
+                } else {
+                        GardenKingMod.LOGGER.warn(
+                                        "Skipping rotten crop entry {} because the crop item could not be determined.",
+                                        entryLabel);
+                        return null;
                 }
 
                 if (Registries.ITEM.getOrEmpty(cropId).isEmpty()) {
@@ -272,9 +277,17 @@ public final class RottenCropDefinitions {
                         if (lootTableId == null) {
                                 return null;
                         }
-                } else {
+                } else if (block != null) {
                         lootTableId = block.getLootTableId();
                         if (LootTables.EMPTY.equals(lootTableId)) {
+                                GardenKingMod.LOGGER.warn(
+                                                "Skipping rotten crop entry {} because target {} does not have a loot table. Specify one with 'loot_table'.",
+                                                entryLabel, targetId);
+                                return null;
+                        }
+                } else {
+                        lootTableId = createDefaultLootTableId(targetId);
+                        if (lootTableId == null) {
                                 GardenKingMod.LOGGER.warn(
                                                 "Skipping rotten crop entry {} because target {} does not have a loot table. Specify one with 'loot_table'.",
                                                 entryLabel, targetId);
@@ -287,6 +300,19 @@ public final class RottenCropDefinitions {
 
                 return new RottenCropDefinition(cropId, targetId, lootTableId, rottenItemId.getPath(), extraNoDropChance,
                                 extraRottenChance);
+        }
+
+        private static Identifier createDefaultLootTableId(Identifier targetId) {
+                if (targetId == null) {
+                        return null;
+                }
+
+                String path = targetId.getPath();
+                if (path == null || path.isEmpty()) {
+                        return null;
+                }
+
+                return new Identifier(targetId.getNamespace(), "blocks/" + path);
         }
 
         private static Identifier parseIdentifier(JsonObject object, String key, String entryLabel) {
