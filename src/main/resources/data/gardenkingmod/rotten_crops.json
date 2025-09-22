@@ -8,16 +8,30 @@
       "extra_rotten_chance": 0.0
     },
     {
-      "target": "croptopia:tomato_crop",
-      "crop": "croptopia:tomato",
-      "rotten_item": "gardenkingmod:rotten_tomato",
+      "target": "croptopia:apple_crop",
+      "crop": "minecraft:apple",
+      "rotten_item": "gardenkingmod:rotten_apple",
       "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
     },
     {
-      "target": "croptopia:apple_crop",
-      "crop": "minecraft:apple",
-      "rotten_item": "gardenkingmod:rotten_apple",
+      "target": "croptopia:apricot_crop",
+      "crop": "croptopia:apricot",
+      "rotten_item": "gardenkingmod:rotten_apricot",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:artichoke_crop",
+      "crop": "croptopia:artichoke",
+      "rotten_item": "gardenkingmod:rotten_artichoke",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:tomato_crop",
+      "crop": "croptopia:tomato",
+      "rotten_item": "gardenkingmod:rotten_tomato",
       "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
     },
