@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "croptopia:almond_crop",
+    "croptopia:apple_crop",
     "croptopia:tomato_crop",
     "minecraft:beetroots",
     "minecraft:carrots",

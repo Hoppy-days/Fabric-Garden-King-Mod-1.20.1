@@ -15,6 +15,13 @@
       "extra_rotten_chance": 0.0
     },
     {
+      "target": "croptopia:apple_crop",
+      "crop": "minecraft:apple",
+      "rotten_item": "gardenkingmod:rotten_apple",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
       "target": "minecraft:beetroots",
       "crop": "minecraft:beetroot",
       "rotten_item": "gardenkingmod:rotten_beetroot",
