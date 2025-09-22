@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.jeremy.gardenkingmod.GardenKingMod;
 
 import net.minecraft.block.Block;
@@ -153,18 +155,25 @@ public final class RottenCropDefinitions {
         }
 
         private static List<RottenCropDefinition> loadDefinitionsFromResource() {
-                Optional<Path> resourcePath = FabricLoader.getInstance()
+                Optional<Collection<Path>> rootPaths = FabricLoader.getInstance()
                                 .getModContainer(GardenKingMod.MOD_ID)
-                                .flatMap(container -> container
-                                                .findPath("data/" + GardenKingMod.MOD_ID + "/rotten_crops.json"));
+                                .map(ModContainer::getRootPaths);
 
-                if (resourcePath.isPresent()) {
-                        try (BufferedReader reader = Files.newBufferedReader(resourcePath.get(), StandardCharsets.UTF_8)) {
-                                return parseDefinitions(reader);
-                        } catch (JsonParseException | IOException exception) {
-                                GardenKingMod.LOGGER.error("Failed to read rotten crop definitions from {}", RESOURCE_PATH,
-                                                exception);
-                                return List.of();
+                if (rootPaths.isPresent()) {
+                        for (Path rootPath : rootPaths.get()) {
+                                Path dataPath = rootPath.resolve("data").resolve(GardenKingMod.MOD_ID)
+                                                .resolve("rotten_crops.json");
+                                if (Files.isRegularFile(dataPath)) {
+                                        try (BufferedReader reader = Files.newBufferedReader(dataPath,
+                                                        StandardCharsets.UTF_8)) {
+                                                return parseDefinitions(reader);
+                                        } catch (JsonParseException | IOException exception) {
+                                                GardenKingMod.LOGGER.error(
+                                                                "Failed to read rotten crop definitions from {}",
+                                                                RESOURCE_PATH, exception);
+                                                return List.of();
+                                        }
+                                }
                         }
                 }
 
