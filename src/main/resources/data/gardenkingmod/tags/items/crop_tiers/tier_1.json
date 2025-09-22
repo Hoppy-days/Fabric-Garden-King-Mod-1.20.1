@@ -1,14 +1,11 @@
 {
   "replace": false,
   "values": [
-    "minecraft:wheat",
-    "minecraft:carrot",
-    "minecraft:potato",
+    "croptopia:almond",
     "minecraft:beetroot",
-    "minecraft:wheat_seeds",
-    "minecraft:beetroot_seeds",
-    { "id": "croptopia:tomato", "required": false },
-    { "id": "croptopia:tomato_seed", "required": false },
-    { "id": "croptopia:tomato_seeds", "required": false }
+    "minecraft:carrot",
+    "croptopia:tomato",
+    "minecraft:potato",
+    "minecraft:wheat"
   ]
 }

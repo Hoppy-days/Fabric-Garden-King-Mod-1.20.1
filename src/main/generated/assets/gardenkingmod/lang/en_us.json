@@ -2,6 +2,8 @@
   "block.gardenkingmod.market_block": "Garden Market",
   "container.gardenkingmod.market": "Garden Market",
   "item.gardenkingmod.garden_coin": "Garden Coin",
+  "item.gardenkingmod.rotten_almond": "Rotten Almond",
+  "item.gardenkingmod.rotten_beetroot": "Rotten Beetroot",
   "item.gardenkingmod.rotten_carrot": "Rotten Carrot",
   "item.gardenkingmod.rotten_potato": "Rotten Potato",
   "item.gardenkingmod.rotten_tomato": "Rotten Tomato",

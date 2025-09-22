@@ -1,9 +1,9 @@
 {
   "entries": [
     {
-      "target": "minecraft:wheat",
-      "crop": "minecraft:wheat",
-      "rotten_item": "gardenkingmod:rotten_wheat",
+      "target": "croptopia:almond_crop",
+      "crop": "croptopia:almond",
+      "rotten_item": "gardenkingmod:rotten_almond",
       "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
     },
@@ -11,6 +11,13 @@
       "target": "croptopia:tomato_crop",
       "crop": "croptopia:tomato",
       "rotten_item": "gardenkingmod:rotten_tomato",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "minecraft:beetroots",
+      "crop": "minecraft:beetroot",
+      "rotten_item": "gardenkingmod:rotten_beetroot",
       "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
     },
@@ -27,6 +34,16 @@
       "rotten_item": "gardenkingmod:rotten_potato",
       "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "minecraft:wheat",
+      "crop": "minecraft:wheat",
+      "rotten_item": "gardenkingmod:rotten_wheat",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
     }
+
+
+
   ]
 }
