@@ -1,9 +1,13 @@
 package net.jeremy.gardenkingmod.crop;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,6 +25,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.jeremy.gardenkingmod.GardenKingMod;
 
 import net.minecraft.block.Block;
@@ -142,44 +147,65 @@ public final class RottenCropDefinitions {
         }
 
         private static List<RottenCropDefinition> manualDefinitions() {
+                // Textures for each rotten item should be placed in
+                // src/main/resources/assets/gardenkingmod/textures/item/.
                 return loadDefinitionsFromResource();
         }
 
         private static List<RottenCropDefinition> loadDefinitionsFromResource() {
+                Optional<Path> resourcePath = FabricLoader.getInstance()
+                                .getModContainer(GardenKingMod.MOD_ID)
+                                .flatMap(container -> container
+                                                .findPath("data/" + GardenKingMod.MOD_ID + "/rotten_crops.json"));
+
+                if (resourcePath.isPresent()) {
+                        try (BufferedReader reader = Files.newBufferedReader(resourcePath.get(), StandardCharsets.UTF_8)) {
+                                return parseDefinitions(reader);
+                        } catch (JsonParseException | IOException exception) {
+                                GardenKingMod.LOGGER.error("Failed to read rotten crop definitions from {}", RESOURCE_PATH,
+                                                exception);
+                                return List.of();
+                        }
+                }
+
                 InputStream stream = RottenCropDefinitions.class.getResourceAsStream(RESOURCE_PATH);
                 if (stream == null) {
-                        GardenKingMod.LOGGER.info("No rotten crop list found at {}. Add the file to register custom rotten items.",
+                        GardenKingMod.LOGGER.info(
+                                        "No rotten crop list found at {}. Add the file to register custom rotten items.",
                                         RESOURCE_PATH);
                         return List.of();
                 }
 
-                List<RottenCropDefinition> definitions = new ArrayList<>();
-
                 try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-                        JsonElement root = JsonParser.parseReader(reader);
-                        JsonArray entries = extractEntriesArray(root);
-                        if (entries == null) {
-                                GardenKingMod.LOGGER.warn("Expected an array of rotten crop entries in {}.", RESOURCE_PATH);
-                                return List.of();
-                        }
-
-                        for (int index = 0; index < entries.size(); index++) {
-                                JsonElement element = entries.get(index);
-                                if (!element.isJsonObject()) {
-                                        GardenKingMod.LOGGER.warn(
-                                                        "Ignoring non-object entry at index {} while reading {}.", index,
-                                                        RESOURCE_PATH);
-                                        continue;
-                                }
-
-                                RottenCropDefinition definition = parseDefinition(element.getAsJsonObject(), index);
-                                if (definition != null) {
-                                        definitions.add(definition);
-                                }
-                        }
+                        return parseDefinitions(reader);
                 } catch (JsonParseException | IOException exception) {
                         GardenKingMod.LOGGER.error("Failed to read rotten crop definitions from {}", RESOURCE_PATH, exception);
                         return List.of();
+                }
+        }
+
+        private static List<RottenCropDefinition> parseDefinitions(Reader reader) {
+                List<RottenCropDefinition> definitions = new ArrayList<>();
+
+                JsonElement root = JsonParser.parseReader(reader);
+                JsonArray entries = extractEntriesArray(root);
+                if (entries == null) {
+                        GardenKingMod.LOGGER.warn("Expected an array of rotten crop entries in {}.", RESOURCE_PATH);
+                        return List.of();
+                }
+
+                for (int index = 0; index < entries.size(); index++) {
+                        JsonElement element = entries.get(index);
+                        if (!element.isJsonObject()) {
+                                GardenKingMod.LOGGER.warn("Ignoring non-object entry at index {} while reading {}.", index,
+                                                RESOURCE_PATH);
+                                continue;
+                        }
+
+                        RottenCropDefinition definition = parseDefinition(element.getAsJsonObject(), index);
+                        if (definition != null) {
+                                definitions.add(definition);
+                        }
                 }
 
                 return List.copyOf(definitions);
