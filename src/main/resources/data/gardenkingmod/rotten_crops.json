@@ -64,6 +64,13 @@
       "extra_rotten_chance": 0.0
     },
     {
+      "target": "croptopia:bellpepper_crop",
+      "crop": "croptopia:bellpepper",
+      "rotten_item": "gardenkingmod:rotten_bellpepper",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
       "target": "croptopia:tomato_crop",
       "crop": "croptopia:tomato",
       "rotten_item": "gardenkingmod:rotten_tomato",
