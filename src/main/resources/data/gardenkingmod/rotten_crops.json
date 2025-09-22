@@ -43,6 +43,27 @@
       "extra_rotten_chance": 0.0
     },
     {
+      "target": "croptopia:banana_crop",
+      "crop": "croptopia:banana",
+      "rotten_item": "gardenkingmod:rotten_banana",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:barley_crop",
+      "crop": "croptopia:barley",
+      "rotten_item": "gardenkingmod:rotten_barley",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:basil_crop",
+      "crop": "croptopia:basil",
+      "rotten_item": "gardenkingmod:rotten_basil",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
       "target": "croptopia:tomato_crop",
       "crop": "croptopia:tomato",
       "rotten_item": "gardenkingmod:rotten_tomato",
