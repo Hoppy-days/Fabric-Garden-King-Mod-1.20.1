@@ -64,6 +64,13 @@
       "extra_rotten_chance": 0.0
     },
     {
+      "target": "minecraft:beetroots",
+      "crop": "minecraft:beetroot",
+      "rotten_item": "gardenkingmod:rotten_beetroot",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
       "target": "croptopia:bellpepper_crop",
       "crop": "croptopia:bellpepper",
       "rotten_item": "gardenkingmod:rotten_bellpepper",
@@ -113,6 +120,13 @@
       "extra_rotten_chance": 0.0
     },
     {
+      "target": "minecraft:carrots",
+      "crop": "minecraft:carrot",
+      "rotten_item": "gardenkingmod:rotten_carrot",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
       "target": "croptopia:cashew_crop",
       "crop": "croptopia:cashew",
       "rotten_item": "gardenkingmod:rotten_cashew",
@@ -155,23 +169,289 @@
       "extra_rotten_chance": 0.0
     },
     {
-      "target": "croptopia:tomato_crop",
-      "crop": "croptopia:tomato",
-      "rotten_item": "gardenkingmod:rotten_tomato",
+      "target": "croptopia:coffee_crop",
+      "crop": "croptopia:coffee_beans",
+      "rotten_item": "gardenkingmod:rotten_coffee_beans",
       "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
     },
     {
-      "target": "minecraft:beetroots",
-      "crop": "minecraft:beetroot",
-      "rotten_item": "gardenkingmod:rotten_beetroot",
+      "target": "croptopia:corn_crop",
+      "crop": "croptopia:corn",
+      "rotten_item": "gardenkingmod:rotten_corn",
       "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
     },
     {
-      "target": "minecraft:carrots",
-      "crop": "minecraft:carrot",
-      "rotten_item": "gardenkingmod:rotten_carrot",
+      "target": "croptopia:cranberry_crop",
+      "crop": "croptopia:cranberry",
+      "rotten_item": "gardenkingmod:rotten_cranberry",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:cucumber_crop",
+      "crop": "croptopia:cucumber",
+      "rotten_item": "gardenkingmod:rotten_cucumber",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:currant_crop",
+      "crop": "croptopia:currant",
+      "rotten_item": "gardenkingmod:rotten_currant",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:date_crop",
+      "crop": "croptopia:date",
+      "rotten_item": "gardenkingmod:rotten_date",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:dragonfruit_crop",
+      "crop": "croptopia:dragonfruit",
+      "rotten_item": "gardenkingmod:rotten_dragonfruit",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:eggplant_crop",
+      "crop": "croptopia:eggplant",
+      "rotten_item": "gardenkingmod:rotten_eggplant",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:elderberry_crop",
+      "crop": "croptopia:elderberry",
+      "rotten_item": "gardenkingmod:rotten_elderberry",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:fig_crop",
+      "crop": "croptopia:fig",
+      "rotten_item": "gardenkingmod:rotten_fig",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:garlic_crop",
+      "crop": "croptopia:garlic",
+      "rotten_item": "gardenkingmod:rotten_garlic",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:ginger_crop",
+      "crop": "croptopia:ginger",
+      "rotten_item": "gardenkingmod:rotten_ginger",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:grape_crop",
+      "crop": "croptopia:grape",
+      "rotten_item": "gardenkingmod:rotten_grape",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:grapefruit_crop",
+      "crop": "croptopia:grapefruit",
+      "rotten_item": "gardenkingmod:rotten_grapefruit",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:greenbean_crop",
+      "crop": "croptopia:greenbean",
+      "rotten_item": "gardenkingmod:rotten_greenbean",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:greenonion_crop",
+      "crop": "croptopia:greenonion",
+      "rotten_item": "gardenkingmod:rotten_greenonion",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:honeydew_crop",
+      "crop": "croptopia:honeydew",
+      "rotten_item": "gardenkingmod:rotten_honeydew",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:hops_crop",
+      "crop": "croptopia:hops",
+      "rotten_item": "gardenkingmod:rotten_hops",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:kale_crop",
+      "crop": "croptopia:kale",
+      "rotten_item": "gardenkingmod:rotten_kale",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:kiwi_crop",
+      "crop": "croptopia:kiwi",
+      "rotten_item": "gardenkingmod:rotten_kiwi",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:kumquat_crop",
+      "crop": "croptopia:kumquat",
+      "rotten_item": "gardenkingmod:rotten_kumquat",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:leek_crop",
+      "crop": "croptopia:leek",
+      "rotten_item": "gardenkingmod:rotten_leek",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:lemon_crop",
+      "crop": "croptopia:lemon",
+      "rotten_item": "gardenkingmod:rotten_lemon",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:lettuce_crop",
+      "crop": "croptopia:lettuce",
+      "rotten_item": "gardenkingmod:rotten_lettuce",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:lime_crop",
+      "crop": "croptopia:lime",
+      "rotten_item": "gardenkingmod:rotten_lime",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:mango_crop",
+      "crop": "croptopia:mango",
+      "rotten_item": "gardenkingmod:rotten_mango",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:mustard_crop",
+      "crop": "croptopia:mustard",
+      "rotten_item": "gardenkingmod:rotten_mustard",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:nectarine_crop",
+      "crop": "croptopia:nectarine",
+      "rotten_item": "gardenkingmod:rotten_nectarine",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:nutmeg_crop",
+      "crop": "croptopia:nutmeg",
+      "rotten_item": "gardenkingmod:rotten_nutmeg",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:oat_crop",
+      "crop": "croptopia:oat",
+      "rotten_item": "gardenkingmod:rotten_oat",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:olive_crop",
+      "crop": "croptopia:olive",
+      "rotten_item": "gardenkingmod:rotten_olive",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:onion_crop",
+      "crop": "croptopia:onion",
+      "rotten_item": "gardenkingmod:rotten_onion",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:orange_crop",
+      "crop": "croptopia:orange",
+      "rotten_item": "gardenkingmod:rotten_orange",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:peach_crop",
+      "crop": "croptopia:peach",
+      "rotten_item": "gardenkingmod:rotten_peach",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:peanut_crop",
+      "crop": "croptopia:peanut",
+      "rotten_item": "gardenkingmod:rotten_peanut",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:pear_crop",
+      "crop": "croptopia:pear",
+      "rotten_item": "gardenkingmod:rotten_pear",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:pecan_crop",
+      "crop": "croptopia:pecan",
+      "rotten_item": "gardenkingmod:rotten_pecan",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:pepper_crop",
+      "crop": "croptopia:pepper",
+      "rotten_item": "gardenkingmod:rotten_pepper",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:persimmon_crop",
+      "crop": "croptopia:persimmon",
+      "rotten_item": "gardenkingmod:rotten_persimmon",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:pineapple_crop",
+      "crop": "croptopia:pineapple",
+      "rotten_item": "gardenkingmod:rotten_pineapple",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:plum_crop",
+      "crop": "croptopia:plum",
+      "rotten_item": "gardenkingmod:rotten_plum",
       "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
     },
@@ -183,14 +463,158 @@
       "extra_rotten_chance": 0.0
     },
     {
+      "target": "croptopia:radish_crop",
+      "crop": "croptopia:radish",
+      "rotten_item": "gardenkingmod:rotten_radish",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:raspberry_crop",
+      "crop": "croptopia:raspberry",
+      "rotten_item": "gardenkingmod:rotten_raspberry",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:rhubarb_crop",
+      "crop": "croptopia:rhubarb",
+      "rotten_item": "gardenkingmod:rotten_rhubarb",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:rice_crop",
+      "crop": "croptopia:rice",
+      "rotten_item": "gardenkingmod:rotten_rice",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:rutabaga_crop",
+      "crop": "croptopia:rutabaga",
+      "rotten_item": "gardenkingmod:rotten_rutabaga",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:saguaro_crop",
+      "crop": "croptopia:saguaro",
+      "rotten_item": "gardenkingmod:rotten_saguaro",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:soybean_crop",
+      "crop": "croptopia:soybean",
+      "rotten_item": "gardenkingmod:rotten_soybean",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:spinach_crop",
+      "crop": "croptopia:spinach",
+      "rotten_item": "gardenkingmod:rotten_spinach",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:squash_crop",
+      "crop": "croptopia:squash",
+      "rotten_item": "gardenkingmod:rotten_squash",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:starfruit_crop",
+      "crop": "croptopia:starfruit",
+      "rotten_item": "gardenkingmod:rotten_starfruit",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:strawberry_crop",
+      "crop": "croptopia:strawberry",
+      "rotten_item": "gardenkingmod:rotten_strawberry",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:sweetpotato_crop",
+      "crop": "croptopia:sweetpotato",
+      "rotten_item": "gardenkingmod:rotten_sweetpotato",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:tea_crop",
+      "crop": "croptopia:tea_leaves",
+      "rotten_item": "gardenkingmod:rotten_tea_leaves",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:tomatillo_crop",
+      "crop": "croptopia:tomatillo",
+      "rotten_item": "gardenkingmod:rotten_tomatillo",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:tomato_crop",
+      "crop": "croptopia:tomato",
+      "rotten_item": "gardenkingmod:rotten_tomato",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:turmeric_crop",
+      "crop": "croptopia:turmeric",
+      "rotten_item": "gardenkingmod:rotten_turmeric",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:turnip_crop",
+      "crop": "croptopia:turnip",
+      "rotten_item": "gardenkingmod:rotten_turnip",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:vanilla_crop",
+      "crop": "croptopia:vanilla",
+      "rotten_item": "gardenkingmod:rotten_vanilla",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:walnut_crop",
+      "crop": "croptopia:walnut",
+      "rotten_item": "gardenkingmod:rotten_walnut",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
       "target": "minecraft:wheat",
       "crop": "minecraft:wheat",
       "rotten_item": "gardenkingmod:rotten_wheat",
       "extra_no_drop_chance": 0.0,
       "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:yam_crop",
+      "crop": "croptopia:yam",
+      "rotten_item": "gardenkingmod:rotten_yam",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:zucchini_crop",
+      "crop": "croptopia:zucchini",
+      "rotten_item": "gardenkingmod:rotten_zucchini",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
     }
-
-
-
   ]
 }
