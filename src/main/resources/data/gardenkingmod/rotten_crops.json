@@ -85,6 +85,13 @@
       "extra_rotten_chance": 0.0
     },
     {
+      "target": "croptopia:blueberry_crop",
+      "crop": "croptopia:blueberry",
+      "rotten_item": "gardenkingmod:rotten_blueberry",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
       "target": "croptopia:tomato_crop",
       "crop": "croptopia:tomato",
       "rotten_item": "gardenkingmod:rotten_tomato",
