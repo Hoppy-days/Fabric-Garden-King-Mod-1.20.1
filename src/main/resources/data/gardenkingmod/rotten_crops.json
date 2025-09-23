@@ -106,6 +106,27 @@
       "extra_rotten_chance": 0.0
     },
     {
+      "target": "croptopia:cantaloupe_crop",
+      "crop": "croptopia:cantaloupe",
+      "rotten_item": "gardenkingmod:rotten_cantaloupe",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:cashew_crop",
+      "crop": "croptopia:cashew",
+      "rotten_item": "gardenkingmod:rotten_cashew",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:cauliflower_crop",
+      "crop": "croptopia:cauliflower",
+      "rotten_item": "gardenkingmod:rotten_cauliflower",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
       "target": "croptopia:tomato_crop",
       "crop": "croptopia:tomato",
       "rotten_item": "gardenkingmod:rotten_tomato",
