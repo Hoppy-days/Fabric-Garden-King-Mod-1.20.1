@@ -3,6 +3,9 @@
   "values": [
     "minecraft:melon_slice",
     "minecraft:pumpkin_seeds",
-    { "id": "croptopia:example_tier_2_crop_item", "required": false }
+    "croptopia:barley",
+    "croptopia:corn",
+    "croptopia:oat",
+    "croptopia:rice"
   ]
 }

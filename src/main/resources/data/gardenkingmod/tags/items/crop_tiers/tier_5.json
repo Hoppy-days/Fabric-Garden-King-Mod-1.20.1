@@ -3,6 +3,8 @@
   "values": [
     "minecraft:bamboo",
     "minecraft:chorus_fruit",
-    { "id": "croptopia:example_tier_5_crop_item", "required": false }
+    "croptopia:almond",
+    "croptopia:pecan",
+    "croptopia:walnut"
   ]
 }

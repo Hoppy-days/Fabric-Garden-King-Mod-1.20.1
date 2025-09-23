@@ -6,6 +6,17 @@
     "minecraft:cocoa",
     "minecraft:cave_vines",
     "minecraft:cave_vines_plant",
-    { "id": "croptopia:example_tier_3_crop", "required": false }
+    "croptopia:basil_crop",
+    "croptopia:blackbean_crop",
+    "croptopia:cashew_crop",
+    "croptopia:chile_pepper_crop",
+    "croptopia:coffee_crop",
+    "croptopia:hops_crop",
+    "croptopia:nutmeg_crop",
+    "croptopia:peanut_crop",
+    "croptopia:pepper_crop",
+    "croptopia:tea_crop",
+    "croptopia:turmeric_crop",
+    "croptopia:vanilla_crop"
   ]
 }
