@@ -5,6 +5,9 @@
     "minecraft:attached_melon_stem",
     "minecraft:pumpkin_stem",
     "minecraft:attached_pumpkin_stem",
-    { "id": "croptopia:example_tier_2_crop", "required": false }
+    "croptopia:barley_crop",
+    "croptopia:corn_crop",
+    "croptopia:oat_crop",
+    "croptopia:rice_crop"
   ]
 }
