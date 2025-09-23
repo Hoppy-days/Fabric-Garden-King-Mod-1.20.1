@@ -4,10 +4,6 @@
     "minecraft:melon_stem",
     "minecraft:attached_melon_stem",
     "minecraft:pumpkin_stem",
-    "minecraft:attached_pumpkin_stem",
-    "croptopia:barley_crop",
-    "croptopia:corn_crop",
-    "croptopia:oat_crop",
-    "croptopia:rice_crop"
+    "minecraft:attached_pumpkin_stem"
   ]
 }
