@@ -127,6 +127,27 @@
       "extra_rotten_chance": 0.0
     },
     {
+      "target": "croptopia:celery_crop",
+      "crop": "croptopia:celery",
+      "rotten_item": "gardenkingmod:rotten_celery",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:cherry_crop",
+      "crop": "croptopia:cherry",
+      "rotten_item": "gardenkingmod:rotten_cherry",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
+      "target": "croptopia:chile_pepper_crop",
+      "crop": "croptopia:chile_pepper",
+      "rotten_item": "gardenkingmod:rotten_chile_pepper",
+      "extra_no_drop_chance": 0.0,
+      "extra_rotten_chance": 0.0
+    },
+    {
       "target": "croptopia:tomato_crop",
       "crop": "croptopia:tomato",
       "rotten_item": "gardenkingmod:rotten_tomato",
