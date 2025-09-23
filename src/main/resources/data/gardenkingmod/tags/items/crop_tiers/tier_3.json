@@ -5,6 +5,17 @@
     "minecraft:sweet_berries",
     "minecraft:cocoa_beans",
     "minecraft:glow_berries",
-    { "id": "croptopia:example_tier_3_crop_item", "required": false }
+    "croptopia:basil",
+    "croptopia:blackbean",
+    "croptopia:cashew",
+    "croptopia:chile_pepper",
+    "croptopia:coffee_beans",
+    "croptopia:hops",
+    "croptopia:nutmeg",
+    "croptopia:peanut",
+    "croptopia:pepper",
+    "croptopia:tea_leaves",
+    "croptopia:turmeric",
+    "croptopia:vanilla"
   ]
 }
