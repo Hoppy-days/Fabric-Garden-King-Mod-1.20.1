@@ -6,7 +6,7 @@
                 "ExampleMixin",
                 "PlayerEntityMixin",
                 "ServerPlayerEntityMixin",
-                "AbstractBlockMixin",
+                "BlockMixin",
                 "CropBlockMixin",
                 "CroptopiaCropBlockMixin"
         ],

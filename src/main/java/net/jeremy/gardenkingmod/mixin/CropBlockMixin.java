@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(CropBlock.class)
 public abstract class CropBlockMixin {
-        @ModifyVariable(method = "randomTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraf"
-                        + "t/util/math/BlockPos;Lnet/minecraft/util/math/random/Random;)V",
+        @ModifyVariable(method = "randomTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/random/Random;)V",
                         at = @At(value = "STORE"), ordinal = 0)
         private float gardenkingmod$scaleGrowthChance(float moisture, BlockState state, ServerWorld world, BlockPos pos,
                         Random random) {
