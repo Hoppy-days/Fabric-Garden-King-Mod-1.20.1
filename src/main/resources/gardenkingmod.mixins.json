@@ -7,7 +7,8 @@
                 "PlayerEntityMixin",
                 "ServerPlayerEntityMixin",
                 "CropBlockMixin",
-                "CroptopiaCropBlockMixin"
+                "CroptopiaCropBlockMixin",
+                "EnchantmentHelperMixin"
         ],
 	"injectors": {
 		"defaultRequire": 1
