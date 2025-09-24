@@ -1,18 +1,19 @@
 {
-	"required": true,
-	"package": "net.jeremy.gardenkingmod.mixin",
-	"compatibilityLevel": "JAVA_17",
+        "required": true,
+        "package": "net.jeremy.gardenkingmod.mixin",
+        "compatibilityLevel": "JAVA_17",
         "mixins": [
                 "ExampleMixin",
                 "PlayerEntityMixin",
                 "ServerPlayerEntityMixin",
+                "AbstractBlockMixin",
                 "CropBlockMixin",
                 "CroptopiaCropBlockMixin"
         ],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"overwrites": {
-		"requireAnnotations": true
-	}
+        "injectors": {
+                "defaultRequire": 1
+        },
+        "overwrites": {
+                "requireAnnotations": true
+        }
 }
