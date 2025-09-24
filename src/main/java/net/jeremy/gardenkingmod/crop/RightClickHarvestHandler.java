@@ -34,10 +34,10 @@ public final class RightClickHarvestHandler {
                 ItemStack heldStack = player.getStackInHand(hand);
                 ItemStack toolForDrops = ItemStack.EMPTY;
 
-                if (heldStack.getItem() instanceof HoeItem) {
+                if (heldStack.getItem() instanceof HoeItem hoeItem) {
                         toolForDrops = heldStack.copy();
                 }
-
+                        
                 if (world.isClient) {
                         return ActionResult.SUCCESS;
                 }
