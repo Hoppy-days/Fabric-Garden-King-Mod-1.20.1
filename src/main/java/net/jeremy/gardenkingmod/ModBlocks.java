@@ -20,6 +20,9 @@ public final class ModBlocks {
                         new MarketBlock(
                                         FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).strength(2.5f).nonOpaque()));
 
+        public static final Block RUBY_BLOCK = registerBlock("ruby_block",
+                        new Block(FabricBlockSettings.copyOf(Blocks.DIAMOND_BLOCK)));
+
         public static final Block MARKET_BLOCK_PART = registerBlockWithoutItem("market_block_part",
                         new MarketBlockPart(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).dropsNothing().nonOpaque()));
 
@@ -42,5 +45,6 @@ public final class ModBlocks {
         public static void registerModBlocks() {
                 GardenKingMod.LOGGER.info("Registering mod blocks for {}", GardenKingMod.MOD_ID);
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.add(MARKET_BLOCK));
+                ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(entries -> entries.add(RUBY_BLOCK));
         }
 }
