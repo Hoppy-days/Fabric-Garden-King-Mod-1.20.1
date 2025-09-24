@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinition;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinitions;
+import net.jeremy.gardenkingmod.item.FortuneHoeItem;
 import net.jeremy.gardenkingmod.item.RubyArmorMaterial;
 import net.jeremy.gardenkingmod.item.RubyToolMaterial;
 import net.minecraft.item.ArmorItem;
@@ -37,7 +38,7 @@ public final class ModItems {
         public static final Item RUBY_SHOVEL = registerItem("ruby_shovel",
                         new ShovelItem(RubyToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
         public static final Item RUBY_HOE = registerItem("ruby_hoe",
-                        new HoeItem(RubyToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings()));
+                        new FortuneHoeItem(RubyToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 5));
         public static final Item RUBY_HELMET = registerItem("ruby_helmet",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item RUBY_CHESTPLATE = registerItem("ruby_chestplate",
