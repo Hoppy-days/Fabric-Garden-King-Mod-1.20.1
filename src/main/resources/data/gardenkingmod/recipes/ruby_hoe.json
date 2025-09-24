@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RR",
+    " S",
+    " S"
+  ],
+  "key": {
+    "R": { "item": "gardenkingmod:ruby" },
+    "S": { "item": "minecraft:stick" }
+  },
+  "result": { "item": "gardenkingmod:ruby_hoe" }
+}
