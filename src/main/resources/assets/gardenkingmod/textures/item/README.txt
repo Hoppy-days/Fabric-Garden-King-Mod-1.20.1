@@ -1,0 +1,11 @@
+Place the following 16x16 item textures in this folder:
+- ruby.png
+- ruby_sword.png
+- ruby_pickaxe.png
+- ruby_axe.png
+- ruby_shovel.png
+- ruby_hoe.png
+- ruby_helmet.png
+- ruby_chestplate.png
+- ruby_leggings.png
+- ruby_boots.png
