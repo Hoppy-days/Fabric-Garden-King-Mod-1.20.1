@@ -1,7 +1,7 @@
 package net.jeremy.gardenkingmod.mixin;
 
 import net.jeremy.gardenkingmod.crop.RightClickHarvestHandler;
-import net.minecraft.block.Block;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Block.class)
+@Mixin(AbstractBlock.class)
 public abstract class BlockMixin {
         @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
         private void gardenkingmod$harvestCrops(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
