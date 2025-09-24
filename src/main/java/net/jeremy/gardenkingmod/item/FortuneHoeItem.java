@@ -15,9 +15,9 @@ public class FortuneHoeItem extends HoeItem implements FortuneProvidingItem {
         super(toolMaterial, attackDamage, attackSpeed, settings);
         this.fortuneLevel = fortuneLevel;
     }
-
-    @Override
-    public int gardenkingmod$getFortuneLevel(ItemStack stack) {
-        return fortuneLevel;
-    }
+  
+        @Override
+        public int gardenkingmod$getFortuneLevel(ItemStack stack) {
+                return fortuneLevel;
+        }
 }
