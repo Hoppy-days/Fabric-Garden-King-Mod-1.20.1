@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.jeremy.gardenkingmod.client.model.MarketBlockModel;
 import net.jeremy.gardenkingmod.client.render.MarketBlockEntityRenderer;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
+import net.jeremy.gardenkingmod.item.FortuneProvidingItem;
 import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.screen.MarketScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -55,14 +56,25 @@ public class GardenKingModClient implements ClientModInitializer {
                         });
                 });
 
-        ItemTooltipCallback.EVENT.register((stack, context, lines) -> CropTierRegistry.get(stack.getItem())
-                .ifPresent(tier -> {
+        ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
+                if (stack.getItem() instanceof FortuneProvidingItem fortuneItem) {
+                        int fortuneLevel = fortuneItem.gardenkingmod$getFortuneLevel(stack);
+                        if (fortuneLevel > 0) {
+                                lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".built_in_fortune",
+                                                Text.translatable("enchantment.minecraft.fortune"),
+                                                Text.translatable("enchantment.level." + fortuneLevel))
+                                                .formatted(Formatting.GRAY));
+                        }
+                }
+
+                CropTierRegistry.get(stack.getItem()).ifPresent(tier -> {
                         String path = tier.id().getPath();
                         String suffix = path.contains("/") ? path.substring(path.lastIndexOf('/') + 1) : path;
                         Text tierName = Text
                                         .translatable("tooltip." + tier.id().getNamespace() + ".crop_tier." + suffix);
                         lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_tier", tierName)
                                         .formatted(Formatting.GREEN));
-                }));
+                });
+        });
     }
 }
