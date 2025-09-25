@@ -8,24 +8,24 @@
 ## High-Level Architecture
 
 ### Packages / Namespaces
-- `com.gardenking.entity.crow`
+- `net.jeremy.gardenkingmod.entity.crow`
   - `CrowEntity`: custom `PathAwareEntity` (or `MobEntity`) subclass with flight controls.
   - `CrowEntityModel` / `CrowEntityRenderer`: client-side rendering layer.
   - `CrowAiGoals`: helper class containing reusable `Goal` implementations (e.g., `CircleCropGoal`, `RandomPerchGoal`).
-- `com.gardenking.block.ward`
+- `net.jeremy.gardenkingmod.block.ward`
   - `ScarecrowBlock`: ward block providing deterrence aura.
   - `ScarecrowBlockEntity`: tracks aura state, cooldowns, and optionally durability.
   - `ScarecrowAuraComponent`: server-side utility for ward radius calculations.
-- `com.gardenking.registry`
-  - `EntityRegistry`, `BlockRegistry`, `SoundRegistry`, `ItemRegistry`, `LootTableRegistry`, etc., updated with crow and warding assets.
+- `net.jeremy.gardenkingmod.registry`
+  - Follow existing patterns such as `ModBlocks`, `ModItems`, and the planned `ModEntities` for registering crow and warding assets (sound events, loot tables, etc.) so new code slots cleanly into the current architecture.
 
 ### Resources
-- Models: `src/main/resources/assets/gardenking/models/entity/crow.json` (GeckoLib or vanilla format).
-- Textures: `src/main/resources/assets/gardenking/textures/entity/crow.png` and ward block textures under `textures/block/`.
-- Animations (if GeckoLib is used): `assets/gardenking/animations/crow.animation.json`.
-- Sounds: `assets/gardenking/sounds/crow_call.ogg`, `crow_flap.ogg`, etc.; referenced in `sounds.json`.
+- Models: `src/main/resources/assets/gardenkingmod/models/entity/crow.json` (GeckoLib or vanilla format).
+- Textures: `src/main/resources/assets/gardenkingmod/textures/entity/crow.png` and ward block textures under `textures/block/`.
+- Animations (if GeckoLib is used): `assets/gardenkingmod/animations/crow.animation.json`.
+- Sounds: `assets/gardenkingmod/sounds/crow_call.ogg`, `crow_flap.ogg`, etc.; referenced in `sounds.json`.
 
-> **Texture Reminder:** add the crow texture PNG under `src/main/resources/assets/gardenking/textures/entity/crow.png` and ward block textures under `textures/block/`. (Per user instruction, do not auto-generate these files.)
+> **Texture Reminder:** add the crow texture PNG under `src/main/resources/assets/gardenkingmod/textures/entity/crow.png` and ward block textures under `textures/block/`. (Per user instruction, do not auto-generate these files.)
 
 ## Crow Entity Specification
 
@@ -33,7 +33,7 @@
 - **Health:** 10 HP (configurable via JSON or gamerule).
 - **Armor:** 0 by default; allow modifications through data-driven attributes.
 - **Movement:** Custom flight movement control with strafing and hovering (similar to parrots or ghasts but faster).
-- **Spawn Weight:** Controlled by biome tags (e.g., `gardenking:spawns_crows`).
+- **Spawn Weight:** Controlled by biome tags (e.g., `gardenkingmod:spawns_crows`).
 
 ### AI Goal Stack (ordered by priority)
 1. **FleeWardingGoal:** High priority; checks for nearby active ward auras and navigates away.
@@ -46,7 +46,7 @@
 ### Crop Targeting Workflow
 - Maintain a server-side hunger timer (e.g., 600–1200 ticks). When zero, switch to `BreakCropGoal` state.
 - `BreakCropGoal` steps:
-  1. Search within configurable radius for mature crop blocks (tag `minecraft:crop` or custom tag `gardenking:crow_targets`).
+  1. Search within configurable radius for mature crop blocks (tag `minecraft:crop` or custom tag `gardenkingmod:crow_targets`).
   2. Use a `BlockPos` predicate to ensure mature state (e.g., `CropBlock.isMature`).
   3. Pathfind to block (3D path, use `BirdNavigation`).
   4. Upon reaching, trigger animation/sound, call `world.breakBlock(pos, dropLoot)`.
@@ -58,8 +58,8 @@
 - Breeding/Taming: optionally disable; if enabled, use shiny objects or seeds.
 
 ### Data & Config
-- Add data-driven settings in `config/gardenking/crow.json` with fields: spawn weight, hunger timer range, ward fear radius multiplier, etc.
-- Optional gamerule: `gardenking:crowGriefing` toggles crop breaking.
+- Add data-driven settings in `config/gardenkingmod/crow.json` with fields: spawn weight, hunger timer range, ward fear radius multiplier, etc.
+- Optional gamerule: `gardenkingmod:crowGriefing` toggles crop breaking.
 
 ## Warding Mechanic Specification
 
@@ -87,7 +87,7 @@
 ## Systems Integration Workflow
 
 1. **Data Preparation**
-   - Define biome tags (`data/gardenking/tags/worldgen/biome/spawns_crows.json`).
+   - Define biome tags (`data/gardenkingmod/tags/worldgen/biome/spawns_crows.json`).
    - Add loot tables for crow and scarecrow block.
    - Update language files with new strings.
 
