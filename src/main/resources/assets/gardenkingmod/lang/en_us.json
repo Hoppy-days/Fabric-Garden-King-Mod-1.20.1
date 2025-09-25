@@ -120,6 +120,22 @@
   "item.gardenkingmod.rotten_walnut": "Rotten Walnut",
   "item.gardenkingmod.rotten_wheat": "Rotten Wheat",
   "item.gardenkingmod.rotten_yam": "Rotten Yam",
-  "item.gardenkingmod.rotten_zucchini": "Rotten Zucchini"
+  "item.gardenkingmod.rotten_zucchini": "Rotten Zucchini",
+
+  "entity.gardenkingmod.crow": "Crow",
+  "block.gardenkingmod.scarecrow": "Field Scarecrow",
+  "item.gardenkingmod.scarecrow": "Field Scarecrow",
+  "item.gardenkingmod.crow_spawn_egg": "Crow Spawn Egg",
+
+  "tooltip.gardenkingmod.scarecrow.ward_radius": "Wards crows within %s blocks.",
+
+  "subtitles.gardenkingmod.entity.crow.caw": "Crow caws",
+  "subtitles.gardenkingmod.entity.crow.flap": "Crow wings flap",
+  "subtitles.gardenkingmod.entity.crow.crop_break": "Crow tears at crops",
+  "subtitles.gardenkingmod.entity.crow.warded": "Crow screeches in fear",
+  "subtitles.gardenkingmod.block.scarecrow.activate": "Scarecrow ward pulses",
+  "subtitles.gardenkingmod.block.scarecrow.ambient": "Scarecrow ward hums",
+
+  "particle.gardenkingmod.scarecrow_ward": "Scarecrow Ward Wisps"
 
 }

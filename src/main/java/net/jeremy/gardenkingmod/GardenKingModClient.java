@@ -7,8 +7,11 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.jeremy.gardenkingmod.client.model.MarketBlockModel;
 import net.jeremy.gardenkingmod.client.render.MarketBlockEntityRenderer;
+import net.jeremy.gardenkingmod.client.model.CrowEntityModel;
+import net.jeremy.gardenkingmod.client.render.CrowEntityRenderer;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.item.FortuneProvidingItem;
 import net.jeremy.gardenkingmod.network.ModPackets;
@@ -26,7 +29,9 @@ public class GardenKingModClient implements ClientModInitializer {
     public void onInitializeClient() {
         HandledScreens.register(ModScreenHandlers.MARKET_SCREEN_HANDLER, MarketScreen::new);
         EntityModelLayerRegistry.registerModelLayer(MarketBlockModel.LAYER_LOCATION, MarketBlockModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(CrowEntityModel.LAYER_LOCATION, CrowEntityModel::getTexturedModelData);
         BlockEntityRendererFactories.register(ModBlockEntities.MARKET_BLOCK_ENTITY, MarketBlockEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.CROW, CrowEntityRenderer::new);
 
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.MARKET_SALE_RESULT_PACKET,
                 (client, handler, buf, responseSender) -> {
