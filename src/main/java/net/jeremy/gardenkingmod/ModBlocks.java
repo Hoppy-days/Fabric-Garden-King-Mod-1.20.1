@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.jeremy.gardenkingmod.block.MarketBlock;
 import net.jeremy.gardenkingmod.block.MarketBlockPart;
+import net.jeremy.gardenkingmod.block.ward.ScarecrowBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
@@ -16,9 +17,11 @@ import net.minecraft.util.Identifier;
 
 public final class ModBlocks {
         public static final Block MARKET_BLOCK = registerBlock("market_block",
-
                         new MarketBlock(
                                         FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).strength(2.5f).nonOpaque()));
+
+        public static final Block SCARECROW_BLOCK = registerBlock("scarecrow",
+                        new ScarecrowBlock(FabricBlockSettings.copyOf(Blocks.HAY_BLOCK).strength(1.5f).nonOpaque()));
 
         public static final Block RUBY_BLOCK = registerBlock("ruby_block",
                         new Block(FabricBlockSettings.copyOf(Blocks.DIAMOND_BLOCK)));
@@ -44,7 +47,10 @@ public final class ModBlocks {
 
         public static void registerModBlocks() {
                 GardenKingMod.LOGGER.info("Registering mod blocks for {}", GardenKingMod.MOD_ID);
-                ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.add(MARKET_BLOCK));
+                ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
+                        entries.add(MARKET_BLOCK);
+                        entries.add(SCARECROW_BLOCK);
+                });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(entries -> entries.add(RUBY_BLOCK));
         }
 }
