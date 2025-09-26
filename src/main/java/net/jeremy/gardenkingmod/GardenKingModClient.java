@@ -63,7 +63,7 @@ public class GardenKingModClient implements ClientModInitializer {
                                 lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".built_in_fortune",
                                                 Text.translatable("enchantment.minecraft.fortune"),
                                                 Text.translatable("enchantment.level." + fortuneLevel))
-                                                .formatted(Formatting.GRAY));
+                                                .formatted(Formatting.RED));
                         }
                 }
 

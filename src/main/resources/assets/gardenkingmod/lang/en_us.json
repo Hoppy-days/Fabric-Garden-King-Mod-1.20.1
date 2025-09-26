@@ -27,7 +27,7 @@
   "screen.gardenkingmod.market.sale_result_item": "%1$s %2$s",
   "screen.gardenkingmod.market.sell": "Sell",
   "tooltip.gardenkingmod.crop_tier": "Tier: %s",
-  "tooltip.gardenkingmod.built_in_fortune": "Built-in %s %s",
+  "tooltip.gardenkingmod.built_in_fortune": "%s %s",
   "tooltip.gardenkingmod.crop_tier.tier_1": "Tier 1",
   "tooltip.gardenkingmod.crop_tier.tier_2": "Tier 2",
   "tooltip.gardenkingmod.crop_tier.tier_3": "Tier 3",
