@@ -22,6 +22,7 @@ public class GardenKingMod implements ModInitializer {
                 ModItems.registerModItems();
                 ModBlocks.registerModBlocks();
                 ModBlockEntities.registerBlockEntities();
+                ModEntities.registerModEntities();
                 ModScreenHandlers.registerScreenHandlers();
                 ModScoreboards.registerScoreboards();
                 ModEntities.register();

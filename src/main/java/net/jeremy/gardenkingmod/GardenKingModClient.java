@@ -32,7 +32,8 @@ public class GardenKingModClient implements ClientModInitializer {
         HandledScreens.register(ModScreenHandlers.MARKET_SCREEN_HANDLER, MarketScreen::new);
         HandledScreens.register(ModScreenHandlers.SCARECROW_SCREEN_HANDLER, ScarecrowScreen::new);
         EntityModelLayerRegistry.registerModelLayer(MarketBlockModel.LAYER_LOCATION, MarketBlockModel::getTexturedModelData);
-        EntityModelLayerRegistry.registerModelLayer(CrowEntityRenderer.MODEL_LAYER, CrowEntityModel::getTexturedModelData);
+
+        EntityModelLayerRegistry.registerModelLayer(CrowEntityModel.LAYER_LOCATION, CrowEntityModel::getTexturedModelData);
         BlockEntityRendererFactories.register(ModBlockEntities.MARKET_BLOCK_ENTITY, MarketBlockEntityRenderer::new);
         EntityRendererRegistry.register(ModEntities.CROW, CrowEntityRenderer::new);
 

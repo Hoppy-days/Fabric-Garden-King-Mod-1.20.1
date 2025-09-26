@@ -1,0 +1,39 @@
+{
+  "entity.crow.caw": {
+    "subtitle": "subtitles.gardenkingmod.entity.crow.caw",
+    "sounds": [
+      { "name": "gardenkingmod:crow_call", "volume": 0.9 },
+      { "name": "gardenkingmod:crow_call_alt", "volume": 0.85, "pitch": 1.1 }
+    ]
+  },
+  "entity.crow.flap": {
+    "subtitle": "subtitles.gardenkingmod.entity.crow.flap",
+    "sounds": [
+      { "name": "gardenkingmod:crow_flap", "volume": 0.8 }
+    ]
+  },
+  "entity.crow.crop_break": {
+    "subtitle": "subtitles.gardenkingmod.entity.crow.crop_break",
+    "sounds": [
+      { "name": "gardenkingmod:crow_crop_break", "volume": 1.0 }
+    ]
+  },
+  "entity.crow.warded": {
+    "subtitle": "subtitles.gardenkingmod.entity.crow.warded",
+    "sounds": [
+      { "name": "gardenkingmod:crow_warded", "volume": 0.9, "pitch": 0.8 }
+    ]
+  },
+  "block.scarecrow.activate": {
+    "subtitle": "subtitles.gardenkingmod.block.scarecrow.activate",
+    "sounds": [
+      { "name": "gardenkingmod:scarecrow_activate", "volume": 0.8 }
+    ]
+  },
+  "block.scarecrow.ambient": {
+    "subtitle": "subtitles.gardenkingmod.block.scarecrow.ambient",
+    "sounds": [
+      { "name": "gardenkingmod:scarecrow_ambient", "volume": 0.5, "pitch": 1.2 }
+    ]
+  }
+}
