@@ -411,11 +411,22 @@ public class CrowEntity extends PathAwareEntity {
         Vec3d wardCenter = findNearestWard().map(Vec3d::ofCenter).orElse(null);
         double range = Math.max(4.0, config.randomFlightRange());
 
+        double minY = this.getWorld().getBottomY() + 1;
+        double maxY = this.getWorld().getTopY() - 1;
+        double baseY = MathHelper.clamp(base.y, minY, maxY);
+        double verticalRange = Math.max(range, 4.0);
+
         for (int attempt = 0; attempt < 12; attempt++) {
             double dx = (this.random.nextDouble() * 2.0 - 1.0) * range;
-            double dy = (this.random.nextDouble() * 0.6 - 0.3) * range;
             double dz = (this.random.nextDouble() * 2.0 - 1.0) * range;
-            Vec3d candidate = base.add(dx, dy, dz);
+            double dy = (this.random.nextDouble() * 2.0 - 1.0) * verticalRange;
+
+            if (baseY - minY < 4.0) {
+                dy = Math.abs(dy) + this.random.nextDouble() * verticalRange * 0.25;
+            }
+
+            double targetY = MathHelper.clamp(baseY + dy, minY, maxY);
+            Vec3d candidate = new Vec3d(base.x + dx, targetY, base.z + dz);
             if (wardCenter != null) {
                 double currentDistance = base.squaredDistanceTo(wardCenter);
                 double candidateDistance = candidate.squaredDistanceTo(wardCenter);
@@ -432,11 +443,14 @@ public class CrowEntity extends PathAwareEntity {
         if (wardCenter != null) {
             Vec3d direction = base.subtract(wardCenter);
             if (direction.lengthSquared() > 1.0E-4) {
-                return base.add(direction.normalize());
+                Vec3d normalized = direction.normalize();
+                double targetY = MathHelper.clamp(baseY + Math.max(1.0, range * 0.25), minY, maxY);
+                return new Vec3d(base.x + normalized.x, targetY, base.z + normalized.z);
             }
         }
 
-        return base.add(0.0, 0.5, 0.0);
+        double fallbackY = MathHelper.clamp(baseY + Math.max(1.0, range * 0.3), minY, maxY);
+        return new Vec3d(base.x, fallbackY, base.z);
     }
 
     @Override
