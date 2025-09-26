@@ -188,6 +188,14 @@ public final class CrowBalanceConfig {
         return dropLootOnCropBreak;
     }
 
+    public int minHungerTicks() {
+        return minHungerTicks;
+    }
+
+    public int maxHungerTicks() {
+        return maxHungerTicks;
+    }
+
     public double baseHealth() {
         return baseHealth;
     }
