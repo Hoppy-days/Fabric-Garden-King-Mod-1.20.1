@@ -16,6 +16,7 @@ import net.jeremy.gardenkingmod.client.model.ScarecrowModel;
 import net.jeremy.gardenkingmod.client.render.CrowEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.MarketBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.ScarecrowBlockEntityRenderer;
+import net.jeremy.gardenkingmod.client.render.item.MarketItemRenderer;
 import net.jeremy.gardenkingmod.client.render.item.ScarecrowItemRenderer;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.item.FortuneProvidingItem;
@@ -44,6 +45,7 @@ public class GardenKingModClient implements ClientModInitializer {
         BlockEntityRendererFactories.register(ModBlockEntities.MARKET_BLOCK_ENTITY, MarketBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlockEntities.SCARECROW_BLOCK_ENTITY, ScarecrowBlockEntityRenderer::new);
         EntityRendererRegistry.register(ModEntities.CROW, CrowEntityRenderer::new);
+        BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.MARKET_BLOCK, new MarketItemRenderer());
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.SCARECROW_BLOCK, new ScarecrowItemRenderer());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.SCARECROW_BLOCK, RenderLayer.getCutout());
 
