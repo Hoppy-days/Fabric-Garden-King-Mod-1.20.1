@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
 import net.jeremy.gardenkingmod.registry.ModEntities;
+import net.jeremy.gardenkingmod.registry.ModSoundEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
 import net.minecraft.entity.EntityType;
@@ -27,7 +28,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -180,17 +180,17 @@ public class CrowEntity extends PathAwareEntity {
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.ENTITY_PARROT_AMBIENT;
+        return ModSoundEvents.CROW_CAW;
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.ENTITY_PARROT_HURT;
+        return ModSoundEvents.CROW_CAW;
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.ENTITY_PARROT_DEATH;
+        return ModSoundEvents.CROW_CAW;
     }
 
     @Override
@@ -321,7 +321,7 @@ public class CrowEntity extends PathAwareEntity {
 
     protected void onCropBroken(BlockState state, BlockPos pos) {
         this.resetHunger();
-        this.playSound(SoundEvents.ENTITY_PARROT_EAT, 0.9f, 0.9f + this.random.nextFloat() * 0.2f);
+        this.playSound(ModSoundEvents.CROW_CROP_BREAK, 0.9f, 0.9f + this.random.nextFloat() * 0.2f);
     }
 
     public Optional<BlockPos> findNearestWard() {

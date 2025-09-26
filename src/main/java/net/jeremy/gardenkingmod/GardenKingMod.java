@@ -7,6 +7,7 @@ import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager;
 import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.registry.ModEntities;
+import net.jeremy.gardenkingmod.registry.ModSoundEvents;
 
 import net.minecraft.resource.ResourceType;
 
@@ -23,6 +24,7 @@ public class GardenKingMod implements ModInitializer {
                 ModBlocks.registerModBlocks();
                 ModBlockEntities.registerBlockEntities();
                 ModEntities.register();
+                ModSoundEvents.register();
                 ModScreenHandlers.registerScreenHandlers();
                 ModScoreboards.registerScoreboards();
 
