@@ -32,9 +32,20 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
 
         switch (mode) {
-            case GUI, GROUND, FIXED -> {
-                matrices.scale(0.35F, 0.35F, 0.35F);
-                matrices.translate(0.0F, 2.5F, 0.0F); // pull it back into frame
+            case GUI:
+                matrices.scale(0.35f, 0.35f, 0.35f);
+                matrices.translate(0.0, 2.4, 0.0);
+                break;
+            case GROUND:
+                matrices.scale(0.35f, 0.35f, 0.35f);
+                matrices.translate(0.0, 0.9, 0.0);
+                break;
+            case FIXED:
+                matrices.scale(0.4f, 0.4f, 0.4f);
+                matrices.translate(0.0, 1.8, 0.0);
+                break;
+            default:
+                break;
             }
             case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND,
                  THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> {
