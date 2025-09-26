@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager;
 import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
+import net.jeremy.gardenkingmod.registry.ModEntities;
 
 import net.minecraft.resource.ResourceType;
 
@@ -24,6 +25,7 @@ public class GardenKingMod implements ModInitializer {
                 ModEntities.registerModEntities();
                 ModScreenHandlers.registerScreenHandlers();
                 ModScoreboards.registerScoreboards();
+                ModEntities.register();
 
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(BonusHarvestDropManager.getInstance());
 
