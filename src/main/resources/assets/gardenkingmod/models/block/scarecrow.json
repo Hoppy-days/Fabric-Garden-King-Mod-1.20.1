@@ -1,53 +1,6 @@
 {
-  "render_type": "minecraft:cutout",
+  "parent": "minecraft:block/cube_all",
   "textures": {
-    "particle": "gardenkingmod:block/scarecrow",
     "all": "gardenkingmod:block/scarecrow"
-  },
-  "elements": [
-    {
-      "from": [7.0, 0.0, 7.0],
-      "to": [9.0, 16.0, 9.0],
-      "faces": {
-        "north": { "texture": "#all", "uv": [0.0, 0.0, 2.0, 16.0] },
-        "south": { "texture": "#all", "uv": [2.0, 0.0, 4.0, 16.0] },
-        "east": { "texture": "#all", "uv": [4.0, 0.0, 6.0, 16.0] },
-        "west": { "texture": "#all", "uv": [6.0, 0.0, 8.0, 16.0] }
-      }
-    },
-    {
-      "from": [2.0, 10.0, 7.0],
-      "to": [14.0, 12.0, 9.0],
-      "faces": {
-        "north": { "texture": "#all", "uv": [8.0, 0.0, 20.0, 2.0] },
-        "south": { "texture": "#all", "uv": [8.0, 2.0, 20.0, 4.0] },
-        "up": { "texture": "#all", "uv": [8.0, 4.0, 20.0, 6.0] },
-        "down": { "texture": "#all", "uv": [8.0, 6.0, 20.0, 8.0] }
-      }
-    },
-    {
-      "from": [5.0, 14.0, 5.0],
-      "to": [11.0, 20.0, 11.0],
-      "faces": {
-        "north": { "texture": "#all", "uv": [0.0, 16.0, 6.0, 22.0] },
-        "south": { "texture": "#all", "uv": [6.0, 16.0, 12.0, 22.0] },
-        "east": { "texture": "#all", "uv": [12.0, 16.0, 18.0, 22.0] },
-        "west": { "texture": "#all", "uv": [18.0, 16.0, 24.0, 22.0] },
-        "up": { "texture": "#all", "uv": [24.0, 16.0, 30.0, 22.0] },
-        "down": { "texture": "#all", "uv": [30.0, 16.0, 36.0, 22.0] }
-      }
-    },
-    {
-      "from": [6.0, 0.0, 6.0],
-      "to": [10.0, 2.0, 10.0],
-      "faces": {
-        "north": { "texture": "#all", "uv": [0.0, 22.0, 4.0, 24.0] },
-        "south": { "texture": "#all", "uv": [4.0, 22.0, 8.0, 24.0] },
-        "east": { "texture": "#all", "uv": [8.0, 22.0, 12.0, 24.0] },
-        "west": { "texture": "#all", "uv": [12.0, 22.0, 16.0, 24.0] },
-        "up": { "texture": "#all", "uv": [16.0, 22.0, 20.0, 26.0] },
-        "down": { "texture": "#all", "uv": [20.0, 22.0, 24.0, 26.0] }
-      }
-    }
-  ]
+  }
 }
