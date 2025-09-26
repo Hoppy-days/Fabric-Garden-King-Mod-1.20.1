@@ -46,6 +46,13 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
                 break;
             default:
                 break;
+            }
+            case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND,
+                 THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> {
+                matrices.scale(0.25F, 0.25F, 0.25F);
+                matrices.translate(0.0F, 2.0F, 0.0F);
+            }
+            default -> { /* keep block-sized scale for pedestal/world */ }
         }
 
         if (this.model == null) {
