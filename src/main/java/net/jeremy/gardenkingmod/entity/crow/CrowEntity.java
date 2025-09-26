@@ -44,7 +44,10 @@ public class CrowEntity extends PathAwareEntity {
     private static final TrackedData<Boolean> HUNGRY = DataTracker.registerData(CrowEntity.class,
             TrackedDataHandlerRegistry.BOOLEAN);
 
+    private static final int MIN_DESPERATION_TICKS = 200;
+
     private int timeSinceCropBreak;
+    private boolean desperateForFood;
 
     public CrowEntity(EntityType<? extends CrowEntity> entityType, World world) {
         super(entityType, world);
@@ -121,6 +124,8 @@ public class CrowEntity extends PathAwareEntity {
         if (timeSinceCropBreak < Integer.MAX_VALUE) {
             timeSinceCropBreak++;
         }
+
+        updateDesperationState();
     }
 
     @Override
@@ -211,16 +216,28 @@ public class CrowEntity extends PathAwareEntity {
 
     public void setHungry(boolean hungry) {
         this.dataTracker.set(HUNGRY, hungry);
+        if (!hungry) {
+            desperateForFood = false;
+        }
     }
 
     public void resetHunger() {
         setHungry(false);
         setHungerTicks(CrowBalanceConfig.get().chooseHungerDuration());
         timeSinceCropBreak = 0;
+        desperateForFood = false;
     }
 
     public int getTimeSinceCropBreak() {
         return timeSinceCropBreak;
+    }
+
+    public boolean isDesperateForFood() {
+        return desperateForFood;
+    }
+
+    public boolean canIgnoreHungerLockout() {
+        return !isHungry() || isDesperateForFood();
     }
 
     public Optional<BlockPos> findCropTarget() {
@@ -428,6 +445,7 @@ public class CrowEntity extends PathAwareEntity {
         nbt.putInt("HungerTicks", getHungerTicks());
         nbt.putBoolean("Hungry", isHungry());
         nbt.putInt("TimeSinceCropBreak", timeSinceCropBreak);
+        nbt.putBoolean("Desperate", desperateForFood);
     }
 
     @Override
@@ -436,5 +454,22 @@ public class CrowEntity extends PathAwareEntity {
         setHungerTicks(nbt.getInt("HungerTicks"));
         setHungry(nbt.getBoolean("Hungry"));
         timeSinceCropBreak = nbt.getInt("TimeSinceCropBreak");
+        desperateForFood = nbt.getBoolean("Desperate") && isHungry();
+    }
+
+    private void updateDesperationState() {
+        if (!isHungry()) {
+            desperateForFood = false;
+            return;
+        }
+
+        if (!desperateForFood && timeSinceCropBreak >= getDesperationDelay()) {
+            desperateForFood = true;
+        }
+    }
+
+    private int getDesperationDelay() {
+        CrowBalanceConfig config = CrowBalanceConfig.get();
+        return Math.max(MIN_DESPERATION_TICKS, config.minHungerTicks());
     }
 }

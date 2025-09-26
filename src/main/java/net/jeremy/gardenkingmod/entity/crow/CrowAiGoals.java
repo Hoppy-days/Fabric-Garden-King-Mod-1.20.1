@@ -255,7 +255,7 @@ public final class CrowAiGoals {
 
         @Override
         public boolean canStart() {
-            if (crow.isHungry()) {
+            if (!crow.canIgnoreHungerLockout()) {
                 return false;
             }
 
@@ -269,7 +269,7 @@ public final class CrowAiGoals {
 
         @Override
         public boolean shouldContinue() {
-            return target != null && !crow.isHungry() && !crow.getNavigation().isIdle();
+            return target != null && crow.canIgnoreHungerLockout() && !crow.getNavigation().isIdle();
         }
 
         @Override
@@ -305,7 +305,7 @@ public final class CrowAiGoals {
 
         @Override
         public boolean canStart() {
-            if (crow.isHungry()) {
+            if (!crow.canIgnoreHungerLockout()) {
                 return false;
             }
 
@@ -319,7 +319,7 @@ public final class CrowAiGoals {
 
         @Override
         public boolean shouldContinue() {
-            return perchPos != null && !crow.isHungry() && perchTicks < 100;
+            return perchPos != null && crow.canIgnoreHungerLockout() && perchTicks < 100;
         }
 
         @Override
