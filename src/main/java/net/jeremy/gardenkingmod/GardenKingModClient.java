@@ -16,6 +16,7 @@ import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.item.FortuneProvidingItem;
 import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.screen.MarketScreen;
+import net.jeremy.gardenkingmod.screen.ScarecrowScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.item.Item;
@@ -29,6 +30,7 @@ public class GardenKingModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         HandledScreens.register(ModScreenHandlers.MARKET_SCREEN_HANDLER, MarketScreen::new);
+        HandledScreens.register(ModScreenHandlers.SCARECROW_SCREEN_HANDLER, ScarecrowScreen::new);
         EntityModelLayerRegistry.registerModelLayer(MarketBlockModel.LAYER_LOCATION, MarketBlockModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(CrowEntityRenderer.MODEL_LAYER, CrowEntityModel::getTexturedModelData);
         BlockEntityRendererFactories.register(ModBlockEntities.MARKET_BLOCK_ENTITY, MarketBlockEntityRenderer::new);
