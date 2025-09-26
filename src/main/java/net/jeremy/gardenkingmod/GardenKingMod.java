@@ -22,10 +22,9 @@ public class GardenKingMod implements ModInitializer {
                 ModItems.registerModItems();
                 ModBlocks.registerModBlocks();
                 ModBlockEntities.registerBlockEntities();
-                ModEntities.registerModEntities();
+                ModEntities.register();
                 ModScreenHandlers.registerScreenHandlers();
                 ModScoreboards.registerScoreboards();
-                ModEntities.register();
 
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(BonusHarvestDropManager.getInstance());
 
