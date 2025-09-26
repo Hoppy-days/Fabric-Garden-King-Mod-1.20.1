@@ -19,11 +19,9 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
             "textures/entity/scarecrow/scarecrow.png"
     );
 
-    private final ScarecrowModel model;
+    private ScarecrowModel model;
 
     public ScarecrowItemRenderer() {
-        this.model = new ScarecrowModel(MinecraftClient.getInstance().getEntityModelLoader()
-                .getModelPart(ScarecrowModel.LAYER_LOCATION));
     }
 
     @Override
@@ -32,6 +30,11 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
         matrices.push();
         matrices.translate(0.5f, 1.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
+
+        if (this.model == null) {
+            this.model = new ScarecrowModel(MinecraftClient.getInstance().getEntityModelLoader()
+                    .getModelPart(ScarecrowModel.LAYER_LOCATION));
+        }
 
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
         this.model.render(matrices, vertexConsumer, light, overlay, 1.0f, 1.0f, 1.0f, 1.0f);
