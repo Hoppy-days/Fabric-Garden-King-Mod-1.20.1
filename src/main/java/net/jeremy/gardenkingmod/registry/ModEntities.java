@@ -27,7 +27,7 @@ public final class ModEntities {
     public static final EntityType<CrowEntity> CROW = Registry.register(Registries.ENTITY_TYPE,
             new Identifier(GardenKingMod.MOD_ID, "crow"),
             FabricEntityTypeBuilder.<CrowEntity>create(SpawnGroup.CREATURE, CrowEntity::new)
-                    .dimensions(EntityDimensions.changing(0.6f, 0.8f)).trackRangeBlocks(10).build());
+                    .dimensions(EntityDimensions.changing(0.6f, 0.8f)).trackRangeBlocks(80).build());
 
     private ModEntities() {
     }
