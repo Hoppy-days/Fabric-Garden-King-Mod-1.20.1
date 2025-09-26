@@ -31,6 +31,23 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
         matrices.translate(0.5f, 1.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
 
+        switch (mode) {
+            case GUI:
+                matrices.scale(0.35f, 0.35f, 0.35f);
+                matrices.translate(0.0, 2.4, 0.0);
+                break;
+            case GROUND:
+                matrices.scale(0.35f, 0.35f, 0.35f);
+                matrices.translate(0.0, 0.9, 0.0);
+                break;
+            case FIXED:
+                matrices.scale(0.4f, 0.4f, 0.4f);
+                matrices.translate(0.0, 1.8, 0.0);
+                break;
+            default:
+                break;
+        }
+
         if (this.model == null) {
             this.model = new ScarecrowModel(MinecraftClient.getInstance().getEntityModelLoader()
                     .getModelPart(ScarecrowModel.LAYER_LOCATION));
