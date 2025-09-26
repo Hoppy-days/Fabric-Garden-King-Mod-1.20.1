@@ -26,7 +26,7 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
 
     @Override
     public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices,
-            VertexConsumerProvider vertexConsumers, int light, int overlay) {
+                       VertexConsumerProvider vertexConsumers, int light, int overlay) {
         matrices.push();
         matrices.translate(0.5f, 1.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
@@ -44,25 +44,23 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
                 matrices.scale(0.4f, 0.4f, 0.4f);
                 matrices.translate(0.0, 1.8, 0.0);
                 break;
-            default:
-                break;
-            }
             case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND,
-                 THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> {
+                 THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND:
                 matrices.scale(0.25F, 0.25F, 0.25F);
                 matrices.translate(0.0F, 2.0F, 0.0F);
-            }
-            default -> { /* keep block-sized scale for pedestal/world */ }
+                break;
+
+            default: /* keep block-sized scale for pedestal/world */
+
+                if (this.model == null) {
+                    this.model = new ScarecrowModel(MinecraftClient.getInstance().getEntityModelLoader()
+                            .getModelPart(ScarecrowModel.LAYER_LOCATION));
+                }
+
+                VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
+                this.model.render(matrices, vertexConsumer, light, overlay, 1.0f, 1.0f, 1.0f, 1.0f);
+
+                matrices.pop();
         }
-
-        if (this.model == null) {
-            this.model = new ScarecrowModel(MinecraftClient.getInstance().getEntityModelLoader()
-                    .getModelPart(ScarecrowModel.LAYER_LOCATION));
-        }
-
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
-        this.model.render(matrices, vertexConsumer, light, overlay, 1.0f, 1.0f, 1.0f, 1.0f);
-
-        matrices.pop();
     }
 }
