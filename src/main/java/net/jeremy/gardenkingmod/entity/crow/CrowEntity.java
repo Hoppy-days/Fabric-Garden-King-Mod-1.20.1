@@ -55,7 +55,6 @@ public class CrowEntity extends PathAwareEntity {
         this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, 0.0f);
         this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, 0.0f);
         this.setPathfindingPenalty(PathNodeType.WATER, -1.0f);
-        this.noClip = true;
         this.experiencePoints = 3;
     }
 
