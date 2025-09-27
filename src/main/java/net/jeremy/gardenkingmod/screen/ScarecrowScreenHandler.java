@@ -1,5 +1,7 @@
 package net.jeremy.gardenkingmod.screen;
 
+import java.util.function.Predicate;
+
 import net.jeremy.gardenkingmod.ModScreenHandlers;
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,9 +17,15 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 
 public class ScarecrowScreenHandler extends ScreenHandler {
-        private static final int UPGRADE_SLOT_INDEX = 0;
-        private static final int SLOT_X = 80;
-        private static final int SLOT_Y = 35;
+        private static final int EQUIPMENT_SLOT_COUNT = ScarecrowBlockEntity.INVENTORY_SIZE;
+        private static final int HAT_SLOT_X = 80;
+        private static final int HAT_SLOT_Y = 17;
+        private static final int HEAD_SLOT_X = 80;
+        private static final int HEAD_SLOT_Y = 35;
+        private static final int CHEST_SLOT_X = 80;
+        private static final int CHEST_SLOT_Y = 53;
+        private static final int PITCHFORK_SLOT_X = 104;
+        private static final int PITCHFORK_SLOT_Y = 35;
         private static final int PLAYER_INVENTORY_START_Y = 84;
         private static final int PLAYER_HOTBAR_Y = 142;
 
@@ -46,23 +54,31 @@ public class ScarecrowScreenHandler extends ScreenHandler {
 
                 this.inventory.onOpen(playerInventory.player);
 
-                this.addSlot(new Slot(this.inventory, UPGRADE_SLOT_INDEX, SLOT_X, SLOT_Y) {
+                this.addSlot(createEquipmentSlot(ScarecrowBlockEntity.SLOT_HAT, HAT_SLOT_X, HAT_SLOT_Y,
+                                ScarecrowBlockEntity::isValidHatItem));
+                this.addSlot(createEquipmentSlot(ScarecrowBlockEntity.SLOT_HEAD, HEAD_SLOT_X, HEAD_SLOT_Y,
+                                ScarecrowBlockEntity::isValidHeadItem));
+                this.addSlot(createEquipmentSlot(ScarecrowBlockEntity.SLOT_CHEST, CHEST_SLOT_X, CHEST_SLOT_Y,
+                                ScarecrowBlockEntity::isValidChestItem));
+                this.addSlot(createEquipmentSlot(ScarecrowBlockEntity.SLOT_PITCHFORK, PITCHFORK_SLOT_X,
+                                PITCHFORK_SLOT_Y, ScarecrowBlockEntity::isValidPitchforkItem));
+
+                addPlayerInventory(playerInventory);
+                addPlayerHotbar(playerInventory);
+        }
+
+        private Slot createEquipmentSlot(int slotIndex, int x, int y, Predicate<ItemStack> validator) {
+                return new Slot(this.inventory, slotIndex, x, y) {
                         @Override
                         public boolean canInsert(ItemStack stack) {
-                                if (blockEntity == null) {
-                                        return true;
-                                }
-                                return blockEntity.isValidUpgrade(stack);
+                                return validator.test(stack);
                         }
 
                         @Override
                         public int getMaxItemCount() {
-                                return blockEntity != null ? blockEntity.getMaxCountPerStack() : 16;
+                                return 1;
                         }
-                });
-
-                addPlayerInventory(playerInventory);
-                addPlayerHotbar(playerInventory);
+                };
         }
 
         private static ScarecrowBlockEntity getBlockEntity(PlayerInventory playerInventory, BlockPos pos) {
@@ -90,11 +106,18 @@ public class ScarecrowScreenHandler extends ScreenHandler {
                 if (slot != null && slot.hasStack()) {
                         ItemStack original = slot.getStack();
                         newStack = original.copy();
-                        if (slotIndex == UPGRADE_SLOT_INDEX) {
+                        if (slotIndex < EQUIPMENT_SLOT_COUNT) {
                                 if (!this.insertItem(original, ScarecrowBlockEntity.INVENTORY_SIZE, this.slots.size(), true)) {
                                         return ItemStack.EMPTY;
                                 }
-                        } else if (!this.insertItem(original, UPGRADE_SLOT_INDEX, UPGRADE_SLOT_INDEX + 1, false)) {
+                        } else if (!this.insertItem(original, ScarecrowBlockEntity.SLOT_HAT,
+                                        ScarecrowBlockEntity.SLOT_HAT + 1, false)
+                                        && !this.insertItem(original, ScarecrowBlockEntity.SLOT_HEAD,
+                                                        ScarecrowBlockEntity.SLOT_HEAD + 1, false)
+                                        && !this.insertItem(original, ScarecrowBlockEntity.SLOT_CHEST,
+                                                        ScarecrowBlockEntity.SLOT_CHEST + 1, false)
+                                        && !this.insertItem(original, ScarecrowBlockEntity.SLOT_PITCHFORK,
+                                                        ScarecrowBlockEntity.SLOT_PITCHFORK + 1, false)) {
                                 return ItemStack.EMPTY;
                         }
 
