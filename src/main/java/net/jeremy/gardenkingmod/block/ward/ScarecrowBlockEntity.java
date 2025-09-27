@@ -1,6 +1,7 @@
 package net.jeremy.gardenkingmod.block.ward;
 
 import net.jeremy.gardenkingmod.ModBlockEntities;
+import net.jeremy.gardenkingmod.ModItemTags;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreenHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -13,7 +14,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -25,7 +25,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ScarecrowBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, Inventory {
-        public static final int INVENTORY_SIZE = 1;
+        public static final int SLOT_HAT = 0;
+        public static final int SLOT_HEAD = 1;
+        public static final int SLOT_CHEST = 2;
+        public static final int SLOT_PITCHFORK = 3;
+
+        public static final int INVENTORY_SIZE = 4;
         public static final int MAX_DURABILITY = 64;
 
         private static final Text TITLE = Text.translatable("container.gardenkingmod.scarecrow");
@@ -79,6 +84,7 @@ public class ScarecrowBlockEntity extends BlockEntity implements NamedScreenHand
                 super.readNbt(nbt);
                 this.inventory = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
                 Inventories.readNbt(nbt, this.inventory);
+                sanitizeInventory();
                 this.durability = Math.max(0, Math.min(nbt.getInt("Durability"), MAX_DURABILITY));
                 this.auraComponent.loadNbt(nbt);
         }
@@ -129,10 +135,10 @@ public class ScarecrowBlockEntity extends BlockEntity implements NamedScreenHand
                 if (!stack.isEmpty() && !this.isValid(slot, stack)) {
                         return;
                 }
-                this.inventory.set(slot, stack);
-                if (stack.getCount() > this.getMaxCountPerStack()) {
+                if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack()) {
                         stack.setCount(this.getMaxCountPerStack());
                 }
+                this.inventory.set(slot, stack);
                 markDirtyAndSync();
         }
 
@@ -148,6 +154,15 @@ public class ScarecrowBlockEntity extends BlockEntity implements NamedScreenHand
         public void clear() {
                 this.inventory.clear();
                 markDirtyAndSync();
+        }
+
+        private void sanitizeInventory() {
+                for (int slot = 0; slot < this.inventory.size(); slot++) {
+                        ItemStack stack = this.inventory.get(slot);
+                        if (!stack.isEmpty() && !this.isValid(slot, stack)) {
+                                this.inventory.set(slot, ItemStack.EMPTY);
+                        }
+                }
         }
 
         @Override
@@ -177,10 +192,6 @@ public class ScarecrowBlockEntity extends BlockEntity implements NamedScreenHand
 
         public ScarecrowAuraComponent getAuraComponent() {
                 return this.auraComponent;
-        }
-
-        public boolean isValidUpgrade(ItemStack stack) {
-                return stack.isIn(ItemTags.FLOWERS) || stack.isIn(ItemTags.WOOL_CARPETS);
         }
 
         public boolean isAuraActive() {
@@ -213,24 +224,31 @@ public class ScarecrowBlockEntity extends BlockEntity implements NamedScreenHand
         }
 
         public double getUpgradeRadiusBonus() {
-                ItemStack stack = this.inventory.get(0);
-                if (stack.isEmpty()) {
-                        return 0.0;
-                }
-                return Math.min(6.0, stack.getCount() * 0.5);
+                return Math.min(6.0, getEquipmentLevel() * 0.5);
         }
 
         public double getUpgradeVerticalBonus() {
-                ItemStack stack = this.inventory.get(0);
-                if (stack.isEmpty()) {
-                        return 0.0;
-                }
-                return Math.min(4.0, stack.getCount() * 0.25);
+                return Math.min(4.0, getEquipmentLevel() * 0.25);
         }
 
         public int getUpgradeLevel() {
-                ItemStack stack = this.inventory.get(0);
-                return stack.isEmpty() ? 0 : Math.min(16, stack.getCount());
+                return getEquipmentLevel();
+        }
+
+        public ItemStack getEquippedHat() {
+                return this.inventory.get(SLOT_HAT);
+        }
+
+        public ItemStack getEquippedHead() {
+                return this.inventory.get(SLOT_HEAD);
+        }
+
+        public ItemStack getEquippedChest() {
+                return this.inventory.get(SLOT_CHEST);
+        }
+
+        public ItemStack getEquippedPitchfork() {
+                return this.inventory.get(SLOT_PITCHFORK);
         }
 
         public double getHorizontalAuraRadius() {
@@ -250,12 +268,54 @@ public class ScarecrowBlockEntity extends BlockEntity implements NamedScreenHand
 
         @Override
         public boolean isValid(int slot, ItemStack stack) {
-                return slot == 0 && this.isValidUpgrade(stack);
+                if (stack.isEmpty()) {
+                        return true;
+                }
+                return switch (slot) {
+                        case SLOT_HAT -> isValidHatItem(stack);
+                        case SLOT_HEAD -> isValidHeadItem(stack);
+                        case SLOT_CHEST -> isValidChestItem(stack);
+                        case SLOT_PITCHFORK -> isValidPitchforkItem(stack);
+                        default -> false;
+                };
         }
 
         @Override
         public int getMaxCountPerStack() {
-                return 16;
+                return 1;
+        }
+
+        public static boolean isValidHatItem(ItemStack stack) {
+                return stack.isIn(ModItemTags.SCARECROW_HATS);
+        }
+
+        public static boolean isValidHeadItem(ItemStack stack) {
+                return stack.isIn(ModItemTags.SCARECROW_HEADS);
+        }
+
+        public static boolean isValidChestItem(ItemStack stack) {
+                return stack.isIn(ModItemTags.SCARECROW_SHIRTS);
+        }
+
+        public static boolean isValidPitchforkItem(ItemStack stack) {
+                return stack.isIn(ModItemTags.SCARECROW_PITCHFORKS);
+        }
+
+        private int getEquipmentLevel() {
+                int level = 0;
+                if (isValidHatItem(getEquippedHat())) {
+                        level += 4;
+                }
+                if (isValidHeadItem(getEquippedHead())) {
+                        level += 4;
+                }
+                if (isValidChestItem(getEquippedChest())) {
+                        level += 4;
+                }
+                if (isValidPitchforkItem(getEquippedPitchfork())) {
+                        level += 4;
+                }
+                return Math.min(16, level);
         }
 
         public boolean isWithinAura(Vec3d position) {
