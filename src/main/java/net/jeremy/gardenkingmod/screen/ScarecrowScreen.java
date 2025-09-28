@@ -45,8 +45,8 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
         private static final Text HAND_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.hand");
 
         private static final float PREVIEW_Z_OFFSET = 150.0F;
-        private static final int PREVIEW_CENTER_X = 136;
-        private static final int PREVIEW_CENTER_Y = 70;
+        private static final int PREVIEW_CENTER_X = 56;
+        private static final int PREVIEW_CENTER_Y = 76;
         private static final float PREVIEW_SCALE = 28.0F;
 
         private ScarecrowRenderHelper renderHelper;
