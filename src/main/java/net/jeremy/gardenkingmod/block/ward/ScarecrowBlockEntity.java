@@ -32,9 +32,10 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
         public static final int SLOT_HAT = 0;
         public static final int SLOT_HEAD = 1;
         public static final int SLOT_CHEST = 2;
-        public static final int SLOT_PITCHFORK = 3;
+        public static final int SLOT_PANTS = 3;
+        public static final int SLOT_PITCHFORK = 4;
 
-        public static final int INVENTORY_SIZE = 4;
+        public static final int INVENTORY_SIZE = 5;
         public static final int MAX_DURABILITY = 64;
 
         private static final String NBT_PITCHFORK_AURA = "ScarecrowAura";
@@ -292,6 +293,10 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
                 return this.inventory.get(SLOT_CHEST);
         }
 
+        public ItemStack getEquippedPants() {
+                return this.inventory.get(SLOT_PANTS);
+        }
+
         public ItemStack getEquippedPitchfork() {
                 return this.inventory.get(SLOT_PITCHFORK);
         }
@@ -320,6 +325,7 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
                         case SLOT_HAT -> isValidHatItem(stack);
                         case SLOT_HEAD -> isValidHeadItem(stack);
                         case SLOT_CHEST -> isValidChestItem(stack);
+                        case SLOT_PANTS -> isValidPantsItem(stack);
                         case SLOT_PITCHFORK -> isValidPitchforkItem(stack);
                         default -> false;
                 };
@@ -340,6 +346,10 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
 
         public static boolean isValidChestItem(ItemStack stack) {
                 return stack.isIn(ModItemTags.SCARECROW_SHIRTS);
+        }
+
+        public static boolean isValidPantsItem(ItemStack stack) {
+                return stack.isIn(ModItemTags.SCARECROW_PANTS);
         }
 
         public static boolean isValidPitchforkItem(ItemStack stack) {
