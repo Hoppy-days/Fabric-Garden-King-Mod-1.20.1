@@ -128,6 +128,13 @@
   "item.gardenkingmod.crow_spawn_egg": "Crow Spawn Egg",
 
   "tooltip.gardenkingmod.scarecrow.ward_radius": "Wards crows within %s blocks.",
+  "screen.gardenkingmod.scarecrow.slot.hat": "Hat Slot",
+  "screen.gardenkingmod.scarecrow.slot.head": "Head Slot",
+  "screen.gardenkingmod.scarecrow.slot.chest": "Chest Slot",
+  "screen.gardenkingmod.scarecrow.slot.hand": "Hand Slot",
+  "screen.gardenkingmod.scarecrow.radius.summary": "Ward Radius: %1$s x %2$s",
+  "screen.gardenkingmod.scarecrow.radius.horizontal": "Horizontal radius: %s blocks",
+  "screen.gardenkingmod.scarecrow.radius.vertical": "Vertical radius: %s blocks",
 
   "subtitles.gardenkingmod.entity.crow.caw": "Crow caws",
   "subtitles.gardenkingmod.entity.crow.flap": "Crow wings flap",
