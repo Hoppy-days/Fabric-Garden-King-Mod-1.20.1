@@ -17,17 +17,17 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 
 public class ScarecrowScreenHandler extends ScreenHandler {
-        private static final int EQUIPMENT_SLOT_COUNT = ScarecrowBlockEntity.INVENTORY_SIZE;
-        private static final int HAT_SLOT_X = 80;
-        private static final int HAT_SLOT_Y = 17;
-        private static final int HEAD_SLOT_X = 80;
-        private static final int HEAD_SLOT_Y = 35;
-        private static final int CHEST_SLOT_X = 80;
-        private static final int CHEST_SLOT_Y = 53;
-        private static final int PITCHFORK_SLOT_X = 104;
-        private static final int PITCHFORK_SLOT_Y = 35;
-        private static final int PLAYER_INVENTORY_START_Y = 84;
-        private static final int PLAYER_HOTBAR_Y = 142;
+        public static final int EQUIPMENT_SLOT_COUNT = ScarecrowBlockEntity.INVENTORY_SIZE;
+        public static final int HAT_SLOT_X = 44;
+        public static final int HAT_SLOT_Y = 28;
+        public static final int HEAD_SLOT_X = 98;
+        public static final int HEAD_SLOT_Y = 28;
+        public static final int CHEST_SLOT_X = 44;
+        public static final int CHEST_SLOT_Y = 82;
+        public static final int PITCHFORK_SLOT_X = 98;
+        public static final int PITCHFORK_SLOT_Y = 82;
+        public static final int PLAYER_INVENTORY_START_Y = 118;
+        public static final int PLAYER_HOTBAR_Y = 176;
 
         private final Inventory inventory;
         private final PropertyDelegate properties;
@@ -128,6 +128,10 @@ public class ScarecrowScreenHandler extends ScreenHandler {
                         }
                 }
                 return newStack;
+        }
+
+        public Inventory getInventory() {
+                return inventory;
         }
 
         private void addPlayerInventory(PlayerInventory playerInventory) {
