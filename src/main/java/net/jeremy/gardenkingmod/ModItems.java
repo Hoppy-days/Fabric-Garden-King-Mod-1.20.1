@@ -29,6 +29,8 @@ import net.minecraft.util.Identifier;
 public final class ModItems {
         public static final Item GARDEN_COIN = registerItem("garden_coin", new Item(new FabricItemSettings()));
         public static final Item RUBY = registerItem("ruby", new Item(new FabricItemSettings()));
+        public static final Item SCARECROW_SHIRT_RED = registerItem("scarecrow_shirt_red",
+                        new Item(new FabricItemSettings()));
         public static final Item RUBY_SWORD = registerItem("ruby_sword",
                         new SwordItem(RubyToolMaterial.INSTANCE, 4, -2.2F, new FabricItemSettings()));
         public static final Item RUBY_PICKAXE = registerItem("ruby_pickaxe",
@@ -113,6 +115,8 @@ public final class ModItems {
                                         entries.add(RUBY);
                                         rottenItems.forEach(entries::add);
                                 });
+                ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL)
+                                .register(entries -> entries.add(SCARECROW_SHIRT_RED));
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS)
                                 .register(entries -> {
                                         entries.add(RUBY_PICKAXE);
