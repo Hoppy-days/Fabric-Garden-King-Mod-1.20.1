@@ -27,7 +27,7 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
         private static final int BACKGROUND_WIDTH = 176;
         private static final int BACKGROUND_HEIGHT = 206;
         private static final int PLAYER_LABEL_Y = 112;
-        private static final int TITLE_X = 8;
+        private static final int TITLE_X = 104;
         private static final int TITLE_Y = 8;
         private static final int OVERLAY_SIZE = 18;
         private static final int SLOT_OVERLAY_U = 176;
@@ -98,8 +98,14 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 Text radiusSummary = Text.translatable("screen.gardenkingmod.scarecrow.radius.summary", horizontalRadius,
                                 verticalRadius);
                 int summaryY = RADIUS_TEXT_Y + textRenderer.fontHeight + RADIUS_TEXT_SPACING;
+                int titleWidth = textRenderer.getWidth(radiusTitle);
+                int summaryWidth = textRenderer.getWidth(radiusSummary);
+                int summaryX = RADIUS_TEXT_X;
+                if (summaryWidth < titleWidth) {
+                summaryX += (titleWidth - summaryWidth) / 2;
+            }
                 context.drawText(textRenderer, radiusTitle, RADIUS_TEXT_X, RADIUS_TEXT_Y, 0x404040, false);
-                context.drawText(textRenderer, radiusSummary, RADIUS_TEXT_X, summaryY, 0x404040, false);
+                context.drawText(textRenderer, radiusSummary, summaryX, summaryY, 0x404040, false);
         }
 
         @Override
