@@ -47,7 +47,7 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
         private static final float PREVIEW_Z_OFFSET = 150.0F;
         private static final int PREVIEW_CENTER_X = 51;
         private static final int PREVIEW_CENTER_Y = 75;
-        private static final float PREVIEW_SCALE = 28.0F;
+        private static final float PREVIEW_SCALE = 24.0F;
 
         private ScarecrowRenderHelper renderHelper;
 
@@ -145,7 +145,7 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 matrices.scale(PREVIEW_SCALE, PREVIEW_SCALE, PREVIEW_SCALE);
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(pitch * 20.0F));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F + (yaw * 40.0F)));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yaw * 40.0F));
 
                 this.renderHelper.render(matrices, immediate, 0xF000F0, OverlayTexture.DEFAULT_UV, equipment,
                                 client.world);

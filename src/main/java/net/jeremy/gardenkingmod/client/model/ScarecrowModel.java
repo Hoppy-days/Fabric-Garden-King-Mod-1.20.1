@@ -75,13 +75,13 @@ public class ScarecrowModel extends EntityModel<Entity> {
                 .uv(22, 43).cuboid(4.0F, -24.0F, 3.0F, 1.0F, 2.0F, 0.0F, new Dilation(0.0F))
                 .uv(25, 41).cuboid(11.0F, -26.0F, 3.0F, 2.0F, 2.0F, 0.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
 
-        ModelPartData cube_r1 = bb_main.addChild("cube_r1", ModelPartBuilder.create().uv(50, 18).cuboid(-1.0F, -2.0F, 1.0F, 1.0F, 3.0F, 0.0F, new Dilation(0.0F)), ModelTransform.of(1.2929F, -36.5F, -5.2F, 0.0F, 0.0F, 2.3562F));
+        ModelPartData cube_r1 = bb_main.addChild("cube_r1", ModelPartBuilder.create().uv(50, 18).cuboid(-1.0F, -2.0F, 1.0F, 1.0F, 3.0F, 0.0F, new Dilation(0.0F)), ModelTransform.of(1.2929F, -36.5F, 3.1F, 0.0F, 0.0F, 2.3562F));
 
-        ModelPartData cube_r2 = bb_main.addChild("cube_r2", ModelPartBuilder.create().uv(51, 18).cuboid(-1.0F, -2.0F, 1.0F, 1.0F, 3.0F, 0.0F, new Dilation(0.0F)), ModelTransform.of(2.0F, -35.7929F, -5.2F, 0.0F, 0.0F, 0.7854F));
+        ModelPartData cube_r2 = bb_main.addChild("cube_r2", ModelPartBuilder.create().uv(51, 18).cuboid(-1.0F, -2.0F, 1.0F, 1.0F, 3.0F, 0.0F, new Dilation(0.0F)), ModelTransform.of(2.0F, -35.7929F, 3.1F, 0.0F, 0.0F, 0.7854F));
 
-        ModelPartData cube_r3 = bb_main.addChild("cube_r3", ModelPartBuilder.create().uv(50, 18).cuboid(-1.0F, -2.0F, 1.0F, 1.0F, 3.0F, 0.0F, new Dilation(0.0F)), ModelTransform.of(-2.7071F, -36.5F, -5.2F, 0.0F, 0.0F, 2.3562F));
+        ModelPartData cube_r3 = bb_main.addChild("cube_r3", ModelPartBuilder.create().uv(50, 18).cuboid(-1.0F, -2.0F, 1.0F, 1.0F, 3.0F, 0.0F, new Dilation(0.0F)), ModelTransform.of(-2.7071F, -36.5F, 3.1F, 0.0F, 0.0F, 2.3562F));
 
-        ModelPartData cube_r4 = bb_main.addChild("cube_r4", ModelPartBuilder.create().uv(51, 18).cuboid(-1.0F, -2.0F, 1.0F, 1.0F, 3.0F, 0.0F, new Dilation(0.0F)), ModelTransform.of(-2.0F, -35.7929F, -5.2F, 0.0F, 0.0F, 0.7854F));
+        ModelPartData cube_r4 = bb_main.addChild("cube_r4", ModelPartBuilder.create().uv(51, 18).cuboid(-1.0F, -2.0F, 1.0F, 1.0F, 3.0F, 0.0F, new Dilation(0.0F)), ModelTransform.of(-2.0F, -35.7929F, 3.1F, 0.0F, 0.0F, 0.7854F));
 
         ModelPartData cube_r5 = bb_main.addChild("cube_r5", ModelPartBuilder.create().uv(49, 8).cuboid(-3.0F, -1.0F, -3.0F, 6.0F, 1.0F, 1.0F, new Dilation(0.0F))
                 .uv(49, 9).cuboid(-4.0F, -1.0F, -2.0F, 8.0F, 1.0F, 1.0F, new Dilation(0.0F))
