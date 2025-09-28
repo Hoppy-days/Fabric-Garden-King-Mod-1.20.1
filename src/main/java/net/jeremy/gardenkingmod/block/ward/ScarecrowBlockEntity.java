@@ -26,6 +26,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import net.minecraft.nbt.NbtElement;
+
 public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
         public static final int SLOT_HAT = 0;
         public static final int SLOT_HEAD = 1;
@@ -34,6 +36,13 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
 
         public static final int INVENTORY_SIZE = 4;
         public static final int MAX_DURABILITY = 64;
+
+        private static final String NBT_PITCHFORK_AURA = "ScarecrowAura";
+        private static final String NBT_HORIZONTAL_BONUS = "HorizontalBonus";
+        private static final String NBT_VERTICAL_BONUS = "VerticalBonus";
+        private static final String NBT_LEVEL = "Level";
+        private static final String NBT_PULSE_INTERVAL = "PulseInterval";
+        private static final String NBT_PULSE_DURATION = "PulseDuration";
 
         private static final Text TITLE = Text.translatable("container.gardenkingmod.scarecrow");
 
@@ -118,6 +127,9 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
         public ItemStack removeStack(int slot, int amount) {
                 ItemStack stack = Inventories.splitStack(this.inventory, slot, amount);
                 if (!stack.isEmpty()) {
+                        if (slot == SLOT_PITCHFORK) {
+                                onPitchforkChanged();
+                        }
                         markDirtyAndSync();
                 }
                 return stack;
@@ -127,6 +139,9 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
         public ItemStack removeStack(int slot) {
                 ItemStack stack = Inventories.removeStack(this.inventory, slot);
                 if (!stack.isEmpty()) {
+                        if (slot == SLOT_PITCHFORK) {
+                                onPitchforkChanged();
+                        }
                         markDirtyAndSync();
                 }
                 return stack;
@@ -140,7 +155,11 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
                 if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack()) {
                         stack.setCount(this.getMaxCountPerStack());
                 }
+                ItemStack previous = this.inventory.get(slot);
                 this.inventory.set(slot, stack);
+                if (slot == SLOT_PITCHFORK && !ItemStack.areEqual(previous, stack)) {
+                        onPitchforkChanged();
+                }
                 markDirtyAndSync();
         }
 
@@ -154,7 +173,11 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
 
         @Override
         public void clear() {
+                boolean hadPitchfork = !getEquippedPitchfork().isEmpty();
                 this.inventory.clear();
+                if (hadPitchfork) {
+                        onPitchforkChanged();
+                }
                 markDirtyAndSync();
         }
 
@@ -163,6 +186,9 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
                         ItemStack stack = this.inventory.get(slot);
                         if (!stack.isEmpty() && !this.isValid(slot, stack)) {
                                 this.inventory.set(slot, ItemStack.EMPTY);
+                                if (slot == SLOT_PITCHFORK) {
+                                        onPitchforkChanged();
+                                }
                         }
                 }
         }
@@ -230,16 +256,28 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
                 markDirtyAndSync();
         }
 
-        public double getUpgradeRadiusBonus() {
-                return Math.min(6.0, getEquipmentLevel() * 0.5);
+        public PitchforkAuraStats getPitchforkAuraStats() {
+                return resolvePitchforkAuraStats(getEquippedPitchfork());
         }
 
-        public double getUpgradeVerticalBonus() {
-                return Math.min(4.0, getEquipmentLevel() * 0.25);
+        public double getPitchforkHorizontalBonus() {
+                return getPitchforkAuraStats().horizontalBonus();
         }
 
-        public int getUpgradeLevel() {
-                return getEquipmentLevel();
+        public double getPitchforkVerticalBonus() {
+                return getPitchforkAuraStats().verticalBonus();
+        }
+
+        public int getPitchforkLevel() {
+                return getPitchforkAuraStats().level();
+        }
+
+        public int getPitchforkPulseIntervalTicks() {
+                return getPitchforkAuraStats().pulseIntervalTicks();
+        }
+
+        public int getPitchforkPulseDurationTicks() {
+                return getPitchforkAuraStats().pulseDurationTicks();
         }
 
         public ItemStack getEquippedHat() {
@@ -308,21 +346,14 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
                 return stack.isIn(ModItemTags.SCARECROW_PITCHFORKS);
         }
 
-        private int getEquipmentLevel() {
-                int level = 0;
-                if (isValidHatItem(getEquippedHat())) {
-                        level += 4;
+        private PitchforkAuraStats resolvePitchforkAuraStats(ItemStack stack) {
+                if (stack.isEmpty()) {
+                        return PitchforkAuraStats.EMPTY;
                 }
-                if (isValidHeadItem(getEquippedHead())) {
-                        level += 4;
+                if (!isValidPitchforkItem(stack)) {
+                        return PitchforkAuraStats.EMPTY;
                 }
-                if (isValidChestItem(getEquippedChest())) {
-                        level += 4;
-                }
-                if (isValidPitchforkItem(getEquippedPitchfork())) {
-                        level += 4;
-                }
-                return Math.min(16, level);
+                return PitchforkAuraStats.fromStack(stack);
         }
 
         public boolean isWithinAura(Vec3d position) {
@@ -333,6 +364,52 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
                 double dz = position.z - center.z;
                 double dy = Math.abs(position.y - center.y);
                 return Math.sqrt(dx * dx + dz * dz) <= horizontalRadius && dy <= verticalRadius;
+        }
+
+        private void onPitchforkChanged() {
+                if (this.world instanceof ServerWorld serverWorld) {
+                        this.auraComponent.onAuraModifiersChanged(serverWorld.getTime());
+                } else {
+                        this.auraComponent.onAuraModifiersChanged(-1L);
+                }
+        }
+
+        private static double readDouble(NbtCompound nbt, String key, double defaultValue) {
+                if (!nbt.contains(key, NbtElement.NUMBER_TYPE)) {
+                        return defaultValue;
+                }
+                return nbt.getDouble(key);
+        }
+
+        private static int readInt(NbtCompound nbt, String key, int defaultValue) {
+                if (!nbt.contains(key, NbtElement.NUMBER_TYPE)) {
+                        return defaultValue;
+                }
+                return nbt.getInt(key);
+        }
+
+        public record PitchforkAuraStats(double horizontalBonus, double verticalBonus, int level,
+                        int pulseIntervalTicks, int pulseDurationTicks) {
+
+                public static final PitchforkAuraStats EMPTY = new PitchforkAuraStats(0.0, 0.0, 0,
+                                ScarecrowAuraComponent.PULSE_INTERVAL_TICKS,
+                                ScarecrowAuraComponent.PULSE_DURATION_TICKS);
+
+                static PitchforkAuraStats fromStack(ItemStack stack) {
+                        NbtCompound nbt = stack.getNbt();
+                        if (nbt == null || !nbt.contains(NBT_PITCHFORK_AURA, NbtElement.COMPOUND_TYPE)) {
+                                return EMPTY;
+                        }
+                        NbtCompound aura = nbt.getCompound(NBT_PITCHFORK_AURA);
+                        double horizontal = readDouble(aura, NBT_HORIZONTAL_BONUS, 0.0);
+                        double vertical = readDouble(aura, NBT_VERTICAL_BONUS, 0.0);
+                        int level = Math.max(0, readInt(aura, NBT_LEVEL, 0));
+                        int pulseInterval = Math.max(1,
+                                        readInt(aura, NBT_PULSE_INTERVAL, ScarecrowAuraComponent.PULSE_INTERVAL_TICKS));
+                        int pulseDuration = Math.max(0,
+                                        readInt(aura, NBT_PULSE_DURATION, ScarecrowAuraComponent.PULSE_DURATION_TICKS));
+                        return new PitchforkAuraStats(horizontal, vertical, level, pulseInterval, pulseDuration);
+                }
         }
 
         public boolean hasRecentPulse(long time) {

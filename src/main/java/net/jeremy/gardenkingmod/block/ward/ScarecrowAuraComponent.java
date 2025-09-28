@@ -73,24 +73,33 @@ public final class ScarecrowAuraComponent {
                         return;
                 }
 
+                ScarecrowBlockEntity.PitchforkAuraStats stats = owner.getPitchforkAuraStats();
+                int interval = Math.max(1, stats.pulseIntervalTicks());
+
+                if (this.pulseCooldown > interval) {
+                        this.pulseCooldown = interval;
+                }
+
                 if (this.pulseCooldown > 0) {
                         this.pulseCooldown--;
-                } else {
-                        this.pulseCooldown = Math.max(10, PULSE_INTERVAL_TICKS - owner.getUpgradeLevel());
+                }
+
+                if (this.pulseCooldown <= 0) {
+                        this.pulseCooldown = interval;
                         this.lastPulseTick = world.getTime();
                 }
         }
 
         double getHorizontalRadius() {
-                return BASE_HORIZONTAL_RADIUS + owner.getUpgradeRadiusBonus();
+                return BASE_HORIZONTAL_RADIUS + owner.getPitchforkHorizontalBonus();
         }
 
         double getVerticalRadius() {
-                return BASE_VERTICAL_RADIUS + owner.getUpgradeVerticalBonus();
+                return BASE_VERTICAL_RADIUS + owner.getPitchforkVerticalBonus();
         }
 
         boolean isPulseActive(long worldTime) {
-                return worldTime - this.lastPulseTick <= PULSE_DURATION_TICKS;
+                return worldTime - this.lastPulseTick <= owner.getPitchforkPulseDurationTicks();
         }
 
         void initialize(long worldTime) {
@@ -105,5 +114,12 @@ public final class ScarecrowAuraComponent {
         void loadNbt(NbtCompound nbt) {
                 this.pulseCooldown = nbt.getInt("AuraCooldown");
                 this.lastPulseTick = nbt.getLong("AuraLastPulse");
+        }
+
+        void onAuraModifiersChanged(long worldTime) {
+                this.pulseCooldown = 0;
+                if (worldTime >= 0L) {
+                        this.lastPulseTick = worldTime;
+                }
         }
 }
