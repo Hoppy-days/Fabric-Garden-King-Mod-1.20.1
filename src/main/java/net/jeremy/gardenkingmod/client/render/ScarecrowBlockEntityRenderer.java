@@ -1,32 +1,23 @@
 package net.jeremy.gardenkingmod.client.render;
 
-import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlockEntity;
-import net.jeremy.gardenkingmod.client.model.ScarecrowModel;
+import net.jeremy.gardenkingmod.client.render.ScarecrowRenderHelper.ScarecrowEquipment;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 
 public class ScarecrowBlockEntityRenderer implements BlockEntityRenderer<ScarecrowBlockEntity> {
-    private static final Identifier TEXTURE = new Identifier(
-            GardenKingMod.MOD_ID,
-            "textures/entity/scarecrow/scarecrow.png"
-    );
-
-    private final ScarecrowModel model;
+    private final ScarecrowRenderHelper renderHelper;
 
     public ScarecrowBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
-        this.model = new ScarecrowModel(context.getLayerModelPart(ScarecrowModel.LAYER_LOCATION));
+        this.renderHelper = ScarecrowRenderHelper.createDefault(context);
     }
 
     @Override
@@ -43,8 +34,8 @@ public class ScarecrowBlockEntityRenderer implements BlockEntityRenderer<Scarecr
             combinedLight = WorldRenderer.getLightmapCoordinates(world, exposedPos);
         }
 
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
-        this.model.render(matrices, vertexConsumer, combinedLight, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
+        ScarecrowEquipment equipment = ScarecrowEquipment.fromBlockEntity(entity);
+        this.renderHelper.render(matrices, vertexConsumers, combinedLight, OverlayTexture.DEFAULT_UV, equipment, world);
 
         matrices.pop();
     }
