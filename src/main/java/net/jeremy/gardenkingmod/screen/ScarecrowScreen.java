@@ -141,10 +141,11 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 float pitch = (float) Math.atan(mouseDeltaY / 40.0F);
 
                 matrices.translate(centerX, centerY, PREVIEW_Z_OFFSET);
+                matrices.scale(1.0F, -1.0F, 1.0F);
                 matrices.scale(PREVIEW_SCALE, PREVIEW_SCALE, PREVIEW_SCALE);
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yaw * 40.0F));
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(pitch * 20.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yaw * 40.0F));
 
                 this.renderHelper.render(matrices, immediate, 0xF000F0, OverlayTexture.DEFAULT_UV, equipment,
                                 client.world);
