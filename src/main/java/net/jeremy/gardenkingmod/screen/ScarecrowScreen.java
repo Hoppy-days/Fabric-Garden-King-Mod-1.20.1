@@ -34,10 +34,10 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
         private static final int SLOT_OVERLAY_V = 0;
         private static final int RADIUS_TEXT_X = 104;
         private static final int RADIUS_TEXT_Y = 62;
+        private static final int RADIUS_TEXT_SPACING = 2;
         private static final int RADIUS_INFO_X = 104;
         private static final int RADIUS_INFO_Y = 62;
         private static final int RADIUS_INFO_WIDTH = 160;
-        private static final int RADIUS_INFO_HEIGHT = 14;
 
         private static final Text HAT_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.hat");
         private static final Text HEAD_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.head");
@@ -94,9 +94,12 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 super.drawForeground(context, mouseX, mouseY);
                 int horizontalRadius = handler.getHorizontalRadius();
                 int verticalRadius = handler.getVerticalRadius();
-                Text radiusSummary = Text.translatable("screen.gardenkingmod.scarecrow.radius.summary",
-                                horizontalRadius, verticalRadius);
-                context.drawText(textRenderer, radiusSummary, RADIUS_TEXT_X, RADIUS_TEXT_Y, 0x404040, false);
+                Text radiusTitle = Text.translatable("screen.gardenkingmod.scarecrow.radius.title");
+                Text radiusSummary = Text.translatable("screen.gardenkingmod.scarecrow.radius.summary", horizontalRadius,
+                                verticalRadius);
+                int summaryY = RADIUS_TEXT_Y + textRenderer.fontHeight + RADIUS_TEXT_SPACING;
+                context.drawText(textRenderer, radiusTitle, RADIUS_TEXT_X, RADIUS_TEXT_Y, 0x404040, false);
+                context.drawText(textRenderer, radiusSummary, RADIUS_TEXT_X, summaryY, 0x404040, false);
         }
 
         @Override
@@ -158,6 +161,10 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 context.drawTexture(TEXTURE, x, y, SLOT_OVERLAY_U, SLOT_OVERLAY_V, OVERLAY_SIZE, OVERLAY_SIZE);
         }
 
+        private int getRadiusInfoHeight() {
+                return textRenderer.fontHeight * 2 + RADIUS_TEXT_SPACING;
+        }
+
         private void drawCustomTooltips(DrawContext context, int mouseX, int mouseY) {
                 Slot hoveredSlot = findHoveredEquipmentSlot(mouseX, mouseY);
                 if (hoveredSlot != null && !hoveredSlot.hasStack()) {
@@ -168,7 +175,8 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                         }
                 }
 
-                if (isPointWithinBounds(RADIUS_INFO_X, RADIUS_INFO_Y, RADIUS_INFO_WIDTH, RADIUS_INFO_HEIGHT, mouseX,
+                int radiusInfoHeight = getRadiusInfoHeight();
+                if (isPointWithinBounds(RADIUS_INFO_X, RADIUS_INFO_Y, RADIUS_INFO_WIDTH, radiusInfoHeight, mouseX,
                                 mouseY)) {
                         int horizontalRadius = handler.getHorizontalRadius();
                         int verticalRadius = handler.getVerticalRadius();
