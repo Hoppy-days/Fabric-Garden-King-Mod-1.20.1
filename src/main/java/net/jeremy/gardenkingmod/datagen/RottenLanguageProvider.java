@@ -23,6 +23,7 @@ public final class RottenLanguageProvider extends FabricLanguageProvider {
                 translationBuilder.add("block.gardenkingmod.market_block", "Garden Market");
                 translationBuilder.add("item.gardenkingmod.garden_coin", "Garden Coin");
                 translationBuilder.add("container.gardenkingmod.market", "Garden Market");
+                translationBuilder.add("container.gardenkingmod.scarecrow", "Field Scarecrow");
                 translationBuilder.add("screen.gardenkingmod.market.sell", "Sell");
                 translationBuilder.add("screen.gardenkingmod.market.sale_result",
                                 "You sold %1$s crops and earned %2$s garden coins.");
