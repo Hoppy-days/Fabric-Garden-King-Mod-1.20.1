@@ -24,8 +24,8 @@ public class ScarecrowScreenHandler extends ScreenHandler {
         public static final int HEAD_SLOT_Y = 26;
         public static final int CHEST_SLOT_X = 8;
         public static final int CHEST_SLOT_Y = 44;
-        public static final int PITCHFORK_SLOT_X = 77;
-        public static final int PITCHFORK_SLOT_Y = 62;
+        public static final int PITCHFORK_SLOT_X = 8;
+        public static final int PITCHFORK_SLOT_Y = 80;
         public static final int PLAYER_INVENTORY_START_Y = 124;
         public static final int PLAYER_HOTBAR_Y = 182;
 

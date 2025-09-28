@@ -26,16 +26,16 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                         "textures/gui/container/scarecrow_gui.png");
         private static final int BACKGROUND_WIDTH = 176;
         private static final int BACKGROUND_HEIGHT = 206;
-        private static final int PLAYER_LABEL_Y = 108;
+        private static final int PLAYER_LABEL_Y = 112;
         private static final int TITLE_X = 8;
         private static final int TITLE_Y = 8;
         private static final int OVERLAY_SIZE = 18;
         private static final int SLOT_OVERLAY_U = 176;
         private static final int SLOT_OVERLAY_V = 0;
-        private static final int RADIUS_TEXT_X = 8;
-        private static final int RADIUS_TEXT_Y = 28;
-        private static final int RADIUS_INFO_X = 8;
-        private static final int RADIUS_INFO_Y = 24;
+        private static final int RADIUS_TEXT_X = 104;
+        private static final int RADIUS_TEXT_Y = 62;
+        private static final int RADIUS_INFO_X = 104;
+        private static final int RADIUS_INFO_Y = 62;
         private static final int RADIUS_INFO_WIDTH = 160;
         private static final int RADIUS_INFO_HEIGHT = 14;
 
@@ -45,9 +45,9 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
         private static final Text HAND_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.hand");
 
         private static final float PREVIEW_Z_OFFSET = 150.0F;
-        private static final int PREVIEW_CENTER_X = 51;
-        private static final int PREVIEW_CENTER_Y = 75;
-        private static final float PREVIEW_SCALE = 24.0F;
+        private static final int PREVIEW_CENTER_X = 50;
+        private static final int PREVIEW_CENTER_Y = 35;
+        private static final float PREVIEW_SCALE = 22.0F;
 
         private ScarecrowRenderHelper renderHelper;
 
