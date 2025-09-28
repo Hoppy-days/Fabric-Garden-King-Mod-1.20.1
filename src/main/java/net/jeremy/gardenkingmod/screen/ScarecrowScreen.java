@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier;
 
 public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
-                        "textures/gui/container/scarecrow.png");
+                        "textures/gui/container/scarecrow_gui.png");
         private static final int BACKGROUND_WIDTH = 176;
         private static final int BACKGROUND_HEIGHT = 206;
         private static final int PLAYER_LABEL_Y = 108;
