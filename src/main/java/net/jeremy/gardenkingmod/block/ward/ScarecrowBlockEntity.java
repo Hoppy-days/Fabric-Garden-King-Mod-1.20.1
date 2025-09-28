@@ -1,5 +1,6 @@
 package net.jeremy.gardenkingmod.block.ward;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.ModItemTags;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreenHandler;
@@ -11,12 +12,13 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
@@ -24,7 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class ScarecrowBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, Inventory {
+public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
         public static final int SLOT_HAT = 0;
         public static final int SLOT_HEAD = 1;
         public static final int SLOT_CHEST = 2;
@@ -176,6 +178,11 @@ public class ScarecrowBlockEntity extends BlockEntity implements NamedScreenHand
         @Override
         public Text getDisplayName() {
                 return TITLE;
+        }
+
+        @Override
+        public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+                buf.writeBlockPos(getPos());
         }
 
         @Override
