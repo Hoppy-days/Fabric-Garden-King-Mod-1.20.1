@@ -98,8 +98,14 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 Text radiusSummary = Text.translatable("screen.gardenkingmod.scarecrow.radius.summary", horizontalRadius,
                                 verticalRadius);
                 int summaryY = RADIUS_TEXT_Y + textRenderer.fontHeight + RADIUS_TEXT_SPACING;
+                int titleWidth = textRenderer.getWidth(radiusTitle);
+                int summaryWidth = textRenderer.getWidth(radiusSummary);
+                int summaryX = RADIUS_TEXT_X;
+                if (summaryWidth < titleWidth) {
+                        summaryX += (titleWidth - summaryWidth) / 2;
+                }
                 context.drawText(textRenderer, radiusTitle, RADIUS_TEXT_X, RADIUS_TEXT_Y, 0x404040, false);
-                context.drawText(textRenderer, radiusSummary, RADIUS_TEXT_X, summaryY, 0x404040, false);
+                context.drawText(textRenderer, radiusSummary, summaryX, summaryY, 0x404040, false);
         }
 
         @Override
