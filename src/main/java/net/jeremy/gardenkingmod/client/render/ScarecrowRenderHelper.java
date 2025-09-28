@@ -57,6 +57,7 @@ public final class ScarecrowRenderHelper {
         renderHeadLayer(matrices, vertexConsumers, light, overlay, equipment.head(), world);
         renderHeadLayer(matrices, vertexConsumers, light, overlay, equipment.hat(), world);
         renderChestLayer(matrices, vertexConsumers, light, overlay, equipment.chest(), world);
+        renderLegLayer(matrices, vertexConsumers, light, overlay, equipment.pants(), world);
         renderPitchfork(matrices, vertexConsumers, light, overlay, equipment.pitchfork());
     }
 
@@ -102,6 +103,30 @@ public final class ScarecrowRenderHelper {
         matrices.translate(0.0F, 0.2F, -0.25F);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
         matrices.scale(0.6F, 0.6F, 0.6F);
+        ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
+        itemRenderer.renderItem(stack, ModelTransformationMode.FIXED,
+                light, overlay, matrices, vertexConsumers, world, 0);
+        matrices.pop();
+    }
+
+    private void renderLegLayer(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay,
+            ItemStack stack, @Nullable World world) {
+        if (stack.isEmpty()) {
+            return;
+        }
+
+        Item item = stack.getItem();
+        if (item instanceof ArmorItem armorItem && armorItem.getSlotType() == EquipmentSlot.LEGS) {
+            renderArmor(stack, armorItem, matrices, vertexConsumers, light, overlay, world);
+            return;
+        }
+
+        matrices.push();
+        applyScarecrowPose(this.bodyModel);
+        this.bodyModel.body.rotate(matrices);
+        matrices.translate(0.0F, 0.95F, -0.15F);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
+        matrices.scale(0.55F, 0.55F, 0.55F);
         ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
         itemRenderer.renderItem(stack, ModelTransformationMode.FIXED,
                 light, overlay, matrices, vertexConsumers, world, 0);
@@ -218,15 +243,17 @@ public final class ScarecrowRenderHelper {
         model.hat.copyTransform(model.head);
     }
 
-    public record ScarecrowEquipment(ItemStack hat, ItemStack head, ItemStack chest, ItemStack pitchfork) {
+    public record ScarecrowEquipment(ItemStack hat, ItemStack head, ItemStack chest, ItemStack pants,
+            ItemStack pitchfork) {
         public static final ScarecrowEquipment EMPTY = new ScarecrowEquipment(ItemStack.EMPTY, ItemStack.EMPTY,
-                ItemStack.EMPTY, ItemStack.EMPTY);
+                ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY);
 
         public static ScarecrowEquipment fromBlockEntity(ScarecrowBlockEntity entity) {
             return new ScarecrowEquipment(
                     entity.getEquippedHat(),
                     entity.getEquippedHead(),
                     entity.getEquippedChest(),
+                    entity.getEquippedPants(),
                     entity.getEquippedPitchfork()
             );
         }
@@ -248,6 +275,7 @@ public final class ScarecrowRenderHelper {
                     inventory.get(ScarecrowBlockEntity.SLOT_HAT),
                     inventory.get(ScarecrowBlockEntity.SLOT_HEAD),
                     inventory.get(ScarecrowBlockEntity.SLOT_CHEST),
+                    inventory.get(ScarecrowBlockEntity.SLOT_PANTS),
                     inventory.get(ScarecrowBlockEntity.SLOT_PITCHFORK)
             );
         }

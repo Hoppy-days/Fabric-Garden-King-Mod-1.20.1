@@ -9,6 +9,7 @@ public final class ModItemTags {
         public static final TagKey<Item> SCARECROW_HATS = of("scarecrow_hats");
         public static final TagKey<Item> SCARECROW_HEADS = of("scarecrow_heads");
         public static final TagKey<Item> SCARECROW_SHIRTS = of("scarecrow_shirts");
+        public static final TagKey<Item> SCARECROW_PANTS = of("scarecrow_pants");
         public static final TagKey<Item> SCARECROW_PITCHFORKS = of("scarecrow_pitchforks");
 
         private ModItemTags() {
