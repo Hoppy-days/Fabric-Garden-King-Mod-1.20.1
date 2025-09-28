@@ -5,12 +5,21 @@ import java.util.List;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlockEntity;
+import net.jeremy.gardenkingmod.client.render.ScarecrowRenderHelper;
+import net.jeremy.gardenkingmod.client.render.ScarecrowRenderHelper.ScarecrowEquipment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 
 public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
@@ -35,6 +44,13 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
         private static final Text CHEST_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.chest");
         private static final Text HAND_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.hand");
 
+        private static final float PREVIEW_Z_OFFSET = 150.0F;
+        private static final int PREVIEW_CENTER_X = 136;
+        private static final int PREVIEW_CENTER_Y = 70;
+        private static final float PREVIEW_SCALE = 28.0F;
+
+        private ScarecrowRenderHelper renderHelper;
+
         public ScarecrowScreen(ScarecrowScreenHandler handler, PlayerInventory inventory, Text title) {
                 super(handler, inventory, title);
                 this.backgroundWidth = BACKGROUND_WIDTH;
@@ -49,6 +65,12 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 super.init();
                 this.titleX = TITLE_X;
                 this.titleY = TITLE_Y;
+                if (this.renderHelper == null) {
+                        MinecraftClient client = MinecraftClient.getInstance();
+                        if (client != null) {
+                                this.renderHelper = ScarecrowRenderHelper.createDefault(client);
+                        }
+                }
         }
 
         @Override
@@ -81,8 +103,54 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
                 renderBackground(context);
                 super.render(context, mouseX, mouseY, delta);
+                renderScarecrowModel(context, mouseX, mouseY);
                 drawCustomTooltips(context, mouseX, mouseY);
                 drawMouseoverTooltip(context, mouseX, mouseY);
+        }
+
+        private void renderScarecrowModel(DrawContext context, int mouseX, int mouseY) {
+                if (this.renderHelper == null) {
+                        return;
+                }
+
+                MinecraftClient client = MinecraftClient.getInstance();
+                if (client == null) {
+                        return;
+                }
+
+                Inventory inventory = handler.getInventory();
+                ItemStack hat = inventory.getStack(ScarecrowBlockEntity.SLOT_HAT);
+                ItemStack head = inventory.getStack(ScarecrowBlockEntity.SLOT_HEAD);
+                ItemStack chest = inventory.getStack(ScarecrowBlockEntity.SLOT_CHEST);
+                ItemStack pitchfork = inventory.getStack(ScarecrowBlockEntity.SLOT_PITCHFORK);
+                ScarecrowEquipment equipment = new ScarecrowEquipment(hat, head, chest, pitchfork);
+
+                VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
+
+                MatrixStack matrices = context.getMatrices();
+                matrices.push();
+
+                int originX = (width - backgroundWidth) / 2;
+                int originY = (height - backgroundHeight) / 2;
+                float centerX = originX + PREVIEW_CENTER_X;
+                float centerY = originY + PREVIEW_CENTER_Y;
+
+                float mouseDeltaX = centerX - mouseX;
+                float mouseDeltaY = centerY - mouseY;
+                float yaw = (float) Math.atan(mouseDeltaX / 40.0F);
+                float pitch = (float) Math.atan(mouseDeltaY / 40.0F);
+
+                matrices.translate(centerX, centerY, PREVIEW_Z_OFFSET);
+                matrices.scale(PREVIEW_SCALE, PREVIEW_SCALE, PREVIEW_SCALE);
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yaw * 40.0F));
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(pitch * 20.0F));
+
+                this.renderHelper.render(matrices, immediate, 0xF000F0, OverlayTexture.DEFAULT_UV, equipment,
+                                client.world);
+
+                matrices.pop();
+                immediate.draw();
         }
 
         private void drawSlotOverlay(DrawContext context, int x, int y) {
