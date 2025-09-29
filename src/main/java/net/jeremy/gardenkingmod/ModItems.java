@@ -31,6 +31,8 @@ public final class ModItems {
         public static final Item RUBY = registerItem("ruby", new Item(new FabricItemSettings()));
         public static final Item SCARECROW_SHIRT_RED = registerItem("scarecrow_shirt_red",
                         new Item(new FabricItemSettings()));
+        public static final Item SCARECROW_SHIRT = registerItem("scarecrow_shirt",
+                        new Item(new FabricItemSettings()));
         public static final Item RUBY_SWORD = registerItem("ruby_sword",
                         new SwordItem(RubyToolMaterial.INSTANCE, 4, -2.2F, new FabricItemSettings()));
         public static final Item RUBY_PICKAXE = registerItem("ruby_pickaxe",
