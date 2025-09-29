@@ -1,5 +1,7 @@
 package net.jeremy.gardenkingmod.client.render;
 
+import java.lang.reflect.Field;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
@@ -31,7 +33,6 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.decoration.ArmorStandEntity;
 
 public final class ScarecrowRenderHelper {
     private static final Identifier BASE_TEXTURE = new Identifier(
@@ -39,15 +40,20 @@ public final class ScarecrowRenderHelper {
             "textures/entity/scarecrow/scarecrow.png"
     );
 
+    private static final Field SHOULDER_STICK_FIELD = getArmorStandField("shoulderStick");
+    private static final Field BASE_PLATE_FIELD = getArmorStandField("basePlate");
+    private static final Field RIGHT_BODY_STICK_FIELD = getArmorStandField("rightBodyStick");
+    private static final Field LEFT_BODY_STICK_FIELD = getArmorStandField("leftBodyStick");
+
     private final ScarecrowModel baseModel;
-    private final ArmorStandEntityModel<ArmorStandEntity> bodyModel;
+    private final ArmorStandEntityModel bodyModel;
     private final ArmorStandArmorEntityModel innerArmorModel;
     private final ArmorStandArmorEntityModel outerArmorModel;
 
     public ScarecrowRenderHelper(ModelPart baseModelPart, ModelPart bodyModelPart,
             ModelPart innerArmorModelPart, ModelPart outerArmorModelPart) {
         this.baseModel = new ScarecrowModel(baseModelPart);
-        this.bodyModel = new ArmorStandEntityModel<>(bodyModelPart);
+        this.bodyModel = new ArmorStandEntityModel(bodyModelPart);
         this.innerArmorModel = new ArmorStandArmorEntityModel(innerArmorModelPart);
         this.outerArmorModel = new ArmorStandArmorEntityModel(outerArmorModelPart);
     }
@@ -191,11 +197,11 @@ public final class ScarecrowRenderHelper {
 
     private void setModelVisibility(BipedEntityModel<?> model, ArmorItem armorItem) {
         model.setVisible(false);
-        if (model instanceof ArmorStandEntityModel<?> armorStandModel) {
-            armorStandModel.shoulderStick.visible = false;
-            armorStandModel.basePlate.visible = false;
-            armorStandModel.rightBodyStick.visible = false;
-            armorStandModel.leftBodyStick.visible = false;
+        if (model instanceof ArmorStandEntityModel armorStandModel) {
+            setArmorStandPartVisibility(armorStandModel, SHOULDER_STICK_FIELD, false);
+            setArmorStandPartVisibility(armorStandModel, BASE_PLATE_FIELD, false);
+            setArmorStandPartVisibility(armorStandModel, RIGHT_BODY_STICK_FIELD, false);
+            setArmorStandPartVisibility(armorStandModel, LEFT_BODY_STICK_FIELD, false);
         }
         EquipmentSlot slot = armorItem.getSlotType();
         switch (slot) {
@@ -228,6 +234,31 @@ public final class ScarecrowRenderHelper {
         String path = String.format("textures/models/armor/%s_layer_%d%s.png",
                 id.getPath(), leggings ? 2 : 1, overlay ? "_overlay" : "");
         return new Identifier(id.getNamespace(), path);
+    }
+
+    private static void setArmorStandPartVisibility(ArmorStandEntityModel model, @Nullable Field field,
+            boolean visible) {
+        if (field == null) {
+            return;
+        }
+        try {
+            ModelPart part = (ModelPart) field.get(model);
+            part.visible = visible;
+        } catch (IllegalAccessException exception) {
+            GardenKingMod.LOGGER.warn("Failed to update armor stand part visibility", exception);
+        }
+    }
+
+    @Nullable
+    private static Field getArmorStandField(String name) {
+        try {
+            Field field = ArmorStandEntityModel.class.getDeclaredField(name);
+            field.setAccessible(true);
+            return field;
+        } catch (NoSuchFieldException exception) {
+            GardenKingMod.LOGGER.warn("Missing armor stand field {}", name, exception);
+            return null;
+        }
     }
 
     private static void applyScarecrowPose(BipedEntityModel<?> model) {
