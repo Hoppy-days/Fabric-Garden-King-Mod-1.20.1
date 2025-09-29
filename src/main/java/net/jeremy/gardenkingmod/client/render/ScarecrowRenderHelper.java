@@ -110,6 +110,7 @@ public final class ScarecrowRenderHelper {
         applyScarecrowPose(this.bodyModel);
         this.bodyModel.body.rotate(matrices);
         matrices.translate(0.0F, 0.2F, -0.25F);
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
         matrices.scale(0.6F, 0.6F, 0.6F);
         ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
@@ -134,6 +135,7 @@ public final class ScarecrowRenderHelper {
         applyScarecrowPose(this.bodyModel);
         this.bodyModel.body.rotate(matrices);
         matrices.translate(0.0F, 0.95F, -0.15F);
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
         matrices.scale(0.55F, 0.55F, 0.55F);
         ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
