@@ -41,7 +41,7 @@ public class ScarecrowModel extends EntityModel<Entity> {
                         .uv(36, 18)
                         .cuboid(-6.0F, -18.0F, -1.0F, 12.0F, 2.0F, 2.0F, new Dilation(0.0F)),
                 ModelTransform.pivot(0.0F, 24.0F, 0.0F));
-        return TexturedModelData.of(modelData, 64, 32);
+        return TexturedModelData.of(modelData, 128, 128);
     }
 
     @Override
