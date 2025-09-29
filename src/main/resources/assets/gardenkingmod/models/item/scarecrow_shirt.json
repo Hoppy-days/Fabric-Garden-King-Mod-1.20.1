@@ -4,8 +4,8 @@
 	"ambientocclusion": false,
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "scarecrow_shirt",
-		"particle": "scarecrow_shirt"
+		"0": "gardenkingmod:item/scarecrow_shirt",
+		"particle": "gardenkingmod:item/scarecrow_shirt"
 	},
 	"elements": [
 		{
