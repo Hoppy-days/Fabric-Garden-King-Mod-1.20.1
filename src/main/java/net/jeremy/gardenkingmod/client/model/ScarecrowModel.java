@@ -32,10 +32,19 @@ public class ScarecrowModel extends EntityModel<Entity> {
     public static TexturedModelData getTexturedModelData() {
         ModelData modelData = new ModelData();
         ModelPartData modelPartData = modelData.getRoot();
-        ModelPartData bone = modelPartData.addChild("bone", ModelPartBuilder.create().uv(0, 0).cuboid(-6.0F, -2.0F, -6.0F, 12.0F, 2.0F, 12.0F, new Dilation(0.0F))
-                .uv(0, 14).cuboid(-4.0F, -4.0F, -4.0F, 8.0F, 2.0F, 8.0F, new Dilation(0.0F))
-                .uv(0, 28).cuboid(-1.0F, -14.0F, -1.0F, 2.0F, 10.0F, 2.0F, new Dilation(0.0F))
-                .uv(0, 24).cuboid(-8.0F, -16.0F, -1.0F, 16.0F, 2.0F, 2.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
+        modelPartData.addChild("bone",
+                ModelPartBuilder.create()
+                        .uv(0, 0)
+                        .cuboid(-6.0F, -2.0F, -6.0F, 12.0F, 2.0F, 12.0F, new Dilation(0.0F))
+                        .uv(0, 14)
+                        .cuboid(-4.0F, -8.0F, -4.0F, 8.0F, 4.0F, 8.0F, new Dilation(0.0F))
+                        .uv(0, 26)
+                        .cuboid(-1.0F, -24.0F, -1.0F, 2.0F, 16.0F, 2.0F, new Dilation(0.0F))
+                        .uv(0, 44)
+                        .cuboid(-8.0F, -22.0F, -1.0F, 16.0F, 2.0F, 2.0F, new Dilation(0.0F))
+                        .uv(32, 0)
+                        .cuboid(-5.0F, -30.0F, -5.0F, 10.0F, 6.0F, 10.0F, new Dilation(0.0F)),
+                ModelTransform.pivot(0.0F, 24.0F, 0.0F));
         return TexturedModelData.of(modelData, 64, 64);
     }
     @Override
