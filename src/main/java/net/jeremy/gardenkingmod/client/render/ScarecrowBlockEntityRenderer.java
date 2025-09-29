@@ -1,7 +1,6 @@
 package net.jeremy.gardenkingmod.client.render;
 
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlockEntity;
-import net.jeremy.gardenkingmod.client.render.ScarecrowRenderHelper.ScarecrowEquipment;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -34,8 +33,13 @@ public class ScarecrowBlockEntityRenderer implements BlockEntityRenderer<Scarecr
             combinedLight = WorldRenderer.getLightmapCoordinates(world, exposedPos);
         }
 
-        ScarecrowEquipment equipment = ScarecrowEquipment.fromBlockEntity(entity);
-        this.renderHelper.render(matrices, vertexConsumers, combinedLight, OverlayTexture.DEFAULT_UV, equipment, world);
+        this.renderHelper.setHatVisible(!entity.getEquippedHat().isEmpty());
+        this.renderHelper.setHeadVisible(!entity.getEquippedHead().isEmpty());
+        this.renderHelper.setChestVisible(!entity.getEquippedChest().isEmpty());
+        this.renderHelper.setPantsVisible(!entity.getEquippedPants().isEmpty());
+        this.renderHelper.setPitchforkVisible(!entity.getEquippedPitchfork().isEmpty());
+
+        this.renderHelper.render(matrices, vertexConsumers, combinedLight, OverlayTexture.DEFAULT_UV);
 
         matrices.pop();
     }

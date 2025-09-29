@@ -6,7 +6,6 @@ import java.util.List;
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlockEntity;
 import net.jeremy.gardenkingmod.client.render.ScarecrowRenderHelper;
-import net.jeremy.gardenkingmod.client.render.ScarecrowRenderHelper.ScarecrowEquipment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -136,7 +135,12 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 ItemStack chest = inventory.getStack(ScarecrowBlockEntity.SLOT_CHEST);
                 ItemStack pants = inventory.getStack(ScarecrowBlockEntity.SLOT_PANTS);
                 ItemStack pitchfork = inventory.getStack(ScarecrowBlockEntity.SLOT_PITCHFORK);
-                ScarecrowEquipment equipment = new ScarecrowEquipment(hat, head, chest, pants, pitchfork);
+
+                this.renderHelper.setHatVisible(!hat.isEmpty());
+                this.renderHelper.setHeadVisible(!head.isEmpty());
+                this.renderHelper.setChestVisible(!chest.isEmpty());
+                this.renderHelper.setPantsVisible(!pants.isEmpty());
+                this.renderHelper.setPitchforkVisible(!pitchfork.isEmpty());
 
                 VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
 
@@ -160,8 +164,7 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(pitch * 20.0F));
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yaw * 40.0F));
 
-                this.renderHelper.render(matrices, immediate, 0xF000F0, OverlayTexture.DEFAULT_UV, equipment,
-                                client.world);
+                this.renderHelper.render(matrices, immediate, 0xF000F0, OverlayTexture.DEFAULT_UV);
 
                 matrices.pop();
                 immediate.draw();
