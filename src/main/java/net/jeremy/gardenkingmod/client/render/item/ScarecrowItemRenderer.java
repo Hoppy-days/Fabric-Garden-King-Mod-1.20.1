@@ -1,13 +1,18 @@
 package net.jeremy.gardenkingmod.client.render.item;
 
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
+import net.jeremy.gardenkingmod.ModBlocks;
+import net.jeremy.gardenkingmod.block.ward.ScarecrowBlockEntity;
 import net.jeremy.gardenkingmod.client.render.ScarecrowRenderHelper;
-import net.jeremy.gardenkingmod.client.render.ScarecrowRenderHelper.ScarecrowEquipment;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.item.BlockItem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.RotationAxis;
 
 public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
@@ -51,10 +56,36 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
             this.renderHelper = ScarecrowRenderHelper.createDefault(MinecraftClient.getInstance());
         }
 
-        ScarecrowEquipment equipment = ScarecrowEquipment.fromItemStack(stack);
-        this.renderHelper.render(matrices, vertexConsumers, light, overlay, equipment,
-                MinecraftClient.getInstance().world);
+        updateVisibilityFromItem(stack);
+        this.renderHelper.render(matrices, vertexConsumers, light, overlay);
 
         matrices.pop();
+    }
+
+    private void updateVisibilityFromItem(ItemStack stack) {
+        boolean hatVisible = false;
+        boolean headVisible = false;
+        boolean chestVisible = false;
+        boolean pantsVisible = false;
+        boolean pitchforkVisible = false;
+
+        if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() == ModBlocks.SCARECROW_BLOCK) {
+            NbtCompound nbt = BlockItem.getBlockEntityNbt(stack);
+            if (nbt != null) {
+                DefaultedList<ItemStack> inventory = DefaultedList.ofSize(ScarecrowBlockEntity.INVENTORY_SIZE, ItemStack.EMPTY);
+                Inventories.readNbt(nbt, inventory);
+                hatVisible = !inventory.get(ScarecrowBlockEntity.SLOT_HAT).isEmpty();
+                headVisible = !inventory.get(ScarecrowBlockEntity.SLOT_HEAD).isEmpty();
+                chestVisible = !inventory.get(ScarecrowBlockEntity.SLOT_CHEST).isEmpty();
+                pantsVisible = !inventory.get(ScarecrowBlockEntity.SLOT_PANTS).isEmpty();
+                pitchforkVisible = !inventory.get(ScarecrowBlockEntity.SLOT_PITCHFORK).isEmpty();
+            }
+        }
+
+        this.renderHelper.setHatVisible(hatVisible);
+        this.renderHelper.setHeadVisible(headVisible);
+        this.renderHelper.setChestVisible(chestVisible);
+        this.renderHelper.setPantsVisible(pantsVisible);
+        this.renderHelper.setPitchforkVisible(pitchforkVisible);
     }
 }
