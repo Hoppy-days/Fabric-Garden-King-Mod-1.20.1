@@ -33,11 +33,11 @@ public class ScarecrowBlockEntityRenderer implements BlockEntityRenderer<Scarecr
             combinedLight = WorldRenderer.getLightmapCoordinates(world, exposedPos);
         }
 
-        this.renderHelper.setHatVisible(!entity.getEquippedHat().isEmpty());
-        this.renderHelper.setHeadVisible(!entity.getEquippedHead().isEmpty());
-        this.renderHelper.setChestVisible(!entity.getEquippedChest().isEmpty());
-        this.renderHelper.setPantsVisible(!entity.getEquippedPants().isEmpty());
-        this.renderHelper.setPitchforkVisible(!entity.getEquippedPitchfork().isEmpty());
+        this.renderHelper.setHatStack(entity.getEquippedHat());
+        this.renderHelper.setHeadStack(entity.getEquippedHead());
+        this.renderHelper.setChestStack(entity.getEquippedChest());
+        this.renderHelper.setPantsStack(entity.getEquippedPants());
+        this.renderHelper.setPitchforkStack(entity.getEquippedPitchfork());
 
         this.renderHelper.render(matrices, vertexConsumers, combinedLight, OverlayTexture.DEFAULT_UV);
 

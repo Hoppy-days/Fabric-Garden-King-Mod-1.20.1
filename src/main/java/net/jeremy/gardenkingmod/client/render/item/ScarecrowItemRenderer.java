@@ -56,36 +56,36 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
             this.renderHelper = ScarecrowRenderHelper.createDefault(MinecraftClient.getInstance());
         }
 
-        updateVisibilityFromItem(stack);
+        applyEquipmentFromItem(stack);
         this.renderHelper.render(matrices, vertexConsumers, light, overlay);
 
         matrices.pop();
     }
 
-    private void updateVisibilityFromItem(ItemStack stack) {
-        boolean hatVisible = false;
-        boolean headVisible = false;
-        boolean chestVisible = false;
-        boolean pantsVisible = false;
-        boolean pitchforkVisible = false;
+    private void applyEquipmentFromItem(ItemStack stack) {
+        ItemStack hat = ItemStack.EMPTY;
+        ItemStack head = ItemStack.EMPTY;
+        ItemStack chest = ItemStack.EMPTY;
+        ItemStack pants = ItemStack.EMPTY;
+        ItemStack pitchfork = ItemStack.EMPTY;
 
         if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() == ModBlocks.SCARECROW_BLOCK) {
             NbtCompound nbt = BlockItem.getBlockEntityNbt(stack);
             if (nbt != null) {
                 DefaultedList<ItemStack> inventory = DefaultedList.ofSize(ScarecrowBlockEntity.INVENTORY_SIZE, ItemStack.EMPTY);
                 Inventories.readNbt(nbt, inventory);
-                hatVisible = !inventory.get(ScarecrowBlockEntity.SLOT_HAT).isEmpty();
-                headVisible = !inventory.get(ScarecrowBlockEntity.SLOT_HEAD).isEmpty();
-                chestVisible = !inventory.get(ScarecrowBlockEntity.SLOT_CHEST).isEmpty();
-                pantsVisible = !inventory.get(ScarecrowBlockEntity.SLOT_PANTS).isEmpty();
-                pitchforkVisible = !inventory.get(ScarecrowBlockEntity.SLOT_PITCHFORK).isEmpty();
+                hat = inventory.get(ScarecrowBlockEntity.SLOT_HAT);
+                head = inventory.get(ScarecrowBlockEntity.SLOT_HEAD);
+                chest = inventory.get(ScarecrowBlockEntity.SLOT_CHEST);
+                pants = inventory.get(ScarecrowBlockEntity.SLOT_PANTS);
+                pitchfork = inventory.get(ScarecrowBlockEntity.SLOT_PITCHFORK);
             }
         }
 
-        this.renderHelper.setHatVisible(hatVisible);
-        this.renderHelper.setHeadVisible(headVisible);
-        this.renderHelper.setChestVisible(chestVisible);
-        this.renderHelper.setPantsVisible(pantsVisible);
-        this.renderHelper.setPitchforkVisible(pitchforkVisible);
+        this.renderHelper.setHatStack(hat);
+        this.renderHelper.setHeadStack(head);
+        this.renderHelper.setChestStack(chest);
+        this.renderHelper.setPantsStack(pants);
+        this.renderHelper.setPitchforkStack(pitchfork);
     }
 }
