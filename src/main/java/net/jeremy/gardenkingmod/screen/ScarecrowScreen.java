@@ -136,11 +136,11 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 ItemStack pants = inventory.getStack(ScarecrowBlockEntity.SLOT_PANTS);
                 ItemStack pitchfork = inventory.getStack(ScarecrowBlockEntity.SLOT_PITCHFORK);
 
-                this.renderHelper.setHatVisible(!hat.isEmpty());
-                this.renderHelper.setHeadVisible(!head.isEmpty());
-                this.renderHelper.setChestVisible(!chest.isEmpty());
-                this.renderHelper.setPantsVisible(!pants.isEmpty());
-                this.renderHelper.setPitchforkVisible(!pitchfork.isEmpty());
+                this.renderHelper.setHatStack(hat);
+                this.renderHelper.setHeadStack(head);
+                this.renderHelper.setChestStack(chest);
+                this.renderHelper.setPantsStack(pants);
+                this.renderHelper.setPitchforkStack(pitchfork);
 
                 VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
 
