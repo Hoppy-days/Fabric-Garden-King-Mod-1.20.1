@@ -18,9 +18,15 @@ import net.minecraft.util.Identifier;
 // Made with Blockbench 4.12.6
 // Exported for Minecraft version 1.17+ for Yarn
 // Paste this class into your mod and generate all required imports
-public class scarecrow_base extends EntityModel<Entity> {
+public class ScarecrowModel extends EntityModel<Entity> {
+    public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(
+            new Identifier(GardenKingMod.MOD_ID, "scarecrow"),
+            "main"
+    );
+
     private final ModelPart bone;
-    public scarecrow_base(ModelPart root) {
+
+    public ScarecrowModel(ModelPart root) {
         this.bone = root.getChild("bone");
     }
     public static TexturedModelData getTexturedModelData() {
