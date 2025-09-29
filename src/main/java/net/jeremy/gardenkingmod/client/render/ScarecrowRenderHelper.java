@@ -12,6 +12,8 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.entity.model.ArmorStandArmorEntityModel;
+import net.minecraft.client.render.entity.model.ArmorStandEntityModel;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.item.ItemRenderer;
@@ -29,6 +31,7 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 
 public final class ScarecrowRenderHelper {
     private static final Identifier BASE_TEXTURE = new Identifier(
@@ -37,16 +40,16 @@ public final class ScarecrowRenderHelper {
     );
 
     private final ScarecrowModel baseModel;
-    private final BipedEntityModel<?> bodyModel;
-    private final BipedEntityModel<?> innerArmorModel;
-    private final BipedEntityModel<?> outerArmorModel;
+    private final ArmorStandEntityModel<ArmorStandEntity> bodyModel;
+    private final ArmorStandArmorEntityModel innerArmorModel;
+    private final ArmorStandArmorEntityModel outerArmorModel;
 
     public ScarecrowRenderHelper(ModelPart baseModelPart, ModelPart bodyModelPart,
             ModelPart innerArmorModelPart, ModelPart outerArmorModelPart) {
         this.baseModel = new ScarecrowModel(baseModelPart);
-        this.bodyModel = new BipedEntityModel<>(bodyModelPart);
-        this.innerArmorModel = new BipedEntityModel<>(innerArmorModelPart);
-        this.outerArmorModel = new BipedEntityModel<>(outerArmorModelPart);
+        this.bodyModel = new ArmorStandEntityModel<>(bodyModelPart);
+        this.innerArmorModel = new ArmorStandArmorEntityModel(innerArmorModelPart);
+        this.outerArmorModel = new ArmorStandArmorEntityModel(outerArmorModelPart);
     }
 
     public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay,
@@ -188,6 +191,12 @@ public final class ScarecrowRenderHelper {
 
     private void setModelVisibility(BipedEntityModel<?> model, ArmorItem armorItem) {
         model.setVisible(false);
+        if (model instanceof ArmorStandEntityModel<?> armorStandModel) {
+            armorStandModel.shoulderStick.visible = false;
+            armorStandModel.basePlate.visible = false;
+            armorStandModel.rightBodyStick.visible = false;
+            armorStandModel.leftBodyStick.visible = false;
+        }
         EquipmentSlot slot = armorItem.getSlotType();
         switch (slot) {
             case HEAD -> {
@@ -283,17 +292,17 @@ public final class ScarecrowRenderHelper {
 
     public static ScarecrowRenderHelper createDefault(BlockEntityRendererFactory.Context context) {
         ModelPart base = context.getLayerModelPart(ScarecrowModel.LAYER_LOCATION);
-        ModelPart body = context.getLayerModelPart(EntityModelLayers.PLAYER);
-        ModelPart inner = context.getLayerModelPart(EntityModelLayers.PLAYER_INNER_ARMOR);
-        ModelPart outer = context.getLayerModelPart(EntityModelLayers.PLAYER_OUTER_ARMOR);
+        ModelPart body = context.getLayerModelPart(EntityModelLayers.ARMOR_STAND);
+        ModelPart inner = context.getLayerModelPart(EntityModelLayers.ARMOR_STAND_INNER_ARMOR);
+        ModelPart outer = context.getLayerModelPart(EntityModelLayers.ARMOR_STAND_OUTER_ARMOR);
         return new ScarecrowRenderHelper(base, body, inner, outer);
     }
 
     public static ScarecrowRenderHelper createDefault(MinecraftClient client) {
         ModelPart base = client.getEntityModelLoader().getModelPart(ScarecrowModel.LAYER_LOCATION);
-        ModelPart body = client.getEntityModelLoader().getModelPart(EntityModelLayers.PLAYER);
-        ModelPart inner = client.getEntityModelLoader().getModelPart(EntityModelLayers.PLAYER_INNER_ARMOR);
-        ModelPart outer = client.getEntityModelLoader().getModelPart(EntityModelLayers.PLAYER_OUTER_ARMOR);
+        ModelPart body = client.getEntityModelLoader().getModelPart(EntityModelLayers.ARMOR_STAND);
+        ModelPart inner = client.getEntityModelLoader().getModelPart(EntityModelLayers.ARMOR_STAND_INNER_ARMOR);
+        ModelPart outer = client.getEntityModelLoader().getModelPart(EntityModelLayers.ARMOR_STAND_OUTER_ARMOR);
         return new ScarecrowRenderHelper(base, body, inner, outer);
     }
 }
