@@ -34,12 +34,12 @@ public class ScarecrowModel extends EntityModel<Entity> {
         ModelData modelData = new ModelData();
         ModelPartData modelPartData = modelData.getRoot();
         modelPartData.addChild("scarecrow_base", ModelPartBuilder.create()
-                        .uv(0, 0)
-                        .cuboid(-8.0F, -2.0F, -8.0F, 16.0F, 2.0F, 16.0F, new Dilation(0.0F))
-                        .uv(0, 18)
-                        .cuboid(-1.0F, -16.0F, -1.0F, 2.0F, 14.0F, 2.0F, new Dilation(0.0F))
-                        .uv(8, 22)
-                        .cuboid(-6.0F, -18.0F, -1.0F, 12.0F, 2.0F, 2.0F, new Dilation(0.0F)),
+                        .uv(0, 12)
+                        .cuboid(-8.0F, -4.0F, -8.0F, 16.0F, 4.0F, 16.0F, new Dilation(0.0F))
+                        .uv(0, 28)
+                        .cuboid(-1.0F, -16.0F, -1.0F, 2.0F, 12.0F, 2.0F, new Dilation(0.0F))
+                        .uv(12, 0)
+                        .cuboid(-8.0F, -18.0F, -1.0F, 16.0F, 2.0F, 2.0F, new Dilation(0.0F)),
                 ModelTransform.pivot(0.0F, 24.0F, 0.0F));
         return TexturedModelData.of(modelData, 64, 64);
     }
