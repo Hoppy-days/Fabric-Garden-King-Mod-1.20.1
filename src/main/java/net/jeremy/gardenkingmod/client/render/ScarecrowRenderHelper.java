@@ -16,6 +16,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 
 public final class ScarecrowRenderHelper {
+    public static final float DEFAULT_RENDER_SCALE = 0.9F;
     private static final Identifier BASE_TEXTURE = new Identifier(
             GardenKingMod.MOD_ID,
             "textures/entity/scarecrow/scarecrow.png"
@@ -128,6 +129,7 @@ public final class ScarecrowRenderHelper {
         matrices.translate(0.0F, -1.05F, -0.2F);
         matrices.scale(0.9F, 0.9F, 0.9F);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(10.0F));
         renderStack(client, stack, matrices, vertexConsumers, light, overlay);
         matrices.pop();

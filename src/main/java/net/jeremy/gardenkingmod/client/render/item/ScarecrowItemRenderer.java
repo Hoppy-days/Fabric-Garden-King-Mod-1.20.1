@@ -26,6 +26,9 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
                        VertexConsumerProvider vertexConsumers, int light, int overlay) {
         matrices.push();
         matrices.translate(0.5f, 1.5f, 0.5f);
+        matrices.scale(ScarecrowRenderHelper.DEFAULT_RENDER_SCALE,
+                ScarecrowRenderHelper.DEFAULT_RENDER_SCALE,
+                ScarecrowRenderHelper.DEFAULT_RENDER_SCALE);
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
 
         if (mode != null) {
