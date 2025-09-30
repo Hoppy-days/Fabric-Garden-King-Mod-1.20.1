@@ -31,6 +31,8 @@ public final class ModItems {
         public static final Item RUBY = registerItem("ruby", new Item(new FabricItemSettings()));
         public static final Item SCARECROW_SHIRT = registerItem("scarecrow_shirt",
                         new Item(new FabricItemSettings()));
+        public static final Item SCARECROW_HEAD = registerItem("scarecrow_head",
+                        new Item(new FabricItemSettings()));
         public static final Item RUBY_SWORD = registerItem("ruby_sword",
                         new SwordItem(RubyToolMaterial.INSTANCE, 4, -2.2F, new FabricItemSettings()));
         public static final Item RUBY_PICKAXE = registerItem("ruby_pickaxe",
@@ -116,7 +118,10 @@ public final class ModItems {
                                         rottenItems.forEach(entries::add);
                                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL)
-                                .register(entries -> entries.add(SCARECROW_SHIRT));
+                                .register(entries -> {
+                                            entries.add(SCARECROW_SHIRT);
+                                            entries.add(SCARECROW_HEAD);
+                                });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS)
                                 .register(entries -> {
                                         entries.add(RUBY_PICKAXE);
