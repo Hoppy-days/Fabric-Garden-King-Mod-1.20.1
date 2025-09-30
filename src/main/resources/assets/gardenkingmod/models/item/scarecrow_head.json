@@ -4,7 +4,8 @@
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "gardenkingmod:item/scarecrow_head",
-		"particle": "gardenkingmod:item/scarecrow_head"
+		"particle": "gardenkingmod:item/scarecrow_head",
+        "parent": "minecraft:item/template_skull"
 	},
 	"elements": [
 		{
