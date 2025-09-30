@@ -4,13 +4,14 @@
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "gardenkingmod:item/scarecrow_head",
-		"particle": "gardenkingmod:item/scarecrow_head",
-        "parent": "minecraft:item/template_skull"
+		"particle": "gardenkingmod:item/scarecrow_head"
 	},
-	"elements": [
+  "parent": "gardenkingmod:item/scarecrow_equipment_head_base",
+
+  "elements": [
 		{
-			"from": [3, 8, 3],
-			"to": [13, 18, 13],
+			"from": [3, 3, 3],
+			"to": [13, 13, 13],
 			"rotation": {"angle": 0, "axis": "y", "origin": [0, 24, 0]},
 			"faces": {
 				"north": {"uv": [2.5, 2.5, 5, 5], "texture": "#0"},
@@ -22,9 +23,9 @@
 			}
 		},
 		{
-			"from": [9.5, 14, 13.1],
-			"to": [12.5, 15, 13.1],
-			"rotation": {"angle": 45, "axis": "z", "origin": [10.5, 14, 13.1]},
+			"from": [9.5, 9, 13.1],
+			"to": [12.5, 10, 13.1],
+			"rotation": {"angle": 45, "axis": "z", "origin": [10.5, 9, 13.1]},
 			"faces": {
 				"north": {"uv": [0, 5, 0.75, 5.25], "texture": "#0"},
 				"east": {"uv": [0, 0, 0, 0.25], "texture": "#0"},
@@ -35,9 +36,9 @@
 			}
 		},
 		{
-			"from": [10.5, 13, 13.2],
-			"to": [11.5, 16, 13.2],
-			"rotation": {"angle": 45, "axis": "z", "origin": [10.5, 14, 13.2]},
+			"from": [10.5, 8, 13.2],
+			"to": [11.5, 11, 13.2],
+			"rotation": {"angle": 45, "axis": "z", "origin": [10.5, 9, 13.2]},
 			"faces": {
 				"north": {"uv": [1.5, 5, 1.75, 5.75], "texture": "#0"},
 				"east": {"uv": [0, 0, 0, 0.75], "texture": "#0"},
@@ -48,9 +49,9 @@
 			}
 		},
 		{
-			"from": [4.5, 14, 13.2],
-			"to": [7.5, 15, 13.2],
-			"rotation": {"angle": 45, "axis": "z", "origin": [5.5, 14, 13.2]},
+			"from": [4.5, 9, 13.2],
+			"to": [7.5, 10, 13.2],
+			"rotation": {"angle": 45, "axis": "z", "origin": [5.5, 9, 13.2]},
 			"faces": {
 				"north": {"uv": [2.5, 5, 3.25, 5.25], "texture": "#0"},
 				"east": {"uv": [0, 0, 0, 0.25], "texture": "#0"},
@@ -61,9 +62,9 @@
 			}
 		},
 		{
-			"from": [5.5, 13, 13.1],
-			"to": [6.5, 16, 13.1],
-			"rotation": {"angle": 45, "axis": "z", "origin": [5.5, 14, 13.1]},
+			"from": [5.5, 8, 13.1],
+			"to": [6.5, 11, 13.1],
+			"rotation": {"angle": 45, "axis": "z", "origin": [5.5, 9, 13.1]},
 			"faces": {
 				"north": {"uv": [2, 5, 2.25, 5.75], "texture": "#0"},
 				"east": {"uv": [0, 0, 0, 0.75], "texture": "#0"},
