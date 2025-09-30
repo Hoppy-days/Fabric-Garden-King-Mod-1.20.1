@@ -23,7 +23,7 @@ public class ScarecrowBlockEntityRenderer implements BlockEntityRenderer<Scarecr
     public void render(ScarecrowBlockEntity entity, float tickDelta, MatrixStack matrices,
             VertexConsumerProvider vertexConsumers, int light, int overlay) {
         matrices.push();
-        float groundY = ScarecrowRenderHelper.DEFAULT_RENDER_SCALE * ((24.0F - 2.0F) / 16.0F);
+        float groundY = ScarecrowRenderHelper.DEFAULT_RENDER_SCALE * (24.0F / 16.0F);
         matrices.translate(0.5f, groundY, 0.5f);
         matrices.scale(ScarecrowRenderHelper.DEFAULT_RENDER_SCALE,
                 ScarecrowRenderHelper.DEFAULT_RENDER_SCALE,
