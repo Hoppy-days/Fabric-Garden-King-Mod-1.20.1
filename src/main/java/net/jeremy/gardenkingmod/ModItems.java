@@ -33,6 +33,8 @@ public final class ModItems {
                         new Item(new FabricItemSettings()));
         public static final Item SCARECROW_HEAD = registerItem("scarecrow_head",
                         new Item(new FabricItemSettings()));
+        public static final Item SCARECROW_HAT = registerItem("scarecrow_hat",
+                        new Item(new FabricItemSettings()));
         public static final Item RUBY_SWORD = registerItem("ruby_sword",
                         new SwordItem(RubyToolMaterial.INSTANCE, 4, -2.2F, new FabricItemSettings()));
         public static final Item RUBY_PICKAXE = registerItem("ruby_pickaxe",
@@ -121,6 +123,7 @@ public final class ModItems {
                                 .register(entries -> {
                                             entries.add(SCARECROW_SHIRT);
                                             entries.add(SCARECROW_HEAD);
+                                            entries.add(SCARECROW_HAT);
                                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS)
                                 .register(entries -> {
