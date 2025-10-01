@@ -6,7 +6,9 @@
 		"0": "gardenkingmod:item/scarecrow_shirt",
 		"particle": "gardenkingmod:item/scarecrow_shirt"
 	},
-	"elements": [
+  "parent": "gardenkingmod:item/scarecrow_equipment_base",
+
+  "elements": [
 		{
 			"from": [5, 3, 5],
 			"to": [11, 16, 11],
