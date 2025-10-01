@@ -41,7 +41,6 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
         private static final Text HAT_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.hat");
         private static final Text HEAD_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.head");
         private static final Text CHEST_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.chest");
-        private static final Text PANTS_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.pants");
         private static final Text HAND_TOOLTIP = Text.translatable("screen.gardenkingmod.scarecrow.slot.hand");
 
         private static final float PREVIEW_Z_OFFSET = 150.0F;
@@ -85,8 +84,6 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                                 y + ScarecrowScreenHandler.HEAD_SLOT_Y - 1);
                 drawSlotOverlay(context, x + ScarecrowScreenHandler.CHEST_SLOT_X - 1,
                                 y + ScarecrowScreenHandler.CHEST_SLOT_Y - 1);
-                drawSlotOverlay(context, x + ScarecrowScreenHandler.PANTS_SLOT_X - 1,
-                                y + ScarecrowScreenHandler.PANTS_SLOT_Y - 1);
                 drawSlotOverlay(context, x + ScarecrowScreenHandler.PITCHFORK_SLOT_X - 1,
                                 y + ScarecrowScreenHandler.PITCHFORK_SLOT_Y - 1);
         }
@@ -133,13 +130,11 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 ItemStack hat = inventory.getStack(ScarecrowBlockEntity.SLOT_HAT);
                 ItemStack head = inventory.getStack(ScarecrowBlockEntity.SLOT_HEAD);
                 ItemStack chest = inventory.getStack(ScarecrowBlockEntity.SLOT_CHEST);
-                ItemStack pants = inventory.getStack(ScarecrowBlockEntity.SLOT_PANTS);
                 ItemStack pitchfork = inventory.getStack(ScarecrowBlockEntity.SLOT_PITCHFORK);
 
                 this.renderHelper.setHatStack(hat);
                 this.renderHelper.setHeadStack(head);
                 this.renderHelper.setChestStack(chest);
-                this.renderHelper.setPantsStack(pants);
                 this.renderHelper.setPitchforkStack(pitchfork);
 
                 VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
@@ -210,7 +205,6 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                         case ScarecrowBlockEntity.SLOT_HAT -> HAT_TOOLTIP;
                         case ScarecrowBlockEntity.SLOT_HEAD -> HEAD_TOOLTIP;
                         case ScarecrowBlockEntity.SLOT_CHEST -> CHEST_TOOLTIP;
-                        case ScarecrowBlockEntity.SLOT_PANTS -> PANTS_TOOLTIP;
                         case ScarecrowBlockEntity.SLOT_PITCHFORK -> HAND_TOOLTIP;
                         default -> null;
                         };

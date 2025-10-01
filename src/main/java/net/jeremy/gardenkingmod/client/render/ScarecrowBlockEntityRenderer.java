@@ -40,7 +40,6 @@ public class ScarecrowBlockEntityRenderer implements BlockEntityRenderer<Scarecr
         this.renderHelper.setHatStack(entity.getEquippedHat());
         this.renderHelper.setHeadStack(entity.getEquippedHead());
         this.renderHelper.setChestStack(entity.getEquippedChest());
-        this.renderHelper.setPantsStack(entity.getEquippedPants());
         this.renderHelper.setPitchforkStack(entity.getEquippedPitchfork());
 
         this.renderHelper.render(matrices, vertexConsumers, combinedLight, OverlayTexture.DEFAULT_UV);
