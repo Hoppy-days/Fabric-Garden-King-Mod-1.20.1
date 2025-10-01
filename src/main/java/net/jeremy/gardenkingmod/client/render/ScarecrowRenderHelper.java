@@ -140,10 +140,10 @@ public final class ScarecrowRenderHelper {
     private void renderPants(MinecraftClient client, ItemStack stack, MatrixStack matrices,
                              VertexConsumerProvider vertexConsumers, int light, int overlay) {
         matrices.push();
-        matrices.translate(0.0F, -0.45F, -0.18F);
-        matrices.scale(0.9F, 0.9F, 0.9F);
+        matrices.translate(0.0F, 0.55F, 0.0F);
+        matrices.scale(1.0F, 1.0F, 1.0F);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(5.0F));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
         renderStack(client, stack, matrices, vertexConsumers, light, overlay);
         matrices.pop();
     }
