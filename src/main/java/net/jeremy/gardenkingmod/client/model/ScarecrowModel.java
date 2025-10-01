@@ -26,7 +26,6 @@ public class ScarecrowModel extends EntityModel<Entity> {
     private final ModelPart hat;
     private final ModelPart head;
     private final ModelPart chest;
-    private final ModelPart pants;
     private final ModelPart pitchfork;
 
     public ScarecrowModel(ModelPart root) {
@@ -34,14 +33,12 @@ public class ScarecrowModel extends EntityModel<Entity> {
         this.hat = root.getChild("hat");
         this.head = root.getChild("head");
         this.chest = root.getChild("chest");
-        this.pants = root.getChild("pants");
         this.pitchfork = root.getChild("pitchfork");
 
         this.base.visible = true;
         this.hat.visible = false;
         this.head.visible = false;
         this.chest.visible = false;
-        this.pants.visible = false;
         this.pitchfork.visible = false;
     }
 
@@ -57,7 +54,6 @@ public class ScarecrowModel extends EntityModel<Entity> {
         modelPartData.addChild("hat", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
         modelPartData.addChild("head", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
         modelPartData.addChild("chest", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
-        modelPartData.addChild("pants", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
         modelPartData.addChild("pitchfork", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
 
         return TexturedModelData.of(modelData, 128, 128);
@@ -78,9 +74,6 @@ public class ScarecrowModel extends EntityModel<Entity> {
         }
         if (chest.visible) {
             chest.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
-        }
-        if (pants.visible) {
-            pants.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
         }
         if (pitchfork.visible) {
             pitchfork.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
@@ -117,14 +110,6 @@ public class ScarecrowModel extends EntityModel<Entity> {
 
     public boolean isChestVisible() {
         return this.chest.visible;
-    }
-
-    public void setPantsVisible(boolean visible) {
-        this.pants.visible = visible;
-    }
-
-    public boolean isPantsVisible() {
-        return this.pants.visible;
     }
 
     public void setPitchforkVisible(boolean visible) {

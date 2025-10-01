@@ -26,7 +26,6 @@ public final class ScarecrowRenderHelper {
     private ItemStack hatStack;
     private ItemStack headStack;
     private ItemStack chestStack;
-    private ItemStack pantsStack;
     private ItemStack pitchforkStack;
 
     public ScarecrowRenderHelper(ModelPart baseModelPart) {
@@ -34,7 +33,6 @@ public final class ScarecrowRenderHelper {
         this.hatStack = ItemStack.EMPTY;
         this.headStack = ItemStack.EMPTY;
         this.chestStack = ItemStack.EMPTY;
-        this.pantsStack = ItemStack.EMPTY;
         this.pitchforkStack = ItemStack.EMPTY;
     }
 
@@ -50,10 +48,6 @@ public final class ScarecrowRenderHelper {
         this.chestStack = stack;
     }
 
-    public void setPantsStack(ItemStack stack) {
-        this.pantsStack = stack;
-    }
-
     public void setPitchforkStack(ItemStack stack) {
         this.pitchforkStack = stack;
     }
@@ -63,7 +57,6 @@ public final class ScarecrowRenderHelper {
         this.baseModel.setHatVisible(false);
         this.baseModel.setHeadVisible(false);
         this.baseModel.setChestVisible(false);
-        this.baseModel.setPantsVisible(false);
         this.baseModel.setPitchforkVisible(false);
 
         VertexConsumer baseConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(BASE_TEXTURE));
@@ -72,13 +65,11 @@ public final class ScarecrowRenderHelper {
         ItemStack hat = this.hatStack;
         ItemStack head = this.headStack;
         ItemStack chest = this.chestStack;
-        ItemStack pants = this.pantsStack;
         ItemStack pitchfork = this.pitchforkStack;
 
         this.hatStack = ItemStack.EMPTY;
         this.headStack = ItemStack.EMPTY;
         this.chestStack = ItemStack.EMPTY;
-        this.pantsStack = ItemStack.EMPTY;
         this.pitchforkStack = ItemStack.EMPTY;
 
         MinecraftClient client = MinecraftClient.getInstance();
@@ -94,9 +85,6 @@ public final class ScarecrowRenderHelper {
         }
         if (!chest.isEmpty()) {
             renderChest(client, chest, matrices, vertexConsumers, light, overlay);
-        }
-        if (!pants.isEmpty()) {
-            renderPants(client, pants, matrices, vertexConsumers, light, overlay);
         }
         if (!pitchfork.isEmpty()) {
             renderPitchfork(client, pitchfork, matrices, vertexConsumers, light, overlay);
@@ -133,17 +121,6 @@ public final class ScarecrowRenderHelper {
         matrices.scale(1.5F, 1.1F, 1.1F);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
-        renderStack(client, stack, matrices, vertexConsumers, light, overlay);
-        matrices.pop();
-    }
-
-    private void renderPants(MinecraftClient client, ItemStack stack, MatrixStack matrices,
-                             VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        matrices.push();
-        matrices.translate(0.0F, 0.55F, 0.0F);
-        matrices.scale(1.0F, 1.0F, 1.0F);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
         renderStack(client, stack, matrices, vertexConsumers, light, overlay);
         matrices.pop();
     }

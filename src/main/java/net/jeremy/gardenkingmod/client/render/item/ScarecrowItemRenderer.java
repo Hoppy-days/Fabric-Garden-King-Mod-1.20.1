@@ -4,19 +4,22 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.jeremy.gardenkingmod.ModBlocks;
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlockEntity;
 import net.jeremy.gardenkingmod.client.render.ScarecrowRenderHelper;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.BlockItem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.RotationAxis;
 
 public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
     private ScarecrowRenderHelper renderHelper;
+    private static final int LEGACY_PITCHFORK_SLOT = 4;
 
     public ScarecrowItemRenderer() {
     }
@@ -69,7 +72,6 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
         ItemStack hat = ItemStack.EMPTY;
         ItemStack head = ItemStack.EMPTY;
         ItemStack chest = ItemStack.EMPTY;
-        ItemStack pants = ItemStack.EMPTY;
         ItemStack pitchfork = ItemStack.EMPTY;
 
         if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() == ModBlocks.SCARECROW_BLOCK) {
@@ -80,15 +82,28 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
                 hat = inventory.get(ScarecrowBlockEntity.SLOT_HAT);
                 head = inventory.get(ScarecrowBlockEntity.SLOT_HEAD);
                 chest = inventory.get(ScarecrowBlockEntity.SLOT_CHEST);
-                pants = inventory.get(ScarecrowBlockEntity.SLOT_PANTS);
                 pitchfork = inventory.get(ScarecrowBlockEntity.SLOT_PITCHFORK);
+                if (pitchfork.isEmpty() && nbt.contains("Items", NbtElement.LIST_TYPE)) {
+                    NbtList items = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
+                    for (int i = 0; i < items.size(); i++) {
+                        NbtCompound itemTag = items.getCompound(i);
+                        int slot = itemTag.getByte("Slot") & 255;
+                        if (slot == LEGACY_PITCHFORK_SLOT) {
+                            ItemStack legacyPitchfork = ItemStack.fromNbt(itemTag);
+                            if (!legacyPitchfork.isEmpty()
+                                    && ScarecrowBlockEntity.isValidPitchforkItem(legacyPitchfork)) {
+                                pitchfork = legacyPitchfork;
+                            }
+                            break;
+                        }
+                    }
+                }
             }
         }
 
         this.renderHelper.setHatStack(hat);
         this.renderHelper.setHeadStack(head);
         this.renderHelper.setChestStack(chest);
-        this.renderHelper.setPantsStack(pants);
         this.renderHelper.setPitchforkStack(pitchfork);
     }
 }

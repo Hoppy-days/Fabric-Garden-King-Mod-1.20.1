@@ -24,10 +24,8 @@ public class ScarecrowScreenHandler extends ScreenHandler {
         public static final int HEAD_SLOT_Y = 26;
         public static final int CHEST_SLOT_X = 8;
         public static final int CHEST_SLOT_Y = 44;
-        public static final int PANTS_SLOT_X = 8;
-        public static final int PANTS_SLOT_Y = 62;
         public static final int PITCHFORK_SLOT_X = 8;
-        public static final int PITCHFORK_SLOT_Y = 80;
+        public static final int PITCHFORK_SLOT_Y = 62;
         public static final int PLAYER_INVENTORY_START_Y = 124;
         public static final int PLAYER_HOTBAR_Y = 182;
 
@@ -62,8 +60,6 @@ public class ScarecrowScreenHandler extends ScreenHandler {
                                 ScarecrowBlockEntity::isValidHeadItem));
                 this.addSlot(createEquipmentSlot(ScarecrowBlockEntity.SLOT_CHEST, CHEST_SLOT_X, CHEST_SLOT_Y,
                                 ScarecrowBlockEntity::isValidChestItem));
-                this.addSlot(createEquipmentSlot(ScarecrowBlockEntity.SLOT_PANTS, PANTS_SLOT_X, PANTS_SLOT_Y,
-                                ScarecrowBlockEntity::isValidPantsItem));
                 this.addSlot(createEquipmentSlot(ScarecrowBlockEntity.SLOT_PITCHFORK, PITCHFORK_SLOT_X,
                                 PITCHFORK_SLOT_Y, ScarecrowBlockEntity::isValidPitchforkItem));
 
@@ -120,8 +116,6 @@ public class ScarecrowScreenHandler extends ScreenHandler {
                                                         ScarecrowBlockEntity.SLOT_HEAD + 1, false)
                                         && !this.insertItem(original, ScarecrowBlockEntity.SLOT_CHEST,
                                                         ScarecrowBlockEntity.SLOT_CHEST + 1, false)
-                                        && !this.insertItem(original, ScarecrowBlockEntity.SLOT_PANTS,
-                                                        ScarecrowBlockEntity.SLOT_PANTS + 1, false)
                                         && !this.insertItem(original, ScarecrowBlockEntity.SLOT_PITCHFORK,
                                                         ScarecrowBlockEntity.SLOT_PITCHFORK + 1, false)) {
                                 return ItemStack.EMPTY;
