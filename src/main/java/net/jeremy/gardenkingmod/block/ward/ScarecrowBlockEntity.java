@@ -26,16 +26,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 
 public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
         public static final int SLOT_HAT = 0;
         public static final int SLOT_HEAD = 1;
         public static final int SLOT_CHEST = 2;
         public static final int SLOT_PITCHFORK = 3;
-
-        private static final int LEGACY_SLOT_PITCHFORK = 4;
 
         public static final int INVENTORY_SIZE = 4;
         public static final int MAX_DURABILITY = 64;
@@ -98,7 +94,6 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
                 super.readNbt(nbt);
                 this.inventory = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
                 Inventories.readNbt(nbt, this.inventory);
-                migrateLegacyInventory(nbt);
                 sanitizeInventory();
                 this.durability = Math.max(0, Math.min(nbt.getInt("Durability"), MAX_DURABILITY));
                 this.auraComponent.loadNbt(nbt);
@@ -183,37 +178,6 @@ public class ScarecrowBlockEntity extends BlockEntity implements ExtendedScreenH
                         onPitchforkChanged();
                 }
                 markDirtyAndSync();
-        }
-
-        private void migrateLegacyInventory(NbtCompound nbt) {
-                if (!nbt.contains("Items", NbtElement.LIST_TYPE)) {
-                        return;
-                }
-                boolean changed = false;
-                ItemStack current = this.inventory.get(SLOT_PITCHFORK);
-                if (!current.isEmpty()) {
-                        if (isValidPitchforkItem(current)) {
-                                return;
-                        }
-                        this.inventory.set(SLOT_PITCHFORK, ItemStack.EMPTY);
-                        changed = true;
-                }
-                NbtList items = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
-                for (int i = 0; i < items.size(); i++) {
-                        NbtCompound itemTag = items.getCompound(i);
-                        int slot = itemTag.getByte("Slot") & 255;
-                        if (slot == LEGACY_SLOT_PITCHFORK) {
-                                ItemStack legacyStack = ItemStack.fromNbt(itemTag);
-                                if (!legacyStack.isEmpty() && isValidPitchforkItem(legacyStack)) {
-                                        this.inventory.set(SLOT_PITCHFORK, legacyStack);
-                                        changed = true;
-                                }
-                                break;
-                        }
-                }
-                if (changed) {
-                        onPitchforkChanged();
-                }
         }
 
         private void sanitizeInventory() {

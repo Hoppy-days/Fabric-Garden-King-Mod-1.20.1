@@ -12,15 +12,11 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.RotationAxis;
 
 public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
     private ScarecrowRenderHelper renderHelper;
-    private static final int LEGACY_PITCHFORK_SLOT = 4;
-
     public ScarecrowItemRenderer() {
     }
 
@@ -83,21 +79,6 @@ public class ScarecrowItemRenderer implements BuiltinItemRendererRegistry.Dynami
                 head = inventory.get(ScarecrowBlockEntity.SLOT_HEAD);
                 chest = inventory.get(ScarecrowBlockEntity.SLOT_CHEST);
                 pitchfork = inventory.get(ScarecrowBlockEntity.SLOT_PITCHFORK);
-                if (pitchfork.isEmpty() && nbt.contains("Items", NbtElement.LIST_TYPE)) {
-                    NbtList items = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
-                    for (int i = 0; i < items.size(); i++) {
-                        NbtCompound itemTag = items.getCompound(i);
-                        int slot = itemTag.getByte("Slot") & 255;
-                        if (slot == LEGACY_PITCHFORK_SLOT) {
-                            ItemStack legacyPitchfork = ItemStack.fromNbt(itemTag);
-                            if (!legacyPitchfork.isEmpty()
-                                    && ScarecrowBlockEntity.isValidPitchforkItem(legacyPitchfork)) {
-                                pitchfork = legacyPitchfork;
-                            }
-                            break;
-                        }
-                    }
-                }
             }
         }
 
