@@ -10,6 +10,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.control.FlightMoveControl;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
@@ -31,6 +32,9 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.Heightmap;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
@@ -69,6 +73,20 @@ public class CrowEntity extends PathAwareEntity {
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, config.movementSpeed())
                 .add(EntityAttributes.GENERIC_FLYING_SPEED, config.flyingSpeed())
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 2.0);
+    }
+
+    public static boolean canSpawn(EntityType<CrowEntity> type, ServerWorldAccess world, SpawnReason reason, BlockPos pos,
+            Random random) {
+        if (reason != SpawnReason.NATURAL && reason != SpawnReason.CHUNK_GENERATION) {
+            return true;
+        }
+
+        int surfaceY = world.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ());
+        if (pos.getY() < surfaceY) {
+            return false;
+        }
+
+        return world.getBaseLightLevel(pos, 0) > 7;
     }
 
     @Override
