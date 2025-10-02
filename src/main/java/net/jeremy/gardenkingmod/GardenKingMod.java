@@ -3,6 +3,7 @@ package net.jeremy.gardenkingmod;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 
+import net.jeremy.gardenkingmod.armor.ModArmorSetEffects;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager;
 import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
@@ -27,6 +28,7 @@ public class GardenKingMod implements ModInitializer {
                 ModSoundEvents.register();
                 ModScreenHandlers.registerScreenHandlers();
                 ModScoreboards.registerScoreboards();
+                ModArmorSetEffects.register();
 
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(BonusHarvestDropManager.getInstance());
 
