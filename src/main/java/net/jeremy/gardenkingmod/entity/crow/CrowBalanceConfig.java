@@ -43,6 +43,8 @@ public final class CrowBalanceConfig {
     private double flyingSpeed = 0.6;
     private double movementSpeed = 0.25;
     private int spawnWeight = 6;
+    private int minSpawnGroupSize = 1;
+    private int maxSpawnGroupSize = 3;
 
     private CrowBalanceConfig() {
     }
@@ -71,7 +73,10 @@ public final class CrowBalanceConfig {
                 GardenKingMod.LOGGER.warn("Crow config file was empty; using defaults");
                 instance = defaults;
             } else {
-                loaded.validateAndApplyDefaults(defaults);
+                boolean updated = loaded.validateAndApplyDefaults(defaults);
+                if (updated) {
+                    writeConfigFile(loaded);
+                }
                 instance = loaded;
             }
         } catch (IOException exception) {
@@ -88,58 +93,84 @@ public final class CrowBalanceConfig {
         }
     }
 
-    private void validateAndApplyDefaults(CrowBalanceConfig defaults) {
+    private boolean validateAndApplyDefaults(CrowBalanceConfig defaults) {
+        boolean changed = false;
         if (minHungerTicks <= 0) {
             minHungerTicks = defaults.minHungerTicks;
+            changed = true;
         }
 
         if (maxHungerTicks < minHungerTicks) {
             maxHungerTicks = Math.max(minHungerTicks, defaults.maxHungerTicks);
+            changed = true;
         }
 
         if (cropSearchHorizontal <= 0) {
             cropSearchHorizontal = defaults.cropSearchHorizontal;
+            changed = true;
         }
 
         if (cropSearchVertical <= 0) {
             cropSearchVertical = defaults.cropSearchVertical;
+            changed = true;
         }
 
         if (randomFlightRange <= 0.0) {
             randomFlightRange = defaults.randomFlightRange;
+            changed = true;
         }
 
         if (perchSearchRange <= 0.0) {
             perchSearchRange = defaults.perchSearchRange;
+            changed = true;
         }
 
         if (wardHorizontalRadius <= 0.0) {
             wardHorizontalRadius = defaults.wardHorizontalRadius;
+            changed = true;
         }
 
         if (wardVerticalRadius <= 0.0) {
             wardVerticalRadius = defaults.wardVerticalRadius;
+            changed = true;
         }
 
         if (wardFearRadiusMultiplier <= 0.0) {
             wardFearRadiusMultiplier = defaults.wardFearRadiusMultiplier;
+            changed = true;
         }
 
         if (baseHealth <= 0.0) {
             baseHealth = defaults.baseHealth;
+            changed = true;
         }
 
         if (flyingSpeed <= 0.0) {
             flyingSpeed = defaults.flyingSpeed;
+            changed = true;
         }
 
         if (movementSpeed <= 0.0) {
             movementSpeed = defaults.movementSpeed;
+            changed = true;
         }
 
         if (spawnWeight < 0) {
             spawnWeight = defaults.spawnWeight;
+            changed = true;
         }
+
+        if (minSpawnGroupSize <= 0) {
+            minSpawnGroupSize = defaults.minSpawnGroupSize;
+            changed = true;
+        }
+
+        if (maxSpawnGroupSize < minSpawnGroupSize) {
+            maxSpawnGroupSize = Math.max(minSpawnGroupSize, defaults.maxSpawnGroupSize);
+            changed = true;
+        }
+
+        return changed;
     }
 
     public static CrowBalanceConfig get() {
@@ -212,11 +243,19 @@ public final class CrowBalanceConfig {
         return spawnWeight;
     }
 
+    public int minSpawnGroupSize() {
+        return minSpawnGroupSize;
+    }
+
+    public int maxSpawnGroupSize() {
+        return maxSpawnGroupSize;
+    }
+
     @Override
     public String toString() {
         return String.format(Locale.ROOT,
-                "CrowBalanceConfig{hunger=%d-%d,cropRadius=%d,%d,wardRadius=%.2f/%.2f,loot=%s}",
+                "CrowBalanceConfig{hunger=%d-%d,cropRadius=%d,%d,wardRadius=%.2f/%.2f,loot=%s,spawn=%d:%d-%d}",
                 minHungerTicks, maxHungerTicks, cropSearchHorizontal, cropSearchVertical, wardHorizontalRadius,
-                wardVerticalRadius, dropLootOnCropBreak);
+                wardVerticalRadius, dropLootOnCropBreak, spawnWeight, minSpawnGroupSize, maxSpawnGroupSize);
     }
 }
