@@ -3,6 +3,8 @@ package net.jeremy.gardenkingmod;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.jeremy.gardenkingmod.block.GardenShopBlock;
+import net.jeremy.gardenkingmod.block.GardenShopBlockPart;
 import net.jeremy.gardenkingmod.block.MarketBlock;
 import net.jeremy.gardenkingmod.block.MarketBlockPart;
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlock;
@@ -20,6 +22,10 @@ public final class ModBlocks {
                         new MarketBlock(
                                         FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).strength(2.5f).nonOpaque()));
 
+        public static final Block GARDEN_SHOP_BLOCK = registerBlock("garden_shop_block",
+                        new GardenShopBlock(
+                                        FabricBlockSettings.copyOf(Blocks.SPRUCE_PLANKS).strength(2.5f).nonOpaque()));
+
         public static final Block SCARECROW_BLOCK = registerBlock("scarecrow",
                         new ScarecrowBlock(FabricBlockSettings.copyOf(Blocks.HAY_BLOCK).strength(1.5f).nonOpaque()));
 
@@ -28,6 +34,10 @@ public final class ModBlocks {
 
         public static final Block MARKET_BLOCK_PART = registerBlockWithoutItem("market_block_part",
                         new MarketBlockPart(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).dropsNothing().nonOpaque()));
+
+        public static final Block GARDEN_SHOP_BLOCK_PART = registerBlockWithoutItem("garden_shop_block_part",
+                        new GardenShopBlockPart(
+                                        FabricBlockSettings.copyOf(Blocks.SPRUCE_PLANKS).dropsNothing().nonOpaque()));
 
         private ModBlocks() {
         }
@@ -49,6 +59,7 @@ public final class ModBlocks {
                 GardenKingMod.LOGGER.info("Registering mod blocks for {}", GardenKingMod.MOD_ID);
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> {
                         entries.add(MARKET_BLOCK);
+                        entries.add(GARDEN_SHOP_BLOCK);
                         entries.add(SCARECROW_BLOCK);
                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(entries -> entries.add(RUBY_BLOCK));
