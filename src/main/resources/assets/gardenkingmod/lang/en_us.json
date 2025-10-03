@@ -17,7 +17,9 @@
   "block.gardenkingmod.ruby_block": "Ruby Block",
 
   "block.gardenkingmod.market_block": "Garden Market",
+  "block.gardenkingmod.garden_shop_block": "Garden Shop",
   "container.gardenkingmod.market": "Garden Market",
+  "container.gardenkingmod.garden_shop": "Garden Shop",
   "container.gardenkingmod.scarecrow": "Scarecrow",
   "item.gardenkingmod.garden_coin": "Garden Coin",
   "message.gardenkingmod.market.empty": "There are no crops to sell.",
