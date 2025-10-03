@@ -1,9 +1,26 @@
 package net.jeremy.gardenkingmod.client.model;
 
+import net.jeremy.gardenkingmod.GardenKingMod;
+import net.minecraft.client.model.Dilation;
+import net.minecraft.client.model.ModelData;
+import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.model.ModelPartBuilder;
+import net.minecraft.client.model.ModelPartData;
+import net.minecraft.client.model.ModelTransform;
+import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.render.entity.model.EntityModelLayer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.Identifier;
+
 // Made with Blockbench 4.12.6
 // Exported for Minecraft version 1.17+ for Yarn
-// Paste this class into your mod and generate all required imports
 public class GardenShopModel extends EntityModel<Entity> {
+        public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(
+                        new Identifier(GardenKingMod.MOD_ID, "garden_shop"),
+                        "main");
 	private final ModelPart fencegate1;
 	private final ModelPart fencegate2;
 	private final ModelPart fencegate3;
