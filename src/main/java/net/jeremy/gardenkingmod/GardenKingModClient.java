@@ -11,11 +11,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.jeremy.gardenkingmod.client.model.CrowEntityModel;
+import net.jeremy.gardenkingmod.client.model.GardenShopModel;
 import net.jeremy.gardenkingmod.client.model.MarketBlockModel;
 import net.jeremy.gardenkingmod.client.model.ScarecrowModel;
 import net.jeremy.gardenkingmod.client.render.CrowEntityRenderer;
+import net.jeremy.gardenkingmod.client.render.GardenShopBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.MarketBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.ScarecrowBlockEntityRenderer;
+import net.jeremy.gardenkingmod.client.render.item.GardenShopItemRenderer;
 import net.jeremy.gardenkingmod.client.render.item.MarketItemRenderer;
 import net.jeremy.gardenkingmod.client.render.item.ScarecrowItemRenderer;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
@@ -39,13 +42,18 @@ public class GardenKingModClient implements ClientModInitializer {
         HandledScreens.register(ModScreenHandlers.MARKET_SCREEN_HANDLER, MarketScreen::new);
         HandledScreens.register(ModScreenHandlers.SCARECROW_SCREEN_HANDLER, ScarecrowScreen::new);
         EntityModelLayerRegistry.registerModelLayer(MarketBlockModel.LAYER_LOCATION, MarketBlockModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(GardenShopModel.LAYER_LOCATION,
+                        GardenShopModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ScarecrowModel.LAYER_LOCATION, ScarecrowModel::getTexturedModelData);
 
         EntityModelLayerRegistry.registerModelLayer(CrowEntityModel.LAYER_LOCATION, CrowEntityModel::getTexturedModelData);
         BlockEntityRendererFactories.register(ModBlockEntities.MARKET_BLOCK_ENTITY, MarketBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(ModBlockEntities.GARDEN_SHOP_BLOCK_ENTITY,
+                        GardenShopBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlockEntities.SCARECROW_BLOCK_ENTITY, ScarecrowBlockEntityRenderer::new);
         EntityRendererRegistry.register(ModEntities.CROW, CrowEntityRenderer::new);
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.MARKET_BLOCK, new MarketItemRenderer());
+        BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GARDEN_SHOP_BLOCK, new GardenShopItemRenderer());
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.SCARECROW_BLOCK, new ScarecrowItemRenderer());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.SCARECROW_BLOCK, RenderLayer.getCutout());
 

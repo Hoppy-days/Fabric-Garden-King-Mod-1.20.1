@@ -19,10 +19,12 @@ public final class RottenLanguageProvider extends FabricLanguageProvider {
         }
 
     @Override
-    public void generateTranslations(TranslationBuilder translationBuilder) {
+        public void generateTranslations(TranslationBuilder translationBuilder) {
                 translationBuilder.add("block.gardenkingmod.market_block", "Garden Market");
+                translationBuilder.add("block.gardenkingmod.garden_shop_block", "Garden Shop");
                 translationBuilder.add("item.gardenkingmod.garden_coin", "Garden Coin");
                 translationBuilder.add("container.gardenkingmod.market", "Garden Market");
+                translationBuilder.add("container.gardenkingmod.garden_shop", "Garden Shop");
                 translationBuilder.add("container.gardenkingmod.scarecrow", "Field Scarecrow");
                 translationBuilder.add("screen.gardenkingmod.market.sell", "Sell");
                 translationBuilder.add("screen.gardenkingmod.market.sale_result",
