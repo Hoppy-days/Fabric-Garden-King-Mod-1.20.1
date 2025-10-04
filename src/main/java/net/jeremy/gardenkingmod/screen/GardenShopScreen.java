@@ -11,7 +11,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
                         "textures/gui/container/garden_shop_gui.png");
 
-        private static final int BACKGROUND_WIDTH = 274;
+        private static final int BACKGROUND_WIDTH = 276;
         private static final int BACKGROUND_HEIGHT = 198;
         private static final int PLAYER_INVENTORY_LABEL_Y = BACKGROUND_HEIGHT - 94;
         private static final int TITLE_X = 8;
@@ -30,7 +30,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
                 int x = (width - backgroundWidth) / 2;
                 int y = (height - backgroundHeight) / 2;
-                context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
+                context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight, 512, 256);
         }
 
         @Override
