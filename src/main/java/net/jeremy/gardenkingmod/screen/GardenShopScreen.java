@@ -13,7 +13,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private static final int BACKGROUND_WIDTH = 276;
         private static final int BACKGROUND_HEIGHT = 198;
-        private static final int PLAYER_INVENTORY_LABEL_Y = BACKGROUND_HEIGHT - 94;
+        private static final int PLAYER_INVENTORY_LABEL_Y = BACKGROUND_HEIGHT - 104;
+        private static final int PLAYER_INVENTORY_LABEL_X = BACKGROUND_HEIGHT - 110;
         private static final int TITLE_X = 8;
         private static final int TITLE_Y = 6;
 
@@ -22,6 +23,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 this.backgroundWidth = BACKGROUND_WIDTH;
                 this.backgroundHeight = BACKGROUND_HEIGHT;
                 this.playerInventoryTitleY = PLAYER_INVENTORY_LABEL_Y;
+                this.playerInventoryTitleX = PLAYER_INVENTORY_LABEL_X;
                 this.titleX = TITLE_X;
                 this.titleY = TITLE_Y;
         }
