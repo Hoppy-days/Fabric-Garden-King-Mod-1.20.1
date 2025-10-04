@@ -1,6 +1,7 @@
 package net.jeremy.gardenkingmod;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.jeremy.gardenkingmod.screen.GardenShopScreenHandler;
 import net.jeremy.gardenkingmod.screen.MarketScreenHandler;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreenHandler;
 import net.minecraft.registry.Registries;
@@ -9,6 +10,10 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 
 public final class ModScreenHandlers {
+        public static final ScreenHandlerType<GardenShopScreenHandler> GARDEN_SHOP_SCREEN_HANDLER = Registry.register(
+                        Registries.SCREEN_HANDLER, new Identifier(GardenKingMod.MOD_ID, "garden_shop"),
+                        new ExtendedScreenHandlerType<>(GardenShopScreenHandler::new));
+
         public static final ScreenHandlerType<MarketScreenHandler> MARKET_SCREEN_HANDLER = Registry.register(
                         Registries.SCREEN_HANDLER, new Identifier(GardenKingMod.MOD_ID, "market"),
                         new ExtendedScreenHandlerType<>(MarketScreenHandler::new));

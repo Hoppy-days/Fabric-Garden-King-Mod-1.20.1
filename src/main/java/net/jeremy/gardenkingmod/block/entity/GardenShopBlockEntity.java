@@ -2,6 +2,7 @@ package net.jeremy.gardenkingmod.block.entity;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.jeremy.gardenkingmod.ModBlockEntities;
+import net.jeremy.gardenkingmod.screen.GardenShopScreenHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -40,7 +41,7 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
 
         @Override
         public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-                return null;
+                return new GardenShopScreenHandler(syncId, playerInventory, this);
         }
 
         @Override
