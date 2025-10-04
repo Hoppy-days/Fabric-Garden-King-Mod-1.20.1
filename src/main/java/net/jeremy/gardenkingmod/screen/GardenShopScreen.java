@@ -13,8 +13,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private static final int BACKGROUND_WIDTH = 276;
         private static final int BACKGROUND_HEIGHT = 198;
-        private static final int PLAYER_INVENTORY_LABEL_Y = BACKGROUND_HEIGHT - 104;
-        private static final int PLAYER_INVENTORY_LABEL_X = BACKGROUND_HEIGHT - 110;
+        private static final int PLAYER_INVENTORY_LABEL_Y = 104;
+        private static final int PLAYER_INVENTORY_LABEL_X = 110;
         private static final int TITLE_X = 8;
         private static final int TITLE_Y = 6;
 
@@ -33,6 +33,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 int x = (width - backgroundWidth) / 2;
                 int y = (height - backgroundHeight) / 2;
                 context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight, 512, 256);
+
+                int scrollbarX = x + 94; // replace with the on-screen offset you measured
+                int scrollbarY = y + 16;  // replace with the on-screen offset you measured
+                context.drawTexture(TEXTURE, scrollbarX, scrollbarY, 0, 199,
+                    6, 27,          // width/height of that art slice
+                    512, 256);       // full size of the texture file
         }
 
         @Override
