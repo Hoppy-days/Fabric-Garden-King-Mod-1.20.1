@@ -31,8 +31,8 @@ import net.minecraft.nbt.NbtList;
 public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
     public static final int INVENTORY_SIZE = 27;
     private static final String OFFERS_KEY = "Offers";
-    private static final String OFFER_ITEM_KEY = "Item";
-    private static final String OFFER_PRICE_KEY = "Price";
+    private static final String OFFER_RESULT_KEY = "Result";
+    private static final String OFFER_COSTS_KEY = "Costs";
     private static final int TEST_OFFER_COUNT = 18;
     private static final int TEST_PRICE_PER_ITEM = 64;
 
@@ -49,8 +49,12 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         buf.writeBlockPos(getPos());
         buf.writeVarInt(offers.size());
         for (GardenShopOffer offer : offers) {
-            buf.writeItemStack(offer.createDisplayStack());
-            buf.writeVarInt(offer.price());
+            buf.writeItemStack(offer.copyResultStack());
+            List<ItemStack> costs = offer.copyCostStacks();
+            buf.writeVarInt(costs.size());
+            for (ItemStack cost : costs) {
+                buf.writeItemStack(cost);
+            }
         }
     }
 
@@ -158,8 +162,12 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         NbtList offerList = new NbtList();
         for (GardenShopOffer offer : offers) {
             NbtCompound offerNbt = new NbtCompound();
-            offerNbt.put(OFFER_ITEM_KEY, offer.createDisplayStack().writeNbt(new NbtCompound()));
-            offerNbt.putInt(OFFER_PRICE_KEY, offer.price());
+            offerNbt.put(OFFER_RESULT_KEY, offer.copyResultStack().writeNbt(new NbtCompound()));
+            NbtList costsList = new NbtList();
+            for (ItemStack cost : offer.copyCostStacks()) {
+                costsList.add(cost.writeNbt(new NbtCompound()));
+            }
+            offerNbt.put(OFFER_COSTS_KEY, costsList);
             offerList.add(offerNbt);
         }
         nbt.put(OFFERS_KEY, offerList);
@@ -175,17 +183,27 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
             NbtList offerList = nbt.getList(OFFERS_KEY, NbtElement.COMPOUND_TYPE);
             for (int index = 0; index < offerList.size(); index++) {
                 NbtCompound offerNbt = offerList.getCompound(index);
-                ItemStack stack = ItemStack.fromNbt(offerNbt.getCompound(OFFER_ITEM_KEY));
-                int price = offerNbt.getInt(OFFER_PRICE_KEY);
-                if (!stack.isEmpty()) {
-                    offers.add(new GardenShopOffer(stack, price));
+                if (!offerNbt.contains(OFFER_RESULT_KEY, NbtElement.COMPOUND_TYPE)) {
+                    continue;
                 }
-            }
-        } else {
-            for (ItemStack stack : items) {
-                if (!stack.isEmpty()) {
-                    offers.add(new GardenShopOffer(stack, TEST_PRICE_PER_ITEM));
+
+                ItemStack result = ItemStack.fromNbt(offerNbt.getCompound(OFFER_RESULT_KEY));
+                if (result.isEmpty()) {
+                    continue;
                 }
+
+                List<ItemStack> costs = new ArrayList<>();
+                if (offerNbt.contains(OFFER_COSTS_KEY, NbtElement.LIST_TYPE)) {
+                    NbtList costsList = offerNbt.getList(OFFER_COSTS_KEY, NbtElement.COMPOUND_TYPE);
+                    for (int costIndex = 0; costIndex < costsList.size(); costIndex++) {
+                        ItemStack costStack = ItemStack.fromNbt(costsList.getCompound(costIndex));
+                        if (!costStack.isEmpty()) {
+                            costs.add(costStack);
+                        }
+                    }
+                }
+
+                offers.add(GardenShopOffer.of(result, costs));
             }
         }
         syncItemsFromOffers();
@@ -204,7 +222,7 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         offers.clear();
         for (int index = 0; index < Math.min(TEST_OFFER_COUNT, INVENTORY_SIZE); index++) {
             ItemStack stack = new ItemStack(ModItems.RUBY_CHESTPLATE);
-            offers.add(new GardenShopOffer(stack, TEST_PRICE_PER_ITEM));
+            offers.add(GardenShopOffer.of(stack, new ItemStack(ModItems.GARDEN_COIN, TEST_PRICE_PER_ITEM)));
         }
         syncItemsFromOffers();
         markDirty();
@@ -215,7 +233,7 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
             items.set(index, ItemStack.EMPTY);
         }
         for (int index = 0; index < offers.size() && index < items.size(); index++) {
-            items.set(index, offers.get(index).createDisplayStack());
+            items.set(index, offers.get(index).copyResultStack());
         }
     }
 }

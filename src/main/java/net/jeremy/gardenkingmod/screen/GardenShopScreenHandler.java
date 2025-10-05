@@ -58,10 +58,17 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         this.offers.clear();
                         int offerCount = buf.readVarInt();
                         for (int index = 0; index < offerCount; index++) {
-                                ItemStack stack = buf.readItemStack();
-                                int price = buf.readVarInt();
-                                if (!stack.isEmpty()) {
-                                        this.offers.add(new GardenShopOffer(stack, price));
+                                ItemStack result = buf.readItemStack();
+                                int costCount = buf.readVarInt();
+                                List<ItemStack> costs = new ArrayList<>(costCount);
+                                for (int costIndex = 0; costIndex < costCount; costIndex++) {
+                                        ItemStack costStack = buf.readItemStack();
+                                        if (!costStack.isEmpty()) {
+                                                costs.add(costStack);
+                                        }
+                                }
+                                if (!result.isEmpty()) {
+                                        this.offers.add(GardenShopOffer.of(result, costs));
                                 }
                         }
                         fillInventoryFromOffers();
@@ -133,7 +140,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
         private void fillInventoryFromOffers() {
                 for (int index = 0; index < this.inventory.size(); index++) {
-                        ItemStack stack = index < this.offers.size() ? this.offers.get(index).createDisplayStack() : ItemStack.EMPTY;
+                        ItemStack stack = index < this.offers.size() ? this.offers.get(index).copyResultStack() : ItemStack.EMPTY;
                         this.inventory.setStack(index, stack);
                 }
         }

@@ -1,18 +1,60 @@
 package net.jeremy.gardenkingmod.shop;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 import net.minecraft.item.ItemStack;
 
 /**
- * Simple data holder representing a single item that the garden shop can sell
- * along with the Garden Coin price for that item.
+ * Represents a single shop offer consisting of the resulting stack and a list
+ * of ItemStacks required to purchase it.
  */
-public record GardenShopOffer(ItemStack displayStack, int price) {
+public record GardenShopOffer(ItemStack resultStack, List<ItemStack> costStacks) {
 
     public GardenShopOffer {
-        displayStack = displayStack.copy();
+        Objects.requireNonNull(resultStack, "resultStack");
+        Objects.requireNonNull(costStacks, "costStacks");
+        resultStack = resultStack.copy();
+        costStacks = toImmutableCostList(costStacks);
     }
 
-    public ItemStack createDisplayStack() {
-        return displayStack.copy();
+    public static GardenShopOffer of(ItemStack result, ItemStack... costs) {
+        return new GardenShopOffer(result, Arrays.asList(costs));
+    }
+
+    public static GardenShopOffer of(ItemStack result, List<ItemStack> costs) {
+        return new GardenShopOffer(result, costs);
+    }
+
+    private static List<ItemStack> toImmutableCostList(List<ItemStack> source) {
+        List<ItemStack> copy = new ArrayList<>(source.size());
+        for (ItemStack stack : source) {
+            copy.add(stack.copy());
+        }
+        return List.copyOf(copy);
+    }
+
+    @Override
+    public ItemStack resultStack() {
+        return this.resultStack.copy();
+    }
+
+    public ItemStack copyResultStack() {
+        return this.resultStack.copy();
+    }
+
+    @Override
+    public List<ItemStack> costStacks() {
+        return this.costStacks;
+    }
+
+    public List<ItemStack> copyCostStacks() {
+        List<ItemStack> copy = new ArrayList<>(this.costStacks.size());
+        for (ItemStack stack : this.costStacks) {
+            copy.add(stack.copy());
+        }
+        return copy;
     }
 }

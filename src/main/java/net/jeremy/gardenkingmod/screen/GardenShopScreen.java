@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
-import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -39,6 +38,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int MAX_VISIBLE_OFFERS = (PLAYER_INVENTORY_LABEL_Y - OFFER_LIST_Y) / OFFER_ENTRY_HEIGHT;
         private static final int OFFER_ITEM_OFFSET_Y = 2;
         private static final int OFFER_COST_ITEM_OFFSET_X = 6;
+        private static final int OFFER_COST_ITEM_SPACING = 18;
         private static final int OFFER_RESULT_ITEM_OFFSET_X = 68;
         private static final int OFFER_BACKGROUND_U = 277;
         private static final int OFFER_BACKGROUND_V = 0;
@@ -204,18 +204,26 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         }
 
                         GardenShopOffer offer = offers.get(offerIndex);
-                        ItemStack costStack = new ItemStack(ModItems.GARDEN_COIN, offer.price());
                         int itemY = entryY + OFFER_ITEM_OFFSET_Y;
-                        int costX = listLeft + OFFER_COST_ITEM_OFFSET_X;
-                        context.drawItem(costStack, costX, itemY);
-                        context.drawItemInSlot(textRenderer, costStack, costX, itemY);
-
+                        int costStartX = listLeft + OFFER_COST_ITEM_OFFSET_X;
                         int arrowX = listLeft + OFFER_ARROW_OFFSET_X;
+                        int maxCostRight = arrowX - 2;
+                        List<ItemStack> costStacks = offer.costStacks();
+                        for (int costIndex = 0; costIndex < costStacks.size(); costIndex++) {
+                                int costX = costStartX + costIndex * OFFER_COST_ITEM_SPACING;
+                                if (costX + 16 > maxCostRight) {
+                                        break;
+                                }
+                                ItemStack costStack = costStacks.get(costIndex);
+                                context.drawItem(costStack, costX, itemY);
+                                context.drawItemInSlot(textRenderer, costStack, costX, itemY);
+                        }
+
                         int arrowY = entryY + OFFER_ARROW_OFFSET_Y;
                         context.drawTexture(TEXTURE, arrowX, arrowY, OFFER_ARROW_U, OFFER_ARROW_V, OFFER_ARROW_WIDTH,
                                         OFFER_ARROW_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
 
-                        ItemStack displayStack = offer.createDisplayStack();
+                        ItemStack displayStack = offer.copyResultStack();
                         int resultX = listLeft + OFFER_RESULT_ITEM_OFFSET_X;
                         context.drawItem(displayStack, resultX, itemY);
                         context.drawItemInSlot(textRenderer, displayStack, resultX, itemY);
@@ -336,14 +344,23 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
 
                 GardenShopOffer offer = handler.getOffers().get(offerIndex);
-                int costLeft = listLeft + OFFER_COST_ITEM_OFFSET_X;
-                if (mouseX >= costLeft && mouseX < costLeft + 16) {
-                        return Optional.of(new ItemStack(ModItems.GARDEN_COIN, offer.price()));
+                int costStart = listLeft + OFFER_COST_ITEM_OFFSET_X;
+                int arrowLeft = listLeft + OFFER_ARROW_OFFSET_X;
+                int maxCostRight = arrowLeft - 2;
+                List<ItemStack> costStacks = offer.costStacks();
+                for (int costIndex = 0; costIndex < costStacks.size(); costIndex++) {
+                        int costX = costStart + costIndex * OFFER_COST_ITEM_SPACING;
+                        if (costX + 16 > maxCostRight) {
+                                break;
+                        }
+                        if (mouseX >= costX && mouseX < costX + 16) {
+                                return Optional.of(costStacks.get(costIndex).copy());
+                        }
                 }
 
                 int resultLeft = listLeft + OFFER_RESULT_ITEM_OFFSET_X;
                 if (mouseX >= resultLeft && mouseX < resultLeft + 16) {
-                        return Optional.of(offer.createDisplayStack());
+                        return Optional.of(offer.copyResultStack());
                 }
 
                 return Optional.empty();
