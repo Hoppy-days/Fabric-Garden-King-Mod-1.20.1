@@ -42,6 +42,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_RESULT_ITEM_OFFSET_X = 70;
         private static final int OFFER_BACKGROUND_U = 277;
         private static final int OFFER_BACKGROUND_V = 0;
+        private static final int OFFER_HOVER_BACKGROUND_V = 21;
         private static final int OFFER_ARROW_U = 330;
         private static final int OFFER_ARROW_V = 9;
         private static final int OFFER_ARROW_WIDTH = 14;
@@ -61,7 +62,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int SCROLLBAR_KNOB_HEIGHT = 27;
 
         private static final int SELECTED_HIGHLIGHT_COLOR = 0x40FFFFFF;
-        private static final int HOVER_HIGHLIGHT_COLOR = 0x20000000;
 
         private int maxScrollSteps;
         private int scrollOffset;
@@ -179,13 +179,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         }
 
                         int entryY = listTop + visibleRow * OFFER_ENTRY_HEIGHT;
-                        context.drawTexture(TEXTURE, listLeft, entryY, OFFER_BACKGROUND_U, OFFER_BACKGROUND_V, OFFER_ENTRY_WIDTH,
+                        int backgroundV = offerIndex == hoveredOffer ? OFFER_HOVER_BACKGROUND_V : OFFER_BACKGROUND_V;
+                        context.drawTexture(TEXTURE, listLeft, entryY, OFFER_BACKGROUND_U, backgroundV, OFFER_ENTRY_WIDTH,
                                         OFFER_ENTRY_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-
-                        if (offerIndex == hoveredOffer) {
-                                context.fill(listLeft, entryY, listLeft + OFFER_ENTRY_WIDTH, entryY + OFFER_ENTRY_HEIGHT,
-                                                HOVER_HIGHLIGHT_COLOR);
-                        }
 
                         if (offerIndex == selectedOffer) {
                                 context.fill(listLeft, entryY, listLeft + OFFER_ENTRY_WIDTH, entryY + OFFER_ENTRY_HEIGHT,
