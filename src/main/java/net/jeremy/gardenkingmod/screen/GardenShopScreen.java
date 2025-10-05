@@ -184,7 +184,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 int hoveredOffer = getOfferIndexAt(mouseX, mouseY);
                 int listHeight = VISIBLE_OFFER_COUNT * OFFER_ENTRY_HEIGHT;
 
-                context.enableScissor(listLeft, listTop, listLeft + OFFER_ENTRY_WIDTH, listTop + listHeight);
+                context.enableScissor(listLeft, listTop, OFFER_ENTRY_WIDTH, listHeight);
                 for (int visibleRow = 0; visibleRow < VISIBLE_OFFER_COUNT; visibleRow++) {
                         int offerIndex = scrollOffset + visibleRow;
                         if (offerIndex >= offers.size()) {
