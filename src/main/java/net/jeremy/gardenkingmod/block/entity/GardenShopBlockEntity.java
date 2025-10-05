@@ -17,16 +17,19 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.Identifier;
 
 public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
     public static final int INVENTORY_SIZE = 27;
@@ -230,5 +233,11 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         for (int index = 0; index < offers.size() && index < items.size(); index++) {
             items.set(index, offers.get(index).copyResultStack());
         }
+    }
+
+    private ItemStack createStack(Identifier itemId, int count) {
+        return Registries.ITEM.getOrEmpty(itemId)
+                .map(item -> new ItemStack(item, count))
+                .orElse(ItemStack.EMPTY);
     }
 }
