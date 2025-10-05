@@ -17,24 +17,27 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.Identifier;
 
 public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
     public static final int INVENTORY_SIZE = 27;
     private static final String OFFERS_KEY = "Offers";
     private static final String OFFER_RESULT_KEY = "Result";
     private static final String OFFER_COSTS_KEY = "Costs";
-    private static final int TEST_OFFER_COUNT = 18;
-    private static final int TEST_PRICE_PER_ITEM = 64;
+    private static final Identifier CROPTOPIA_BUTTER_ID = new Identifier("croptopia", "butter");
+    private static final Identifier CROPTOPIA_CHEESE_ID = new Identifier("croptopia", "cheese");
 
     private DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
     private final List<GardenShopOffer> offers = new ArrayList<>();
@@ -220,9 +223,16 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         }
 
         offers.clear();
-        for (int index = 0; index < Math.min(TEST_OFFER_COUNT, INVENTORY_SIZE); index++) {
-            ItemStack stack = new ItemStack(ModItems.RUBY_CHESTPLATE);
-            offers.add(GardenShopOffer.of(stack, new ItemStack(ModItems.GARDEN_COIN, TEST_PRICE_PER_ITEM)));
+        ItemStack cheese = createStack(CROPTOPIA_CHEESE_ID, 1);
+        ItemStack butter = createStack(CROPTOPIA_BUTTER_ID, 1);
+        if (!cheese.isEmpty() && !butter.isEmpty()) {
+            offers.add(GardenShopOffer.of(cheese, new ItemStack(Items.MILK_BUCKET), butter));
+        }
+
+        ItemStack elytra = new ItemStack(Items.ELYTRA);
+        ItemStack rubies = new ItemStack(ModItems.RUBY, 32);
+        if (!elytra.isEmpty() && !rubies.isEmpty()) {
+            offers.add(GardenShopOffer.of(elytra, rubies));
         }
         syncItemsFromOffers();
         markDirty();
@@ -235,5 +245,11 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         for (int index = 0; index < offers.size() && index < items.size(); index++) {
             items.set(index, offers.get(index).copyResultStack());
         }
+    }
+
+    private ItemStack createStack(Identifier itemId, int count) {
+        return Registries.ITEM.getOrEmpty(itemId)
+                .map(item -> new ItemStack(item, count))
+                .orElse(ItemStack.EMPTY);
     }
 }

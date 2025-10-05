@@ -42,6 +42,26 @@ Crow spawning is configured with two JSON files so that designers can keep biome
 
 Crow models, textures, and other assets follow the same conventions as the rest of the project. Keep any `.png` textures for the crow entity under `assets/gardenkingmod/textures/entity/` so that they are picked up automatically at runtime.
 
+## Garden shop trades
+
+The garden shop's default trades are defined in [`GardenShopBlockEntity`](src/main/java/net/jeremy/gardenkingmod/block/entity/GardenShopBlockEntity.java).
+When the block entity is opened, its `ensureOffers` method populates the offers list with preconfigured `GardenShopOffer`
+instances. Each offer specifies the result `ItemStack` followed by one or more cost stacks that players must provide to
+complete the trade. The current configuration supplies two trades:
+
+1. One Minecraft milk bucket plus one Croptopia butter yields one Croptopia cheese.
+2. Thirty-two Garden King rubies yield one Minecraft elytra.
+
+### Adding more trades
+
+1. Open `GardenShopBlockEntity` and locate the `ensureOffers` method.
+2. Use `createStack(new Identifier("namespace", "item"), count)` for third-party mod items, or `new ItemStack(Items.*)` and
+   `new ItemStack(ModItems.*)` for vanilla and Garden King items.
+3. Call `offers.add(GardenShopOffer.of(resultStack, costStacks...))` to register the new trade before the method invokes
+   `syncItemsFromOffers()`.
+4. Save the file and rebuild or reload the mod. If the trade produces a brand-new item, place its `.png` texture in
+   `assets/gardenkingmod/textures/item/` so Fabric can find it.
+
 ## Fortune levels and loot drops
 
 The Fortune effect rolls for extra items whenever a block or crop is flagged as "fortune affected" in its loot table. For ore-style drops (diamonds, coal, emeralds, etc.) the final stack size equals `1 + random(0, level)`, so higher levels guarantee more bonus items on average. The table below shows how this plays out in practice:
