@@ -43,8 +43,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_BACKGROUND_U = 0;
         private static final int OFFER_BACKGROUND_V = 226;
 
-        private static final int SCROLLBAR_OFFSET_X = 138;
-        private static final int SCROLLBAR_OFFSET_Y = 28;
+        private static final int SCROLLBAR_OFFSET_X = 94;
+        private static final int SCROLLBAR_OFFSET_Y = 16;
         private static final int SCROLLBAR_TRACK_U = 0;
         private static final int SCROLLBAR_TRACK_V = 199;
         private static final int SCROLLBAR_TRACK_WIDTH = 6;
@@ -52,7 +52,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int SCROLLBAR_KNOB_U = 6;
         private static final int SCROLLBAR_KNOB_V = 199;
         private static final int SCROLLBAR_KNOB_WIDTH = 6;
-        private static final int SCROLLBAR_KNOB_HEIGHT = 9;
+        private static final int SCROLLBAR_KNOB_HEIGHT = 27;
 
         private static final int SELECTED_HIGHLIGHT_COLOR = 0x40FFFFFF;
         private static final int HOVER_HIGHLIGHT_COLOR = 0x20000000;
