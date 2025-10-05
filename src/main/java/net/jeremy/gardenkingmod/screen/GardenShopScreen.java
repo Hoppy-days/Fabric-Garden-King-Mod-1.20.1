@@ -36,7 +36,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_LIST_Y = 17;
         private static final int OFFER_ENTRY_WIDTH = 88;
         private static final int OFFER_ENTRY_HEIGHT = 20;
-        private static final int VISIBLE_OFFER_COUNT = 12;
+        private static final int MAX_VISIBLE_OFFERS = (PLAYER_INVENTORY_LABEL_Y - OFFER_LIST_Y) / OFFER_ENTRY_HEIGHT;
         private static final int OFFER_ITEM_OFFSET_Y = 2;
         private static final int OFFER_COST_ITEM_OFFSET_X = 6;
         private static final int OFFER_RESULT_ITEM_OFFSET_X = 68;
@@ -182,14 +182,16 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 int listLeft = originX + OFFER_LIST_X;
                 int listTop = originY + OFFER_LIST_Y;
                 int hoveredOffer = getOfferIndexAt(mouseX, mouseY);
-                int listHeight = VISIBLE_OFFER_COUNT * OFFER_ENTRY_HEIGHT;
+                int clampedVisibleOffers = Math.min(MAX_VISIBLE_OFFERS, Math.max(offers.size() - scrollOffset, 0));
+                int scissorHeight = Math.min(MAX_VISIBLE_OFFERS, offers.size()) * OFFER_ENTRY_HEIGHT;
 
-                context.enableScissor(listLeft, listTop, listLeft + OFFER_ENTRY_WIDTH, listTop + listHeight);
-                for (int visibleRow = 0; visibleRow < VISIBLE_OFFER_COUNT; visibleRow++) {
+                if (scissorHeight <= 0) {
+                        return;
+                }
+
+                context.enableScissor(listLeft, listTop, listLeft + OFFER_ENTRY_WIDTH, listTop + scissorHeight);
+                for (int visibleRow = 0; visibleRow < clampedVisibleOffers; visibleRow++) {
                         int offerIndex = scrollOffset + visibleRow;
-                        if (offerIndex >= offers.size()) {
-                                break;
-                        }
 
                         int entryY = listTop + visibleRow * OFFER_ENTRY_HEIGHT;
                         int backgroundV = offerIndex == hoveredOffer ? OFFER_HOVER_BACKGROUND_V : OFFER_BACKGROUND_V;
@@ -252,7 +254,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private void updateScrollLimits() {
                 int offerCount = handler.getOffers().size();
-                maxScrollSteps = Math.max(offerCount - VISIBLE_OFFER_COUNT, 0);
+                maxScrollSteps = Math.max(offerCount - MAX_VISIBLE_OFFERS, 0);
                 setScrollAmount(scrollAmount);
                 if (selectedOffer >= offerCount) {
                         selectedOffer = offerCount - 1;
@@ -299,7 +301,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
 
                 int row = (int) (localY / OFFER_ENTRY_HEIGHT);
-                if (row < 0 || row >= VISIBLE_OFFER_COUNT) {
+                if (row < 0 || row >= MAX_VISIBLE_OFFERS) {
                         return -1;
                 }
 
@@ -323,7 +325,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
 
                 int row = relativeMouseY / OFFER_ENTRY_HEIGHT;
-                if (row < 0 || row >= VISIBLE_OFFER_COUNT) {
+                if (row < 0 || row >= MAX_VISIBLE_OFFERS) {
                         return Optional.empty();
                 }
 
