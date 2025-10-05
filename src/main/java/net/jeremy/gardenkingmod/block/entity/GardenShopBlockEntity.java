@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.List;
 
 import net.jeremy.gardenkingmod.ModBlockEntities;
-import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.screen.GardenShopScreenHandler;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
+import net.jeremy.gardenkingmod.shop.GardenShopOfferManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -36,9 +36,6 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
     private static final String OFFERS_KEY = "Offers";
     private static final String OFFER_RESULT_KEY = "Result";
     private static final String OFFER_COSTS_KEY = "Costs";
-    private static final Identifier CROPTOPIA_BUTTER_ID = new Identifier("croptopia", "butter");
-    private static final Identifier CROPTOPIA_CHEESE_ID = new Identifier("croptopia", "cheese");
-
     private DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
     private final List<GardenShopOffer> offers = new ArrayList<>();
 
@@ -217,23 +214,14 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
     }
 
     public void ensureOffers() {
-        if (!offers.isEmpty()) {
+        List<GardenShopOffer> configuredOffers = GardenShopOfferManager.getInstance().getOffers();
+        if (offers.equals(configuredOffers)) {
             syncItemsFromOffers();
             return;
         }
 
         offers.clear();
-        ItemStack cheese = createStack(CROPTOPIA_CHEESE_ID, 1);
-        ItemStack butter = createStack(CROPTOPIA_BUTTER_ID, 1);
-        if (!cheese.isEmpty() && !butter.isEmpty()) {
-            offers.add(GardenShopOffer.of(cheese, new ItemStack(Items.MILK_BUCKET), butter));
-        }
-
-        ItemStack elytra = new ItemStack(Items.ELYTRA);
-        ItemStack rubies = new ItemStack(ModItems.RUBY, 32);
-        if (!elytra.isEmpty() && !rubies.isEmpty()) {
-            offers.add(GardenShopOffer.of(elytra, rubies));
-        }
+        offers.addAll(configuredOffers);
         syncItemsFromOffers();
         markDirty();
     }

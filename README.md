@@ -44,23 +44,39 @@ Crow models, textures, and other assets follow the same conventions as the rest 
 
 ## Garden shop trades
 
-The garden shop's default trades are defined in [`GardenShopBlockEntity`](src/main/java/net/jeremy/gardenkingmod/block/entity/GardenShopBlockEntity.java).
-When the block entity is opened, its `ensureOffers` method populates the offers list with preconfigured `GardenShopOffer`
-instances. Each offer specifies the result `ItemStack` followed by one or more cost stacks that players must provide to
-complete the trade. The current configuration supplies two trades:
+The garden shop's inventory is now data-driven. All default trades live in
+[`data/gardenkingmod/garden_shop_offers.json`](src/main/resources/data/gardenkingmod/garden_shop_offers.json), so you can add
+new entries without touching Java code. Each entry follows a simple "offer / price" layout:
+
+```json
+{
+  "offer": "minecraft:elytra",
+  "price": "gardenkingmod:ruby*32"
+}
+```
+
+* `offer` is the item the shop will sell. You can provide it as a plain string (`"namespace:item"`) or as an object with
+  explicit fields:
+
+  ```json
+  { "item": "croptopia:cheese", "count": 2 }
+  ```
+
+* `price` accepts either a single string/object or an array if you want multiple inputs. To specify stack sizes inline, append
+  `*<count>` to the identifier (for example, `"gardenkingmod:ruby*32"`).
+
+The current configuration supplies two trades:
 
 1. One Minecraft milk bucket plus one Croptopia butter yields one Croptopia cheese.
 2. Thirty-two Garden King rubies yield one Minecraft elytra.
 
 ### Adding more trades
 
-1. Open `GardenShopBlockEntity` and locate the `ensureOffers` method.
-2. Use `createStack(new Identifier("namespace", "item"), count)` for third-party mod items, or `new ItemStack(Items.*)` and
-   `new ItemStack(ModItems.*)` for vanilla and Garden King items.
-3. Call `offers.add(GardenShopOffer.of(resultStack, costStacks...))` to register the new trade before the method invokes
-   `syncItemsFromOffers()`.
-4. Save the file and rebuild or reload the mod. If the trade produces a brand-new item, place its `.png` texture in
-   `assets/gardenkingmod/textures/item/` so Fabric can find it.
+1. Open [`garden_shop_offers.json`](src/main/resources/data/gardenkingmod/garden_shop_offers.json).
+2. Add a new JSON object to the `offers` array using the format above (one `offer`, one `price`).
+3. Save the file and reload your data packs (or restart the game/server) so Fabric's resource loader picks up the change.
+4. If the trade produces a brand-new item, place its `.png` texture inside `assets/gardenkingmod/textures/item/` so Fabric can
+   find it at runtime.
 
 ## Fortune levels and loot drops
 
