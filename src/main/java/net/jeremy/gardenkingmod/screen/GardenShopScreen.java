@@ -52,8 +52,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private static final int SCROLLBAR_OFFSET_X = 94;
         private static final int SCROLLBAR_OFFSET_Y = 16;
-        private static final int SCROLLBAR_TRACK_U = 0;
-        private static final int SCROLLBAR_TRACK_V = 199;
         private static final int SCROLLBAR_TRACK_WIDTH = 6;
         private static final int SCROLLBAR_TRACK_HEIGHT = 78;
         private static final int SCROLLBAR_KNOB_U = 6;
@@ -234,9 +232,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private void drawScrollbar(DrawContext context, int originX, int originY) {
                 int scrollbarX = originX + SCROLLBAR_OFFSET_X;
                 int scrollbarY = originY + SCROLLBAR_OFFSET_Y;
-                context.drawTexture(TEXTURE, scrollbarX, scrollbarY, SCROLLBAR_TRACK_U, SCROLLBAR_TRACK_V, SCROLLBAR_TRACK_WIDTH,
-                                SCROLLBAR_TRACK_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-
                 if (!canScroll()) {
                         int centeredY = scrollbarY + (SCROLLBAR_TRACK_HEIGHT - SCROLLBAR_KNOB_HEIGHT) / 2;
                         context.drawTexture(TEXTURE, scrollbarX, centeredY, SCROLLBAR_KNOB_U, SCROLLBAR_KNOB_V,
