@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
+import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -33,15 +34,20 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private static final int OFFER_LIST_X = 14;
         private static final int OFFER_LIST_Y = 28;
-        private static final int OFFER_ENTRY_WIDTH = 120;
-        private static final int OFFER_ENTRY_HEIGHT = 20;
+        private static final int OFFER_ENTRY_WIDTH = 88;
+        private static final int OFFER_ENTRY_HEIGHT = 27;
         private static final int VISIBLE_OFFER_COUNT = 6;
-        private static final int OFFER_ITEM_OFFSET_X = 2;
-        private static final int OFFER_ITEM_OFFSET_Y = 2;
-        private static final int OFFER_PRICE_TEXT_OFFSET_X = 28;
-        private static final int OFFER_PRICE_TEXT_OFFSET_Y = 6;
-        private static final int OFFER_BACKGROUND_U = 0;
-        private static final int OFFER_BACKGROUND_V = 226;
+        private static final int OFFER_ITEM_OFFSET_Y = 6;
+        private static final int OFFER_COST_ITEM_OFFSET_X = 14;
+        private static final int OFFER_RESULT_ITEM_OFFSET_X = 70;
+        private static final int OFFER_BACKGROUND_U = 277;
+        private static final int OFFER_BACKGROUND_V = 0;
+        private static final int OFFER_ARROW_U = 330;
+        private static final int OFFER_ARROW_V = 9;
+        private static final int OFFER_ARROW_WIDTH = 14;
+        private static final int OFFER_ARROW_HEIGHT = 10;
+        private static final int OFFER_ARROW_OFFSET_X = 53;
+        private static final int OFFER_ARROW_OFFSET_Y = 9;
 
         private static final int SCROLLBAR_OFFSET_X = 94;
         private static final int SCROLLBAR_OFFSET_Y = 16;
@@ -56,7 +62,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private static final int SELECTED_HIGHLIGHT_COLOR = 0x40FFFFFF;
         private static final int HOVER_HIGHLIGHT_COLOR = 0x20000000;
-        private static final int PRICE_TEXT_COLOR = 0x3F3F3F;
 
         private int maxScrollSteps;
         private int scrollOffset;
@@ -188,16 +193,21 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         }
 
                         GardenShopOffer offer = offers.get(offerIndex);
-                        ItemStack displayStack = offer.createDisplayStack();
-                        int itemX = listLeft + OFFER_ITEM_OFFSET_X;
+                        ItemStack costStack = new ItemStack(ModItems.GARDEN_COIN, offer.price());
                         int itemY = entryY + OFFER_ITEM_OFFSET_Y;
-                        context.drawItem(displayStack, itemX, itemY);
-                        context.drawItemInSlot(textRenderer, displayStack, itemX, itemY);
+                        int costX = listLeft + OFFER_COST_ITEM_OFFSET_X;
+                        context.drawItem(costStack, costX, itemY);
+                        context.drawItemInSlot(textRenderer, costStack, costX, itemY);
 
-                        Text priceText = Text.translatable("screen.gardenkingmod.garden_shop.price", offer.price());
-                        int textX = listLeft + OFFER_PRICE_TEXT_OFFSET_X;
-                        int textY = entryY + OFFER_PRICE_TEXT_OFFSET_Y;
-                        context.drawText(textRenderer, priceText, textX, textY, PRICE_TEXT_COLOR, false);
+                        int arrowX = listLeft + OFFER_ARROW_OFFSET_X;
+                        int arrowY = entryY + OFFER_ARROW_OFFSET_Y;
+                        context.drawTexture(TEXTURE, arrowX, arrowY, OFFER_ARROW_U, OFFER_ARROW_V, OFFER_ARROW_WIDTH,
+                                        OFFER_ARROW_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+
+                        ItemStack displayStack = offer.createDisplayStack();
+                        int resultX = listLeft + OFFER_RESULT_ITEM_OFFSET_X;
+                        context.drawItem(displayStack, resultX, itemY);
+                        context.drawItemInSlot(textRenderer, displayStack, resultX, itemY);
                 }
                 context.disableScissor();
         }
@@ -296,18 +306,35 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
                 int originX = (width - backgroundWidth) / 2;
                 int originY = (height - backgroundHeight) / 2;
-                int itemLeft = originX + OFFER_LIST_X + OFFER_ITEM_OFFSET_X;
-                int itemTop = originY + OFFER_LIST_Y;
-                int relativeMouseY = mouseY - (originY + OFFER_LIST_Y);
-                int row = relativeMouseY / OFFER_ENTRY_HEIGHT;
-                int iconY = itemTop + row * OFFER_ENTRY_HEIGHT + OFFER_ITEM_OFFSET_Y;
-                if (mouseX < itemLeft || mouseX >= itemLeft + 16) {
-                        return Optional.empty();
-                }
-                if (mouseY < iconY || mouseY >= iconY + 16) {
+                int listLeft = originX + OFFER_LIST_X;
+                int listTop = originY + OFFER_LIST_Y;
+                int relativeMouseY = mouseY - listTop;
+                if (relativeMouseY < 0) {
                         return Optional.empty();
                 }
 
-                return Optional.of(handler.getOffers().get(offerIndex).createDisplayStack());
+                int row = relativeMouseY / OFFER_ENTRY_HEIGHT;
+                if (row < 0 || row >= VISIBLE_OFFER_COUNT) {
+                        return Optional.empty();
+                }
+
+                int entryTop = listTop + row * OFFER_ENTRY_HEIGHT;
+                int itemTop = entryTop + OFFER_ITEM_OFFSET_Y;
+                if (mouseY < itemTop || mouseY >= itemTop + 16) {
+                        return Optional.empty();
+                }
+
+                GardenShopOffer offer = handler.getOffers().get(offerIndex);
+                int costLeft = listLeft + OFFER_COST_ITEM_OFFSET_X;
+                if (mouseX >= costLeft && mouseX < costLeft + 16) {
+                        return Optional.of(new ItemStack(ModItems.GARDEN_COIN, offer.price()));
+                }
+
+                int resultLeft = listLeft + OFFER_RESULT_ITEM_OFFSET_X;
+                if (mouseX >= resultLeft && mouseX < resultLeft + 16) {
+                        return Optional.of(offer.createDisplayStack());
+                }
+
+                return Optional.empty();
         }
 }
