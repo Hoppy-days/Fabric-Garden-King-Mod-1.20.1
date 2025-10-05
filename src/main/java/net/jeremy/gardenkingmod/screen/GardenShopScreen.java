@@ -36,7 +36,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_LIST_Y = 17;
         private static final int OFFER_ENTRY_WIDTH = 88;
         private static final int OFFER_ENTRY_HEIGHT = 20;
-        private static final int VISIBLE_OFFER_COUNT = 9;
+        private static final int VISIBLE_OFFER_COUNT = 12;
         private static final int OFFER_ITEM_OFFSET_Y = 2;
         private static final int OFFER_COST_ITEM_OFFSET_X = 6;
         private static final int OFFER_RESULT_ITEM_OFFSET_X = 68;
