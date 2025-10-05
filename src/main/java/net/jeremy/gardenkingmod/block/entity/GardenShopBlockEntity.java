@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.List;
 
 import net.jeremy.gardenkingmod.ModBlockEntities;
-import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.screen.GardenShopScreenHandler;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
+import net.jeremy.gardenkingmod.shop.GardenShopOfferManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -33,9 +33,6 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
     private static final String OFFERS_KEY = "Offers";
     private static final String OFFER_RESULT_KEY = "Result";
     private static final String OFFER_COSTS_KEY = "Costs";
-    private static final int TEST_OFFER_COUNT = 18;
-    private static final int TEST_PRICE_PER_ITEM = 64;
-
     private DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
     private final List<GardenShopOffer> offers = new ArrayList<>();
 
@@ -214,16 +211,14 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
     }
 
     public void ensureOffers() {
-        if (!offers.isEmpty()) {
+        List<GardenShopOffer> configuredOffers = GardenShopOfferManager.getInstance().getOffers();
+        if (offers.equals(configuredOffers)) {
             syncItemsFromOffers();
             return;
         }
 
         offers.clear();
-        for (int index = 0; index < Math.min(TEST_OFFER_COUNT, INVENTORY_SIZE); index++) {
-            ItemStack stack = new ItemStack(ModItems.RUBY_CHESTPLATE);
-            offers.add(GardenShopOffer.of(stack, new ItemStack(ModItems.GARDEN_COIN, TEST_PRICE_PER_ITEM)));
-        }
+        offers.addAll(configuredOffers);
         syncItemsFromOffers();
         markDirty();
     }

@@ -1,0 +1,15 @@
+{
+  "offers": [
+    {
+      "offer": "croptopia:cheese",
+      "price": [
+        "minecraft:milk_bucket",
+        "croptopia:butter"
+      ]
+    },
+    {
+      "offer": "minecraft:elytra",
+      "price": "gardenkingmod:ruby*32"
+    }
+  ]
+}

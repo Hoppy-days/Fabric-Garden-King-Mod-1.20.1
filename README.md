@@ -42,6 +42,42 @@ Crow spawning is configured with two JSON files so that designers can keep biome
 
 Crow models, textures, and other assets follow the same conventions as the rest of the project. Keep any `.png` textures for the crow entity under `assets/gardenkingmod/textures/entity/` so that they are picked up automatically at runtime.
 
+## Garden shop trades
+
+The garden shop's inventory is now data-driven. All default trades live in
+[`data/gardenkingmod/garden_shop_offers.json`](src/main/resources/data/gardenkingmod/garden_shop_offers.json), so you can add
+new entries without touching Java code. Each entry follows a simple "offer / price" layout:
+
+```json
+{
+  "offer": "minecraft:elytra",
+  "price": "gardenkingmod:ruby*32"
+}
+```
+
+* `offer` is the item the shop will sell. You can provide it as a plain string (`"namespace:item"`) or as an object with
+  explicit fields:
+
+  ```json
+  { "item": "croptopia:cheese", "count": 2 }
+  ```
+
+* `price` accepts either a single string/object or an array if you want multiple inputs. To specify stack sizes inline, append
+  `*<count>` to the identifier (for example, `"gardenkingmod:ruby*32"`).
+
+The current configuration supplies two trades:
+
+1. One Minecraft milk bucket plus one Croptopia butter yields one Croptopia cheese.
+2. Thirty-two Garden King rubies yield one Minecraft elytra.
+
+### Adding more trades
+
+1. Open [`garden_shop_offers.json`](src/main/resources/data/gardenkingmod/garden_shop_offers.json).
+2. Add a new JSON object to the `offers` array using the format above (one `offer`, one `price`).
+3. Save the file and reload your data packs (or restart the game/server) so Fabric's resource loader picks up the change.
+4. If the trade produces a brand-new item, place its `.png` texture inside `assets/gardenkingmod/textures/item/` so Fabric can
+   find it at runtime.
+
 ## Fortune levels and loot drops
 
 The Fortune effect rolls for extra items whenever a block or crop is flagged as "fortune affected" in its loot table. For ore-style drops (diamonds, coal, emeralds, etc.) the final stack size equals `1 + random(0, level)`, so higher levels guarantee more bonus items on average. The table below shows how this plays out in practice:

@@ -9,6 +9,7 @@ import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.registry.ModEntities;
 import net.jeremy.gardenkingmod.registry.ModSoundEvents;
+import net.jeremy.gardenkingmod.shop.GardenShopOfferManager;
 
 import net.minecraft.resource.ResourceType;
 
@@ -31,6 +32,7 @@ public class GardenKingMod implements ModInitializer {
                 ModArmorSetEffects.register();
 
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(BonusHarvestDropManager.getInstance());
+                ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(GardenShopOfferManager.getInstance());
 
                 CropTierRegistry.init();
                 CropDropModifier.register();
