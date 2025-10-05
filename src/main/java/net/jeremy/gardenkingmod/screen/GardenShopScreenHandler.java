@@ -23,8 +23,10 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
         private static final int SLOT_SIZE = 18;
         private static final int SHOP_SLOT_START_X = 8;
-        private static final int PLAYER_INVENTORY_START_Y = 84;
-        private static final int PLAYER_HOTBAR_Y = 142;
+        private static final int PLAYER_INVENTORY_START_Y = 116;
+        private static final int PLAYER_INVENTORY_START_X = 108;
+        private static final int PLAYER_HOTBAR_Y = 174;
+        private static final int PLAYER_HOTBAR_X = 108;
 
         private final Inventory inventory;
         private final GardenShopBlockEntity blockEntity;
@@ -114,7 +116,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private void addPlayerInventory(PlayerInventory playerInventory) {
                 for (int row = 0; row < PLAYER_INVENTORY_ROW_COUNT; ++row) {
                         for (int column = 0; column < PLAYER_INVENTORY_COLUMN_COUNT; ++column) {
-                                int x = SHOP_SLOT_START_X + column * SLOT_SIZE;
+                                int x = PLAYER_INVENTORY_START_X + column * SLOT_SIZE;
                                 int y = PLAYER_INVENTORY_START_Y + row * SLOT_SIZE;
                                 this.addSlot(new Slot(playerInventory, column + row * PLAYER_INVENTORY_COLUMN_COUNT + HOTBAR_SLOT_COUNT,
                                                 x, y));
@@ -124,7 +126,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
         private void addPlayerHotbar(PlayerInventory playerInventory) {
                 for (int slot = 0; slot < HOTBAR_SLOT_COUNT; ++slot) {
-                        int x = SHOP_SLOT_START_X + slot * SLOT_SIZE;
+                        int x = PLAYER_HOTBAR_X + slot * SLOT_SIZE;
                         this.addSlot(new Slot(playerInventory, slot, x, PLAYER_HOTBAR_Y));
                 }
         }

@@ -23,13 +23,13 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int BACKGROUND_HEIGHT = 198;
         private static final int PLAYER_INVENTORY_LABEL_Y = 104;
         private static final int PLAYER_INVENTORY_LABEL_X = 110;
-        private static final int TITLE_X = 8;
+        private static final int TITLE_X = 156;
         private static final int TITLE_Y = 6;
 
-        private static final int OFFERS_LABEL_X = 14;
-        private static final int OFFERS_LABEL_Y = 12;
-        private static final int BUY_LABEL_X = 208;
-        private static final int BUY_LABEL_Y = 136;
+        private static final int OFFERS_LABEL_X = 8;
+        private static final int OFFERS_LABEL_Y = 6;
+        private static final int BUY_LABEL_X = 180;
+        private static final int BUY_LABEL_Y = 87;
 
         private static final int OFFER_LIST_X = 14;
         private static final int OFFER_LIST_Y = 28;
