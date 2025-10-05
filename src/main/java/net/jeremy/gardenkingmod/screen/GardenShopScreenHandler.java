@@ -1,7 +1,12 @@
 package net.jeremy.gardenkingmod.screen;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import net.jeremy.gardenkingmod.ModScreenHandlers;
 import net.jeremy.gardenkingmod.block.entity.GardenShopBlockEntity;
+import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -16,41 +21,54 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static final int HOTBAR_SLOT_COUNT = 9;
         private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
         private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
-        private static final int SHOP_SLOTS_PER_ROW = 9;
         private static final int SLOT_SIZE = 18;
         private static final int SHOP_SLOT_START_X = 8;
-        private static final int SHOP_SLOT_START_Y = 18;
         private static final int PLAYER_INVENTORY_START_Y = 84;
         private static final int PLAYER_HOTBAR_Y = 142;
 
         private final Inventory inventory;
         private final GardenShopBlockEntity blockEntity;
+        private final List<GardenShopOffer> offers;
 
         public GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
-                this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()));
+                this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()), buf);
         }
 
         public GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, GardenShopBlockEntity blockEntity) {
+                this(syncId, playerInventory, blockEntity, null);
+        }
+
+        private GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, GardenShopBlockEntity blockEntity,
+                        PacketByteBuf buf) {
                 super(ModScreenHandlers.GARDEN_SHOP_SCREEN_HANDLER, syncId);
                 this.blockEntity = blockEntity;
                 this.inventory = blockEntity != null ? blockEntity : new SimpleInventory(GardenShopBlockEntity.INVENTORY_SIZE);
+                this.offers = new ArrayList<>();
 
                 checkSize(this.inventory, GardenShopBlockEntity.INVENTORY_SIZE);
+                if (blockEntity != null) {
+                        blockEntity.ensureOffers();
+                        this.offers.addAll(blockEntity.getOffers());
+                        fillInventoryFromOffers();
+                }
+
+                if (buf != null) {
+                        this.offers.clear();
+                        int offerCount = buf.readVarInt();
+                        for (int index = 0; index < offerCount; index++) {
+                                ItemStack stack = buf.readItemStack();
+                                int price = buf.readVarInt();
+                                if (!stack.isEmpty()) {
+                                        this.offers.add(new GardenShopOffer(stack, price));
+                                }
+                        }
+                        fillInventoryFromOffers();
+                }
+
                 this.inventory.onOpen(playerInventory.player);
 
-                addGardenShopInventory();
                 addPlayerInventory(playerInventory);
                 addPlayerHotbar(playerInventory);
-        }
-
-        private void addGardenShopInventory() {
-                for (int slotIndex = 0; slotIndex < GardenShopBlockEntity.INVENTORY_SIZE; ++slotIndex) {
-                        int column = slotIndex % SHOP_SLOTS_PER_ROW;
-                        int row = slotIndex / SHOP_SLOTS_PER_ROW;
-                        int x = SHOP_SLOT_START_X + column * SLOT_SIZE;
-                        int y = SHOP_SLOT_START_Y + row * SLOT_SIZE;
-                        this.addSlot(new Slot(this.inventory, slotIndex, x, y));
-                }
         }
 
         private static GardenShopBlockEntity getBlockEntity(PlayerInventory playerInventory, BlockPos pos) {
@@ -82,31 +100,15 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
         @Override
         public ItemStack quickMove(PlayerEntity player, int index) {
-                ItemStack newStack = ItemStack.EMPTY;
-                Slot slot = this.slots.get(index);
-                if (slot != null && slot.hasStack()) {
-                        ItemStack originalStack = slot.getStack();
-                        newStack = originalStack.copy();
-                        if (index < GardenShopBlockEntity.INVENTORY_SIZE) {
-                                if (!this.insertItem(originalStack, GardenShopBlockEntity.INVENTORY_SIZE, this.slots.size(), true)) {
-                                        return ItemStack.EMPTY;
-                                }
-                        } else if (!this.insertItem(originalStack, 0, GardenShopBlockEntity.INVENTORY_SIZE, false)) {
-                                return ItemStack.EMPTY;
-                        }
-
-                        if (originalStack.isEmpty()) {
-                                slot.setStack(ItemStack.EMPTY);
-                        } else {
-                                slot.markDirty();
-                        }
-                }
-
-                return newStack;
+                return ItemStack.EMPTY;
         }
 
         public Inventory getInventory() {
                 return this.inventory;
+        }
+
+        public List<GardenShopOffer> getOffers() {
+                return Collections.unmodifiableList(this.offers);
         }
 
         private void addPlayerInventory(PlayerInventory playerInventory) {
@@ -124,6 +126,13 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 for (int slot = 0; slot < HOTBAR_SLOT_COUNT; ++slot) {
                         int x = SHOP_SLOT_START_X + slot * SLOT_SIZE;
                         this.addSlot(new Slot(playerInventory, slot, x, PLAYER_HOTBAR_Y));
+                }
+        }
+
+        private void fillInventoryFromOffers() {
+                for (int index = 0; index < this.inventory.size(); index++) {
+                        ItemStack stack = index < this.offers.size() ? this.offers.get(index).createDisplayStack() : ItemStack.EMPTY;
+                        this.inventory.setStack(index, stack);
                 }
         }
 }

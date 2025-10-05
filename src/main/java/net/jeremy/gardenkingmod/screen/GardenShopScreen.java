@@ -1,15 +1,23 @@
 package net.jeremy.gardenkingmod.screen;
 
+import java.util.List;
+import java.util.Optional;
+
 import net.jeremy.gardenkingmod.GardenKingMod;
+import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 
 public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
                         "textures/gui/container/garden_shop_gui.png");
+        private static final int TEXTURE_WIDTH = 512;
+        private static final int TEXTURE_HEIGHT = 256;
 
         private static final int BACKGROUND_WIDTH = 276;
         private static final int BACKGROUND_HEIGHT = 198;
@@ -17,6 +25,44 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int PLAYER_INVENTORY_LABEL_X = 110;
         private static final int TITLE_X = 8;
         private static final int TITLE_Y = 6;
+
+        private static final int OFFERS_LABEL_X = 14;
+        private static final int OFFERS_LABEL_Y = 12;
+        private static final int BUY_LABEL_X = 208;
+        private static final int BUY_LABEL_Y = 136;
+
+        private static final int OFFER_LIST_X = 14;
+        private static final int OFFER_LIST_Y = 28;
+        private static final int OFFER_ENTRY_WIDTH = 120;
+        private static final int OFFER_ENTRY_HEIGHT = 20;
+        private static final int VISIBLE_OFFER_COUNT = 6;
+        private static final int OFFER_ITEM_OFFSET_X = 2;
+        private static final int OFFER_ITEM_OFFSET_Y = 2;
+        private static final int OFFER_PRICE_TEXT_OFFSET_X = 28;
+        private static final int OFFER_PRICE_TEXT_OFFSET_Y = 6;
+        private static final int OFFER_BACKGROUND_U = 0;
+        private static final int OFFER_BACKGROUND_V = 226;
+
+        private static final int SCROLLBAR_OFFSET_X = 138;
+        private static final int SCROLLBAR_OFFSET_Y = 28;
+        private static final int SCROLLBAR_TRACK_U = 0;
+        private static final int SCROLLBAR_TRACK_V = 199;
+        private static final int SCROLLBAR_TRACK_WIDTH = 6;
+        private static final int SCROLLBAR_TRACK_HEIGHT = 78;
+        private static final int SCROLLBAR_KNOB_U = 6;
+        private static final int SCROLLBAR_KNOB_V = 199;
+        private static final int SCROLLBAR_KNOB_WIDTH = 6;
+        private static final int SCROLLBAR_KNOB_HEIGHT = 9;
+
+        private static final int SELECTED_HIGHLIGHT_COLOR = 0x40FFFFFF;
+        private static final int HOVER_HIGHLIGHT_COLOR = 0x20000000;
+        private static final int PRICE_TEXT_COLOR = 0x3F3F3F;
+
+        private int maxScrollSteps;
+        private int scrollOffset;
+        private float scrollAmount;
+        private boolean scrollbarDragging;
+        private int selectedOffer = -1;
 
         public GardenShopScreen(GardenShopScreenHandler handler, PlayerInventory inventory, Text title) {
                 super(handler, inventory, title);
@@ -29,16 +75,29 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         @Override
-        protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-                int x = (width - backgroundWidth) / 2;
-                int y = (height - backgroundHeight) / 2;
-                context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight, 512, 256);
+        protected void init() {
+                super.init();
+                updateScrollLimits();
+        }
 
-                int scrollbarX = x + 94; // replace with the on-screen offset you measured
-                int scrollbarY = y + 16;  // replace with the on-screen offset you measured
-                context.drawTexture(TEXTURE, scrollbarX, scrollbarY, 0, 199,
-                    6, 27,          // width/height of that art slice
-                    512, 256);       // full size of the texture file
+        @Override
+        protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+                int originX = (width - backgroundWidth) / 2;
+                int originY = (height - backgroundHeight) / 2;
+                context.drawTexture(TEXTURE, originX, originY, 0, 0, backgroundWidth, backgroundHeight, TEXTURE_WIDTH,
+                                TEXTURE_HEIGHT);
+
+                drawOfferList(context, originX, originY, mouseX, mouseY);
+                drawScrollbar(context, originX, originY);
+        }
+
+        @Override
+        protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+                super.drawForeground(context, mouseX, mouseY);
+                context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.offers"), OFFERS_LABEL_X,
+                                OFFERS_LABEL_Y, 0x404040, false);
+                context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.buy_button"), BUY_LABEL_X,
+                                BUY_LABEL_Y, 0xFFFFFF, false);
         }
 
         @Override
@@ -46,5 +105,209 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 renderBackground(context);
                 super.render(context, mouseX, mouseY, delta);
                 drawMouseoverTooltip(context, mouseX, mouseY);
+        }
+
+        @Override
+        protected void drawMouseoverTooltip(DrawContext context, int mouseX, int mouseY) {
+                super.drawMouseoverTooltip(context, mouseX, mouseY);
+                getHoveredOfferStack(mouseX, mouseY)
+                                .ifPresent(stack -> context.drawItemTooltip(textRenderer, stack, mouseX, mouseY));
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                if (button == 0) {
+                        if (isPointWithinScrollbar(mouseX, mouseY)) {
+                                scrollbarDragging = true;
+                                updateScrollFromMouse(mouseY);
+                                return true;
+                        }
+
+                        int offerIndex = getOfferIndexAt(mouseX, mouseY);
+                        if (offerIndex >= 0) {
+                                selectedOffer = offerIndex;
+                                return true;
+                        }
+                }
+
+                return super.mouseClicked(mouseX, mouseY, button);
+        }
+
+        @Override
+        public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+                if (scrollbarDragging) {
+                        updateScrollFromMouse(mouseY);
+                        return true;
+                }
+                return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        }
+
+        @Override
+        public boolean mouseReleased(double mouseX, double mouseY, int button) {
+                scrollbarDragging = false;
+                return super.mouseReleased(mouseX, mouseY, button);
+        }
+
+        @Override
+        public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+                if (!canScroll()) {
+                        return super.mouseScrolled(mouseX, mouseY, amount);
+                }
+
+                float scrollDelta = (float) (amount / (double) Math.max(maxScrollSteps, 1));
+                setScrollAmount(scrollAmount - scrollDelta);
+                return true;
+        }
+
+        private void drawOfferList(DrawContext context, int originX, int originY, int mouseX, int mouseY) {
+                List<GardenShopOffer> offers = handler.getOffers();
+                int listLeft = originX + OFFER_LIST_X;
+                int listTop = originY + OFFER_LIST_Y;
+                int hoveredOffer = getOfferIndexAt(mouseX, mouseY);
+                int listHeight = VISIBLE_OFFER_COUNT * OFFER_ENTRY_HEIGHT;
+
+                context.enableScissor(listLeft, listTop, listLeft + OFFER_ENTRY_WIDTH, listTop + listHeight);
+                for (int visibleRow = 0; visibleRow < VISIBLE_OFFER_COUNT; visibleRow++) {
+                        int offerIndex = scrollOffset + visibleRow;
+                        if (offerIndex >= offers.size()) {
+                                break;
+                        }
+
+                        int entryY = listTop + visibleRow * OFFER_ENTRY_HEIGHT;
+                        context.drawTexture(TEXTURE, listLeft, entryY, OFFER_BACKGROUND_U, OFFER_BACKGROUND_V, OFFER_ENTRY_WIDTH,
+                                        OFFER_ENTRY_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+
+                        if (offerIndex == hoveredOffer) {
+                                context.fill(listLeft, entryY, listLeft + OFFER_ENTRY_WIDTH, entryY + OFFER_ENTRY_HEIGHT,
+                                                HOVER_HIGHLIGHT_COLOR);
+                        }
+
+                        if (offerIndex == selectedOffer) {
+                                context.fill(listLeft, entryY, listLeft + OFFER_ENTRY_WIDTH, entryY + OFFER_ENTRY_HEIGHT,
+                                                SELECTED_HIGHLIGHT_COLOR);
+                        }
+
+                        GardenShopOffer offer = offers.get(offerIndex);
+                        ItemStack displayStack = offer.createDisplayStack();
+                        int itemX = listLeft + OFFER_ITEM_OFFSET_X;
+                        int itemY = entryY + OFFER_ITEM_OFFSET_Y;
+                        context.drawItem(displayStack, itemX, itemY);
+                        context.drawItemInSlot(textRenderer, displayStack, itemX, itemY);
+
+                        Text priceText = Text.translatable("screen.gardenkingmod.garden_shop.price", offer.price());
+                        int textX = listLeft + OFFER_PRICE_TEXT_OFFSET_X;
+                        int textY = entryY + OFFER_PRICE_TEXT_OFFSET_Y;
+                        context.drawText(textRenderer, priceText, textX, textY, PRICE_TEXT_COLOR, false);
+                }
+                context.disableScissor();
+        }
+
+        private void drawScrollbar(DrawContext context, int originX, int originY) {
+                int scrollbarX = originX + SCROLLBAR_OFFSET_X;
+                int scrollbarY = originY + SCROLLBAR_OFFSET_Y;
+                context.drawTexture(TEXTURE, scrollbarX, scrollbarY, SCROLLBAR_TRACK_U, SCROLLBAR_TRACK_V, SCROLLBAR_TRACK_WIDTH,
+                                SCROLLBAR_TRACK_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+
+                if (!canScroll()) {
+                        int centeredY = scrollbarY + (SCROLLBAR_TRACK_HEIGHT - SCROLLBAR_KNOB_HEIGHT) / 2;
+                        context.drawTexture(TEXTURE, scrollbarX, centeredY, SCROLLBAR_KNOB_U, SCROLLBAR_KNOB_V,
+                                        SCROLLBAR_KNOB_WIDTH, SCROLLBAR_KNOB_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+                        return;
+                }
+
+                int knobTravel = SCROLLBAR_TRACK_HEIGHT - SCROLLBAR_KNOB_HEIGHT;
+                int knobY = scrollbarY + Math.round(scrollAmount * knobTravel);
+                knobY = MathHelper.clamp(knobY, scrollbarY, scrollbarY + knobTravel);
+                context.drawTexture(TEXTURE, scrollbarX, knobY, SCROLLBAR_KNOB_U, SCROLLBAR_KNOB_V, SCROLLBAR_KNOB_WIDTH,
+                                SCROLLBAR_KNOB_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        }
+
+        private boolean isPointWithinScrollbar(double mouseX, double mouseY) {
+                int originX = (width - backgroundWidth) / 2;
+                int originY = (height - backgroundHeight) / 2;
+                int scrollbarX = originX + SCROLLBAR_OFFSET_X;
+                int scrollbarY = originY + SCROLLBAR_OFFSET_Y;
+                return mouseX >= scrollbarX && mouseX < scrollbarX + SCROLLBAR_TRACK_WIDTH && mouseY >= scrollbarY
+                                && mouseY < scrollbarY + SCROLLBAR_TRACK_HEIGHT;
+        }
+
+        private void updateScrollLimits() {
+                int offerCount = handler.getOffers().size();
+                maxScrollSteps = Math.max(offerCount - VISIBLE_OFFER_COUNT, 0);
+                setScrollAmount(scrollAmount);
+                if (selectedOffer >= offerCount) {
+                        selectedOffer = offerCount - 1;
+                }
+        }
+
+        private void updateScrollFromMouse(double mouseY) {
+                int originY = (height - backgroundHeight) / 2;
+                int scrollbarY = originY + SCROLLBAR_OFFSET_Y;
+                double relativeY = mouseY - scrollbarY - (SCROLLBAR_KNOB_HEIGHT / 2.0);
+                double available = SCROLLBAR_TRACK_HEIGHT - SCROLLBAR_KNOB_HEIGHT;
+                setScrollAmount((float) (relativeY / available));
+        }
+
+        private void setScrollAmount(float amount) {
+                if (!canScroll()) {
+                        scrollAmount = 0.0F;
+                        scrollOffset = 0;
+                        return;
+                }
+
+                scrollAmount = MathHelper.clamp(amount, 0.0F, 1.0F);
+                scrollOffset = MathHelper.floor(scrollAmount * maxScrollSteps + 0.5F);
+                scrollOffset = MathHelper.clamp(scrollOffset, 0, maxScrollSteps);
+        }
+
+        private boolean canScroll() {
+                return maxScrollSteps > 0;
+        }
+
+        private int getOfferIndexAt(double mouseX, double mouseY) {
+                int originX = (width - backgroundWidth) / 2;
+                int originY = (height - backgroundHeight) / 2;
+                int listLeft = originX + OFFER_LIST_X;
+                int listTop = originY + OFFER_LIST_Y;
+
+                if (mouseX < listLeft || mouseX >= listLeft + OFFER_ENTRY_WIDTH) {
+                        return -1;
+                }
+
+                double localY = mouseY - listTop;
+                if (localY < 0.0D) {
+                        return -1;
+                }
+
+                int row = (int) (localY / OFFER_ENTRY_HEIGHT);
+                if (row < 0 || row >= VISIBLE_OFFER_COUNT) {
+                        return -1;
+                }
+
+                int offerIndex = scrollOffset + row;
+                return offerIndex < handler.getOffers().size() ? offerIndex : -1;
+        }
+
+        private Optional<ItemStack> getHoveredOfferStack(int mouseX, int mouseY) {
+                int offerIndex = getOfferIndexAt(mouseX, mouseY);
+                if (offerIndex < 0 || offerIndex >= handler.getOffers().size()) {
+                        return Optional.empty();
+                }
+
+                int originX = (width - backgroundWidth) / 2;
+                int originY = (height - backgroundHeight) / 2;
+                int itemLeft = originX + OFFER_LIST_X + OFFER_ITEM_OFFSET_X;
+                int itemTop = originY + OFFER_LIST_Y;
+                int relativeMouseY = mouseY - (originY + OFFER_LIST_Y);
+                int row = relativeMouseY / OFFER_ENTRY_HEIGHT;
+                int iconY = itemTop + row * OFFER_ENTRY_HEIGHT + OFFER_ITEM_OFFSET_Y;
+                if (mouseX < itemLeft || mouseX >= itemLeft + 16) {
+                        return Optional.empty();
+                }
+                if (mouseY < iconY || mouseY >= iconY + 16) {
+                        return Optional.empty();
+                }
+
+                return Optional.of(handler.getOffers().get(offerIndex).createDisplayStack());
         }
 }
