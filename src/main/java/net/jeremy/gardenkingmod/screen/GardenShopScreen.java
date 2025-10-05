@@ -68,6 +68,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private float scrollAmount;
         private boolean scrollbarDragging;
         private int selectedOffer = -1;
+        private int lastOfferCount = -1;
 
         public GardenShopScreen(GardenShopScreenHandler handler, PlayerInventory inventory, Text title) {
                 super(handler, inventory, title);
@@ -83,6 +84,18 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         protected void init() {
                 super.init();
                 updateScrollLimits();
+                lastOfferCount = handler.getOffers().size();
+        }
+
+        @Override
+        protected void handledScreenTick() {
+                super.handledScreenTick();
+
+                int currentOfferCount = handler.getOffers().size();
+                if (currentOfferCount != lastOfferCount) {
+                        updateScrollLimits();
+                        lastOfferCount = currentOfferCount;
+                }
         }
 
         @Override
