@@ -25,12 +25,12 @@
       "_comment": "Page 2: Weapons",
       "offers": [
         {
-          "offer": "minecraft:elytra",
-          "price": "gardenkingmod:ruby*3"
+          "offer": "gardenkingmod:obsidian_sword",
+          "price": "gardenkingmod:garden_coin*128"
         },
         {
-          "offer": "minecraft:elytra",
-          "price": "gardenkingmod:ruby*4"
+          "offer": "gardenkingmod:ruby_sword",
+          "price": "gardenkingmod:garden_coin*500"
         }
       ]
     },
