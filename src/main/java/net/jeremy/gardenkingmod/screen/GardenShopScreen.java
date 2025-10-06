@@ -16,6 +16,12 @@ import net.minecraft.util.math.MathHelper;
 public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
                         "textures/gui/container/garden_shop_gui.png");
+        private static final Identifier[] PAGE_TEXTURES = {
+                        TEXTURE,
+                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/garden_shop_gui2.png"),
+                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/garden_shop_gui3.png"),
+                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/garden_shop_gui4.png"),
+                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/garden_shop_gui5.png") };
         private static final int TEXTURE_WIDTH = 512;
         private static final int TEXTURE_HEIGHT = 256;
 
@@ -51,6 +57,21 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_ARROW_OFFSET_X = 53;
         private static final int OFFER_ARROW_OFFSET_Y = 6;
 
+        private static final int TAB_X = 0;
+        private static final int TAB_WIDTH = 24;
+        private static final int TAB_HEIGHT = 28;
+        private static final int TAB_ICON_SIZE = 16;
+        private static final int TAB_ICON_OFFSET_X = (TAB_WIDTH - TAB_ICON_SIZE) / 2;
+        private static final int TAB_ICON_OFFSET_Y = (TAB_HEIGHT - TAB_ICON_SIZE) / 2;
+        private static final int TAB_HOVER_U = 301;
+        private static final int TAB_HOVER_V = 52;
+        private static final TabDefinition[] TAB_DEFINITIONS = {
+                        new TabDefinition(16, 30, 205),
+                        new TabDefinition(46, 46, 205),
+                        new TabDefinition(76, 62, 205),
+                        new TabDefinition(106, 78, 205),
+                        new TabDefinition(136, 94, 205) };
+
         private static final int SCROLLBAR_OFFSET_X = 118;
         private static final int SCROLLBAR_OFFSET_Y = 17;
         private static final int SCROLLBAR_TRACK_WIDTH = 6;
@@ -68,6 +89,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private boolean scrollbarDragging;
         private int selectedOffer = -1;
         private int lastOfferCount = -1;
+        private int activeTab = 0;
 
         public GardenShopScreen(GardenShopScreenHandler handler, PlayerInventory inventory, Text title) {
                 super(handler, inventory, title);
@@ -101,9 +123,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
                 int originX = (width - backgroundWidth) / 2;
                 int originY = (height - backgroundHeight) / 2;
-                context.drawTexture(TEXTURE, originX, originY, 0, 0, backgroundWidth, backgroundHeight, TEXTURE_WIDTH,
+                Identifier backgroundTexture = getBackgroundTexture();
+                context.drawTexture(backgroundTexture, originX, originY, 0, 0, backgroundWidth, backgroundHeight,
+                                TEXTURE_WIDTH,
                                 TEXTURE_HEIGHT);
 
+                drawTabs(context, originX, originY, mouseX, mouseY);
                 drawOfferList(context, originX, originY, mouseX, mouseY);
                 drawScrollbar(context, originX, originY);
         }
@@ -134,6 +159,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
                 if (button == 0) {
+                        int tabIndex = getTabIndexAt(mouseX, mouseY);
+                        if (tabIndex >= 0) {
+                                setActiveTab(tabIndex);
+                                return true;
+                        }
+
                         if (isPointWithinScrollbar(mouseX, mouseY)) {
                                 scrollbarDragging = true;
                                 updateScrollFromMouse(mouseY);
@@ -287,6 +318,62 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private boolean canScroll() {
                 return maxScrollSteps > 0;
+        }
+
+        private Identifier getBackgroundTexture() {
+                int index = MathHelper.clamp(activeTab, 0, PAGE_TEXTURES.length - 1);
+                return PAGE_TEXTURES[index];
+        }
+
+        private void drawTabs(DrawContext context, int originX, int originY, int mouseX, int mouseY) {
+                int tabX = originX + TAB_X;
+                for (int i = 0; i < TAB_DEFINITIONS.length; i++) {
+                        TabDefinition definition = TAB_DEFINITIONS[i];
+                        int tabY = originY + definition.yOffset();
+                        boolean hovered = isPointWithinTab(mouseX, mouseY, tabX, tabY);
+                        boolean selected = i == activeTab;
+
+                        if (hovered || selected) {
+                                context.drawTexture(TEXTURE, tabX, tabY, TAB_HOVER_U, TAB_HOVER_V, TAB_WIDTH, TAB_HEIGHT,
+                                                TEXTURE_WIDTH, TEXTURE_HEIGHT);
+                        }
+
+                        int iconX = tabX + TAB_ICON_OFFSET_X;
+                        int iconY = tabY + TAB_ICON_OFFSET_Y;
+                        context.drawTexture(TEXTURE, iconX, iconY, definition.iconU(), definition.iconV(), TAB_ICON_SIZE,
+                                        TAB_ICON_SIZE, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+                }
+        }
+
+        private boolean isPointWithinTab(double mouseX, double mouseY, int tabX, int tabY) {
+                return mouseX >= tabX && mouseX < tabX + TAB_WIDTH && mouseY >= tabY && mouseY < tabY + TAB_HEIGHT;
+        }
+
+        private int getTabIndexAt(double mouseX, double mouseY) {
+                int originX = (width - backgroundWidth) / 2;
+                int originY = (height - backgroundHeight) / 2;
+                int tabX = originX + TAB_X;
+                for (int i = 0; i < TAB_DEFINITIONS.length; i++) {
+                        TabDefinition definition = TAB_DEFINITIONS[i];
+                        int tabY = originY + definition.yOffset();
+                        if (isPointWithinTab(mouseX, mouseY, tabX, tabY)) {
+                                return i;
+                        }
+                }
+                return -1;
+        }
+
+        private void setActiveTab(int tabIndex) {
+                int clampedIndex = MathHelper.clamp(tabIndex, 0, TAB_DEFINITIONS.length - 1);
+                if (activeTab != clampedIndex) {
+                        activeTab = clampedIndex;
+                        selectedOffer = -1;
+                        setScrollAmount(0.0F);
+                        updateScrollLimits();
+                }
+        }
+
+        private record TabDefinition(int yOffset, int iconU, int iconV) {
         }
 
         private int getOfferIndexAt(double mouseX, double mouseY) {
