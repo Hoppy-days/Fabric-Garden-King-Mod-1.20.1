@@ -1,7 +1,7 @@
 {
   "offers": [
     {
-      "offer": "croptopia:cheese",
+      "offer": "croptopia:cheese*2",
       "price": [
         "minecraft:milk_bucket",
         "croptopia:butter"
@@ -10,6 +10,44 @@
     {
       "offer": "minecraft:elytra",
       "price": "gardenkingmod:ruby*32"
+    },
+    {
+      "offer": "minecraft:elytra",
+      "price": "gardenkingmod:ruby*32"
+    },
+    {
+      "offer": "minecraft:elytra",
+      "price": "gardenkingmod:ruby*32"
+    },
+    {
+      "offer": "minecraft:elytra",
+      "price": "gardenkingmod:ruby*32"
+    },
+    {
+      "offer": "minecraft:elytra",
+      "price": "gardenkingmod:ruby*32"
+    },
+    {
+      "offer": "minecraft:elytra",
+      "price": "gardenkingmod:ruby*32"
+    },
+    {
+      "offer": "minecraft:elytra",
+      "price": "gardenkingmod:ruby*32"
+    },
+    {
+      "offer": "minecraft:elytra",
+      "price": "gardenkingmod:ruby*32"
+    },
+    {
+      "offer": "minecraft:elytra",
+      "price": "gardenkingmod:ruby*32"
+    },
+    {
+      "offer": "minecraft:elytra",
+      "price": "gardenkingmod:ruby*32"
     }
+
+
   ]
 }
