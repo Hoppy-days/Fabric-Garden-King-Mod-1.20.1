@@ -1,0 +1,68 @@
+package net.jeremy.gardenkingmod.shop;
+
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+
+/**
+ * Utility methods for working with Garden Shop item stacks that need to
+ * represent costs larger than a single vanilla stack can hold.
+ */
+public final class GardenShopStackHelper {
+    private static final String FULL_COUNT_KEY = "GardenShopFullCount";
+
+    private GardenShopStackHelper() {
+    }
+
+    /**
+     * Applies the requested count to the provided stack while preserving the
+     * full requested amount for display or validation purposes.
+     *
+     * @param stack the stack to mutate
+     * @param requestedCount the desired total count for the stack
+     */
+    public static void applyRequestedCount(ItemStack stack, int requestedCount) {
+        if (stack.isEmpty()) {
+            return;
+        }
+
+        int clamped = Math.max(1, Math.min(requestedCount, stack.getMaxCount()));
+        stack.setCount(clamped);
+        if (requestedCount > clamped) {
+            stack.getOrCreateNbt().putInt(FULL_COUNT_KEY, requestedCount);
+        } else {
+            removeFullCount(stack);
+        }
+    }
+
+    /**
+     * Returns the full requested count stored on the stack, or the vanilla
+     * stack count if no custom count is present.
+     *
+     * @param stack the stack to read
+     * @return the requested count encoded on the stack
+     */
+    public static int getRequestedCount(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return 0;
+        }
+
+        NbtCompound nbt = stack.getNbt();
+        if (nbt != null && nbt.contains(FULL_COUNT_KEY, NbtElement.NUMBER_TYPE)) {
+            return Math.max(stack.getCount(), nbt.getInt(FULL_COUNT_KEY));
+        }
+
+        return stack.getCount();
+    }
+
+    private static void removeFullCount(ItemStack stack) {
+        if (!stack.hasNbt()) {
+            return;
+        }
+
+        stack.removeSubNbt(FULL_COUNT_KEY);
+        if (stack.getNbt() != null && stack.getNbt().isEmpty()) {
+            stack.setNbt(null);
+        }
+    }
+}

@@ -240,13 +240,13 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
         if (priceElement.isJsonArray()) {
             JsonArray priceArray = priceElement.getAsJsonArray();
             for (JsonElement costElement : priceArray) {
-                ItemStack cost = parseStack(costElement, "price");
+                ItemStack cost = parseStack(costElement, "price", true);
                 if (!cost.isEmpty()) {
                     costs.add(cost);
                 }
             }
         } else {
-            ItemStack cost = parseStack(priceElement, "price");
+            ItemStack cost = parseStack(priceElement, "price", true);
             if (!cost.isEmpty()) {
                 costs.add(cost);
             }
@@ -255,8 +255,12 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
     }
 
     private ItemStack parseStack(JsonElement element, String fieldName) {
+        return parseStack(element, fieldName, false);
+    }
+
+    private ItemStack parseStack(JsonElement element, String fieldName, boolean preserveFullCount) {
         if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-            return parseDescriptor(element.getAsString().trim(), fieldName);
+            return parseDescriptor(element.getAsString().trim(), fieldName, preserveFullCount);
         }
 
         if (element.isJsonObject()) {
@@ -267,7 +271,7 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
             }
             String itemId = JsonHelper.getString(object, "item");
             int count = JsonHelper.getInt(object, "count", 1);
-            return createStack(itemId, count, fieldName);
+            return createStack(itemId, count, fieldName, preserveFullCount);
         }
 
         GardenKingMod.LOGGER.warn("Garden shop {} entry must be a string or object: {}", fieldName, element);
@@ -275,6 +279,10 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
     }
 
     private ItemStack parseDescriptor(String descriptor, String fieldName) {
+        return parseDescriptor(descriptor, fieldName, false);
+    }
+
+    private ItemStack parseDescriptor(String descriptor, String fieldName, boolean preserveFullCount) {
         if (descriptor.isEmpty()) {
             GardenKingMod.LOGGER.warn("Garden shop {} entry cannot be empty", fieldName);
             return ItemStack.EMPTY;
@@ -296,10 +304,14 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
             }
         }
 
-        return createStack(itemPart, count, fieldName);
+        return createStack(itemPart, count, fieldName, preserveFullCount);
     }
 
     private ItemStack createStack(String itemId, int count, String fieldName) {
+        return createStack(itemId, count, fieldName, false);
+    }
+
+    private ItemStack createStack(String itemId, int count, String fieldName, boolean preserveFullCount) {
         if (count <= 0) {
             GardenKingMod.LOGGER.warn("Garden shop {} entry for '{}' must specify a positive count", fieldName, itemId);
             return ItemStack.EMPTY;
@@ -317,7 +329,13 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
             return ItemStack.EMPTY;
         }
 
-        return new ItemStack(itemOptional.get(), count);
+        ItemStack stack = new ItemStack(itemOptional.get());
+        if (preserveFullCount) {
+            GardenShopStackHelper.applyRequestedCount(stack, count);
+        } else {
+            stack.setCount(Math.min(count, stack.getMaxCount()));
+        }
+        return stack;
     }
 
     private static String describeStack(ItemStack stack) {
