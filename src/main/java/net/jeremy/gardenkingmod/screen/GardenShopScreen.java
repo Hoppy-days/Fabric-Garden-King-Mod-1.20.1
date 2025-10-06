@@ -281,10 +281,14 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
 
                 String text = Integer.toString(count);
+                int textWidth = textRenderer.getWidth(text);
+                int singleDigitWidth = textRenderer.getWidth("0");
+                int extraOffset = Math.max(0, Math.round((textWidth - singleDigitWidth) / 2.0f));
+
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
                 matrices.translate(0.0F, 0.0F, 200.0F);
-                context.drawTextWithShadow(textRenderer, text, x + 19 - textRenderer.getWidth(text), y + 6, 0xFFFFFF);
+                context.drawTextWithShadow(textRenderer, text, x + 19 - textWidth + extraOffset, y + 6, 0xFFFFFF);
                 matrices.pop();
         }
 
