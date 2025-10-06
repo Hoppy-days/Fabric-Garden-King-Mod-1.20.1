@@ -35,7 +35,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_LIST_Y = 17;
         private static final int OFFER_ENTRY_WIDTH = 88;
         private static final int OFFER_ENTRY_HEIGHT = 20;
-        private static final int MAX_VISIBLE_OFFERS = (PLAYER_INVENTORY_LABEL_Y - OFFER_LIST_Y) / OFFER_ENTRY_HEIGHT;
+        private static final int OFFER_LIST_HEIGHT = 173;
+        private static final int MAX_VISIBLE_OFFERS = OFFER_LIST_HEIGHT / OFFER_ENTRY_HEIGHT;
         private static final int OFFER_ITEM_OFFSET_Y = 2;
         private static final int OFFER_COST_ITEM_OFFSET_X = 6;
         private static final int OFFER_COST_ITEM_SPACING = 18;
@@ -53,7 +54,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int SCROLLBAR_OFFSET_X = 94;
         private static final int SCROLLBAR_OFFSET_Y = 17;
         private static final int SCROLLBAR_TRACK_WIDTH = 6;
-        private static final int SCROLLBAR_TRACK_HEIGHT = 78;
+        private static final int SCROLLBAR_TRACK_HEIGHT = OFFER_LIST_HEIGHT;
         private static final int SCROLLBAR_KNOB_U = 0;
         private static final int SCROLLBAR_KNOB_V = 200;
         private static final int SCROLLBAR_KNOB_WIDTH = 6;
