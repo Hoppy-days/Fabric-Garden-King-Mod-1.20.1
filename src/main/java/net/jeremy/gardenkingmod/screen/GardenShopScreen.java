@@ -9,6 +9,7 @@ import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -280,7 +281,11 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
 
                 String text = Integer.toString(count);
+                MatrixStack matrices = context.getMatrices();
+                matrices.push();
+                matrices.translate(0.0F, 0.0F, 200.0F);
                 context.drawTextWithShadow(textRenderer, text, x + 19 - textRenderer.getWidth(text), y + 6, 0xFFFFFF);
+                matrices.pop();
         }
 
         private void drawCostTooltip(DrawContext context, ItemStack stack, int mouseX, int mouseY) {
