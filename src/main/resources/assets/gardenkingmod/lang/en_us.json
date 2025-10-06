@@ -44,6 +44,7 @@
   "screen.gardenkingmod.garden_shop.offers": "OFFERS",
   "screen.gardenkingmod.garden_shop.buy_button": "BUY",
   "screen.gardenkingmod.garden_shop.price": "%s Garden Coins",
+  "screen.gardenkingmod.garden_shop.cost_count": "%s required",
   "tooltip.gardenkingmod.crop_tier": "Tier: %s",
   "tooltip.gardenkingmod.built_in_fortune": "Built-in %s %s",
   "tooltip.gardenkingmod.crop_tier.tier_1": "Tier 1",

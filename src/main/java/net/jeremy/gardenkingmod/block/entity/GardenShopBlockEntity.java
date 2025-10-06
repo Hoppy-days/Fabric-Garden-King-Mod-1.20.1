@@ -9,6 +9,7 @@ import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.screen.GardenShopScreenHandler;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.jeremy.gardenkingmod.shop.GardenShopOfferManager;
+import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -313,7 +314,11 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
 
     private ItemStack createStack(Identifier itemId, int count) {
         return Registries.ITEM.getOrEmpty(itemId)
-                .map(item -> new ItemStack(item, count))
+                .map(item -> {
+                    ItemStack stack = new ItemStack(item);
+                    GardenShopStackHelper.applyRequestedCount(stack, count);
+                    return stack;
+                })
                 .orElse(ItemStack.EMPTY);
     }
 }

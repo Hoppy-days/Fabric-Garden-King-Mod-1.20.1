@@ -1,10 +1,12 @@
 package net.jeremy.gardenkingmod.screen;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
+import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -152,8 +154,14 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         @Override
         protected void drawMouseoverTooltip(DrawContext context, int mouseX, int mouseY) {
                 super.drawMouseoverTooltip(context, mouseX, mouseY);
-                getHoveredOfferStack(mouseX, mouseY)
-                                .ifPresent(stack -> context.drawItemTooltip(textRenderer, stack, mouseX, mouseY));
+                getHoveredOfferStack(mouseX, mouseY).ifPresent(hovered -> {
+                        ItemStack stack = hovered.stack();
+                        if (hovered.isCostStack()) {
+                                drawCostTooltip(context, stack, mouseX, mouseY);
+                        } else {
+                                context.drawTooltip(textRenderer, getTooltipFromItem(stack), mouseX, mouseY);
+                        }
+                });
         }
 
         @Override
@@ -245,8 +253,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                         break;
                                 }
                                 ItemStack costStack = costStacks.get(costIndex);
-                                context.drawItem(costStack, costX, itemY);
-                                context.drawItemInSlot(textRenderer, costStack, costX, itemY);
+                                drawCostStack(context, costStack, costX, itemY);
                         }
 
                         int arrowY = entryY + OFFER_ARROW_OFFSET_Y;
@@ -259,6 +266,30 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         context.drawItemInSlot(textRenderer, displayStack, resultX, itemY);
                 }
                 context.disableScissor();
+        }
+
+        private void drawCostStack(DrawContext context, ItemStack stack, int x, int y) {
+                context.drawItem(stack, x, y);
+                drawStackCountOverlay(context, stack, x, y);
+        }
+
+        private void drawStackCountOverlay(DrawContext context, ItemStack stack, int x, int y) {
+                int count = GardenShopStackHelper.getRequestedCount(stack);
+                if (count <= 1) {
+                        return;
+                }
+
+                String text = Integer.toString(count);
+                context.drawTextWithShadow(textRenderer, text, x + 19 - textRenderer.getWidth(text), y + 6, 0xFFFFFF);
+        }
+
+        private void drawCostTooltip(DrawContext context, ItemStack stack, int mouseX, int mouseY) {
+                List<Text> tooltip = new ArrayList<>(getTooltipFromItem(stack));
+                int requested = GardenShopStackHelper.getRequestedCount(stack);
+                if (requested > stack.getCount()) {
+                        tooltip.add(Text.translatable("screen.gardenkingmod.garden_shop.cost_count", requested));
+                }
+                context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
         }
 
         private void drawScrollbar(DrawContext context, int originX, int originY) {
@@ -402,7 +433,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 return offerIndex < getOffersForActiveTab().size() ? offerIndex : -1;
         }
 
-        private Optional<ItemStack> getHoveredOfferStack(int mouseX, int mouseY) {
+        private Optional<HoveredStack> getHoveredOfferStack(int mouseX, int mouseY) {
                 int offerIndex = getOfferIndexAt(mouseX, mouseY);
                 List<GardenShopOffer> offers = getOffersForActiveTab();
                 if (offerIndex < 0 || offerIndex >= offers.size()) {
@@ -440,13 +471,13 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 break;
                         }
                         if (mouseX >= costX && mouseX < costX + 16) {
-                                return Optional.of(costStacks.get(costIndex).copy());
+                                return Optional.of(new HoveredStack(costStacks.get(costIndex).copy(), true));
                         }
                 }
 
                 int resultLeft = listLeft + OFFER_RESULT_ITEM_OFFSET_X;
                 if (mouseX >= resultLeft && mouseX < resultLeft + 16) {
-                        return Optional.of(offer.copyResultStack());
+                        return Optional.of(new HoveredStack(offer.copyResultStack(), false));
                 }
 
                 return Optional.empty();
@@ -454,5 +485,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private List<GardenShopOffer> getOffersForActiveTab() {
                 return handler.getOffers(activeTab);
+        }
+
+        private record HoveredStack(ItemStack stack, boolean isCostStack) {
         }
 }
