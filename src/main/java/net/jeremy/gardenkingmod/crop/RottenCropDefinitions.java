@@ -29,6 +29,7 @@ import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.jeremy.gardenkingmod.GardenKingMod;
+import net.jeremy.gardenkingmod.util.JsonCommentHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -197,7 +198,8 @@ public final class RottenCropDefinitions {
                 List<RottenCropDefinition> definitions = new ArrayList<>();
 
                 JsonElement root = JsonParser.parseReader(reader);
-                JsonArray entries = extractEntriesArray(root);
+                JsonElement sanitized = JsonCommentHelper.sanitize(root);
+                JsonArray entries = extractEntriesArray(sanitized);
                 if (entries == null) {
                         GardenKingMod.LOGGER.warn("Expected an array of rotten crop entries in {}.", RESOURCE_PATH);
                         return List.of();

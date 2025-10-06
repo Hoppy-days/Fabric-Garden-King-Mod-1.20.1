@@ -18,6 +18,7 @@ import com.google.gson.JsonParser;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
+import net.jeremy.gardenkingmod.util.JsonCommentHelper;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -97,8 +98,9 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
         try (InputStream stream = resourceOptional.get().getInputStream();
              BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             JsonElement root = JsonParser.parseReader(reader);
-            if (root.isJsonObject()) {
-                JsonObject rootObject = root.getAsJsonObject();
+            JsonElement sanitized = JsonCommentHelper.sanitize(root);
+            if (sanitized.isJsonObject()) {
+                JsonObject rootObject = sanitized.getAsJsonObject();
                 if (rootObject.has("pages")) {
                     parsePagesArray(rootObject.get("pages"), loadedPages);
                 } else if (rootObject.has("offers")) {
@@ -110,8 +112,8 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
                         loadedPages.add(List.of(single));
                     }
                 }
-            } else if (root.isJsonArray()) {
-                List<GardenShopOffer> page = parseOffersArray(root, "root array");
+            } else if (sanitized.isJsonArray()) {
+                List<GardenShopOffer> page = parseOffersArray(sanitized, "root array");
                 loadedPages.add(List.copyOf(page));
             } else {
                 GardenKingMod.LOGGER.warn("garden_shop_offers.json must contain an array of offers");
