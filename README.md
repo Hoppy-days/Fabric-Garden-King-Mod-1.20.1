@@ -2,7 +2,7 @@
 
 ## Bonus harvest drops
 
-Garden King now loads bonus crop drop definitions from JSON files under `data/gardenkingmod/bonus_harvest_drops/`. Each file maps a crop block or direct loot table identifier to one or more bonus entries with an `item`, `chance`, and integer `count` range. The new [`wheat_diamonds.json`](src/main/resources/data/gardenkingmod/bonus_harvest_drops/wheat_diamonds.json) file, for example, grants wheat a 5% chance to drop 1–3 diamonds when harvested.
+Garden King now loads bonus crop drop definitions from JSON files under `data/gardenkingmod/bonus_harvest_drops/`. Each file maps a crop block or direct loot table identifier to one or more bonus entries with an `item`, `chance`, and integer `count` range. All of the project's data-driven loaders strip any field named `_comment`, so you can document bonus drops, garden shop offers, or rotten crop definitions with entries such as `"_comment": "This is a general comment about the file."` anywhere in the JSON tree. The new [`wheat_diamonds.json`](src/main/resources/data/gardenkingmod/bonus_harvest_drops/wheat_diamonds.json) file, for example, grants wheat a 5% chance to drop 1–3 diamonds when harvested.
 
 ### Creating event packs
 
@@ -46,14 +46,17 @@ Crow models, textures, and other assets follow the same conventions as the rest 
 
 The garden shop's inventory is now data-driven. All default trades live in
 [`data/gardenkingmod/garden_shop_offers.json`](src/main/resources/data/gardenkingmod/garden_shop_offers.json), which groups
-offers by UI tab through a `pages` array:
+offers by UI tab through a `pages` array. Use `_comment` fields at the root, page, or offer level to label long files without affecting parsing:
 
 ```json
 {
+  "_comment": "Starter inventory for the travelling gardener.",
   "pages": [
     {
+      "_comment": "Page 1: equipment",
       "offers": [
         {
+          "_comment": "Keep the elytra trade near the top for visibility.",
           "offer": "minecraft:elytra",
           "price": "gardenkingmod:ruby*32"
         }

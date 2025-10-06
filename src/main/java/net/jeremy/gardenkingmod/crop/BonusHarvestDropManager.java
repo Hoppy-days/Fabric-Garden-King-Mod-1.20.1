@@ -29,6 +29,8 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.profiler.DummyProfiler;
 import net.minecraft.util.profiler.Profiler;
 
+import net.jeremy.gardenkingmod.util.JsonCommentHelper;
+
 /**
  * Loads bonus harvest drop definitions from JSON files so datapacks can
  * dynamically reconfigure seasonal events without code changes.
@@ -113,7 +115,7 @@ public final class BonusHarvestDropManager extends JsonDataLoader implements Ide
 
                 for (Map.Entry<Identifier, JsonElement> entry : prepared.entrySet()) {
                         Identifier fileId = entry.getKey();
-                        JsonElement json = entry.getValue();
+                        JsonElement json = JsonCommentHelper.sanitize(entry.getValue());
 
                         if (!json.isJsonObject()) {
                                 GardenKingMod.LOGGER.warn("Ignoring bonus harvest drops at {} because it is not a JSON object", fileId);
@@ -165,6 +167,9 @@ public final class BonusHarvestDropManager extends JsonDataLoader implements Ide
                         }
 
                         JsonObject entryObject = element.getAsJsonObject();
+                        if (entryObject.entrySet().isEmpty()) {
+                                continue;
+                        }
                         try {
                                 String itemIdString = JsonHelper.getString(entryObject, "item");
                                 Identifier itemId = parseIdentifier(itemIdString, fileId);
