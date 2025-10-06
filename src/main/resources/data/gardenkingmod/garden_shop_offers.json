@@ -1,53 +1,71 @@
 {
-  "offers": [
+  "pages": [
     {
-      "offer": "croptopia:cheese*2",
-      "price": [
-        "minecraft:milk_bucket",
-        "croptopia:butter"
+      "offers": [
+        {
+          "offer": "croptopia:cheese*2",
+          "price": [
+            "minecraft:milk_bucket",
+            "croptopia:butter"
+          ]
+        },
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*1"
+        },
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*2"
+        }
       ]
     },
     {
-      "offer": "minecraft:elytra",
-      "price": "gardenkingmod:ruby*1"
+      "offers": [
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*3"
+        },
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*4"
+        }
+      ]
     },
     {
-      "offer": "minecraft:elytra",
-      "price": "gardenkingmod:ruby*2"
+      "offers": [
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*5"
+        },
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*6"
+        }
+      ]
     },
     {
-      "offer": "minecraft:elytra",
-      "price": "gardenkingmod:ruby*3"
+      "offers": [
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*7"
+        },
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*8"
+        }
+      ]
     },
     {
-      "offer": "minecraft:elytra",
-      "price": "gardenkingmod:ruby*4"
-    },
-    {
-      "offer": "minecraft:elytra",
-      "price": "gardenkingmod:ruby*5"
-    },
-    {
-      "offer": "minecraft:elytra",
-      "price": "gardenkingmod:ruby*6"
-    },
-    {
-      "offer": "minecraft:elytra",
-      "price": "gardenkingmod:ruby*7"
-    },
-    {
-      "offer": "minecraft:elytra",
-      "price": "gardenkingmod:ruby*8"
-    },
-    {
-      "offer": "minecraft:elytra",
-      "price": "gardenkingmod:ruby*9"
-    },
-    {
-      "offer": "minecraft:elytra",
-      "price": "gardenkingmod:ruby*10"
+      "offers": [
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*9"
+        },
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*10"
+        }
+      ]
     }
-
-
   ]
 }

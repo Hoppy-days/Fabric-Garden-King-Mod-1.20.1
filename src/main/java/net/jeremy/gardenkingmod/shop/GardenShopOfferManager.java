@@ -36,7 +36,9 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
     private static final Identifier OFFERS_FILE = new Identifier(GardenKingMod.MOD_ID, "garden_shop_offers.json");
     private static final GardenShopOfferManager INSTANCE = new GardenShopOfferManager();
 
-    private volatile List<GardenShopOffer> offers = List.of();
+    private static final int MAX_SUPPORTED_PAGES = 5;
+
+    private volatile List<List<GardenShopOffer>> pages = List.of();
 
     private GardenShopOfferManager() {
     }
@@ -46,7 +48,32 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
     }
 
     public List<GardenShopOffer> getOffers() {
-        return offers;
+        if (pages.isEmpty()) {
+            return List.of();
+        }
+
+        List<GardenShopOffer> flattened = new ArrayList<>();
+        for (List<GardenShopOffer> page : pages) {
+            flattened.addAll(page);
+        }
+
+        return List.copyOf(flattened);
+    }
+
+    public List<List<GardenShopOffer>> getOfferPages() {
+        return pages;
+    }
+
+    public List<GardenShopOffer> getOffersForPage(int pageIndex) {
+        if (pageIndex < 0 || pageIndex >= pages.size()) {
+            return List.of();
+        }
+
+        return pages.get(pageIndex);
+    }
+
+    public int getPageCount() {
+        return pages.size();
     }
 
     @Override
@@ -56,32 +83,36 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
 
     @Override
     public void reload(ResourceManager manager) {
-        offers = loadOffers(manager);
+        pages = loadOfferPages(manager);
     }
 
-    private List<GardenShopOffer> loadOffers(ResourceManager manager) {
+    private List<List<GardenShopOffer>> loadOfferPages(ResourceManager manager) {
         Optional<Resource> resourceOptional = manager.getResource(OFFERS_FILE);
         if (resourceOptional.isEmpty()) {
             GardenKingMod.LOGGER.warn("No garden shop offer file found at {}", OFFERS_FILE);
             return List.of();
         }
 
-        List<GardenShopOffer> loaded = new ArrayList<>();
+        List<List<GardenShopOffer>> loadedPages = new ArrayList<>();
         try (InputStream stream = resourceOptional.get().getInputStream();
              BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             JsonElement root = JsonParser.parseReader(reader);
             if (root.isJsonObject()) {
                 JsonObject rootObject = root.getAsJsonObject();
-                if (rootObject.has("offers")) {
-                    parseOffersArray(rootObject.get("offers"), loaded);
+                if (rootObject.has("pages")) {
+                    parsePagesArray(rootObject.get("pages"), loadedPages);
+                } else if (rootObject.has("offers")) {
+                    List<GardenShopOffer> page = parseOffersArray(rootObject.get("offers"), "root offers");
+                    loadedPages.add(List.copyOf(page));
                 } else {
-                    GardenShopOffer single = parseOfferObject(rootObject);
+                    GardenShopOffer single = parseOfferObject(rootObject, "root object");
                     if (single != null) {
-                        loaded.add(single);
+                        loadedPages.add(List.of(single));
                     }
                 }
             } else if (root.isJsonArray()) {
-                parseOffersArray(root, loaded);
+                List<GardenShopOffer> page = parseOffersArray(root, "root array");
+                loadedPages.add(List.copyOf(page));
             } else {
                 GardenKingMod.LOGGER.warn("garden_shop_offers.json must contain an array of offers");
             }
@@ -89,36 +120,91 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
             GardenKingMod.LOGGER.error("Failed to load garden shop offers", exception);
         }
 
-        if (loaded.isEmpty()) {
+        if (loadedPages.size() > MAX_SUPPORTED_PAGES) {
+            GardenKingMod.LOGGER.warn(
+                    "Garden shop defines {} pages but the UI only exposes the first {} tabs", loadedPages.size(),
+                    MAX_SUPPORTED_PAGES);
+            loadedPages = loadedPages.subList(0, MAX_SUPPORTED_PAGES);
+        }
+
+        if (loadedPages.isEmpty()) {
             return List.of();
         }
 
-        return List.copyOf(loaded);
+        List<List<GardenShopOffer>> immutablePages = new ArrayList<>(loadedPages.size());
+        for (List<GardenShopOffer> page : loadedPages) {
+            immutablePages.add(List.copyOf(page));
+        }
+        return List.copyOf(immutablePages);
     }
 
-    private void parseOffersArray(JsonElement element, List<GardenShopOffer> destination) {
+    private void parsePagesArray(JsonElement element, List<List<GardenShopOffer>> destination) {
         if (!element.isJsonArray()) {
-            GardenKingMod.LOGGER.warn("Expected an array of offers in garden_shop_offers.json");
+            GardenKingMod.LOGGER.warn("Expected an array of pages in garden_shop_offers.json");
             return;
         }
 
-        JsonArray offersArray = element.getAsJsonArray();
-        for (JsonElement offerElement : offersArray) {
-            if (!offerElement.isJsonObject()) {
-                GardenKingMod.LOGGER.warn("Skipping malformed garden shop offer entry: {}", offerElement);
-                continue;
-            }
-
-            GardenShopOffer offer = parseOfferObject(offerElement.getAsJsonObject());
-            if (offer != null) {
-                destination.add(offer);
+        JsonArray pagesArray = element.getAsJsonArray();
+        for (int pageIndex = 0; pageIndex < pagesArray.size(); pageIndex++) {
+            JsonElement pageElement = pagesArray.get(pageIndex);
+            List<GardenShopOffer> pageOffers = parsePageElement(pageElement, pageIndex);
+            if (pageOffers != null) {
+                destination.add(pageOffers);
             }
         }
     }
 
-    private GardenShopOffer parseOfferObject(JsonObject object) {
+    private List<GardenShopOffer> parsePageElement(JsonElement pageElement, int pageIndex) {
+        String context = "page " + (pageIndex + 1);
+        if (pageElement.isJsonObject()) {
+            JsonObject object = pageElement.getAsJsonObject();
+            if (object.has("offers")) {
+                return List.copyOf(parseOffersArray(object.get("offers"), context));
+            }
+
+            GardenShopOffer single = parseOfferObject(object, context + " object");
+            if (single != null) {
+                return List.of(single);
+            }
+            return List.of();
+        }
+
+        if (pageElement.isJsonArray()) {
+            return List.copyOf(parseOffersArray(pageElement, context));
+        }
+
+        GardenKingMod.LOGGER.warn("Skipping malformed garden shop page entry at {}: {}", context, pageElement);
+        return null;
+    }
+
+    private List<GardenShopOffer> parseOffersArray(JsonElement element, String context) {
+        if (!element.isJsonArray()) {
+            GardenKingMod.LOGGER.warn("Expected an array of offers {} in garden_shop_offers.json", context);
+            return List.of();
+        }
+
+        List<GardenShopOffer> offers = new ArrayList<>();
+        JsonArray offersArray = element.getAsJsonArray();
+        for (int index = 0; index < offersArray.size(); index++) {
+            JsonElement offerElement = offersArray.get(index);
+            if (!offerElement.isJsonObject()) {
+                GardenKingMod.LOGGER.warn("Skipping malformed garden shop offer entry {} #{}: {}", context, index + 1,
+                        offerElement);
+                continue;
+            }
+
+            GardenShopOffer offer = parseOfferObject(offerElement.getAsJsonObject(), context + " offer " + (index + 1));
+            if (offer != null) {
+                offers.add(offer);
+            }
+        }
+
+        return offers;
+    }
+
+    private GardenShopOffer parseOfferObject(JsonObject object, String context) {
         if (!object.has("offer")) {
-            GardenKingMod.LOGGER.warn("Garden shop offer entry is missing an 'offer' field: {}", object);
+            GardenKingMod.LOGGER.warn("Garden shop offer {} is missing an 'offer' field: {}", context, object);
             return null;
         }
 
@@ -128,17 +214,23 @@ public final class GardenShopOfferManager implements SimpleSynchronousResourceRe
         }
 
         if (!object.has("price")) {
-            GardenKingMod.LOGGER.warn("Garden shop offer entry for {} is missing a 'price' field", describeStack(result));
+            GardenKingMod.LOGGER.warn("Garden shop offer {} for {} is missing a 'price' field", context,
+                    describeStack(result));
             return null;
         }
 
         List<ItemStack> costs = parsePrice(object.get("price"));
         if (costs.isEmpty()) {
-            GardenKingMod.LOGGER.warn("Garden shop offer entry for {} has no valid price entries", describeStack(result));
+            GardenKingMod.LOGGER.warn("Garden shop offer {} for {} has no valid price entries", context,
+                    describeStack(result));
             return null;
         }
 
         return GardenShopOffer.of(result, costs);
+    }
+
+    private GardenShopOffer parseOfferObject(JsonObject object) {
+        return parseOfferObject(object, "entry");
     }
 
     private List<ItemStack> parsePrice(JsonElement priceElement) {

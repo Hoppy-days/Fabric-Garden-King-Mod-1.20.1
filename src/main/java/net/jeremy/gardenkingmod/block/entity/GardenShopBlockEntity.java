@@ -17,7 +17,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
@@ -34,10 +33,12 @@ import net.minecraft.util.Identifier;
 public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
     public static final int INVENTORY_SIZE = 27;
     private static final String OFFERS_KEY = "Offers";
+    private static final String OFFER_PAGES_KEY = "OfferPages";
     private static final String OFFER_RESULT_KEY = "Result";
     private static final String OFFER_COSTS_KEY = "Costs";
     private DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
-    private final List<GardenShopOffer> offers = new ArrayList<>();
+    private final List<List<GardenShopOffer>> offersByPage = new ArrayList<>();
+    private final List<GardenShopOffer> flattenedOffers = new ArrayList<>();
 
         public GardenShopBlockEntity(BlockPos pos, BlockState state) {
                 super(ModBlockEntities.GARDEN_SHOP_BLOCK_ENTITY, pos, state);
@@ -47,13 +48,16 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         ensureOffers();
         buf.writeBlockPos(getPos());
-        buf.writeVarInt(offers.size());
-        for (GardenShopOffer offer : offers) {
-            buf.writeItemStack(offer.copyResultStack());
-            List<ItemStack> costs = offer.copyCostStacks();
-            buf.writeVarInt(costs.size());
-            for (ItemStack cost : costs) {
-                buf.writeItemStack(cost);
+        buf.writeVarInt(offersByPage.size());
+        for (List<GardenShopOffer> page : offersByPage) {
+            buf.writeVarInt(page.size());
+            for (GardenShopOffer offer : page) {
+                buf.writeItemStack(offer.copyResultStack());
+                List<ItemStack> costs = offer.copyCostStacks();
+                buf.writeVarInt(costs.size());
+                for (ItemStack cost : costs) {
+                    buf.writeItemStack(cost);
+                }
             }
         }
     }
@@ -160,15 +164,20 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         syncItemsFromOffers();
         Inventories.writeNbt(nbt, items);
         NbtList offerList = new NbtList();
-        for (GardenShopOffer offer : offers) {
-            NbtCompound offerNbt = new NbtCompound();
-            offerNbt.put(OFFER_RESULT_KEY, offer.copyResultStack().writeNbt(new NbtCompound()));
-            NbtList costsList = new NbtList();
-            for (ItemStack cost : offer.copyCostStacks()) {
-                costsList.add(cost.writeNbt(new NbtCompound()));
+        NbtList pagesList = new NbtList();
+        for (List<GardenShopOffer> page : offersByPage) {
+            NbtCompound pageNbt = new NbtCompound();
+            NbtList pageOffers = new NbtList();
+            for (GardenShopOffer offer : page) {
+                NbtCompound offerNbt = writeOfferNbt(offer);
+                pageOffers.add(offerNbt.copy());
+                offerList.add(offerNbt);
             }
-            offerNbt.put(OFFER_COSTS_KEY, costsList);
-            offerList.add(offerNbt);
+            pageNbt.put(OFFERS_KEY, pageOffers);
+            pagesList.add(pageNbt);
+        }
+        if (!pagesList.isEmpty()) {
+            nbt.put(OFFER_PAGES_KEY, pagesList);
         }
         nbt.put(OFFERS_KEY, offerList);
     }
@@ -178,61 +187,128 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         super.readNbt(nbt);
         items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
         Inventories.readNbt(nbt, items);
-        offers.clear();
-        if (nbt.contains(OFFERS_KEY, NbtElement.LIST_TYPE)) {
-            NbtList offerList = nbt.getList(OFFERS_KEY, NbtElement.COMPOUND_TYPE);
-            for (int index = 0; index < offerList.size(); index++) {
-                NbtCompound offerNbt = offerList.getCompound(index);
-                if (!offerNbt.contains(OFFER_RESULT_KEY, NbtElement.COMPOUND_TYPE)) {
-                    continue;
-                }
+        offersByPage.clear();
+        if (nbt.contains(OFFER_PAGES_KEY, NbtElement.LIST_TYPE)) {
+            NbtList pagesList = nbt.getList(OFFER_PAGES_KEY, NbtElement.COMPOUND_TYPE);
+            for (int pageIndex = 0; pageIndex < pagesList.size(); pageIndex++) {
+                NbtCompound pageNbt = pagesList.getCompound(pageIndex);
+                List<GardenShopOffer> pageOffers = readOffersFromNbt(pageNbt.getList(OFFERS_KEY, NbtElement.COMPOUND_TYPE));
+                offersByPage.add(pageOffers);
+            }
+        }
 
-                ItemStack result = ItemStack.fromNbt(offerNbt.getCompound(OFFER_RESULT_KEY));
-                if (result.isEmpty()) {
-                    continue;
-                }
-
-                List<ItemStack> costs = new ArrayList<>();
-                if (offerNbt.contains(OFFER_COSTS_KEY, NbtElement.LIST_TYPE)) {
-                    NbtList costsList = offerNbt.getList(OFFER_COSTS_KEY, NbtElement.COMPOUND_TYPE);
-                    for (int costIndex = 0; costIndex < costsList.size(); costIndex++) {
-                        ItemStack costStack = ItemStack.fromNbt(costsList.getCompound(costIndex));
-                        if (!costStack.isEmpty()) {
-                            costs.add(costStack);
-                        }
-                    }
-                }
-
-                offers.add(GardenShopOffer.of(result, costs));
+        if (offersByPage.isEmpty() && nbt.contains(OFFERS_KEY, NbtElement.LIST_TYPE)) {
+            List<GardenShopOffer> legacyOffers = readOffersFromNbt(nbt.getList(OFFERS_KEY, NbtElement.COMPOUND_TYPE));
+            if (!legacyOffers.isEmpty()) {
+                offersByPage.add(legacyOffers);
             }
         }
         syncItemsFromOffers();
     }
 
     public List<GardenShopOffer> getOffers() {
-        return Collections.unmodifiableList(offers);
+        return Collections.unmodifiableList(flattenedOffers);
+    }
+
+    public List<GardenShopOffer> getOffersForPage(int pageIndex) {
+        if (pageIndex < 0 || pageIndex >= offersByPage.size()) {
+            return List.of();
+        }
+
+        return Collections.unmodifiableList(offersByPage.get(pageIndex));
+    }
+
+    public List<List<GardenShopOffer>> getOfferPages() {
+        List<List<GardenShopOffer>> snapshot = new ArrayList<>(offersByPage.size());
+        for (List<GardenShopOffer> page : offersByPage) {
+            snapshot.add(List.copyOf(page));
+        }
+        return List.copyOf(snapshot);
+    }
+
+    public int getPageCount() {
+        return offersByPage.size();
     }
 
     public void ensureOffers() {
-        List<GardenShopOffer> configuredOffers = GardenShopOfferManager.getInstance().getOffers();
-        if (offers.equals(configuredOffers)) {
+        List<List<GardenShopOffer>> configuredPages = GardenShopOfferManager.getInstance().getOfferPages();
+        if (offersMatch(configuredPages)) {
             syncItemsFromOffers();
             return;
         }
 
-        offers.clear();
-        offers.addAll(configuredOffers);
+        offersByPage.clear();
+        for (List<GardenShopOffer> page : configuredPages) {
+            offersByPage.add(new ArrayList<>(page));
+        }
         syncItemsFromOffers();
         markDirty();
     }
 
     private void syncItemsFromOffers() {
+        flattenedOffers.clear();
+        for (List<GardenShopOffer> page : offersByPage) {
+            flattenedOffers.addAll(page);
+        }
+
         for (int index = 0; index < items.size(); index++) {
-            items.set(index, ItemStack.EMPTY);
+            ItemStack stack = index < flattenedOffers.size() ? flattenedOffers.get(index).copyResultStack() : ItemStack.EMPTY;
+            items.set(index, stack);
         }
-        for (int index = 0; index < offers.size() && index < items.size(); index++) {
-            items.set(index, offers.get(index).copyResultStack());
+    }
+
+    private boolean offersMatch(List<List<GardenShopOffer>> configuredPages) {
+        if (offersByPage.size() != configuredPages.size()) {
+            return false;
         }
+
+        for (int index = 0; index < offersByPage.size(); index++) {
+            if (!offersByPage.get(index).equals(configuredPages.get(index))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private NbtCompound writeOfferNbt(GardenShopOffer offer) {
+        NbtCompound offerNbt = new NbtCompound();
+        offerNbt.put(OFFER_RESULT_KEY, offer.copyResultStack().writeNbt(new NbtCompound()));
+        NbtList costsList = new NbtList();
+        for (ItemStack cost : offer.copyCostStacks()) {
+            costsList.add(cost.writeNbt(new NbtCompound()));
+        }
+        offerNbt.put(OFFER_COSTS_KEY, costsList);
+        return offerNbt;
+    }
+
+    private List<GardenShopOffer> readOffersFromNbt(NbtList list) {
+        List<GardenShopOffer> offers = new ArrayList<>();
+        for (int index = 0; index < list.size(); index++) {
+            NbtCompound offerNbt = list.getCompound(index);
+            if (!offerNbt.contains(OFFER_RESULT_KEY, NbtElement.COMPOUND_TYPE)) {
+                continue;
+            }
+
+            ItemStack result = ItemStack.fromNbt(offerNbt.getCompound(OFFER_RESULT_KEY));
+            if (result.isEmpty()) {
+                continue;
+            }
+
+            List<ItemStack> costs = new ArrayList<>();
+            if (offerNbt.contains(OFFER_COSTS_KEY, NbtElement.LIST_TYPE)) {
+                NbtList costsList = offerNbt.getList(OFFER_COSTS_KEY, NbtElement.COMPOUND_TYPE);
+                for (int costIndex = 0; costIndex < costsList.size(); costIndex++) {
+                    ItemStack costStack = ItemStack.fromNbt(costsList.getCompound(costIndex));
+                    if (!costStack.isEmpty()) {
+                        costs.add(costStack);
+                    }
+                }
+            }
+
+            offers.add(GardenShopOffer.of(result, costs));
+        }
+        return offers;
     }
 
     private ItemStack createStack(Identifier itemId, int count) {

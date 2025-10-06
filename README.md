@@ -45,35 +45,39 @@ Crow models, textures, and other assets follow the same conventions as the rest 
 ## Garden shop trades
 
 The garden shop's inventory is now data-driven. All default trades live in
-[`data/gardenkingmod/garden_shop_offers.json`](src/main/resources/data/gardenkingmod/garden_shop_offers.json), so you can add
-new entries without touching Java code. Each entry follows a simple "offer / price" layout:
+[`data/gardenkingmod/garden_shop_offers.json`](src/main/resources/data/gardenkingmod/garden_shop_offers.json), which groups
+offers by UI tab through a `pages` array:
 
 ```json
 {
-  "offer": "minecraft:elytra",
-  "price": "gardenkingmod:ruby*32"
+  "pages": [
+    {
+      "offers": [
+        {
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*32"
+        }
+      ]
+    }
+  ]
 }
 ```
 
+* Each object inside `pages` represents one tab from top to bottom. The example file defines five pages to match the five tab
+  buttons in the UI, but you can leave an `offers` array empty if you want a blank tab.
 * `offer` is the item the shop will sell. You can provide it as a plain string (`"namespace:item"`) or as an object with
-  explicit fields:
-
-  ```json
-  { "item": "croptopia:cheese", "count": 2 }
-  ```
-
+  explicit fields such as `{ "item": "croptopia:cheese", "count": 2 }`.
 * `price` accepts either a single string/object or an array if you want multiple inputs. To specify stack sizes inline, append
   `*<count>` to the identifier (for example, `"gardenkingmod:ruby*32"`).
 
-The current configuration supplies two trades:
-
-1. One Minecraft milk bucket plus one Croptopia butter yields one Croptopia cheese.
-2. Thirty-two Garden King rubies yield one Minecraft elytra.
+The stock configuration distributes the ruby-for-elytra upgrades across all five tabs while keeping the cheese trade on the
+first tab.
 
 ### Adding more trades
 
 1. Open [`garden_shop_offers.json`](src/main/resources/data/gardenkingmod/garden_shop_offers.json).
-2. Add a new JSON object to the `offers` array using the format above (one `offer`, one `price`).
+2. Decide which tab should display the trade and add a new JSON object to that page's `offers` array using the format above.
+   Add a brand-new page object under `pages` if you want to populate another tab.
 3. Save the file and reload your data packs (or restart the game/server) so Fabric's resource loader picks up the change.
 4. If the trade produces a brand-new item, place its `.png` texture inside `assets/gardenkingmod/textures/item/` so Fabric can
    find it at runtime.
