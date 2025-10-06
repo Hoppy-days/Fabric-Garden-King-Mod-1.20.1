@@ -12,6 +12,8 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinition;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinitions;
 import net.jeremy.gardenkingmod.item.FortuneHoeItem;
+import net.jeremy.gardenkingmod.item.ObsidianArmorMaterial;
+import net.jeremy.gardenkingmod.item.ObsidianToolMaterial;
 import net.jeremy.gardenkingmod.item.RubyArmorMaterial;
 import net.jeremy.gardenkingmod.item.RubyToolMaterial;
 import net.minecraft.item.ArmorItem;
@@ -45,6 +47,16 @@ public final class ModItems {
                         new ShovelItem(RubyToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
         public static final Item RUBY_HOE = registerItem("ruby_hoe",
                         new FortuneHoeItem(RubyToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 5));
+        public static final Item OBSIDIAN_SWORD = registerItem("obsidian_sword",
+                        new SwordItem(ObsidianToolMaterial.INSTANCE, 5, -2.4F, new FabricItemSettings()));
+        public static final Item OBSIDIAN_PICKAXE = registerItem("obsidian_pickaxe",
+                        new PickaxeItem(ObsidianToolMaterial.INSTANCE, 3, -2.8F, new FabricItemSettings()));
+        public static final Item OBSIDIAN_AXE = registerItem("obsidian_axe",
+                        new AxeItem(ObsidianToolMaterial.INSTANCE, 7.0F, -3.1F, new FabricItemSettings()));
+        public static final Item OBSIDIAN_SHOVEL = registerItem("obsidian_shovel",
+                        new ShovelItem(ObsidianToolMaterial.INSTANCE, 3.5F, -3.0F, new FabricItemSettings()));
+        public static final Item OBSIDIAN_HOE = registerItem("obsidian_hoe",
+                        new HoeItem(ObsidianToolMaterial.INSTANCE, -4, 0.0F, new FabricItemSettings()));
         public static final Item RUBY_HELMET = registerItem("ruby_helmet",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item RUBY_CHESTPLATE = registerItem("ruby_chestplate",
@@ -53,6 +65,14 @@ public final class ModItems {
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
         public static final Item RUBY_BOOTS = registerItem("ruby_boots",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
+        public static final Item OBSIDIAN_HELMET = registerItem("obsidian_helmet",
+                        new ArmorItem(ObsidianArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
+        public static final Item OBSIDIAN_CHESTPLATE = registerItem("obsidian_chestplate",
+                        new ArmorItem(ObsidianArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new FabricItemSettings()));
+        public static final Item OBSIDIAN_LEGGINGS = registerItem("obsidian_leggings",
+                        new ArmorItem(ObsidianArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
+        public static final Item OBSIDIAN_BOOTS = registerItem("obsidian_boots",
+                        new ArmorItem(ObsidianArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
 
         private static Map<Identifier, Item> rottenItemsByCrop = Collections.emptyMap();
         private static Map<Identifier, Item> rottenItemsByTarget = Collections.emptyMap();
@@ -131,6 +151,10 @@ public final class ModItems {
                                         entries.add(RUBY_AXE);
                                         entries.add(RUBY_SHOVEL);
                                         entries.add(RUBY_HOE);
+                                        entries.add(OBSIDIAN_PICKAXE);
+                                        entries.add(OBSIDIAN_AXE);
+                                        entries.add(OBSIDIAN_SHOVEL);
+                                        entries.add(OBSIDIAN_HOE);
                                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT)
                                 .register(entries -> {
@@ -139,6 +163,11 @@ public final class ModItems {
                                         entries.add(RUBY_CHESTPLATE);
                                         entries.add(RUBY_LEGGINGS);
                                         entries.add(RUBY_BOOTS);
+                                        entries.add(OBSIDIAN_SWORD);
+                                        entries.add(OBSIDIAN_HELMET);
+                                        entries.add(OBSIDIAN_CHESTPLATE);
+                                        entries.add(OBSIDIAN_LEGGINGS);
+                                        entries.add(OBSIDIAN_BOOTS);
                                 });
         }
 }
