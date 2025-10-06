@@ -2,10 +2,9 @@
   "_comment": "Default Garden King shop layout. Use _comment fields anywhere to annotate long pages.",
   "pages": [
     {
-      "_comment": "Page 1: Food and starter upgrades",
+      "_comment": "Page 1: Misc",
       "offers": [
         {
-          "_comment": "Cheese bundle pairs well with early farming.",
           "offer": "croptopia:cheese*2",
           "price": [
             "minecraft:milk_bucket",
@@ -13,8 +12,7 @@
           ]
         },
         {
-          "_comment": "First tier elytra trade for seasonal events.",
-          "offer": "minecraft:elytra",
+           "offer": "minecraft:elytra",
           "price": "gardenkingmod:ruby*1"
         },
         {
@@ -24,7 +22,7 @@
       ]
     },
     {
-      "_comment": "Page 2: Advanced elytra upgrades",
+      "_comment": "Page 2: Weapons",
       "offers": [
         {
           "offer": "minecraft:elytra",
@@ -37,6 +35,7 @@
       ]
     },
     {
+      "_comment": "Page 3: Tools",
       "offers": [
         {
           "offer": "minecraft:elytra",
@@ -49,6 +48,7 @@
       ]
     },
     {
+      "_comment": "Page 4: Armors",
       "offers": [
         {
           "offer": "minecraft:elytra",
@@ -61,7 +61,7 @@
       ]
     },
     {
-      "_comment": "Page 5: High-end elytra trades",
+      "_comment": "Page 5: Crops",
       "offers": [
         {
           "offer": "minecraft:elytra",
