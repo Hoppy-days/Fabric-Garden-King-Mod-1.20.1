@@ -105,14 +105,14 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         protected void init() {
                 super.init();
                 updateScrollLimits();
-                lastOfferCount = handler.getOffers().size();
+                lastOfferCount = getOffersForActiveTab().size();
         }
 
         @Override
         protected void handledScreenTick() {
                 super.handledScreenTick();
 
-                int currentOfferCount = handler.getOffers().size();
+                int currentOfferCount = getOffersForActiveTab().size();
                 if (currentOfferCount != lastOfferCount) {
                         updateScrollLimits();
                         lastOfferCount = currentOfferCount;
@@ -208,7 +208,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private void drawOfferList(DrawContext context, int originX, int originY, int mouseX, int mouseY) {
-                List<GardenShopOffer> offers = handler.getOffers();
+                List<GardenShopOffer> offers = getOffersForActiveTab();
                 int listLeft = originX + OFFER_LIST_X;
                 int listTop = originY + OFFER_LIST_Y;
                 int hoveredOffer = getOfferIndexAt(mouseX, mouseY);
@@ -288,7 +288,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private void updateScrollLimits() {
-                int offerCount = handler.getOffers().size();
+                int offerCount = getOffersForActiveTab().size();
                 maxScrollSteps = Math.max(offerCount - MAX_VISIBLE_OFFERS, 0);
                 setScrollAmount(scrollAmount);
                 if (selectedOffer >= offerCount) {
@@ -370,6 +370,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         selectedOffer = -1;
                         setScrollAmount(0.0F);
                         updateScrollLimits();
+                        lastOfferCount = getOffersForActiveTab().size();
                 }
         }
 
@@ -397,12 +398,13 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
 
                 int offerIndex = scrollOffset + row;
-                return offerIndex < handler.getOffers().size() ? offerIndex : -1;
+                return offerIndex < getOffersForActiveTab().size() ? offerIndex : -1;
         }
 
         private Optional<ItemStack> getHoveredOfferStack(int mouseX, int mouseY) {
                 int offerIndex = getOfferIndexAt(mouseX, mouseY);
-                if (offerIndex < 0 || offerIndex >= handler.getOffers().size()) {
+                List<GardenShopOffer> offers = getOffersForActiveTab();
+                if (offerIndex < 0 || offerIndex >= offers.size()) {
                         return Optional.empty();
                 }
 
@@ -426,7 +428,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return Optional.empty();
                 }
 
-                GardenShopOffer offer = handler.getOffers().get(offerIndex);
+                GardenShopOffer offer = offers.get(offerIndex);
                 int costStart = listLeft + OFFER_COST_ITEM_OFFSET_X;
                 int arrowLeft = listLeft + OFFER_ARROW_OFFSET_X;
                 int maxCostRight = arrowLeft - 2;
@@ -447,5 +449,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
 
                 return Optional.empty();
+        }
+
+        private List<GardenShopOffer> getOffersForActiveTab() {
+                return handler.getOffers(activeTab);
         }
 }

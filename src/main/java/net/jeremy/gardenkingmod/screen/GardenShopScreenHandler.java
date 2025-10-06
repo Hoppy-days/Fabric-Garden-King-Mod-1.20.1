@@ -1,7 +1,6 @@
 package net.jeremy.gardenkingmod.screen;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.jeremy.gardenkingmod.ModScreenHandlers;
@@ -30,7 +29,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
         private final Inventory inventory;
         private final GardenShopBlockEntity blockEntity;
-        private final List<GardenShopOffer> offers;
+        private final List<List<GardenShopOffer>> offersByPage;
 
         public GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
                 this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()), buf);
@@ -45,31 +44,36 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 super(ModScreenHandlers.GARDEN_SHOP_SCREEN_HANDLER, syncId);
                 this.blockEntity = blockEntity;
                 this.inventory = blockEntity != null ? blockEntity : new SimpleInventory(GardenShopBlockEntity.INVENTORY_SIZE);
-                this.offers = new ArrayList<>();
+                this.offersByPage = new ArrayList<>();
 
                 checkSize(this.inventory, GardenShopBlockEntity.INVENTORY_SIZE);
                 if (blockEntity != null) {
                         blockEntity.ensureOffers();
-                        this.offers.addAll(blockEntity.getOffers());
+                        this.offersByPage.addAll(blockEntity.getOfferPages());
                         fillInventoryFromOffers();
                 }
 
                 if (buf != null) {
-                        this.offers.clear();
-                        int offerCount = buf.readVarInt();
-                        for (int index = 0; index < offerCount; index++) {
-                                ItemStack result = buf.readItemStack();
-                                int costCount = buf.readVarInt();
-                                List<ItemStack> costs = new ArrayList<>(costCount);
-                                for (int costIndex = 0; costIndex < costCount; costIndex++) {
-                                        ItemStack costStack = buf.readItemStack();
-                                        if (!costStack.isEmpty()) {
-                                                costs.add(costStack);
+                        this.offersByPage.clear();
+                        int pageCount = buf.readVarInt();
+                        for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+                                int offerCount = buf.readVarInt();
+                                List<GardenShopOffer> pageOffers = new ArrayList<>(offerCount);
+                                for (int offerIndex = 0; offerIndex < offerCount; offerIndex++) {
+                                        ItemStack result = buf.readItemStack();
+                                        int costCount = buf.readVarInt();
+                                        List<ItemStack> costs = new ArrayList<>(costCount);
+                                        for (int costIndex = 0; costIndex < costCount; costIndex++) {
+                                                ItemStack costStack = buf.readItemStack();
+                                                if (!costStack.isEmpty()) {
+                                                        costs.add(costStack);
+                                                }
+                                        }
+                                        if (!result.isEmpty()) {
+                                                pageOffers.add(GardenShopOffer.of(result, costs));
                                         }
                                 }
-                                if (!result.isEmpty()) {
-                                        this.offers.add(GardenShopOffer.of(result, costs));
-                                }
+                                this.offersByPage.add(List.copyOf(pageOffers));
                         }
                         fillInventoryFromOffers();
                 }
@@ -116,8 +120,16 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return this.inventory;
         }
 
-        public List<GardenShopOffer> getOffers() {
-                return Collections.unmodifiableList(this.offers);
+        public List<GardenShopOffer> getOffers(int pageIndex) {
+                if (pageIndex < 0 || pageIndex >= this.offersByPage.size()) {
+                        return List.of();
+                }
+
+                return this.offersByPage.get(pageIndex);
+        }
+
+        public int getPageCount() {
+                return this.offersByPage.size();
         }
 
         private void addPlayerInventory(PlayerInventory playerInventory) {
@@ -139,9 +151,22 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private void fillInventoryFromOffers() {
+                List<GardenShopOffer> flattened = flattenOffers();
                 for (int index = 0; index < this.inventory.size(); index++) {
-                        ItemStack stack = index < this.offers.size() ? this.offers.get(index).copyResultStack() : ItemStack.EMPTY;
+                        ItemStack stack = index < flattened.size() ? flattened.get(index).copyResultStack() : ItemStack.EMPTY;
                         this.inventory.setStack(index, stack);
                 }
+        }
+
+        private List<GardenShopOffer> flattenOffers() {
+                if (this.offersByPage.isEmpty()) {
+                        return List.of();
+                }
+
+                List<GardenShopOffer> flattened = new ArrayList<>();
+                for (List<GardenShopOffer> page : this.offersByPage) {
+                        flattened.addAll(page);
+                }
+                return flattened;
         }
 }
