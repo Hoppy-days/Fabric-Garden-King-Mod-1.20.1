@@ -19,44 +19,44 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int TEXTURE_WIDTH = 512;
         private static final int TEXTURE_HEIGHT = 256;
 
-        private static final int BACKGROUND_WIDTH = 276;
-        private static final int BACKGROUND_HEIGHT = 198;
-        private static final int PLAYER_INVENTORY_LABEL_Y = 104;
-        private static final int PLAYER_INVENTORY_LABEL_X = 110;
-        private static final int TITLE_X = 156;
+        private static final int BACKGROUND_WIDTH = 300;
+        private static final int BACKGROUND_HEIGHT = 204;
+        private static final int PLAYER_INVENTORY_LABEL_Y = 112;
+        private static final int PLAYER_INVENTORY_LABEL_X = 134;
+        private static final int TITLE_X = 180;
         private static final int TITLE_Y = 6;
 
-        private static final int OFFERS_LABEL_X = 8;
+        private static final int OFFERS_LABEL_X = 32;
         private static final int OFFERS_LABEL_Y = 6;
-        private static final int BUY_LABEL_X = 180;
-        private static final int BUY_LABEL_Y = 87;
+        private static final int BUY_LABEL_X = 204;
+        private static final int BUY_LABEL_Y = 94;
 
-        private static final int OFFER_LIST_X = 5;
+        private static final int OFFER_LIST_X = 29;
         private static final int OFFER_LIST_Y = 17;
         private static final int OFFER_ENTRY_WIDTH = 88;
         private static final int OFFER_ENTRY_HEIGHT = 20;
-        private static final int OFFER_LIST_HEIGHT = 173;
+        private static final int OFFER_LIST_HEIGHT = 180;
         private static final int MAX_VISIBLE_OFFERS = OFFER_LIST_HEIGHT / OFFER_ENTRY_HEIGHT;
         private static final int OFFER_ITEM_OFFSET_Y = 2;
         private static final int OFFER_COST_ITEM_OFFSET_X = 6;
         private static final int OFFER_COST_ITEM_SPACING = 18;
         private static final int OFFER_RESULT_ITEM_OFFSET_X = 68;
-        private static final int OFFER_BACKGROUND_U = 277;
+        private static final int OFFER_BACKGROUND_U = 301;
         private static final int OFFER_BACKGROUND_V = 0;
         private static final int OFFER_HOVER_BACKGROUND_V = 21;
-        private static final int OFFER_ARROW_U = 277;
+        private static final int OFFER_ARROW_U = 301;
         private static final int OFFER_ARROW_V = 42;
         private static final int OFFER_ARROW_WIDTH = 10;
         private static final int OFFER_ARROW_HEIGHT = 9;
         private static final int OFFER_ARROW_OFFSET_X = 53;
         private static final int OFFER_ARROW_OFFSET_Y = 6;
 
-        private static final int SCROLLBAR_OFFSET_X = 94;
+        private static final int SCROLLBAR_OFFSET_X = 118;
         private static final int SCROLLBAR_OFFSET_Y = 17;
         private static final int SCROLLBAR_TRACK_WIDTH = 6;
         private static final int SCROLLBAR_TRACK_HEIGHT = OFFER_LIST_HEIGHT;
-        private static final int SCROLLBAR_KNOB_U = 0;
-        private static final int SCROLLBAR_KNOB_V = 200;
+        private static final int SCROLLBAR_KNOB_U = 24;
+        private static final int SCROLLBAR_KNOB_V = 207;
         private static final int SCROLLBAR_KNOB_WIDTH = 6;
         private static final int SCROLLBAR_KNOB_HEIGHT = 27;
 

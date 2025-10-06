@@ -23,10 +23,10 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
         private static final int SLOT_SIZE = 18;
         private static final int SHOP_SLOT_START_X = 8;
-        private static final int PLAYER_INVENTORY_START_Y = 116;
-        private static final int PLAYER_INVENTORY_START_X = 108;
-        private static final int PLAYER_HOTBAR_Y = 174;
-        private static final int PLAYER_HOTBAR_X = 108;
+        private static final int PLAYER_INVENTORY_START_Y = 123;
+        private static final int PLAYER_INVENTORY_START_X = 132;
+        private static final int PLAYER_HOTBAR_Y = 181;
+        private static final int PLAYER_HOTBAR_X = 132;
 
         private final Inventory inventory;
         private final GardenShopBlockEntity blockEntity;
