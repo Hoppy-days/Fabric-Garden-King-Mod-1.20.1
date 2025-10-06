@@ -51,7 +51,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_ARROW_OFFSET_Y = 6;
 
         private static final int SCROLLBAR_OFFSET_X = 94;
-        private static final int SCROLLBAR_OFFSET_Y = 16;
+        private static final int SCROLLBAR_OFFSET_Y = 17;
         private static final int SCROLLBAR_TRACK_WIDTH = 6;
         private static final int SCROLLBAR_TRACK_HEIGHT = 78;
         private static final int SCROLLBAR_KNOB_U = 0;
