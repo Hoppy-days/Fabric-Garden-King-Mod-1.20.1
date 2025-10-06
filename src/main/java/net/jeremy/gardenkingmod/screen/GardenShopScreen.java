@@ -311,9 +311,10 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return;
                 }
 
-                scrollAmount = MathHelper.clamp(amount, 0.0F, 1.0F);
-                scrollOffset = MathHelper.floor(scrollAmount * maxScrollSteps + 0.5F);
-                scrollOffset = MathHelper.clamp(scrollOffset, 0, maxScrollSteps);
+                float clampedAmount = MathHelper.clamp(amount, 0.0F, 1.0F);
+                int calculatedOffset = MathHelper.floor(clampedAmount * maxScrollSteps + 0.5F);
+                scrollOffset = MathHelper.clamp(calculatedOffset, 0, maxScrollSteps);
+                scrollAmount = maxScrollSteps > 0 ? (float) scrollOffset / (float) maxScrollSteps : 0.0F;
         }
 
         private boolean canScroll() {
