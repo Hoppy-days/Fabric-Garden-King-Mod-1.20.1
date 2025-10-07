@@ -41,6 +41,7 @@ import net.minecraft.util.Identifier;
 public final class ModItems {
         public static final Item GARDEN_COIN = registerItem("garden_coin", new Item(new FabricItemSettings()));
         public static final Item COIN_SACK = registerItem("coin_sack", new Item(new FabricItemSettings()));
+        public static final Item DOLLAR = registerItem("dollar", new Item(new FabricItemSettings()));
         public static final Item RUBY = registerItem("ruby", new Item(new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE = registerItem("blue_sapphire", new Item(new FabricItemSettings()));
         public static final Item TOPAZ = registerItem("topaz", new Item(new FabricItemSettings()));
@@ -241,6 +242,7 @@ public final class ModItems {
                                 .register(entries -> {
                                         entries.add(GARDEN_COIN);
                                         entries.add(COIN_SACK);
+                                        entries.add(DOLLAR);
                                         entries.add(RUBY);
                                         entries.add(BLUE_SAPPHIRE);
                                         entries.add(TOPAZ);
