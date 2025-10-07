@@ -50,6 +50,7 @@
   "container.gardenkingmod.garden_shop": "Garden Shop",
   "container.gardenkingmod.scarecrow": "Scarecrow",
   "item.gardenkingmod.garden_coin": "Garden Coin",
+  "item.gardenkingmod.coin_sack": "Coin Sack",
   "message.gardenkingmod.market.empty": "There are no crops to sell.",
   "message.gardenkingmod.market.invalid": "Only Crops and Food can be sold here!",
   "message.gardenkingmod.market.sold": "Sold %1$s Croptopia crops for %2$s coins.",

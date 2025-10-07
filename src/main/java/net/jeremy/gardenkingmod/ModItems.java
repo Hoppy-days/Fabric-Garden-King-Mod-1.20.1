@@ -34,6 +34,7 @@ import net.minecraft.util.Identifier;
 
 public final class ModItems {
         public static final Item GARDEN_COIN = registerItem("garden_coin", new Item(new FabricItemSettings()));
+        public static final Item COIN_SACK = registerItem("coin_sack", new Item(new FabricItemSettings()));
         public static final Item RUBY = registerItem("ruby", new Item(new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE = registerItem("blue_sapphire", new Item(new FabricItemSettings()));
         public static final Item SCARECROW_SHIRT = registerItem("scarecrow_shirt",
@@ -177,6 +178,7 @@ public final class ModItems {
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
                                 .register(entries -> {
                                         entries.add(GARDEN_COIN);
+                                        entries.add(COIN_SACK);
                                         entries.add(RUBY);
                                         entries.add(BLUE_SAPPHIRE);
                                         rottenItems.forEach(entries::add);
