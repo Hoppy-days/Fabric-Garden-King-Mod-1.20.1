@@ -156,6 +156,7 @@ public class ScarecrowScreen extends HandledScreen<ScarecrowScreenHandler> {
                 matrices.scale(1.0F, -1.0F, 1.0F);
                 matrices.scale(PREVIEW_SCALE, PREVIEW_SCALE, PREVIEW_SCALE);
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
                 matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(pitch * 20.0F));
                 matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yaw * 40.0F));
 
