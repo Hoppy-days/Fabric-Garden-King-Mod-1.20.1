@@ -11,6 +11,8 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinition;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinitions;
+import net.jeremy.gardenkingmod.item.AmethystArmorMaterial;
+import net.jeremy.gardenkingmod.item.AmethystToolMaterial;
 import net.jeremy.gardenkingmod.item.BlueSapphireArmorMaterial;
 import net.jeremy.gardenkingmod.item.BlueSapphireToolMaterial;
 import net.jeremy.gardenkingmod.item.EmeraldArmorMaterial;
@@ -57,6 +59,8 @@ public final class ModItems {
                         new SwordItem(TopazToolMaterial.INSTANCE, 3, -2.0F, new FabricItemSettings()));
         public static final Item PEARL_SWORD = registerItem("pearl_sword",
                         new SwordItem(PearlToolMaterial.INSTANCE, 5, -2.2F, new FabricItemSettings()));
+        public static final Item AMETHYST_SWORD = registerItem("amethyst_sword",
+                        new SwordItem(AmethystToolMaterial.INSTANCE, 4, -2.1F, new FabricItemSettings()));
         public static final Item RUBY_PICKAXE = registerItem("ruby_pickaxe",
                         new PickaxeItem(RubyToolMaterial.INSTANCE, 2, -2.8F, new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE_PICKAXE = registerItem("blue_sapphire_pickaxe",
@@ -65,6 +69,8 @@ public final class ModItems {
                         new PickaxeItem(TopazToolMaterial.INSTANCE, 2, -2.8F, new FabricItemSettings()));
         public static final Item PEARL_PICKAXE = registerItem("pearl_pickaxe",
                         new PickaxeItem(PearlToolMaterial.INSTANCE, 3, -2.8F, new FabricItemSettings()));
+        public static final Item AMETHYST_PICKAXE = registerItem("amethyst_pickaxe",
+                        new PickaxeItem(AmethystToolMaterial.INSTANCE, 2, -2.8F, new FabricItemSettings()));
         public static final Item RUBY_AXE = registerItem("ruby_axe",
                         new AxeItem(RubyToolMaterial.INSTANCE, 6.0F, -3.0F, new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE_AXE = registerItem("blue_sapphire_axe",
@@ -73,6 +79,8 @@ public final class ModItems {
                         new AxeItem(TopazToolMaterial.INSTANCE, 6.0F, -3.0F, new FabricItemSettings()));
         public static final Item PEARL_AXE = registerItem("pearl_axe",
                         new AxeItem(PearlToolMaterial.INSTANCE, 6.5F, -3.0F, new FabricItemSettings()));
+        public static final Item AMETHYST_AXE = registerItem("amethyst_axe",
+                        new AxeItem(AmethystToolMaterial.INSTANCE, 6.5F, -3.0F, new FabricItemSettings()));
         public static final Item RUBY_SHOVEL = registerItem("ruby_shovel",
                         new ShovelItem(RubyToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE_SHOVEL = registerItem("blue_sapphire_shovel",
@@ -81,6 +89,8 @@ public final class ModItems {
                         new ShovelItem(TopazToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
         public static final Item PEARL_SHOVEL = registerItem("pearl_shovel",
                         new ShovelItem(PearlToolMaterial.INSTANCE, 3.0F, -3.0F, new FabricItemSettings()));
+        public static final Item AMETHYST_SHOVEL = registerItem("amethyst_shovel",
+                        new ShovelItem(AmethystToolMaterial.INSTANCE, 3.0F, -3.0F, new FabricItemSettings()));
         public static final Item RUBY_HOE = registerItem("ruby_hoe",
                         new FortuneHoeItem(RubyToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 5));
         public static final Item BLUE_SAPPHIRE_HOE = registerItem("blue_sapphire_hoe",
@@ -89,6 +99,8 @@ public final class ModItems {
                         new FortuneHoeItem(TopazToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 5));
         public static final Item PEARL_HOE = registerItem("pearl_hoe",
                         new FortuneHoeItem(PearlToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 6));
+        public static final Item AMETHYST_HOE = registerItem("amethyst_hoe",
+                        new FortuneHoeItem(AmethystToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 6));
         public static final Item OBSIDIAN_SWORD = registerItem("obsidian_sword",
                         new SwordItem(ObsidianToolMaterial.INSTANCE, 5, -2.4F, new FabricItemSettings()));
         public static final Item OBSIDIAN_PICKAXE = registerItem("obsidian_pickaxe",
@@ -141,6 +153,14 @@ public final class ModItems {
                         new ArmorItem(TopazArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
         public static final Item PEARL_BOOTS = registerItem("pearl_boots",
                         new ArmorItem(PearlArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
+        public static final Item AMETHYST_HELMET = registerItem("amethyst_helmet",
+                        new ArmorItem(AmethystArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
+        public static final Item AMETHYST_CHESTPLATE = registerItem("amethyst_chestplate",
+                        new ArmorItem(AmethystArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new FabricItemSettings()));
+        public static final Item AMETHYST_LEGGINGS = registerItem("amethyst_leggings",
+                        new ArmorItem(AmethystArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
+        public static final Item AMETHYST_BOOTS = registerItem("amethyst_boots",
+                        new ArmorItem(AmethystArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
         public static final Item OBSIDIAN_HELMET = registerItem("obsidian_helmet",
                         new ArmorItem(ObsidianArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item OBSIDIAN_CHESTPLATE = registerItem("obsidian_chestplate",
@@ -251,6 +271,10 @@ public final class ModItems {
                                         entries.add(PEARL_AXE);
                                         entries.add(PEARL_SHOVEL);
                                         entries.add(PEARL_HOE);
+                                        entries.add(AMETHYST_PICKAXE);
+                                        entries.add(AMETHYST_AXE);
+                                        entries.add(AMETHYST_SHOVEL);
+                                        entries.add(AMETHYST_HOE);
                                         entries.add(OBSIDIAN_PICKAXE);
                                         entries.add(OBSIDIAN_AXE);
                                         entries.add(OBSIDIAN_SHOVEL);
@@ -282,6 +306,11 @@ public final class ModItems {
                                         entries.add(PEARL_CHESTPLATE);
                                         entries.add(PEARL_LEGGINGS);
                                         entries.add(PEARL_BOOTS);
+                                        entries.add(AMETHYST_SWORD);
+                                        entries.add(AMETHYST_HELMET);
+                                        entries.add(AMETHYST_CHESTPLATE);
+                                        entries.add(AMETHYST_LEGGINGS);
+                                        entries.add(AMETHYST_BOOTS);
                                         entries.add(OBSIDIAN_SWORD);
                                         entries.add(OBSIDIAN_HELMET);
                                         entries.add(OBSIDIAN_CHESTPLATE);
