@@ -11,6 +11,8 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinition;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinitions;
+import net.jeremy.gardenkingmod.item.BlueSapphireArmorMaterial;
+import net.jeremy.gardenkingmod.item.BlueSapphireToolMaterial;
 import net.jeremy.gardenkingmod.item.EmeraldArmorMaterial;
 import net.jeremy.gardenkingmod.item.EmeraldToolMaterial;
 import net.jeremy.gardenkingmod.item.FortuneHoeItem;
@@ -33,6 +35,7 @@ import net.minecraft.util.Identifier;
 public final class ModItems {
         public static final Item GARDEN_COIN = registerItem("garden_coin", new Item(new FabricItemSettings()));
         public static final Item RUBY = registerItem("ruby", new Item(new FabricItemSettings()));
+        public static final Item BLUE_SAPPHIRE = registerItem("blue_sapphire", new Item(new FabricItemSettings()));
         public static final Item SCARECROW_SHIRT = registerItem("scarecrow_shirt",
                         new Item(new FabricItemSettings()));
         public static final Item SCARECROW_HEAD = registerItem("scarecrow_head",
@@ -41,14 +44,24 @@ public final class ModItems {
                         new Item(new FabricItemSettings()));
         public static final Item RUBY_SWORD = registerItem("ruby_sword",
                         new SwordItem(RubyToolMaterial.INSTANCE, 4, -2.2F, new FabricItemSettings()));
+        public static final Item BLUE_SAPPHIRE_SWORD = registerItem("blue_sapphire_sword",
+                        new SwordItem(BlueSapphireToolMaterial.INSTANCE, 3, -2.0F, new FabricItemSettings()));
         public static final Item RUBY_PICKAXE = registerItem("ruby_pickaxe",
                         new PickaxeItem(RubyToolMaterial.INSTANCE, 2, -2.8F, new FabricItemSettings()));
+        public static final Item BLUE_SAPPHIRE_PICKAXE = registerItem("blue_sapphire_pickaxe",
+                        new PickaxeItem(BlueSapphireToolMaterial.INSTANCE, 1, -2.8F, new FabricItemSettings()));
         public static final Item RUBY_AXE = registerItem("ruby_axe",
                         new AxeItem(RubyToolMaterial.INSTANCE, 6.0F, -3.0F, new FabricItemSettings()));
+        public static final Item BLUE_SAPPHIRE_AXE = registerItem("blue_sapphire_axe",
+                        new AxeItem(BlueSapphireToolMaterial.INSTANCE, 5.5F, -3.0F, new FabricItemSettings()));
         public static final Item RUBY_SHOVEL = registerItem("ruby_shovel",
                         new ShovelItem(RubyToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
+        public static final Item BLUE_SAPPHIRE_SHOVEL = registerItem("blue_sapphire_shovel",
+                        new ShovelItem(BlueSapphireToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
         public static final Item RUBY_HOE = registerItem("ruby_hoe",
                         new FortuneHoeItem(RubyToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 5));
+        public static final Item BLUE_SAPPHIRE_HOE = registerItem("blue_sapphire_hoe",
+                        new FortuneHoeItem(BlueSapphireToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 5));
         public static final Item OBSIDIAN_SWORD = registerItem("obsidian_sword",
                         new SwordItem(ObsidianToolMaterial.INSTANCE, 5, -2.4F, new FabricItemSettings()));
         public static final Item OBSIDIAN_PICKAXE = registerItem("obsidian_pickaxe",
@@ -71,12 +84,20 @@ public final class ModItems {
                         new FortuneHoeItem(EmeraldToolMaterial.INSTANCE, -3, 0.0F, new FabricItemSettings(), 4));
         public static final Item RUBY_HELMET = registerItem("ruby_helmet",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
+        public static final Item BLUE_SAPPHIRE_HELMET = registerItem("blue_sapphire_helmet",
+                        new ArmorItem(BlueSapphireArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item RUBY_CHESTPLATE = registerItem("ruby_chestplate",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new FabricItemSettings()));
+        public static final Item BLUE_SAPPHIRE_CHESTPLATE = registerItem("blue_sapphire_chestplate",
+                        new ArmorItem(BlueSapphireArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new FabricItemSettings()));
         public static final Item RUBY_LEGGINGS = registerItem("ruby_leggings",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
+        public static final Item BLUE_SAPPHIRE_LEGGINGS = registerItem("blue_sapphire_leggings",
+                        new ArmorItem(BlueSapphireArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
         public static final Item RUBY_BOOTS = registerItem("ruby_boots",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
+        public static final Item BLUE_SAPPHIRE_BOOTS = registerItem("blue_sapphire_boots",
+                        new ArmorItem(BlueSapphireArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
         public static final Item OBSIDIAN_HELMET = registerItem("obsidian_helmet",
                         new ArmorItem(ObsidianArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item OBSIDIAN_CHESTPLATE = registerItem("obsidian_chestplate",
@@ -157,6 +178,7 @@ public final class ModItems {
                                 .register(entries -> {
                                         entries.add(GARDEN_COIN);
                                         entries.add(RUBY);
+                                        entries.add(BLUE_SAPPHIRE);
                                         rottenItems.forEach(entries::add);
                                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL)
@@ -171,6 +193,10 @@ public final class ModItems {
                                         entries.add(RUBY_AXE);
                                         entries.add(RUBY_SHOVEL);
                                         entries.add(RUBY_HOE);
+                                        entries.add(BLUE_SAPPHIRE_PICKAXE);
+                                        entries.add(BLUE_SAPPHIRE_AXE);
+                                        entries.add(BLUE_SAPPHIRE_SHOVEL);
+                                        entries.add(BLUE_SAPPHIRE_HOE);
                                         entries.add(OBSIDIAN_PICKAXE);
                                         entries.add(OBSIDIAN_AXE);
                                         entries.add(OBSIDIAN_SHOVEL);
@@ -187,6 +213,11 @@ public final class ModItems {
                                         entries.add(RUBY_CHESTPLATE);
                                         entries.add(RUBY_LEGGINGS);
                                         entries.add(RUBY_BOOTS);
+                                        entries.add(BLUE_SAPPHIRE_SWORD);
+                                        entries.add(BLUE_SAPPHIRE_HELMET);
+                                        entries.add(BLUE_SAPPHIRE_CHESTPLATE);
+                                        entries.add(BLUE_SAPPHIRE_LEGGINGS);
+                                        entries.add(BLUE_SAPPHIRE_BOOTS);
                                         entries.add(OBSIDIAN_SWORD);
                                         entries.add(OBSIDIAN_HELMET);
                                         entries.add(OBSIDIAN_CHESTPLATE);
