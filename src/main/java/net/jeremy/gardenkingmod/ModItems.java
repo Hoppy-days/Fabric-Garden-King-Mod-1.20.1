@@ -11,6 +11,8 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinition;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinitions;
+import net.jeremy.gardenkingmod.item.EmeraldArmorMaterial;
+import net.jeremy.gardenkingmod.item.EmeraldToolMaterial;
 import net.jeremy.gardenkingmod.item.FortuneHoeItem;
 import net.jeremy.gardenkingmod.item.ObsidianArmorMaterial;
 import net.jeremy.gardenkingmod.item.ObsidianToolMaterial;
@@ -57,6 +59,16 @@ public final class ModItems {
                         new ShovelItem(ObsidianToolMaterial.INSTANCE, 3.5F, -3.0F, new FabricItemSettings()));
         public static final Item OBSIDIAN_HOE = registerItem("obsidian_hoe",
                         new HoeItem(ObsidianToolMaterial.INSTANCE, -4, 0.0F, new FabricItemSettings()));
+        public static final Item EMERALD_SWORD = registerItem("emerald_sword",
+                        new SwordItem(EmeraldToolMaterial.INSTANCE, 3, -2.2F, new FabricItemSettings()));
+        public static final Item EMERALD_PICKAXE = registerItem("emerald_pickaxe",
+                        new PickaxeItem(EmeraldToolMaterial.INSTANCE, 1, -2.8F, new FabricItemSettings()));
+        public static final Item EMERALD_AXE = registerItem("emerald_axe",
+                        new AxeItem(EmeraldToolMaterial.INSTANCE, 5.0F, -3.0F, new FabricItemSettings()));
+        public static final Item EMERALD_SHOVEL = registerItem("emerald_shovel",
+                        new ShovelItem(EmeraldToolMaterial.INSTANCE, 2.0F, -3.0F, new FabricItemSettings()));
+        public static final Item EMERALD_HOE = registerItem("emerald_hoe",
+                        new FortuneHoeItem(EmeraldToolMaterial.INSTANCE, -3, 0.0F, new FabricItemSettings(), 4));
         public static final Item RUBY_HELMET = registerItem("ruby_helmet",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item RUBY_CHESTPLATE = registerItem("ruby_chestplate",
@@ -73,6 +85,14 @@ public final class ModItems {
                         new ArmorItem(ObsidianArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
         public static final Item OBSIDIAN_BOOTS = registerItem("obsidian_boots",
                         new ArmorItem(ObsidianArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
+        public static final Item EMERALD_HELMET = registerItem("emerald_helmet",
+                        new ArmorItem(EmeraldArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
+        public static final Item EMERALD_CHESTPLATE = registerItem("emerald_chestplate",
+                        new ArmorItem(EmeraldArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new FabricItemSettings()));
+        public static final Item EMERALD_LEGGINGS = registerItem("emerald_leggings",
+                        new ArmorItem(EmeraldArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
+        public static final Item EMERALD_BOOTS = registerItem("emerald_boots",
+                        new ArmorItem(EmeraldArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
 
         private static Map<Identifier, Item> rottenItemsByCrop = Collections.emptyMap();
         private static Map<Identifier, Item> rottenItemsByTarget = Collections.emptyMap();
@@ -155,6 +175,10 @@ public final class ModItems {
                                         entries.add(OBSIDIAN_AXE);
                                         entries.add(OBSIDIAN_SHOVEL);
                                         entries.add(OBSIDIAN_HOE);
+                                        entries.add(EMERALD_PICKAXE);
+                                        entries.add(EMERALD_AXE);
+                                        entries.add(EMERALD_SHOVEL);
+                                        entries.add(EMERALD_HOE);
                                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT)
                                 .register(entries -> {
@@ -168,6 +192,11 @@ public final class ModItems {
                                         entries.add(OBSIDIAN_CHESTPLATE);
                                         entries.add(OBSIDIAN_LEGGINGS);
                                         entries.add(OBSIDIAN_BOOTS);
+                                        entries.add(EMERALD_SWORD);
+                                        entries.add(EMERALD_HELMET);
+                                        entries.add(EMERALD_CHESTPLATE);
+                                        entries.add(EMERALD_LEGGINGS);
+                                        entries.add(EMERALD_BOOTS);
                                 });
         }
 }
