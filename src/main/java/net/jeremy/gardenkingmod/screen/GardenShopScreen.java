@@ -2,6 +2,7 @@ package net.jeremy.gardenkingmod.screen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
@@ -48,13 +49,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int MAX_VISIBLE_OFFERS = OFFER_LIST_HEIGHT / OFFER_ENTRY_HEIGHT;
         private static final int OFFER_ITEM_OFFSET_Y = 2;
         private static final int OFFER_COST_ITEM_OFFSET_X = 6;
-        /**
-         * Controls where the cost stack count overlay hugs the right edge of the
-         * item slot. The rightmost digit of the requested count is anchored to this
-         * position, so increasing the value nudges the numbers further right and
-         * decreasing it pulls them left.
-         */
-        private static final int OFFER_COST_COUNT_RIGHT_EDGE = 21;
         private static final int OFFER_COST_ITEM_SPACING = 18;
         private static final int OFFER_RESULT_ITEM_OFFSET_X = 68;
         private static final int OFFER_BACKGROUND_U = 301;
@@ -287,15 +281,39 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return;
                 }
 
-                String text = Integer.toString(count);
-                int textWidth = textRenderer.getWidth(text);
+                String text = formatRequestedCount(count);
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
                 matrices.translate(0.0F, 0.0F, 200.0F);
-                int overlayRight = x + OFFER_COST_COUNT_RIGHT_EDGE;
-                context.drawTextWithShadow(textRenderer, text, overlayRight - textWidth, y + 6,
-                                0xFFFFFF);
+                int overlayX = x + 19 - 2 - textRenderer.getWidth(text);
+                int overlayY = y + 6 + 3;
+                context.drawTextWithShadow(textRenderer, text, overlayX, overlayY, 0xFFFFFF);
                 matrices.pop();
+        }
+
+        private static String formatRequestedCount(int count) {
+                if (count < 1000) {
+                        return Integer.toString(count);
+                }
+
+                double value = count;
+                char[] suffixes = { 'k', 'M', 'B', 'T' };
+                int suffixIndex = -1;
+                while (value >= 1000.0 && suffixIndex + 1 < suffixes.length) {
+                        value /= 1000.0;
+                        suffixIndex++;
+                }
+
+                if (suffixIndex < 0) {
+                        return Integer.toString(count);
+                }
+
+                String format = value >= 100.0 ? "%.0f" : "%.1f";
+                String number = String.format(Locale.ROOT, format, value);
+                if (number.endsWith(".0")) {
+                        number = number.substring(0, number.length() - 2);
+                }
+                return number + suffixes[suffixIndex];
         }
 
         private void drawCostTooltip(DrawContext context, ItemStack stack, int mouseX, int mouseY) {
