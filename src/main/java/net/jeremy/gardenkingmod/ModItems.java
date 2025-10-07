@@ -18,6 +18,8 @@ import net.jeremy.gardenkingmod.item.EmeraldToolMaterial;
 import net.jeremy.gardenkingmod.item.FortuneHoeItem;
 import net.jeremy.gardenkingmod.item.ObsidianArmorMaterial;
 import net.jeremy.gardenkingmod.item.ObsidianToolMaterial;
+import net.jeremy.gardenkingmod.item.PearlArmorMaterial;
+import net.jeremy.gardenkingmod.item.PearlToolMaterial;
 import net.jeremy.gardenkingmod.item.RubyArmorMaterial;
 import net.jeremy.gardenkingmod.item.RubyToolMaterial;
 import net.jeremy.gardenkingmod.item.TopazArmorMaterial;
@@ -40,6 +42,7 @@ public final class ModItems {
         public static final Item RUBY = registerItem("ruby", new Item(new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE = registerItem("blue_sapphire", new Item(new FabricItemSettings()));
         public static final Item TOPAZ = registerItem("topaz", new Item(new FabricItemSettings()));
+        public static final Item PEARL = registerItem("pearl", new Item(new FabricItemSettings()));
         public static final Item SCARECROW_SHIRT = registerItem("scarecrow_shirt",
                         new Item(new FabricItemSettings()));
         public static final Item SCARECROW_HEAD = registerItem("scarecrow_head",
@@ -52,30 +55,40 @@ public final class ModItems {
                         new SwordItem(BlueSapphireToolMaterial.INSTANCE, 3, -2.0F, new FabricItemSettings()));
         public static final Item TOPAZ_SWORD = registerItem("topaz_sword",
                         new SwordItem(TopazToolMaterial.INSTANCE, 3, -2.0F, new FabricItemSettings()));
+        public static final Item PEARL_SWORD = registerItem("pearl_sword",
+                        new SwordItem(PearlToolMaterial.INSTANCE, 5, -2.2F, new FabricItemSettings()));
         public static final Item RUBY_PICKAXE = registerItem("ruby_pickaxe",
                         new PickaxeItem(RubyToolMaterial.INSTANCE, 2, -2.8F, new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE_PICKAXE = registerItem("blue_sapphire_pickaxe",
                         new PickaxeItem(BlueSapphireToolMaterial.INSTANCE, 1, -2.8F, new FabricItemSettings()));
         public static final Item TOPAZ_PICKAXE = registerItem("topaz_pickaxe",
                         new PickaxeItem(TopazToolMaterial.INSTANCE, 2, -2.8F, new FabricItemSettings()));
+        public static final Item PEARL_PICKAXE = registerItem("pearl_pickaxe",
+                        new PickaxeItem(PearlToolMaterial.INSTANCE, 3, -2.8F, new FabricItemSettings()));
         public static final Item RUBY_AXE = registerItem("ruby_axe",
                         new AxeItem(RubyToolMaterial.INSTANCE, 6.0F, -3.0F, new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE_AXE = registerItem("blue_sapphire_axe",
                         new AxeItem(BlueSapphireToolMaterial.INSTANCE, 5.5F, -3.0F, new FabricItemSettings()));
         public static final Item TOPAZ_AXE = registerItem("topaz_axe",
                         new AxeItem(TopazToolMaterial.INSTANCE, 6.0F, -3.0F, new FabricItemSettings()));
+        public static final Item PEARL_AXE = registerItem("pearl_axe",
+                        new AxeItem(PearlToolMaterial.INSTANCE, 6.5F, -3.0F, new FabricItemSettings()));
         public static final Item RUBY_SHOVEL = registerItem("ruby_shovel",
                         new ShovelItem(RubyToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE_SHOVEL = registerItem("blue_sapphire_shovel",
                         new ShovelItem(BlueSapphireToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
         public static final Item TOPAZ_SHOVEL = registerItem("topaz_shovel",
                         new ShovelItem(TopazToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
+        public static final Item PEARL_SHOVEL = registerItem("pearl_shovel",
+                        new ShovelItem(PearlToolMaterial.INSTANCE, 3.0F, -3.0F, new FabricItemSettings()));
         public static final Item RUBY_HOE = registerItem("ruby_hoe",
                         new FortuneHoeItem(RubyToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 5));
         public static final Item BLUE_SAPPHIRE_HOE = registerItem("blue_sapphire_hoe",
                         new FortuneHoeItem(BlueSapphireToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 5));
         public static final Item TOPAZ_HOE = registerItem("topaz_hoe",
                         new FortuneHoeItem(TopazToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 5));
+        public static final Item PEARL_HOE = registerItem("pearl_hoe",
+                        new FortuneHoeItem(PearlToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings(), 6));
         public static final Item OBSIDIAN_SWORD = registerItem("obsidian_sword",
                         new SwordItem(ObsidianToolMaterial.INSTANCE, 5, -2.4F, new FabricItemSettings()));
         public static final Item OBSIDIAN_PICKAXE = registerItem("obsidian_pickaxe",
@@ -102,24 +115,32 @@ public final class ModItems {
                         new ArmorItem(BlueSapphireArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item TOPAZ_HELMET = registerItem("topaz_helmet",
                         new ArmorItem(TopazArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
+        public static final Item PEARL_HELMET = registerItem("pearl_helmet",
+                        new ArmorItem(PearlArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item RUBY_CHESTPLATE = registerItem("ruby_chestplate",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE_CHESTPLATE = registerItem("blue_sapphire_chestplate",
                         new ArmorItem(BlueSapphireArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new FabricItemSettings()));
         public static final Item TOPAZ_CHESTPLATE = registerItem("topaz_chestplate",
                         new ArmorItem(TopazArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new FabricItemSettings()));
+        public static final Item PEARL_CHESTPLATE = registerItem("pearl_chestplate",
+                        new ArmorItem(PearlArmorMaterial.INSTANCE, ArmorItem.Type.CHESTPLATE, new FabricItemSettings()));
         public static final Item RUBY_LEGGINGS = registerItem("ruby_leggings",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE_LEGGINGS = registerItem("blue_sapphire_leggings",
                         new ArmorItem(BlueSapphireArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
         public static final Item TOPAZ_LEGGINGS = registerItem("topaz_leggings",
                         new ArmorItem(TopazArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
+        public static final Item PEARL_LEGGINGS = registerItem("pearl_leggings",
+                        new ArmorItem(PearlArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
         public static final Item RUBY_BOOTS = registerItem("ruby_boots",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE_BOOTS = registerItem("blue_sapphire_boots",
                         new ArmorItem(BlueSapphireArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
         public static final Item TOPAZ_BOOTS = registerItem("topaz_boots",
                         new ArmorItem(TopazArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
+        public static final Item PEARL_BOOTS = registerItem("pearl_boots",
+                        new ArmorItem(PearlArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
         public static final Item OBSIDIAN_HELMET = registerItem("obsidian_helmet",
                         new ArmorItem(ObsidianArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item OBSIDIAN_CHESTPLATE = registerItem("obsidian_chestplate",
@@ -203,6 +224,7 @@ public final class ModItems {
                                         entries.add(RUBY);
                                         entries.add(BLUE_SAPPHIRE);
                                         entries.add(TOPAZ);
+                                        entries.add(PEARL);
                                         rottenItems.forEach(entries::add);
                                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL)
@@ -225,6 +247,10 @@ public final class ModItems {
                                         entries.add(TOPAZ_AXE);
                                         entries.add(TOPAZ_SHOVEL);
                                         entries.add(TOPAZ_HOE);
+                                        entries.add(PEARL_PICKAXE);
+                                        entries.add(PEARL_AXE);
+                                        entries.add(PEARL_SHOVEL);
+                                        entries.add(PEARL_HOE);
                                         entries.add(OBSIDIAN_PICKAXE);
                                         entries.add(OBSIDIAN_AXE);
                                         entries.add(OBSIDIAN_SHOVEL);
@@ -243,6 +269,7 @@ public final class ModItems {
                                         entries.add(RUBY_BOOTS);
                                         entries.add(BLUE_SAPPHIRE_SWORD);
                                         entries.add(TOPAZ_SWORD);
+                                        entries.add(PEARL_SWORD);
                                         entries.add(BLUE_SAPPHIRE_HELMET);
                                         entries.add(BLUE_SAPPHIRE_CHESTPLATE);
                                         entries.add(BLUE_SAPPHIRE_LEGGINGS);
@@ -251,6 +278,10 @@ public final class ModItems {
                                         entries.add(TOPAZ_CHESTPLATE);
                                         entries.add(TOPAZ_LEGGINGS);
                                         entries.add(TOPAZ_BOOTS);
+                                        entries.add(PEARL_HELMET);
+                                        entries.add(PEARL_CHESTPLATE);
+                                        entries.add(PEARL_LEGGINGS);
+                                        entries.add(PEARL_BOOTS);
                                         entries.add(OBSIDIAN_SWORD);
                                         entries.add(OBSIDIAN_HELMET);
                                         entries.add(OBSIDIAN_CHESTPLATE);
