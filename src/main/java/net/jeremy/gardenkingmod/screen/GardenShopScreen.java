@@ -50,8 +50,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_COST_ITEM_OFFSET_X = 6;
         /**
          * Controls where the cost stack count overlay hugs the right edge of the
-         * item slot. Increase to nudge the numbers further right, decrease to
-         * pull them left.
+         * item slot. The rightmost digit of the requested count is anchored to this
+         * position, so increasing the value nudges the numbers further right and
+         * decreasing it pulls them left.
          */
         private static final int OFFER_COST_COUNT_RIGHT_EDGE = 21;
         private static final int OFFER_COST_ITEM_SPACING = 18;
@@ -288,14 +289,11 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
                 String text = Integer.toString(count);
                 int textWidth = textRenderer.getWidth(text);
-                int singleDigitWidth = textRenderer.getWidth("0");
-                int extraOffset = Math.max(0, Math.round((textWidth - singleDigitWidth) / 2.0f));
-
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
                 matrices.translate(0.0F, 0.0F, 200.0F);
                 int overlayRight = x + OFFER_COST_COUNT_RIGHT_EDGE;
-                context.drawTextWithShadow(textRenderer, text, overlayRight - textWidth + extraOffset, y + 6,
+                context.drawTextWithShadow(textRenderer, text, overlayRight - textWidth, y + 6,
                                 0xFFFFFF);
                 matrices.pop();
         }
