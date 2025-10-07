@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "gardenkingmod:coin_sack"
+    }
+  ],
+  "result": {
+    "item": "gardenkingmod:garden_coin",
+    "count": 9
+  }
+}
