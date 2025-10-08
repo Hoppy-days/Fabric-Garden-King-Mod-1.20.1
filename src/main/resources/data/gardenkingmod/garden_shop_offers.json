@@ -25,11 +25,25 @@
       "_comment": "Page 2: Weapons",
       "offers": [
         {
-          "offer": "gardenkingmod:obsidian_sword",
-          "price": "gardenkingmod:coin_sack*128"
-        },
-        {
           "offer": "gardenkingmod:ruby_sword",
+          "price": "gardenkingmod:coin_sack*128"
+        },{
+          "offer": "gardenkingmod:blue_sapphire_sword",
+          "price": "gardenkingmod:coin_sack*128"
+        },{
+          "offer": "gardenkingmod:topaz_sword",
+          "price": "gardenkingmod:coin_sack*128"
+        },{
+          "offer": "gardenkingmod:pearl_sword",
+          "price": "gardenkingmod:coin_sack*128"
+        },{
+          "offer": "gardenkingmod:amethyst_sword",
+          "price": "gardenkingmod:garden_coin*1200"
+        },{
+          "offer": "gardenkingmod:obsidian_sword",
+          "price": "gardenkingmod:garden_coin*1200"
+        },{
+          "offer": "gardenkingmod:emerald_sword",
           "price": "gardenkingmod:garden_coin*1200"
         }
       ]
@@ -38,12 +52,92 @@
       "_comment": "Page 3: Tools",
       "offers": [
         {
-          "offer": "minecraft:elytra",
-          "price": "gardenkingmod:ruby*5"
-        },
-        {
-          "offer": "minecraft:elytra",
-          "price": "gardenkingmod:ruby*6"
+          "offer": "gardenkingmod:ruby_axe",
+          "price": [
+            "gardenkingmod:ruby*128",
+            "gardenkingmod:dollar*128"
+          ]
+        },{
+          "offer": "gardenkingmod:ruby_hoe",
+          "price": "gardenkingmod:ruby*128"
+        },{
+          "offer": "gardenkingmod:ruby_pickaxe",
+          "price": "gardenkingmod:ruby*128"
+        },{
+          "offer": "gardenkingmod:ruby_shovel",
+          "price": "gardenkingmod:ruby*128"
+        },{
+          "offer": "gardenkingmod:blue_sapphire_axe",
+          "price": "gardenkingmod:blue_sapphire*128"
+        },{
+          "offer": "gardenkingmod:blue_sapphire_hoe",
+          "price": "gardenkingmod:blue_sapphire*128"
+        },{
+          "offer": "gardenkingmod:blue_sapphire_pickaxe",
+          "price": "gardenkingmod:blue_sapphire*128"
+        },{
+          "offer": "gardenkingmod:blue_sapphire_shovel",
+          "price": "gardenkingmod:blue_sapphire*128"
+        },{
+          "offer": "gardenkingmod:topaz_axe",
+          "price": "gardenkingmod:topaz*128"
+        },{
+          "offer": "gardenkingmod:topaz_hoe",
+          "price": "gardenkingmod:topaz*128"
+        },{
+          "offer": "gardenkingmod:topaz_pickaxe",
+          "price": "gardenkingmod:topaz*128"
+        },{
+          "offer": "gardenkingmod:topaz_shovel",
+          "price": "gardenkingmod:topaz*128"
+        },{
+          "offer": "gardenkingmod:pearl_axe",
+          "price": "gardenkingmod:pearl*128"
+        },{
+          "offer": "gardenkingmod:pearl_hoe",
+          "price": "gardenkingmod:pearl*128"
+        },{
+          "offer": "gardenkingmod:pearl_pickaxe",
+          "price": "gardenkingmod:pearl*128"
+        },{
+          "offer": "gardenkingmod:pearl_shovel",
+          "price": "gardenkingmod:pearl*128"
+        },{
+          "offer": "gardenkingmod:amethyst_axe",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:amethyst_hoe",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:amethyst_pickaxe",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:amethyst_shovel",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:obsidian_axe",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:obsidian_hoe",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:obsidian_pickaxe",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:obsidian_shovel",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:emerald_axe",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:emerald_hoe",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:emerald_pickaxe",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:emerald_shovel",
+          "price": "gardenkingmod:dollar*128"
         }
       ]
     },
