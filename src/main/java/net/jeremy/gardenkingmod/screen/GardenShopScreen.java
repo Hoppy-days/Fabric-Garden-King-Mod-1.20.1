@@ -15,7 +15,9 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 
 public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
@@ -67,6 +69,17 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_ARROW_HEIGHT = 9;
         private static final int OFFER_ARROW_OFFSET_X = 53;
         private static final int OFFER_ARROW_OFFSET_Y = 6;
+
+        private static final int PRICE_SLOT_ONE_X = 144;
+        private static final int PRICE_SLOT_TWO_X = 180;
+        private static final int PRICE_SLOTS_Y = 45;
+        private static final int OFFER_DISPLAY_X = 233;
+        private static final int OFFER_DISPLAY_Y = 27;
+        private static final int OFFER_DISPLAY_WIDTH = 52;
+        private static final int OFFER_DISPLAY_HEIGHT = 70;
+        private static final float OFFER_DISPLAY_SCALE = 3.25F;
+        private static final float OFFER_DISPLAY_Z = 200.0F;
+        private static final float OFFER_ROTATION_SPEED = 30.0F;
 
         private static final int TAB_X = 0;
         private static final int TAB_WIDTH = 24;
@@ -143,6 +156,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 drawTabs(context, originX, originY, mouseX, mouseY);
                 drawOfferList(context, originX, originY, mouseX, mouseY);
                 drawScrollbar(context, originX, originY);
+                drawSelectedOfferDetails(context, originX, originY, delta);
         }
 
         @Override
@@ -540,5 +554,61 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private record HoveredStack(ItemStack stack, boolean isCostStack) {
+        }
+
+        private void drawSelectedOfferDetails(DrawContext context, int originX, int originY, float delta) {
+                if (selectedOffer < 0) {
+                        return;
+                }
+
+                List<GardenShopOffer> offers = getOffersForActiveTab();
+                if (selectedOffer < 0 || selectedOffer >= offers.size()) {
+                        return;
+                }
+
+                GardenShopOffer offer = offers.get(selectedOffer);
+                List<ItemStack> costStacks = offer.costStacks();
+
+                if (!costStacks.isEmpty()) {
+                        drawCostStack(context, costStacks.get(0), originX + PRICE_SLOT_ONE_X, originY + PRICE_SLOTS_Y);
+                }
+
+                if (costStacks.size() > 1) {
+                        drawCostStack(context, costStacks.get(1), originX + PRICE_SLOT_TWO_X, originY + PRICE_SLOTS_Y);
+                }
+
+                drawOfferPreview(context, originX, originY, offer.copyResultStack(), delta);
+        }
+
+        private void drawOfferPreview(DrawContext context, int originX, int originY, ItemStack stack, float delta) {
+                if (stack.isEmpty()) {
+                        return;
+                }
+
+                MatrixStack matrices = context.getMatrices();
+                matrices.push();
+
+                float centerX = originX + OFFER_DISPLAY_X + OFFER_DISPLAY_WIDTH / 2.0F;
+                float centerY = originY + OFFER_DISPLAY_Y + OFFER_DISPLAY_HEIGHT / 2.0F;
+                matrices.translate(centerX, centerY, OFFER_DISPLAY_Z);
+
+                float rotation = getOfferRotation(delta);
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotation));
+                matrices.scale(OFFER_DISPLAY_SCALE, OFFER_DISPLAY_SCALE, OFFER_DISPLAY_SCALE);
+
+                context.drawItem(stack, -8, -8);
+
+                matrices.pop();
+        }
+
+        private float getOfferRotation(float delta) {
+                float time;
+                if (client != null && client.world != null) {
+                        time = client.world.getTime() + delta;
+                } else {
+                        time = (float) (Util.getMeasuringTimeMs() / 50.0D);
+                }
+
+                return (time * OFFER_ROTATION_SPEED) % 360.0F;
         }
 }
