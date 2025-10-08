@@ -462,9 +462,10 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
                 removeCostStacks(offer.costStacks(), playerInventory);
                 ItemStack result = offer.copyResultStack();
-                boolean inserted = playerInventory.insertStack(result);
-                if (!inserted && !result.isEmpty()) {
-                        player.dropItem(result, false);
+                if (!result.isEmpty()) {
+                        if (!player.giveItemStack(result)) {
+                                player.dropItem(result, false);
+                        }
                 }
                 restockCostSlots(player, offer, false);
                 playerInventory.markDirty();
