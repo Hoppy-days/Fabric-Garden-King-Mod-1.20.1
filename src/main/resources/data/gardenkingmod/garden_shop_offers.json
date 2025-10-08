@@ -53,10 +53,7 @@
       "offers": [
         {
           "offer": "gardenkingmod:ruby_axe",
-          "price": [
-            "gardenkingmod:ruby*128",
-            "gardenkingmod:dollar*128"
-          ]
+          "price": "gardenkingmod:ruby*128"
         },{
           "offer": "gardenkingmod:ruby_hoe",
           "price": "gardenkingmod:ruby*128"
