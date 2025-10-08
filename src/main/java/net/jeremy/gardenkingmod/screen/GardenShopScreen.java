@@ -10,9 +10,11 @@ import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -42,7 +44,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFERS_LABEL_Y = 6;
         private static final int BUY_LABEL_X = 204;
         private static final int BUY_LABEL_Y = 100;
-        private static final int BUY_BUTTON_PAGE_INDEX = 0;
         private static final int BUY_BUTTON_OFFSET_X = 188;
         private static final int BUY_BUTTON_OFFSET_Y = 88;
         private static final int BUY_BUTTON_U = 301;
@@ -178,8 +179,10 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 super.drawForeground(context, mouseX, mouseY);
                 context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.offers"), OFFERS_LABEL_X,
                                 OFFERS_LABEL_Y, 0x404040, false);
-                context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.buy_button"), BUY_LABEL_X,
-                                BUY_LABEL_Y, 0xFFFFFF, false);
+                if (isBuyButtonVisible()) {
+                        context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.buy_button"), BUY_LABEL_X,
+                                        BUY_LABEL_Y, 0xFFFFFF, false);
+                }
         }
 
         @Override
@@ -218,6 +221,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         }
 
                         if (isPointWithinBuyButton(mouseX, mouseY)) {
+                                playClickSound();
                                 attemptPurchase();
                                 return true;
                         }
@@ -225,6 +229,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         int offerIndex = getOfferIndexAt(mouseX, mouseY);
                         if (offerIndex >= 0) {
                                 selectedOffer = offerIndex;
+                                playClickSound();
                                 return true;
                         }
                 }
@@ -384,7 +389,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private void drawBuyButton(DrawContext context, int originX, int originY, int mouseX, int mouseY) {
-                if (activeTab != BUY_BUTTON_PAGE_INDEX) {
+                if (!isBuyButtonVisible()) {
                         return;
                 }
 
@@ -396,7 +401,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private void drawSelectedOfferItems(DrawContext context, int originX, int originY) {
-                if (activeTab != BUY_BUTTON_PAGE_INDEX) {
+                if (!isBuyButtonVisible()) {
                         return;
                 }
 
@@ -432,7 +437,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private void drawSelectedOfferDetails(DrawContext context, int originX, int originY, float delta) {
-                if (activeTab != BUY_BUTTON_PAGE_INDEX) {
+                if (!isBuyButtonVisible()) {
                         return;
                 }
 
@@ -474,7 +479,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private boolean isPointWithinBuyButton(double mouseX, double mouseY) {
-                if (activeTab != BUY_BUTTON_PAGE_INDEX) {
+                if (!isBuyButtonVisible()) {
                         return false;
                 }
 
@@ -670,5 +675,17 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
                 int buttonId = GardenShopScreenHandler.encodePurchaseButtonId(activeTab, selectedOffer);
                 client.interactionManager.clickButton(handler.syncId, buttonId);
+        }
+
+        private boolean isBuyButtonVisible() {
+                return !getOffersForActiveTab().isEmpty();
+        }
+
+        private void playClickSound() {
+                if (client == null) {
+                        return;
+                }
+
+                client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
         }
 }
