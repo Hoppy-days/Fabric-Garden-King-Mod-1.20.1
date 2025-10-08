@@ -39,7 +39,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFERS_LABEL_X = 32;
         private static final int OFFERS_LABEL_Y = 6;
         private static final int BUY_LABEL_X = 204;
-        private static final int BUY_LABEL_Y = 94;
+        private static final int BUY_LABEL_Y = 100;
 
         private static final int OFFER_LIST_X = 29;
         private static final int OFFER_LIST_Y = 17;
