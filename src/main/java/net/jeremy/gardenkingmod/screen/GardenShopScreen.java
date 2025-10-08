@@ -52,18 +52,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int BUY_BUTTON_WIDTH = 46;
         private static final int BUY_BUTTON_HEIGHT = 14;
 
-        private static final int SLOT_ITEM_SIZE = 16;
-        private static final int PRICE_SLOT_SIZE = 18;
-        private static final int OFFER_SLOT_SIZE = 26;
-        private static final int PRICE_SLOT_ITEM_INSET = (PRICE_SLOT_SIZE - SLOT_ITEM_SIZE) / 2;
-        private static final int OFFER_SLOT_ITEM_INSET = (OFFER_SLOT_SIZE - SLOT_ITEM_SIZE) / 2;
-        private static final int PRICE_SLOT_1_OFFSET_X = 159;
-        private static final int PRICE_SLOT_1_OFFSET_Y = 50;
-        private static final int PRICE_SLOT_2_OFFSET_X = 185;
-        private static final int PRICE_SLOT_2_OFFSET_Y = 50;
-        private static final int OFFER_SLOT_OFFSET_X = 239;
-        private static final int OFFER_SLOT_OFFSET_Y = 47;
-
         private static final int OFFER_LIST_X = 29;
         private static final int OFFER_LIST_Y = 17;
         private static final int OFFER_ENTRY_WIDTH = 88;
@@ -84,9 +72,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_ARROW_OFFSET_X = 53;
         private static final int OFFER_ARROW_OFFSET_Y = 6;
 
-        private static final int PRICE_SLOT_ONE_X = 144;
-        private static final int PRICE_SLOT_TWO_X = 180;
-        private static final int PRICE_SLOTS_Y = 45;
         private static final int OFFER_DISPLAY_X = 233;
         private static final int OFFER_DISPLAY_Y = 27;
         private static final int OFFER_DISPLAY_WIDTH = 52;
@@ -169,7 +154,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 drawBuyButton(context, originX, originY, mouseX, mouseY);
                 drawTabs(context, originX, originY, mouseX, mouseY);
                 drawOfferList(context, originX, originY, mouseX, mouseY);
-                drawSelectedOfferItems(context, originX, originY);
                 drawScrollbar(context, originX, originY);
                 drawSelectedOfferDetails(context, originX, originY, delta);
         }
@@ -228,7 +212,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
                         int offerIndex = getOfferIndexAt(mouseX, mouseY);
                         if (offerIndex >= 0) {
-                                selectedOffer = offerIndex;
+                                selectOffer(offerIndex);
                                 playClickSound();
                                 return true;
                         }
@@ -400,42 +384,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 TEXTURE_WIDTH, TEXTURE_HEIGHT);
         }
 
-        private void drawSelectedOfferItems(DrawContext context, int originX, int originY) {
-                if (!isBuyButtonVisible()) {
-                        return;
-                }
-
-                List<GardenShopOffer> offers = getOffersForActiveTab();
-                if (selectedOffer < 0 || selectedOffer >= offers.size()) {
-                        return;
-                }
-
-                GardenShopOffer offer = offers.get(selectedOffer);
-                List<ItemStack> costs = offer.costStacks();
-                if (!costs.isEmpty()) {
-                        ItemStack firstCost = costs.get(0);
-                        int firstX = originX + PRICE_SLOT_1_OFFSET_X + PRICE_SLOT_ITEM_INSET;
-                        int firstY = originY + PRICE_SLOT_1_OFFSET_Y + PRICE_SLOT_ITEM_INSET;
-                        drawCostStack(context, firstCost, firstX, firstY);
-                }
-
-                if (costs.size() > 1) {
-                        ItemStack secondCost = costs.get(1);
-                        int secondX = originX + PRICE_SLOT_2_OFFSET_X + PRICE_SLOT_ITEM_INSET;
-                        int secondY = originY + PRICE_SLOT_2_OFFSET_Y + PRICE_SLOT_ITEM_INSET;
-                        drawCostStack(context, secondCost, secondX, secondY);
-                }
-
-                ItemStack resultStack = offer.copyResultStack();
-                int resultX = originX + OFFER_SLOT_OFFSET_X + OFFER_SLOT_ITEM_INSET;
-                int resultY = originY + OFFER_SLOT_OFFSET_Y + OFFER_SLOT_ITEM_INSET;
-                context.drawItem(resultStack, resultX, resultY);
-                context.drawItemInSlot(textRenderer, resultStack, resultX, resultY);
-                if (GardenShopStackHelper.getRequestedCount(resultStack) > resultStack.getCount()) {
-                        drawStackCountOverlay(context, resultStack, resultX, resultY);
-                }
-        }
-
         private void drawSelectedOfferDetails(DrawContext context, int originX, int originY, float delta) {
                 if (!isBuyButtonVisible()) {
                         return;
@@ -495,8 +443,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 int offerCount = getOffersForActiveTab().size();
                 maxScrollSteps = Math.max(offerCount - MAX_VISIBLE_OFFERS, 0);
                 setScrollAmount(scrollAmount);
-                if (selectedOffer >= offerCount) {
-                        selectedOffer = offerCount - 1;
+                if (offerCount <= 0) {
+                        if (selectedOffer != -1) {
+                                clearSelectedOffer();
+                        }
+                } else if (selectedOffer >= offerCount) {
+                        selectOffer(offerCount - 1);
                 }
         }
 
@@ -572,7 +524,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 int clampedIndex = MathHelper.clamp(tabIndex, 0, TAB_DEFINITIONS.length - 1);
                 if (activeTab != clampedIndex) {
                         activeTab = clampedIndex;
-                        selectedOffer = -1;
+                        clearSelectedOffer();
                         setScrollAmount(0.0F);
                         updateScrollLimits();
                         lastOfferCount = getOffersForActiveTab().size();
@@ -661,6 +613,25 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private record HoveredStack(ItemStack stack, boolean isCostStack) {
+        }
+
+        private void selectOffer(int offerIndex) {
+                selectedOffer = offerIndex;
+                sendOfferSelectionUpdate(offerIndex);
+        }
+
+        private void clearSelectedOffer() {
+                selectedOffer = -1;
+                sendOfferSelectionUpdate(-1);
+        }
+
+        private void sendOfferSelectionUpdate(int offerIndex) {
+                if (client == null || client.interactionManager == null) {
+                        return;
+                }
+
+                int buttonId = GardenShopScreenHandler.encodeSelectButtonId(activeTab, offerIndex);
+                client.interactionManager.clickButton(handler.syncId, buttonId);
         }
 
         private void attemptPurchase() {
