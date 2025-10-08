@@ -48,6 +48,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private final SimpleInventory costInventory;
         private final SimpleInventory resultInventory;
         private final List<List<GardenShopOffer>> offersByPage;
+        private int selectedPageIndex = -1;
+        private int selectedOfferIndex = -1;
 
         private static int encodeOfferIndexValue(int offerIndex) {
                 return offerIndex < 0 ? OFFER_INDEX_MASK : offerIndex & OFFER_INDEX_MASK;
@@ -282,7 +284,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 }
 
                 GardenShopOffer offer = pageOffers.get(offerIndex);
-                return restockCostSlots(player, offer, true);
+                boolean inventoryChanged = restockCostSlots(player, offer, true);
+                boolean selectionChanged = this.selectedPageIndex != pageIndex || this.selectedOfferIndex != offerIndex;
+                this.selectedPageIndex = pageIndex;
+                this.selectedOfferIndex = offerIndex;
+                return inventoryChanged || selectionChanged;
         }
 
         private boolean clearSelection(ServerPlayerEntity player) {
@@ -293,7 +299,10 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         this.resultInventory.markDirty();
                         changed = true;
                 }
-                return changed;
+                boolean selectionChanged = this.selectedPageIndex != -1 || this.selectedOfferIndex != -1;
+                this.selectedPageIndex = -1;
+                this.selectedOfferIndex = -1;
+                return changed || selectionChanged;
         }
 
         private boolean restockCostSlots(ServerPlayerEntity player, GardenShopOffer offer, boolean returnExisting) {
@@ -445,6 +454,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private boolean tryPurchase(ServerPlayerEntity player, int pageIndex, int offerIndex) {
+                return processPurchase(player, pageIndex, offerIndex, false);
+        }
+
+        private boolean processPurchase(ServerPlayerEntity player, int pageIndex, int offerIndex,
+                        boolean resultTakenFromSlot) {
                 if (pageIndex < 0 || pageIndex >= offersByPage.size()) {
                         return false;
                 }
@@ -461,10 +475,12 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 }
 
                 removeCostStacks(offer.costStacks(), playerInventory);
-                ItemStack result = offer.copyResultStack();
-                if (!result.isEmpty()) {
-                        if (!player.giveItemStack(result)) {
-                                player.dropItem(result, false);
+                if (!resultTakenFromSlot) {
+                        ItemStack result = offer.copyResultStack();
+                        if (!result.isEmpty()) {
+                                if (!player.giveItemStack(result)) {
+                                        player.dropItem(result, false);
+                                }
                         }
                 }
                 restockCostSlots(player, offer, false);
@@ -608,7 +624,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private void addResultSlot() {
-                this.addSlot(new ResultSlot(this.resultInventory, 0, RESULT_SLOT_X, RESULT_SLOT_Y));
+                this.addSlot(new ResultSlot(this, this.resultInventory, 0, RESULT_SLOT_X, RESULT_SLOT_Y));
         }
 
         private void fillInventoryFromOffers() {
@@ -635,8 +651,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private static class ResultSlot extends Slot {
-                public ResultSlot(Inventory inventory, int index, int x, int y) {
+                private final GardenShopScreenHandler handler;
+
+                public ResultSlot(GardenShopScreenHandler handler, Inventory inventory, int index, int x, int y) {
                         super(inventory, index, x, y);
+                        this.handler = handler;
                 }
 
                 @Override
@@ -646,7 +665,21 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
                 @Override
                 public boolean canTakeItems(PlayerEntity playerEntity) {
-                        return false;
+                        return !getStack().isEmpty();
+                }
+
+                @Override
+                public void onTakeItem(PlayerEntity player, ItemStack stack) {
+                        boolean purchased = false;
+                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                                int pageIndex = handler.selectedPageIndex;
+                                int offerIndex = handler.selectedOfferIndex;
+                                purchased = handler.processPurchase(serverPlayer, pageIndex, offerIndex, true);
+                        }
+                        super.onTakeItem(player, stack);
+                        if (purchased) {
+                                handler.sendContentUpdates();
+                        }
                 }
         }
 }
