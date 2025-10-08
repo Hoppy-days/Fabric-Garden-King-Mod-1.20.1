@@ -431,6 +431,39 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
         }
 
+        private void drawSelectedOfferDetails(DrawContext context, int originX, int originY, float delta) {
+                if (activeTab != BUY_BUTTON_PAGE_INDEX) {
+                        return;
+                }
+
+                List<GardenShopOffer> offers = getOffersForActiveTab();
+                if (selectedOffer < 0 || selectedOffer >= offers.size()) {
+                        return;
+                }
+
+                ItemStack resultStack = offers.get(selectedOffer).copyResultStack();
+                if (resultStack.isEmpty()) {
+                        return;
+                }
+
+                int displayLeft = originX + OFFER_DISPLAY_X;
+                int displayTop = originY + OFFER_DISPLAY_Y;
+                float centerX = displayLeft + (OFFER_DISPLAY_WIDTH / 2.0F);
+                float centerY = displayTop + (OFFER_DISPLAY_HEIGHT / 2.0F);
+
+                MatrixStack matrices = context.getMatrices();
+                matrices.push();
+                matrices.translate(centerX, centerY, OFFER_DISPLAY_Z);
+                matrices.scale(OFFER_DISPLAY_SCALE, OFFER_DISPLAY_SCALE, OFFER_DISPLAY_SCALE);
+
+                float rotation = ((Util.getMeasuringTimeMs() % 3600000L) / 1000.0F + delta) * OFFER_ROTATION_SPEED;
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotation));
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(25.0F));
+
+                context.drawItem(resultStack, -8, -8);
+                matrices.pop();
+        }
+
         private boolean isPointWithinScrollbar(double mouseX, double mouseY) {
                 int originX = (width - backgroundWidth) / 2;
                 int originY = (height - backgroundHeight) / 2;
