@@ -65,7 +65,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int TAB_WIDTH = 24;
         private static final int TAB_HEIGHT = 28;
         private static final int TAB_ICON_SIZE = 16;
-        private static final int TAB_ICON_OFFSET_X = (TAB_WIDTH - TAB_ICON_SIZE) / 2;
+        private static final int TAB_ICON_OFFSET_X = (TAB_WIDTH - TAB_ICON_SIZE) / 2 + 1;
         private static final int TAB_ICON_OFFSET_Y = (TAB_HEIGHT - TAB_ICON_SIZE) / 2;
         private static final int TAB_HOVER_U = 301;
         private static final int TAB_HOVER_V = 52;
