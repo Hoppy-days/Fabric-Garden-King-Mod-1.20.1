@@ -15,7 +15,9 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 
 public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
@@ -80,6 +82,17 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_ARROW_HEIGHT = 9;
         private static final int OFFER_ARROW_OFFSET_X = 53;
         private static final int OFFER_ARROW_OFFSET_Y = 6;
+
+        private static final int PRICE_SLOT_ONE_X = 144;
+        private static final int PRICE_SLOT_TWO_X = 180;
+        private static final int PRICE_SLOTS_Y = 45;
+        private static final int OFFER_DISPLAY_X = 233;
+        private static final int OFFER_DISPLAY_Y = 27;
+        private static final int OFFER_DISPLAY_WIDTH = 52;
+        private static final int OFFER_DISPLAY_HEIGHT = 70;
+        private static final float OFFER_DISPLAY_SCALE = 3.25F;
+        private static final float OFFER_DISPLAY_Z = 200.0F;
+        private static final float OFFER_ROTATION_SPEED = 30.0F;
 
         private static final int TAB_X = 0;
         private static final int TAB_WIDTH = 24;
@@ -157,6 +170,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 drawOfferList(context, originX, originY, mouseX, mouseY);
                 drawSelectedOfferItems(context, originX, originY);
                 drawScrollbar(context, originX, originY);
+                drawSelectedOfferDetails(context, originX, originY, delta);
         }
 
         @Override
