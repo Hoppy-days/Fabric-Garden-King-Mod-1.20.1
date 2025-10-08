@@ -55,6 +55,24 @@ public final class GardenShopStackHelper {
         return stack.getCount();
     }
 
+    /**
+     * Returns a defensive copy of the stack without the helper metadata used to
+     * encode large requested counts. This is useful when comparing cost stacks
+     * against real inventory stacks which will not contain the helper data.
+     *
+     * @param stack the stack to copy
+     * @return a copy of the provided stack without helper metadata
+     */
+    public static ItemStack copyWithoutRequestedCount(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+
+        ItemStack copy = stack.copy();
+        removeFullCount(copy);
+        return copy;
+    }
+
     private static void removeFullCount(ItemStack stack) {
         if (!stack.hasNbt()) {
             return;

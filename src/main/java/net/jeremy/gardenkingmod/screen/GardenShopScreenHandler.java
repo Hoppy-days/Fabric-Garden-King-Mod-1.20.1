@@ -6,6 +6,7 @@ import java.util.List;
 import net.jeremy.gardenkingmod.ModScreenHandlers;
 import net.jeremy.gardenkingmod.block.entity.GardenShopBlockEntity;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
+import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -14,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class GardenShopScreenHandler extends ScreenHandler {
@@ -27,9 +29,31 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static final int PLAYER_HOTBAR_Y = 181;
         private static final int PLAYER_HOTBAR_X = 132;
 
+        private static final int PURCHASE_BUTTON_FLAG = 1 << 30;
+        private static final int PAGE_INDEX_SHIFT = 16;
+        private static final int PAGE_INDEX_MASK = 0x7FFF;
+        private static final int OFFER_INDEX_MASK = 0xFFFF;
+
         private final Inventory inventory;
         private final GardenShopBlockEntity blockEntity;
         private final List<List<GardenShopOffer>> offersByPage;
+
+        public static int encodePurchaseButtonId(int pageIndex, int offerIndex) {
+                return PURCHASE_BUTTON_FLAG | ((pageIndex & PAGE_INDEX_MASK) << PAGE_INDEX_SHIFT)
+                                | (offerIndex & OFFER_INDEX_MASK);
+        }
+
+        private static boolean isPurchaseButtonId(int id) {
+                return (id & PURCHASE_BUTTON_FLAG) != 0;
+        }
+
+        private static int decodePageIndex(int id) {
+                return (id >>> PAGE_INDEX_SHIFT) & PAGE_INDEX_MASK;
+        }
+
+        private static int decodeOfferIndex(int id) {
+                return id & OFFER_INDEX_MASK;
+        }
 
         public GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
                 this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()), buf);
@@ -116,6 +140,20 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return ItemStack.EMPTY;
         }
 
+        @Override
+        public boolean onButtonClick(PlayerEntity player, int id) {
+                if (isPurchaseButtonId(id) && player instanceof ServerPlayerEntity serverPlayer) {
+                        int pageIndex = decodePageIndex(id);
+                        int offerIndex = decodeOfferIndex(id);
+                        if (tryPurchase(serverPlayer, pageIndex, offerIndex)) {
+                                sendContentUpdates();
+                        }
+                        return true;
+                }
+
+                return super.onButtonClick(player, id);
+        }
+
         public Inventory getInventory() {
                 return this.inventory;
         }
@@ -130,6 +168,113 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
         public int getPageCount() {
                 return this.offersByPage.size();
+        }
+
+        private boolean tryPurchase(ServerPlayerEntity player, int pageIndex, int offerIndex) {
+                if (pageIndex < 0 || pageIndex >= offersByPage.size()) {
+                        return false;
+                }
+
+                List<GardenShopOffer> pageOffers = offersByPage.get(pageIndex);
+                if (offerIndex < 0 || offerIndex >= pageOffers.size()) {
+                        return false;
+                }
+
+                GardenShopOffer offer = pageOffers.get(offerIndex);
+                PlayerInventory playerInventory = player.getInventory();
+                if (!canAfford(playerInventory, offer.costStacks())) {
+                        return false;
+                }
+
+                removeCostStacks(playerInventory, offer.costStacks());
+                ItemStack result = offer.copyResultStack();
+                boolean inserted = playerInventory.insertStack(result);
+                if (!inserted && !result.isEmpty()) {
+                        player.dropItem(result, false);
+                }
+                playerInventory.markDirty();
+                return true;
+        }
+
+        private boolean canAfford(PlayerInventory inventory, List<ItemStack> costs) {
+                if (costs.isEmpty()) {
+                        return true;
+                }
+
+                int[] simulatedCounts = new int[inventory.size()];
+                for (int slot = 0; slot < inventory.size(); slot++) {
+                        simulatedCounts[slot] = inventory.getStack(slot).getCount();
+                }
+
+                for (ItemStack cost : costs) {
+                        if (cost.isEmpty()) {
+                                continue;
+                        }
+
+                        int required = GardenShopStackHelper.getRequestedCount(cost);
+                        if (required <= 0) {
+                                continue;
+                        }
+
+                        ItemStack comparisonStack = GardenShopStackHelper.copyWithoutRequestedCount(cost);
+                        int remaining = required;
+                        for (int slot = 0; slot < inventory.size() && remaining > 0; slot++) {
+                                ItemStack stack = inventory.getStack(slot);
+                                if (stack.isEmpty()) {
+                                        continue;
+                                }
+                                if (!ItemStack.canCombine(stack, comparisonStack)) {
+                                        continue;
+                                }
+
+                                int available = simulatedCounts[slot];
+                                if (available <= 0) {
+                                        continue;
+                                }
+
+                                int taken = Math.min(available, remaining);
+                                simulatedCounts[slot] -= taken;
+                                remaining -= taken;
+                        }
+
+                        if (remaining > 0) {
+                                return false;
+                        }
+                }
+
+                return true;
+        }
+
+        private void removeCostStacks(PlayerInventory inventory, List<ItemStack> costs) {
+                for (ItemStack cost : costs) {
+                        if (cost.isEmpty()) {
+                                continue;
+                        }
+
+                        int required = GardenShopStackHelper.getRequestedCount(cost);
+                        if (required <= 0) {
+                                continue;
+                        }
+
+                        ItemStack comparisonStack = GardenShopStackHelper.copyWithoutRequestedCount(cost);
+                        int remaining = required;
+                        for (int slot = 0; slot < inventory.size() && remaining > 0; slot++) {
+                                ItemStack stack = inventory.getStack(slot);
+                                if (stack.isEmpty()) {
+                                        continue;
+                                }
+                                if (!ItemStack.canCombine(stack, comparisonStack)) {
+                                        continue;
+                                }
+
+                                int taken = Math.min(stack.getCount(), remaining);
+                                stack.decrement(taken);
+                                remaining -= taken;
+                                if (stack.isEmpty()) {
+                                        inventory.setStack(slot, ItemStack.EMPTY);
+                                }
+                        }
+                }
         }
 
         private void addPlayerInventory(PlayerInventory playerInventory) {
