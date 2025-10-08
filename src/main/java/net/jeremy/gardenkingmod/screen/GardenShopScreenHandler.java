@@ -30,11 +30,15 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static final int PLAYER_HOTBAR_Y = 181;
         private static final int PLAYER_HOTBAR_X = 132;
         private static final int COST_SLOT_COUNT = 2;
+        private static final int RESULT_SLOT_COUNT = 1;
         private static final int COST_SLOT_ONE_X = 144;
         private static final int COST_SLOT_TWO_X = 180;
         private static final int COST_SLOTS_Y = 45;
+        private static final int RESULT_SLOT_X = 244;
+        private static final int RESULT_SLOT_Y = 52;
 
         private static final int PURCHASE_BUTTON_FLAG = 1 << 30;
+        private static final int SELECT_BUTTON_FLAG = 1 << 29;
         private static final int PAGE_INDEX_SHIFT = 16;
         private static final int PAGE_INDEX_MASK = 0x7FFF;
         private static final int OFFER_INDEX_MASK = 0xFFFF;
@@ -42,15 +46,29 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private final Inventory inventory;
         private final GardenShopBlockEntity blockEntity;
         private final SimpleInventory costInventory;
+        private final SimpleInventory resultInventory;
         private final List<List<GardenShopOffer>> offersByPage;
+
+        private static int encodeOfferIndexValue(int offerIndex) {
+                return offerIndex < 0 ? OFFER_INDEX_MASK : offerIndex & OFFER_INDEX_MASK;
+        }
 
         public static int encodePurchaseButtonId(int pageIndex, int offerIndex) {
                 return PURCHASE_BUTTON_FLAG | ((pageIndex & PAGE_INDEX_MASK) << PAGE_INDEX_SHIFT)
-                                | (offerIndex & OFFER_INDEX_MASK);
+                                | encodeOfferIndexValue(offerIndex);
+        }
+
+        public static int encodeSelectButtonId(int pageIndex, int offerIndex) {
+                return SELECT_BUTTON_FLAG | ((pageIndex & PAGE_INDEX_MASK) << PAGE_INDEX_SHIFT)
+                                | encodeOfferIndexValue(offerIndex);
         }
 
         private static boolean isPurchaseButtonId(int id) {
                 return (id & PURCHASE_BUTTON_FLAG) != 0;
+        }
+
+        private static boolean isSelectButtonId(int id) {
+                return (id & SELECT_BUTTON_FLAG) != 0;
         }
 
         private static int decodePageIndex(int id) {
@@ -58,7 +76,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private static int decodeOfferIndex(int id) {
-                return id & OFFER_INDEX_MASK;
+                int value = id & OFFER_INDEX_MASK;
+                return value == OFFER_INDEX_MASK ? -1 : value;
         }
 
         public GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
@@ -75,6 +94,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 this.blockEntity = blockEntity;
                 this.inventory = blockEntity != null ? blockEntity : new SimpleInventory(GardenShopBlockEntity.INVENTORY_SIZE);
                 this.costInventory = new SimpleInventory(COST_SLOT_COUNT);
+                this.resultInventory = new SimpleInventory(RESULT_SLOT_COUNT);
                 this.offersByPage = new ArrayList<>();
 
                 checkSize(this.inventory, GardenShopBlockEntity.INVENTORY_SIZE);
@@ -111,8 +131,10 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
                 this.inventory.onOpen(playerInventory.player);
                 this.costInventory.onOpen(playerInventory.player);
+                this.resultInventory.onOpen(playerInventory.player);
 
                 addCostSlots();
+                addResultSlot();
                 addPlayerInventory(playerInventory);
                 addPlayerHotbar(playerInventory);
         }
@@ -143,9 +165,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         this.inventory.onClose(player);
                 }
                 this.costInventory.onClose(player);
+                this.resultInventory.onClose(player);
                 if (!player.getWorld().isClient) {
                         this.dropInventory(player, this.costInventory);
                 }
+                this.resultInventory.clear();
         }
 
         @Override
@@ -159,12 +183,18 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 ItemStack copiedStack = originalStack.copy();
 
                 int costSlotEnd = COST_SLOT_COUNT;
-                int playerInventoryStart = costSlotEnd;
+                int resultSlotStart = costSlotEnd;
+                int resultSlotEnd = resultSlotStart + RESULT_SLOT_COUNT;
+                int playerInventoryStart = resultSlotEnd;
                 int playerInventoryEnd = playerInventoryStart + PLAYER_INVENTORY_SLOT_COUNT;
                 int hotbarStart = playerInventoryEnd;
                 int hotbarEnd = hotbarStart + HOTBAR_SLOT_COUNT;
 
                 if (index < costSlotEnd) {
+                        if (!this.insertItem(originalStack, playerInventoryStart, hotbarEnd, true)) {
+                                return ItemStack.EMPTY;
+                        }
+                } else if (index < resultSlotEnd) {
                         if (!this.insertItem(originalStack, playerInventoryStart, hotbarEnd, true)) {
                                 return ItemStack.EMPTY;
                         }
@@ -200,6 +230,19 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
         @Override
         public boolean onButtonClick(PlayerEntity player, int id) {
+                if (isSelectButtonId(id) && player instanceof ServerPlayerEntity serverPlayer) {
+                        int pageIndex = decodePageIndex(id);
+                        int offerIndex = decodeOfferIndex(id);
+                        if (offerIndex < 0) {
+                                if (clearSelection(serverPlayer)) {
+                                        sendContentUpdates();
+                                }
+                        } else if (setSelectedOffer(serverPlayer, pageIndex, offerIndex)) {
+                                sendContentUpdates();
+                        }
+                        return true;
+                }
+
                 if (isPurchaseButtonId(id) && player instanceof ServerPlayerEntity serverPlayer) {
                         int pageIndex = decodePageIndex(id);
                         int offerIndex = decodeOfferIndex(id);
@@ -228,6 +271,179 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return this.offersByPage.size();
         }
 
+        private boolean setSelectedOffer(ServerPlayerEntity player, int pageIndex, int offerIndex) {
+                if (pageIndex < 0 || pageIndex >= this.offersByPage.size()) {
+                        return clearSelection(player);
+                }
+
+                List<GardenShopOffer> pageOffers = this.offersByPage.get(pageIndex);
+                if (offerIndex < 0 || offerIndex >= pageOffers.size()) {
+                        return clearSelection(player);
+                }
+
+                GardenShopOffer offer = pageOffers.get(offerIndex);
+                return restockCostSlots(player, offer, true);
+        }
+
+        private boolean clearSelection(ServerPlayerEntity player) {
+                boolean changed = returnCostItems(player);
+                ItemStack current = this.resultInventory.getStack(0);
+                if (!current.isEmpty()) {
+                        this.resultInventory.setStack(0, ItemStack.EMPTY);
+                        this.resultInventory.markDirty();
+                        changed = true;
+                }
+                return changed;
+        }
+
+        private boolean restockCostSlots(ServerPlayerEntity player, GardenShopOffer offer, boolean returnExisting) {
+                if (offer == null) {
+                        return clearSelection(player);
+                }
+
+                PlayerInventory playerInventory = player.getInventory();
+                boolean changed = false;
+
+                if (returnExisting) {
+                        if (returnCostItems(player)) {
+                                changed = true;
+                        }
+                }
+
+                List<ItemStack> costs = offer.costStacks();
+                boolean playerChanged = false;
+                boolean slotChanged = false;
+                for (int slotIndex = 0; slotIndex < COST_SLOT_COUNT; slotIndex++) {
+                        ItemStack template = slotIndex < costs.size() ? costs.get(slotIndex) : ItemStack.EMPTY;
+                        PullResult result = pullCostStackIntoSlot(playerInventory, template, slotIndex);
+                        if (result.playerChanged()) {
+                                playerChanged = true;
+                        }
+                        if (result.slotChanged()) {
+                                slotChanged = true;
+                        }
+                }
+
+                if (playerChanged) {
+                        playerInventory.markDirty();
+                        changed = true;
+                }
+
+                if (slotChanged) {
+                        this.costInventory.markDirty();
+                        changed = true;
+                }
+
+                if (updateResultSlot(offer, playerInventory)) {
+                        changed = true;
+                }
+
+                return changed;
+        }
+
+        private boolean updateResultSlot(GardenShopOffer offer, PlayerInventory playerInventory) {
+                ItemStack previous = this.resultInventory.getStack(0);
+                ItemStack next = ItemStack.EMPTY;
+                if (offer != null && canAfford(offer.costStacks(), this.costInventory, playerInventory)) {
+                        next = offer.copyResultStack();
+                }
+
+                boolean changed = !ItemStack.areEqual(previous, next) || previous.getCount() != next.getCount();
+                if (changed) {
+                        this.resultInventory.setStack(0, next);
+                        this.resultInventory.markDirty();
+                }
+                return changed;
+        }
+
+        private boolean returnCostItems(ServerPlayerEntity player) {
+                boolean changed = false;
+                PlayerInventory playerInventory = player.getInventory();
+                for (int slot = 0; slot < this.costInventory.size(); slot++) {
+                        ItemStack stack = this.costInventory.removeStack(slot);
+                        if (stack.isEmpty()) {
+                                continue;
+                        }
+
+                        if (!playerInventory.insertStack(stack)) {
+                                player.dropItem(stack, false);
+                        }
+                        changed = true;
+                }
+
+                if (changed) {
+                        playerInventory.markDirty();
+                        this.costInventory.markDirty();
+                }
+                return changed;
+        }
+
+        private PullResult pullCostStackIntoSlot(PlayerInventory playerInventory, ItemStack template, int slotIndex) {
+                ItemStack previous = this.costInventory.getStack(slotIndex);
+
+                if (template == null || template.isEmpty()) {
+                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        boolean slotChanged = !previous.isEmpty();
+                        return new PullResult(false, slotChanged);
+                }
+
+                int required = GardenShopStackHelper.getRequestedCount(template);
+                if (required <= 0) {
+                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        boolean slotChanged = !previous.isEmpty();
+                        return new PullResult(false, slotChanged);
+                }
+
+                ItemStack comparison = GardenShopStackHelper.copyWithoutRequestedCount(template);
+                if (comparison.isEmpty()) {
+                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        boolean slotChanged = !previous.isEmpty();
+                        return new PullResult(false, slotChanged);
+                }
+
+                int maxToMove = Math.min(required, comparison.getMaxCount());
+                int remaining = maxToMove;
+                ItemStack newStack = ItemStack.EMPTY;
+                boolean playerChanged = false;
+
+                for (int inventorySlot = 0; inventorySlot < playerInventory.size() && remaining > 0; inventorySlot++) {
+                        ItemStack playerStack = playerInventory.getStack(inventorySlot);
+                        if (playerStack.isEmpty() || !ItemStack.canCombine(playerStack, comparison)) {
+                                continue;
+                        }
+
+                        int taken = Math.min(playerStack.getCount(), remaining);
+                        if (taken <= 0) {
+                                continue;
+                        }
+
+                        if (newStack.isEmpty()) {
+                                newStack = playerStack.copy();
+                                newStack.setCount(taken);
+                        } else {
+                                newStack.increment(taken);
+                        }
+
+                        playerStack.decrement(taken);
+                        remaining -= taken;
+                        playerChanged = true;
+
+                        if (playerStack.isEmpty()) {
+                                playerInventory.setStack(inventorySlot, ItemStack.EMPTY);
+                        }
+                }
+
+                if (newStack.isEmpty()) {
+                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        boolean slotChanged = !previous.isEmpty();
+                        return new PullResult(playerChanged, slotChanged);
+                }
+
+                this.costInventory.setStack(slotIndex, newStack);
+                boolean slotChanged = !ItemStack.areEqual(previous, newStack) || previous.getCount() != newStack.getCount();
+                return new PullResult(playerChanged, slotChanged);
+        }
+
         private boolean tryPurchase(ServerPlayerEntity player, int pageIndex, int offerIndex) {
                 if (pageIndex < 0 || pageIndex >= offersByPage.size()) {
                         return false;
@@ -246,10 +462,12 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
                 removeCostStacks(offer.costStacks(), playerInventory);
                 ItemStack result = offer.copyResultStack();
-                boolean inserted = playerInventory.insertStack(result);
-                if (!inserted && !result.isEmpty()) {
-                        player.dropItem(result, false);
+                if (!result.isEmpty()) {
+                        if (!player.giveItemStack(result)) {
+                                player.dropItem(result, false);
+                        }
                 }
+                restockCostSlots(player, offer, false);
                 playerInventory.markDirty();
                 this.costInventory.markDirty();
                 return true;
@@ -389,6 +607,10 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 this.addSlot(new Slot(this.costInventory, 1, COST_SLOT_TWO_X, COST_SLOTS_Y));
         }
 
+        private void addResultSlot() {
+                this.addSlot(new ResultSlot(this.resultInventory, 0, RESULT_SLOT_X, RESULT_SLOT_Y));
+        }
+
         private void fillInventoryFromOffers() {
                 List<GardenShopOffer> flattened = flattenOffers();
                 for (int index = 0; index < this.inventory.size(); index++) {
@@ -407,5 +629,24 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         flattened.addAll(page);
                 }
                 return flattened;
+        }
+
+        private record PullResult(boolean playerChanged, boolean slotChanged) {
+        }
+
+        private static class ResultSlot extends Slot {
+                public ResultSlot(Inventory inventory, int index, int x, int y) {
+                        super(inventory, index, x, y);
+                }
+
+                @Override
+                public boolean canInsert(ItemStack stack) {
+                        return false;
+                }
+
+                @Override
+                public boolean canTakeItems(PlayerEntity playerEntity) {
+                        return false;
+                }
         }
 }
