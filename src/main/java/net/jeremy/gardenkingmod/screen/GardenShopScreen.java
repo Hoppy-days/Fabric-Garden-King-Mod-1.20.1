@@ -40,6 +40,13 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFERS_LABEL_Y = 6;
         private static final int BUY_LABEL_X = 204;
         private static final int BUY_LABEL_Y = 100;
+        private static final int BUY_BUTTON_PAGE_INDEX = 1;
+        private static final int BUY_BUTTON_OFFSET_X = 148;
+        private static final int BUY_BUTTON_OFFSET_Y = 88;
+        private static final int BUY_BUTTON_U = 301;
+        private static final int BUY_BUTTON_V = 81;
+        private static final int BUY_BUTTON_WIDTH = 46;
+        private static final int BUY_BUTTON_HEIGHT = 14;
 
         private static final int OFFER_LIST_X = 29;
         private static final int OFFER_LIST_Y = 17;
@@ -132,6 +139,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 TEXTURE_WIDTH,
                                 TEXTURE_HEIGHT);
 
+                drawBuyButton(context, originX, originY);
                 drawTabs(context, originX, originY, mouseX, mouseY);
                 drawOfferList(context, originX, originY, mouseX, mouseY);
                 drawScrollbar(context, originX, originY);
@@ -340,6 +348,17 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
                 context.drawTexture(TEXTURE, scrollbarX, knobY, SCROLLBAR_KNOB_U, SCROLLBAR_KNOB_V, SCROLLBAR_KNOB_WIDTH,
                                 SCROLLBAR_KNOB_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        }
+
+        private void drawBuyButton(DrawContext context, int originX, int originY) {
+                if (activeTab != BUY_BUTTON_PAGE_INDEX) {
+                        return;
+                }
+
+                int buttonX = originX + BUY_BUTTON_OFFSET_X;
+                int buttonY = originY + BUY_BUTTON_OFFSET_Y;
+                context.drawTexture(TEXTURE, buttonX, buttonY, BUY_BUTTON_U, BUY_BUTTON_V, BUY_BUTTON_WIDTH,
+                                BUY_BUTTON_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         }
 
         private boolean isPointWithinScrollbar(double mouseX, double mouseY) {
