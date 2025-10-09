@@ -48,8 +48,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private static final int OFFERS_LABEL_X = 32;
         private static final int OFFERS_LABEL_Y = 6;
-        private static final int BUY_LABEL_X = 204;
-        private static final int BUY_LABEL_Y = 100;
+        private static final int BUY_LABEL_X = 203;
+        private static final int BUY_LABEL_Y = 91;
         private static final int BUY_BUTTON_OFFSET_X = 188;
         private static final int BUY_BUTTON_OFFSET_Y = 88;
         private static final int BUY_BUTTON_U = 301;
@@ -57,7 +57,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int BUY_BUTTON_HOVER_V = 96;
         private static final int BUY_BUTTON_WIDTH = 46;
         private static final int BUY_BUTTON_HEIGHT = 14;
-        private static final float BUY_LABEL_SCALE = 1.5F;
+        private static final float BUY_LABEL_SCALE = 0.9F;
 
         private static final int OFFER_LIST_X = 29;
         private static final int OFFER_LIST_Y = 17;
@@ -86,7 +86,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
          * others.
          */
         private static final PageLayout PAGE1_LAYOUT = buildLayout(builder -> {
-                /* Offer list placement */
+            /* Offer list placement */
                 builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
                 /* Cost stack spacing */
                 builder.costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING);
@@ -107,7 +107,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final PageLayout PAGE2_LAYOUT = buildLayout(builder -> {
                     int BUY_BUTTON_OFFSET_X = 148;
                     int BUY_BUTTON_OFFSET_Y = 94;
-                    int BUY_LABEL_X = 161;
+                    int BUY_LABEL_X = 163;
                     int BUY_LABEL_Y = 97;
                 /* Offer list placement */
                 builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
@@ -121,6 +121,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 builder.buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH, BUY_BUTTON_HEIGHT);
                 /* Buy label position */
                 builder.buyLabel(BUY_LABEL_X, BUY_LABEL_Y);
+
         });
         /**
          * Page-specific layout overrides for offer list item positions. Update the
