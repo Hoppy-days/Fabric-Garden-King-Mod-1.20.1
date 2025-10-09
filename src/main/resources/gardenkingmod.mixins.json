@@ -9,7 +9,8 @@
                 "BlockMixin",
                 "CropBlockMixin",
                 "CroptopiaCropBlockMixin",
-                "EnchantmentHelperMixin"
+                "EnchantmentHelperMixin",
+                "SlotAccessor"
         ],
         "injectors": {
                 "defaultRequire": 1

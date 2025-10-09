@@ -184,6 +184,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         @Override
         protected void init() {
                 super.init();
+                handler.setDisplayedPage(activeTab);
                 updateScrollLimits();
                 lastOfferCount = getOffersForActiveTab().size();
         }
@@ -590,6 +591,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 int clampedIndex = MathHelper.clamp(tabIndex, 0, TAB_DEFINITIONS.length - 1);
                 if (activeTab != clampedIndex) {
                         activeTab = clampedIndex;
+                        handler.setDisplayedPage(activeTab);
                         clearSelectedOffer();
                         setScrollAmount(0.0F);
                         updateScrollLimits();
