@@ -38,13 +38,13 @@
           "price": "gardenkingmod:coin_sack*128"
         },{
           "offer": "gardenkingmod:amethyst_sword",
-          "price": "gardenkingmod:garden_coin*1200"
+          "price": "gardenkingmod:garden_coin*128"
         },{
           "offer": "gardenkingmod:obsidian_sword",
-          "price": "gardenkingmod:garden_coin*1200"
+          "price": "gardenkingmod:garden_coin*128"
         },{
           "offer": "gardenkingmod:emerald_sword",
-          "price": "gardenkingmod:garden_coin*1200"
+          "price": "gardenkingmod:garden_coin*128"
         }
       ]
     },
