@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
@@ -71,6 +72,60 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_ARROW_HEIGHT = 9;
         private static final int OFFER_ARROW_OFFSET_X = 53;
         private static final int OFFER_ARROW_OFFSET_Y = 6;
+        private static final PageLayout DEFAULT_PAGE_LAYOUT = buildLayout(builder -> {
+        });
+        /**
+         * Layout configuration for page 1 (garden_shop_gui.png). Adjust the builder calls
+         * in this lambda to reposition elements for that page without impacting the
+         * others.
+         */
+        private static final PageLayout PAGE1_LAYOUT = buildLayout(builder -> {
+                /* Offer list placement */
+                builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
+                /* Cost stack spacing */
+                builder.costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING);
+                /* Result slot position */
+                builder.resultItem(OFFER_RESULT_ITEM_OFFSET_X);
+                /* Arrow position */
+                builder.arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y);
+                /* Buy button placement & size */
+                builder.buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH, BUY_BUTTON_HEIGHT);
+                /* Buy label position */
+                builder.buyLabel(BUY_LABEL_X, BUY_LABEL_Y);
+        });
+        /**
+         * Layout configuration for page 2 (garden_shop_gui2.png). Start with the same
+         * defaults as page 1, then tweak any of the values inside this lambda to match
+         * that texture's custom layout.
+         */
+        private static final PageLayout PAGE2_LAYOUT = buildLayout(builder -> {
+                /* Offer list placement */
+                builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
+                /* Cost stack spacing */
+                builder.costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING);
+                /* Result slot position */
+                builder.resultItem(OFFER_RESULT_ITEM_OFFSET_X);
+                /* Arrow position */
+                builder.arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y);
+                /* Buy button placement & size */
+                builder.buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH, BUY_BUTTON_HEIGHT);
+                /* Buy label position */
+                builder.buyLabel(BUY_LABEL_X, BUY_LABEL_Y);
+        });
+        /**
+         * Page-specific layout overrides for offer list item positions. Update the
+         * existing layout lambdas or add new {@code buildLayout(...)} constants (e.g.
+         * PAGE3_LAYOUT) and append them here to move slots for a given page without
+         * affecting the others.
+         */
+        private static final PageLayout[] PAGE_LAYOUTS = { PAGE1_LAYOUT, PAGE2_LAYOUT, DEFAULT_PAGE_LAYOUT,
+                        DEFAULT_PAGE_LAYOUT, DEFAULT_PAGE_LAYOUT };
+
+        private static PageLayout buildLayout(Consumer<PageLayout.Builder> configurer) {
+                PageLayout.Builder builder = PageLayout.defaults();
+                configurer.accept(builder);
+                return builder.build();
+        }
 
         private static final int OFFER_DISPLAY_X = 233;
         private static final int OFFER_DISPLAY_Y = 27;
@@ -161,11 +216,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         @Override
         protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
                 super.drawForeground(context, mouseX, mouseY);
+                PageLayout layout = getPageLayout();
                 context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.offers"), OFFERS_LABEL_X,
                                 OFFERS_LABEL_Y, 0x404040, false);
                 if (isBuyButtonVisible()) {
-                        context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.buy_button"), BUY_LABEL_X,
-                                        BUY_LABEL_Y, 0xFFFFFF, false);
+                        context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.buy_button"),
+                                        layout.buyLabelX(), layout.buyLabelY(), 0xFFFFFF, false);
                 }
         }
 
@@ -248,9 +304,10 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private void drawOfferList(DrawContext context, int originX, int originY, int mouseX, int mouseY) {
+                PageLayout layout = getPageLayout();
                 List<GardenShopOffer> offers = getOffersForActiveTab();
-                int listLeft = originX + OFFER_LIST_X;
-                int listTop = originY + OFFER_LIST_Y;
+                int listLeft = originX + layout.offerListX();
+                int listTop = originY + layout.offerListY();
                 int hoveredOffer = getOfferIndexAt(mouseX, mouseY);
                 int clampedVisibleOffers = Math.min(MAX_VISIBLE_OFFERS, Math.max(offers.size() - scrollOffset, 0));
                 int scissorHeight = Math.min(MAX_VISIBLE_OFFERS, offers.size()) * OFFER_ENTRY_HEIGHT;
@@ -275,12 +332,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
                         GardenShopOffer offer = offers.get(offerIndex);
                         int itemY = entryY + OFFER_ITEM_OFFSET_Y;
-                        int costStartX = listLeft + OFFER_COST_ITEM_OFFSET_X;
-                        int arrowX = listLeft + OFFER_ARROW_OFFSET_X;
+                        int costStartX = listLeft + layout.costItemOffsetX();
+                        int arrowX = listLeft + layout.arrowOffsetX();
                         int maxCostRight = arrowX - 2;
                         List<ItemStack> costStacks = offer.costStacks();
                         for (int costIndex = 0; costIndex < costStacks.size(); costIndex++) {
-                                int costX = costStartX + costIndex * OFFER_COST_ITEM_SPACING;
+                                int costX = costStartX + costIndex * layout.costItemSpacing();
                                 if (costX + 16 > maxCostRight) {
                                         break;
                                 }
@@ -288,12 +345,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 drawCostStack(context, costStack, costX, itemY);
                         }
 
-                        int arrowY = entryY + OFFER_ARROW_OFFSET_Y;
+                        int arrowY = entryY + layout.arrowOffsetY();
                         context.drawTexture(TEXTURE, arrowX, arrowY, OFFER_ARROW_U, OFFER_ARROW_V, OFFER_ARROW_WIDTH,
                                         OFFER_ARROW_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
 
                         ItemStack displayStack = offer.copyResultStack();
-                        int resultX = listLeft + OFFER_RESULT_ITEM_OFFSET_X;
+                        int resultX = listLeft + layout.resultItemOffsetX();
                         context.drawItem(displayStack, resultX, itemY);
                         context.drawItemInSlot(textRenderer, displayStack, resultX, itemY);
                 }
@@ -377,10 +434,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return;
                 }
 
-                int buttonX = originX + BUY_BUTTON_OFFSET_X;
-                int buttonY = originY + BUY_BUTTON_OFFSET_Y;
+                PageLayout layout = getPageLayout();
+                int buttonX = originX + layout.buyButtonOffsetX();
+                int buttonY = originY + layout.buyButtonOffsetY();
                 int v = isPointWithinBuyButton(mouseX, mouseY) ? BUY_BUTTON_HOVER_V : BUY_BUTTON_V;
-                context.drawTexture(TEXTURE, buttonX, buttonY, BUY_BUTTON_U, v, BUY_BUTTON_WIDTH, BUY_BUTTON_HEIGHT,
+                context.drawTexture(TEXTURE, buttonX, buttonY, BUY_BUTTON_U, v, layout.buyButtonWidth(),
+                                layout.buyButtonHeight(),
                                 TEXTURE_WIDTH, TEXTURE_HEIGHT);
         }
 
@@ -429,10 +488,11 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return false;
                 }
 
-                int buttonX = x + BUY_BUTTON_OFFSET_X;
-                int buttonY = y + BUY_BUTTON_OFFSET_Y;
-                return mouseX >= buttonX && mouseX < buttonX + BUY_BUTTON_WIDTH && mouseY >= buttonY
-                                && mouseY < buttonY + BUY_BUTTON_HEIGHT;
+                PageLayout layout = getPageLayout();
+                int buttonX = x + layout.buyButtonOffsetX();
+                int buttonY = y + layout.buyButtonOffsetY();
+                return mouseX >= buttonX && mouseX < buttonX + layout.buyButtonWidth() && mouseY >= buttonY
+                                && mouseY < buttonY + layout.buyButtonHeight();
         }
 
         private void updateScrollLimits() {
@@ -524,12 +584,92 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
         }
 
+        private PageLayout getPageLayout() {
+                int index = MathHelper.clamp(activeTab, 0, PAGE_LAYOUTS.length - 1);
+                return PAGE_LAYOUTS[index];
+        }
+
         private record TabDefinition(int yOffset, int iconU, int iconV) {
         }
 
+        private record PageLayout(int offerListX, int offerListY, int costItemOffsetX, int costItemSpacing,
+                        int resultItemOffsetX, int arrowOffsetX, int arrowOffsetY, int buyButtonOffsetX,
+                        int buyButtonOffsetY, int buyButtonWidth, int buyButtonHeight, int buyLabelX, int buyLabelY) {
+                static Builder defaults() {
+                        return new Builder()
+                                        .offerList(OFFER_LIST_X, OFFER_LIST_Y)
+                                        .costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING)
+                                        .resultItem(OFFER_RESULT_ITEM_OFFSET_X)
+                                        .arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y)
+                                        .buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH,
+                                                        BUY_BUTTON_HEIGHT)
+                                        .buyLabel(BUY_LABEL_X, BUY_LABEL_Y);
+                }
+
+                static final class Builder {
+                        private int offerListX;
+                        private int offerListY;
+                        private int costItemOffsetX;
+                        private int costItemSpacing;
+                        private int resultItemOffsetX;
+                        private int arrowOffsetX;
+                        private int arrowOffsetY;
+                        private int buyButtonOffsetX;
+                        private int buyButtonOffsetY;
+                        private int buyButtonWidth;
+                        private int buyButtonHeight;
+                        private int buyLabelX;
+                        private int buyLabelY;
+
+                        Builder offerList(int x, int y) {
+                                this.offerListX = x;
+                                this.offerListY = y;
+                                return this;
+                        }
+
+                        Builder costStacks(int offsetX, int spacing) {
+                                this.costItemOffsetX = offsetX;
+                                this.costItemSpacing = spacing;
+                                return this;
+                        }
+
+                        Builder resultItem(int offsetX) {
+                                this.resultItemOffsetX = offsetX;
+                                return this;
+                        }
+
+                        Builder arrow(int offsetX, int offsetY) {
+                                this.arrowOffsetX = offsetX;
+                                this.arrowOffsetY = offsetY;
+                                return this;
+                        }
+
+                        Builder buyButton(int offsetX, int offsetY, int width, int height) {
+                                this.buyButtonOffsetX = offsetX;
+                                this.buyButtonOffsetY = offsetY;
+                                this.buyButtonWidth = width;
+                                this.buyButtonHeight = height;
+                                return this;
+                        }
+
+                        Builder buyLabel(int x, int y) {
+                                this.buyLabelX = x;
+                                this.buyLabelY = y;
+                                return this;
+                        }
+
+                        PageLayout build() {
+                                return new PageLayout(offerListX, offerListY, costItemOffsetX, costItemSpacing,
+                                                resultItemOffsetX, arrowOffsetX, arrowOffsetY, buyButtonOffsetX,
+                                                buyButtonOffsetY, buyButtonWidth, buyButtonHeight, buyLabelX, buyLabelY);
+                        }
+                }
+        }
+
         private int getOfferIndexAt(double mouseX, double mouseY) {
-                int listLeft = x + OFFER_LIST_X;
-                int listTop = y + OFFER_LIST_Y;
+                PageLayout layout = getPageLayout();
+                int listLeft = x + layout.offerListX();
+                int listTop = y + layout.offerListY();
 
                 if (mouseX < listLeft || mouseX >= listLeft + OFFER_ENTRY_WIDTH) {
                         return -1;
@@ -556,8 +696,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return Optional.empty();
                 }
 
-                int listLeft = x + OFFER_LIST_X;
-                int listTop = y + OFFER_LIST_Y;
+                PageLayout layout = getPageLayout();
+                int listLeft = x + layout.offerListX();
+                int listTop = y + layout.offerListY();
                 int relativeMouseY = mouseY - listTop;
                 if (relativeMouseY < 0) {
                         return Optional.empty();
@@ -575,12 +716,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
 
                 GardenShopOffer offer = offers.get(offerIndex);
-                int costStart = listLeft + OFFER_COST_ITEM_OFFSET_X;
-                int arrowLeft = listLeft + OFFER_ARROW_OFFSET_X;
+                int costStart = listLeft + layout.costItemOffsetX();
+                int arrowLeft = listLeft + layout.arrowOffsetX();
                 int maxCostRight = arrowLeft - 2;
                 List<ItemStack> costStacks = offer.costStacks();
                 for (int costIndex = 0; costIndex < costStacks.size(); costIndex++) {
-                        int costX = costStart + costIndex * OFFER_COST_ITEM_SPACING;
+                        int costX = costStart + costIndex * layout.costItemSpacing();
                         if (costX + 16 > maxCostRight) {
                                 break;
                         }
@@ -589,7 +730,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         }
                 }
 
-                int resultLeft = listLeft + OFFER_RESULT_ITEM_OFFSET_X;
+                int resultLeft = listLeft + layout.resultItemOffsetX();
                 if (mouseX >= resultLeft && mouseX < resultLeft + 16) {
                         return Optional.of(new HoveredStack(offer.copyResultStack(), false));
                 }
