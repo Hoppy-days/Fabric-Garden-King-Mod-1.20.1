@@ -65,7 +65,7 @@ public class GardenShopCostInventory extends SimpleInventory {
             return super.removeStack(slot);
         }
 
-        ItemStack removed = GardenShopStackHelper.copyWithoutRequestedCount(stack);
+        ItemStack removed = stack.copy();
         GardenShopStackHelper.applyRequestedCount(removed, requestedCount);
         setStack(slot, ItemStack.EMPTY);
 
