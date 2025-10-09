@@ -303,7 +303,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                         break;
                                 }
 
-                                if (ItemStack.canCombine(slotStack, stack)) {
+                                if (canCombineIgnoringRequestedCount(slotStack, stack)) {
                                         int existing = GardenShopStackHelper.getRequestedCount(slotStack);
                                         int addition = stack.getCount();
                                         if (addition > 0) {
@@ -334,7 +334,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         if (slot != null) {
                                 ItemStack slotStack = slot.getStack();
                                 ItemStack cursor = getCursorStack();
-                                if (!slotStack.isEmpty() && !cursor.isEmpty() && ItemStack.canCombine(slotStack, cursor)) {
+                                if (!slotStack.isEmpty() && !cursor.isEmpty()
+                                                && canCombineIgnoringRequestedCount(slotStack, cursor)) {
                                         if (button == 0) {
                                                 int total = GardenShopStackHelper.getRequestedCount(slotStack) + cursor.getCount();
                                                 if (cursor.getCount() > 0) {
@@ -714,8 +715,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return false;
                 }
 
-                ItemStack comparison = GardenShopStackHelper.copyWithoutRequestedCount(required);
-                if (!ItemStack.canCombine(provided, comparison)) {
+                if (!canCombineIgnoringRequestedCount(provided, required)) {
                         return false;
                 }
 
@@ -726,6 +726,12 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
                 int providedCount = GardenShopStackHelper.getRequestedCount(provided);
                 return providedCount >= requiredCount;
+        }
+
+        private static boolean canCombineIgnoringRequestedCount(ItemStack first, ItemStack second) {
+                ItemStack firstComparison = GardenShopStackHelper.copyWithoutRequestedCount(first);
+                ItemStack secondComparison = GardenShopStackHelper.copyWithoutRequestedCount(second);
+                return ItemStack.canCombine(firstComparison, secondComparison);
         }
 
         private boolean removeCostStacks(List<ItemStack> costs, PlayerInventory playerInventory) {
