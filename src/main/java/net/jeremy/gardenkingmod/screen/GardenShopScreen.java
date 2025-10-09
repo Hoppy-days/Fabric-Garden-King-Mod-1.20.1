@@ -104,6 +104,10 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
          * that texture's custom layout.
          */
         private static final PageLayout PAGE2_LAYOUT = buildLayout(builder -> {
+                    int BUY_BUTTON_OFFSET_X = 148;
+                    int BUY_BUTTON_OFFSET_Y = 94;
+                    int BUY_LABEL_X = 161;
+                    int BUY_LABEL_Y = 97;
                 /* Offer list placement */
                 builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
                 /* Cost stack spacing */
