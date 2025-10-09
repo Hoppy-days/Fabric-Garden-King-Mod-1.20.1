@@ -24,6 +24,8 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
                         "textures/gui/container/garden_shop_gui.png");
@@ -391,9 +393,10 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
                 String text = formatRequestedCount(count);
                 int textWidth = textRenderer.getWidth(text);
+                RenderSystem.disableDepthTest();
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
-                matrices.translate(0.0F, 0.0F, 200.0F);
+                matrices.translate(0.0F, 0.0F, 300.0F);
                 int overlayX = x + 19 - 2 - textWidth;
                 int overlayY = y + 6 + 3;
                 if (hideVanillaCount && count > stack.getCount()) {
@@ -406,6 +409,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
                 context.drawTextWithShadow(textRenderer, text, overlayX, overlayY, 0xFFFFFF);
                 matrices.pop();
+                RenderSystem.enableDepthTest();
         }
 
         private List<CostSlotSnapshot> suppressVanillaCostCounts() {
