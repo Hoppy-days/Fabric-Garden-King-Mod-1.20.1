@@ -27,8 +27,9 @@ public final class GardenShopStackHelper {
         }
 
         int sanitized = Math.max(1, requestedCount);
-        stack.setCount(sanitized);
-        if (sanitized > stack.getMaxCount()) {
+        int displayCount = Math.min(sanitized, stack.getMaxCount());
+        stack.setCount(displayCount);
+        if (sanitized > displayCount) {
             stack.getOrCreateNbt().putInt(FULL_COUNT_KEY, sanitized);
         } else {
             removeFullCount(stack);
