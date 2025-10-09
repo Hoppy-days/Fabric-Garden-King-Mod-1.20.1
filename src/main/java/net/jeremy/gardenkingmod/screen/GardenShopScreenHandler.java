@@ -48,6 +48,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private final SimpleInventory costInventory;
         private final SimpleInventory resultInventory;
         private final List<List<GardenShopOffer>> offersByPage;
+        private int selectedPageIndex = -1;
+        private int selectedOfferIndex = -1;
 
         private static int encodeOfferIndexValue(int offerIndex) {
                 return offerIndex < 0 ? OFFER_INDEX_MASK : offerIndex & OFFER_INDEX_MASK;
@@ -95,6 +97,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 this.inventory = blockEntity != null ? blockEntity : new SimpleInventory(GardenShopBlockEntity.INVENTORY_SIZE);
                 this.costInventory = new SimpleInventory(COST_SLOT_COUNT);
                 this.resultInventory = new SimpleInventory(RESULT_SLOT_COUNT);
+                this.costInventory.addListener(inventory -> onContentChanged(inventory));
+                this.resultInventory.addListener(inventory -> onContentChanged(inventory));
                 this.offersByPage = new ArrayList<>();
 
                 checkSize(this.inventory, GardenShopBlockEntity.INVENTORY_SIZE);
@@ -282,7 +286,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 }
 
                 GardenShopOffer offer = pageOffers.get(offerIndex);
-                return restockCostSlots(player, offer, true);
+                boolean inventoryChanged = populateSelectedOffer(player, offer, true);
+                boolean selectionChanged = this.selectedPageIndex != pageIndex || this.selectedOfferIndex != offerIndex;
+                this.selectedPageIndex = pageIndex;
+                this.selectedOfferIndex = offerIndex;
+                return inventoryChanged || selectionChanged;
         }
 
         private boolean clearSelection(ServerPlayerEntity player) {
@@ -293,10 +301,13 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         this.resultInventory.markDirty();
                         changed = true;
                 }
-                return changed;
+                boolean selectionChanged = this.selectedPageIndex != -1 || this.selectedOfferIndex != -1;
+                this.selectedPageIndex = -1;
+                this.selectedOfferIndex = -1;
+                return changed || selectionChanged;
         }
 
-        private boolean restockCostSlots(ServerPlayerEntity player, GardenShopOffer offer, boolean returnExisting) {
+        private boolean populateSelectedOffer(ServerPlayerEntity player, GardenShopOffer offer, boolean returnExisting) {
                 if (offer == null) {
                         return clearSelection(player);
                 }
@@ -315,7 +326,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 boolean slotChanged = false;
                 for (int slotIndex = 0; slotIndex < COST_SLOT_COUNT; slotIndex++) {
                         ItemStack template = slotIndex < costs.size() ? costs.get(slotIndex) : ItemStack.EMPTY;
-                        PullResult result = pullCostStackIntoSlot(playerInventory, template, slotIndex);
+                        ExtractResult result = fillCostSlotFromPlayer(playerInventory, template, slotIndex);
                         if (result.playerChanged()) {
                                 playerChanged = true;
                         }
@@ -378,32 +389,61 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return changed;
         }
 
-        private PullResult pullCostStackIntoSlot(PlayerInventory playerInventory, ItemStack template, int slotIndex) {
+        private ExtractResult fillCostSlotFromPlayer(PlayerInventory playerInventory, ItemStack template, int slotIndex) {
                 ItemStack previous = this.costInventory.getStack(slotIndex);
 
                 if (template == null || template.isEmpty()) {
-                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
                         boolean slotChanged = !previous.isEmpty();
-                        return new PullResult(false, slotChanged);
+                        if (slotChanged) {
+                                this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        }
+                        return new ExtractResult(false, slotChanged);
                 }
 
                 int required = GardenShopStackHelper.getRequestedCount(template);
                 if (required <= 0) {
-                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
                         boolean slotChanged = !previous.isEmpty();
-                        return new PullResult(false, slotChanged);
+                        if (slotChanged) {
+                                this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        }
+                        return new ExtractResult(false, slotChanged);
                 }
 
                 ItemStack comparison = GardenShopStackHelper.copyWithoutRequestedCount(template);
                 if (comparison.isEmpty()) {
-                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
                         boolean slotChanged = !previous.isEmpty();
-                        return new PullResult(false, slotChanged);
+                        if (slotChanged) {
+                                this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        }
+                        return new ExtractResult(false, slotChanged);
                 }
 
                 int maxToMove = Math.min(required, comparison.getMaxCount());
+                ExtractionResult extracted = extractMatchingStacks(playerInventory, comparison, maxToMove);
+                ItemStack collected = extracted.collected();
+
+                if (collected.isEmpty()) {
+                        boolean slotChanged = !previous.isEmpty();
+                        if (slotChanged) {
+                                this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        }
+                        return new ExtractResult(extracted.playerChanged(), slotChanged);
+                }
+
+                boolean slotChanged = !ItemStack.areEqual(previous, collected)
+                                || previous.getCount() != collected.getCount();
+                this.costInventory.setStack(slotIndex, collected);
+                return new ExtractResult(extracted.playerChanged(), slotChanged);
+        }
+
+        private ExtractionResult extractMatchingStacks(PlayerInventory playerInventory, ItemStack comparison,
+                        int maxToMove) {
+                if (maxToMove <= 0) {
+                        return new ExtractionResult(ItemStack.EMPTY, false);
+                }
+
                 int remaining = maxToMove;
-                ItemStack newStack = ItemStack.EMPTY;
+                ItemStack collected = ItemStack.EMPTY;
                 boolean playerChanged = false;
 
                 for (int inventorySlot = 0; inventorySlot < playerInventory.size() && remaining > 0; inventorySlot++) {
@@ -417,11 +457,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                 continue;
                         }
 
-                        if (newStack.isEmpty()) {
-                                newStack = playerStack.copy();
-                                newStack.setCount(taken);
+                        if (collected.isEmpty()) {
+                                collected = playerStack.copy();
+                                collected.setCount(taken);
                         } else {
-                                newStack.increment(taken);
+                                collected.increment(taken);
                         }
 
                         playerStack.decrement(taken);
@@ -433,18 +473,19 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         }
                 }
 
-                if (newStack.isEmpty()) {
-                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
-                        boolean slotChanged = !previous.isEmpty();
-                        return new PullResult(playerChanged, slotChanged);
+                if (!playerChanged) {
+                        return new ExtractionResult(ItemStack.EMPTY, false);
                 }
 
-                this.costInventory.setStack(slotIndex, newStack);
-                boolean slotChanged = !ItemStack.areEqual(previous, newStack) || previous.getCount() != newStack.getCount();
-                return new PullResult(playerChanged, slotChanged);
+                return new ExtractionResult(collected, true);
         }
 
         private boolean tryPurchase(ServerPlayerEntity player, int pageIndex, int offerIndex) {
+                return processPurchase(player, pageIndex, offerIndex, false);
+        }
+
+        private boolean processPurchase(ServerPlayerEntity player, int pageIndex, int offerIndex,
+                        boolean resultTakenFromSlot) {
                 if (pageIndex < 0 || pageIndex >= offersByPage.size()) {
                         return false;
                 }
@@ -461,13 +502,15 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 }
 
                 removeCostStacks(offer.costStacks(), playerInventory);
-                ItemStack result = offer.copyResultStack();
-                if (!result.isEmpty()) {
-                        if (!player.giveItemStack(result)) {
-                                player.dropItem(result, false);
+                if (!resultTakenFromSlot) {
+                        ItemStack result = offer.copyResultStack();
+                        if (!result.isEmpty()) {
+                                if (!player.giveItemStack(result)) {
+                                        player.dropItem(result, false);
+                                }
                         }
                 }
-                restockCostSlots(player, offer, false);
+                populateSelectedOffer(player, offer, false);
                 playerInventory.markDirty();
                 this.costInventory.markDirty();
                 return true;
@@ -608,7 +651,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private void addResultSlot() {
-                this.addSlot(new ResultSlot(this.resultInventory, 0, RESULT_SLOT_X, RESULT_SLOT_Y));
+                this.addSlot(new ResultSlot(this, this.resultInventory, 0, RESULT_SLOT_X, RESULT_SLOT_Y));
         }
 
         private void fillInventoryFromOffers() {
@@ -631,12 +674,18 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return flattened;
         }
 
-        private record PullResult(boolean playerChanged, boolean slotChanged) {
+        private record ExtractResult(boolean playerChanged, boolean slotChanged) {
+        }
+
+        private record ExtractionResult(ItemStack collected, boolean playerChanged) {
         }
 
         private static class ResultSlot extends Slot {
-                public ResultSlot(Inventory inventory, int index, int x, int y) {
+                private final GardenShopScreenHandler handler;
+
+                public ResultSlot(GardenShopScreenHandler handler, Inventory inventory, int index, int x, int y) {
                         super(inventory, index, x, y);
+                        this.handler = handler;
                 }
 
                 @Override
@@ -646,7 +695,21 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
                 @Override
                 public boolean canTakeItems(PlayerEntity playerEntity) {
-                        return false;
+                        return !getStack().isEmpty();
+                }
+
+                @Override
+                public void onTakeItem(PlayerEntity player, ItemStack stack) {
+                        boolean purchased = false;
+                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                                int pageIndex = handler.selectedPageIndex;
+                                int offerIndex = handler.selectedOfferIndex;
+                                purchased = handler.processPurchase(serverPlayer, pageIndex, offerIndex, true);
+                        }
+                        super.onTakeItem(player, stack);
+                        if (purchased) {
+                                handler.sendContentUpdates();
+                        }
                 }
         }
 }
