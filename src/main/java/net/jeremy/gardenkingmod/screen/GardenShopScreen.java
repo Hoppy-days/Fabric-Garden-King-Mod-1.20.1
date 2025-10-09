@@ -231,7 +231,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
                 renderBackground(context);
-                super.render(context, mouseX, mouseY, delta);
+                List<CostSlotSnapshot> suppressedCounts = suppressVanillaCostCounts();
+                try {
+                        super.render(context, mouseX, mouseY, delta);
+                } finally {
+                        restoreVanillaCostCounts(suppressedCounts);
+                }
                 drawCostSlotOverlays(context);
                 drawMouseoverTooltip(context, mouseX, mouseY);
         }
@@ -401,6 +406,39 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
                 context.drawTextWithShadow(textRenderer, text, overlayX, overlayY, 0xFFFFFF);
                 matrices.pop();
+        }
+
+        private List<CostSlotSnapshot> suppressVanillaCostCounts() {
+                List<CostSlotSnapshot> modified = new ArrayList<>();
+                for (Slot slot : handler.slots) {
+                        if (!(slot.inventory instanceof GardenShopCostInventory)) {
+                                continue;
+                        }
+
+                        ItemStack stack = slot.getStack();
+                        if (stack.isEmpty()) {
+                                continue;
+                        }
+
+                        int requested = GardenShopStackHelper.getRequestedCount(stack);
+                        if (requested > stack.getCount()) {
+                                modified.add(new CostSlotSnapshot(slot, stack.getCount()));
+                                stack.setCount(1);
+                        }
+                }
+                return modified;
+        }
+
+        private void restoreVanillaCostCounts(List<CostSlotSnapshot> suppressed) {
+                for (CostSlotSnapshot snapshot : suppressed) {
+                        ItemStack stack = snapshot.slot().getStack();
+                        if (!stack.isEmpty()) {
+                                stack.setCount(snapshot.originalCount());
+                        }
+                }
+        }
+
+        private record CostSlotSnapshot(Slot slot, int originalCount) {
         }
 
         private static String formatRequestedCount(int count) {
