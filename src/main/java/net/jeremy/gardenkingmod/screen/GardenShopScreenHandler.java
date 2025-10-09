@@ -519,9 +519,24 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                 continue;
                         }
 
-                        CostReturnResult result = returnCostSlot(player, slot, original.copy());
-                        if (result.playerChanged()) {
-                                playerChanged = true;
+                        int requested = GardenShopStackHelper.getRequestedCount(original);
+                        ItemStack comparison = GardenShopStackHelper.copyWithoutRequestedCount(original);
+                        ItemStack removed = this.costInventory.removeStack(slot);
+                        if (removed.isEmpty()) {
+                                continue;
+                        }
+
+                        if (requested <= 0) {
+                                requested = Math.max(GardenShopStackHelper.getRequestedCount(removed), removed.getCount());
+                        }
+
+                        if (comparison.isEmpty()) {
+                                comparison = GardenShopStackHelper.copyWithoutRequestedCount(removed);
+                        }
+
+                        if (comparison.isEmpty()) {
+                                comparison = removed.copy();
+                                comparison.setCount(Math.min(requested, comparison.getMaxCount()));
                         }
                         if (result.slotChanged()) {
                                 slotChanged = true;
