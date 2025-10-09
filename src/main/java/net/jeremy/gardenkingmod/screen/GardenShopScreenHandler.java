@@ -504,15 +504,28 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 boolean changed = false;
                 PlayerInventory playerInventory = player.getInventory();
                 for (int slot = 0; slot < this.costInventory.size(); slot++) {
-                        ItemStack stack = this.costInventory.removeStack(slot);
-                        if (stack.isEmpty()) {
+                        ItemStack original = this.costInventory.getStack(slot);
+                        if (original.isEmpty()) {
                                 continue;
                         }
 
-                        int requested = Math.max(GardenShopStackHelper.getRequestedCount(stack), stack.getCount());
-                        ItemStack comparison = GardenShopStackHelper.copyWithoutRequestedCount(stack);
+                        int requested = GardenShopStackHelper.getRequestedCount(original);
+                        ItemStack comparison = GardenShopStackHelper.copyWithoutRequestedCount(original);
+                        ItemStack removed = this.costInventory.removeStack(slot);
+                        if (removed.isEmpty()) {
+                                continue;
+                        }
+
+                        if (requested <= 0) {
+                                requested = Math.max(GardenShopStackHelper.getRequestedCount(removed), removed.getCount());
+                        }
+
                         if (comparison.isEmpty()) {
-                                comparison = stack.copy();
+                                comparison = GardenShopStackHelper.copyWithoutRequestedCount(removed);
+                        }
+
+                        if (comparison.isEmpty()) {
+                                comparison = removed.copy();
                                 comparison.setCount(Math.min(requested, comparison.getMaxCount()));
                         }
 
