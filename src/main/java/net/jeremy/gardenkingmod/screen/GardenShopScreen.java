@@ -83,6 +83,11 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int DEFAULT_COST_SLOT_VALUE_ANCHOR_X = 8;
         private static final int DEFAULT_COST_SLOT_VALUE_OFFSET_Y = 30;
         private static final float DEFAULT_COST_SLOT_TEXT_SCALE = 0.6F;
+        private static final int DEFAULT_COST_TEXT_LABEL_ANCHOR_X = 8;
+        private static final int DEFAULT_COST_TEXT_LABEL_OFFSET_Y = 20;
+        private static final int DEFAULT_COST_TEXT_VALUE_ANCHOR_X = 8;
+        private static final int DEFAULT_COST_TEXT_VALUE_OFFSET_Y = 30;
+        private static final float DEFAULT_COST_TEXT_SCALE = 0.6F;
 
         private static final PageLayout DEFAULT_PAGE_LAYOUT = buildLayout(builder -> {
         });
@@ -449,28 +454,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 RenderSystem.enableDepthTest();
         }
 
-        private void drawCostTextLine(DrawContext context, String text, int anchorX, int baselineY, float scale) {
-                if (text == null || text.isEmpty()) {
-                        return;
-                }
-
-                float scaledWidth = textRenderer.getWidth(text) * scale;
-                float drawX = anchorX - scaledWidth / 2.0F;
-                MatrixStack matrices = context.getMatrices();
-                matrices.push();
-                matrices.translate(0.0F, 0.0F, 300.0F);
-                int overlayX = x + 19 - 2 - textWidth;
-                int overlayY = y + 6 + 3;
-                RenderSystem.disableDepthTest();
-                RenderSystem.enableBlend();
-                RenderSystem.defaultBlendFunc();
-                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-                context.drawTextWithShadow(textRenderer, text, overlayX, overlayY, 0xFFFFFF);
-                RenderSystem.disableBlend();
-                RenderSystem.enableDepthTest();
-                matrices.pop();
-        }
-
         private void drawCostSlotText(DrawContext context, String label, ItemStack stack, int slotX, int slotY,
                         PageLayout layout) {
                 int requiredCount = GardenShopStackHelper.getRequestedCount(stack);
@@ -761,7 +744,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         int resultItemOffsetX, int arrowOffsetX, int arrowOffsetY, int buyButtonOffsetX,
                         int buyButtonOffsetY, int buyButtonWidth, int buyButtonHeight, int buyLabelX, int buyLabelY,
                         int costSlotLabelAnchorOffsetX, int costSlotLabelOffsetY, int costSlotValueAnchorOffsetX,
-                        int costSlotValueOffsetY, float costSlotTextScale) {
+                        int costSlotValueOffsetY, float costSlotTextScale, int costTextLabelAnchorOffsetX,
+                        int costTextLabelOffsetY, int costTextValueAnchorOffsetX, int costTextValueOffsetY,
+                        float costTextScale) {
                 static Builder defaults() {
                         return new Builder()
                                         .offerList(OFFER_LIST_X, OFFER_LIST_Y)
@@ -769,6 +754,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                         .costSlotText(DEFAULT_COST_SLOT_LABEL_ANCHOR_X, DEFAULT_COST_SLOT_LABEL_OFFSET_Y,
                                                         DEFAULT_COST_SLOT_VALUE_ANCHOR_X, DEFAULT_COST_SLOT_VALUE_OFFSET_Y,
                                                         DEFAULT_COST_SLOT_TEXT_SCALE)
+                                        .costText(DEFAULT_COST_TEXT_LABEL_ANCHOR_X, DEFAULT_COST_TEXT_LABEL_OFFSET_Y,
+                                                        DEFAULT_COST_TEXT_VALUE_ANCHOR_X, DEFAULT_COST_TEXT_VALUE_OFFSET_Y,
+                                                        DEFAULT_COST_TEXT_SCALE)
                                         .resultItem(OFFER_RESULT_ITEM_OFFSET_X)
                                         .arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y)
                                         .buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH,
@@ -795,6 +783,11 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         private int costSlotValueAnchorOffsetX;
                         private int costSlotValueOffsetY;
                         private float costSlotTextScale;
+                        private int costTextLabelAnchorOffsetX;
+                        private int costTextLabelOffsetY;
+                        private int costTextValueAnchorOffsetX;
+                        private int costTextValueOffsetY;
+                        private float costTextScale;
 
                         Builder offerList(int x, int y) {
                                 this.offerListX = x;
@@ -805,6 +798,26 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         Builder costStacks(int offsetX, int spacing) {
                                 this.costItemOffsetX = offsetX;
                                 this.costItemSpacing = spacing;
+                                return this;
+                        }
+
+                        Builder costSlotText(int labelAnchorOffsetX, int labelOffsetY, int valueAnchorOffsetX,
+                                        int valueOffsetY, float scale) {
+                                this.costSlotLabelAnchorOffsetX = labelAnchorOffsetX;
+                                this.costSlotLabelOffsetY = labelOffsetY;
+                                this.costSlotValueAnchorOffsetX = valueAnchorOffsetX;
+                                this.costSlotValueOffsetY = valueOffsetY;
+                                this.costSlotTextScale = scale;
+                                return this;
+                        }
+
+                        Builder costText(int labelAnchorOffsetX, int labelOffsetY, int valueAnchorOffsetX,
+                                        int valueOffsetY, float scale) {
+                                this.costTextLabelAnchorOffsetX = labelAnchorOffsetX;
+                                this.costTextLabelOffsetY = labelOffsetY;
+                                this.costTextValueAnchorOffsetX = valueAnchorOffsetX;
+                                this.costTextValueOffsetY = valueOffsetY;
+                                this.costTextScale = scale;
                                 return this;
                         }
 
@@ -833,22 +846,14 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 return this;
                         }
 
-                        Builder costSlotText(int labelAnchorOffsetX, int labelOffsetY, int valueAnchorOffsetX,
-                                        int valueOffsetY, float scale) {
-                                this.costSlotLabelAnchorOffsetX = labelAnchorOffsetX;
-                                this.costSlotLabelOffsetY = labelOffsetY;
-                                this.costSlotValueAnchorOffsetX = valueAnchorOffsetX;
-                                this.costSlotValueOffsetY = valueOffsetY;
-                                this.costSlotTextScale = scale;
-                                return this;
-                        }
-
                         PageLayout build() {
                                 return new PageLayout(offerListX, offerListY, costItemOffsetX, costItemSpacing,
                                                 resultItemOffsetX, arrowOffsetX, arrowOffsetY, buyButtonOffsetX,
                                                 buyButtonOffsetY, buyButtonWidth, buyButtonHeight, buyLabelX, buyLabelY,
                                                 costSlotLabelAnchorOffsetX, costSlotLabelOffsetY,
-                                                costSlotValueAnchorOffsetX, costSlotValueOffsetY, costSlotTextScale);
+                                                costSlotValueAnchorOffsetX, costSlotValueOffsetY, costSlotTextScale,
+                                                costTextLabelAnchorOffsetX, costTextLabelOffsetY,
+                                                costTextValueAnchorOffsetX, costTextValueOffsetY, costTextScale);
                         }
                 }
         }
