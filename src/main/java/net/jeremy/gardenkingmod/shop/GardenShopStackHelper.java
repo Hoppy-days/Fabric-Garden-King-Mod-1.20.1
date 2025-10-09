@@ -26,10 +26,10 @@ public final class GardenShopStackHelper {
             return;
         }
 
-        int clamped = Math.max(1, Math.min(requestedCount, stack.getMaxCount()));
-        stack.setCount(clamped);
-        if (requestedCount > clamped) {
-            stack.getOrCreateNbt().putInt(FULL_COUNT_KEY, requestedCount);
+        int sanitized = Math.max(1, requestedCount);
+        stack.setCount(sanitized);
+        if (sanitized > stack.getMaxCount()) {
+            stack.getOrCreateNbt().putInt(FULL_COUNT_KEY, sanitized);
         } else {
             removeFullCount(stack);
         }
