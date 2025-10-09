@@ -8,12 +8,14 @@ import java.util.Optional;
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
+import net.jeremy.gardenkingmod.screen.inventory.GardenShopCostInventory;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -173,7 +175,18 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
                 renderBackground(context);
                 super.render(context, mouseX, mouseY, delta);
+                drawCostSlotOverlays(context);
                 drawMouseoverTooltip(context, mouseX, mouseY);
+        }
+
+        private void drawCostSlotOverlays(DrawContext context) {
+                for (Slot slot : handler.slots) {
+                        if (slot.inventory instanceof GardenShopCostInventory && slot.hasStack()) {
+                                int slotX = this.x + slot.x;
+                                int slotY = this.y + slot.y;
+                                drawStackCountOverlay(context, slot.getStack(), slotX, slotY, true);
+                        }
+                }
         }
 
         @Override
@@ -302,21 +315,30 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private void drawCostStack(DrawContext context, ItemStack stack, int x, int y) {
                 context.drawItem(stack, x, y);
-                drawStackCountOverlay(context, stack, x, y);
+                drawStackCountOverlay(context, stack, x, y, false);
         }
 
-        private void drawStackCountOverlay(DrawContext context, ItemStack stack, int x, int y) {
+        private void drawStackCountOverlay(DrawContext context, ItemStack stack, int x, int y, boolean hideVanillaCount) {
                 int count = GardenShopStackHelper.getRequestedCount(stack);
                 if (count <= 1) {
                         return;
                 }
 
                 String text = formatRequestedCount(count);
+                int textWidth = textRenderer.getWidth(text);
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
                 matrices.translate(0.0F, 0.0F, 200.0F);
-                int overlayX = x + 19 - 2 - textRenderer.getWidth(text);
+                int overlayX = x + 19 - 2 - textWidth;
                 int overlayY = y + 6 + 3;
+                if (hideVanillaCount && count > stack.getCount()) {
+                        int textHeight = textRenderer.fontHeight;
+                        int backgroundLeft = overlayX - 1;
+                        int backgroundTop = overlayY - 1;
+                        int backgroundRight = overlayX + textWidth + 1;
+                        int backgroundBottom = overlayY + textHeight;
+                        context.fill(backgroundLeft, backgroundTop, backgroundRight, backgroundBottom, 0xCC000000);
+                }
                 context.drawTextWithShadow(textRenderer, text, overlayX, overlayY, 0xFFFFFF);
                 matrices.pop();
         }
