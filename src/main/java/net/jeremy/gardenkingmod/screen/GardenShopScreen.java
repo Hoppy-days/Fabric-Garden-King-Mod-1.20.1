@@ -427,31 +427,14 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private void drawCostStack(DrawContext context, ItemStack stack, int x, int y) {
                 context.drawItem(stack, x, y);
-                drawStackCountOverlay(context, stack, x, y, false);
-        }
 
-        private void drawStackCountOverlay(DrawContext context, ItemStack stack, int x, int y, boolean hideVanillaCount) {
-                int count = GardenShopStackHelper.getRequestedCount(stack);
-                if (count <= 1) {
-                        return;
+                int requestedCount = GardenShopStackHelper.getRequestedCount(stack);
+                if (requestedCount > stack.getCount()) {
+                        String label = formatRequestedCount(requestedCount);
+                        context.drawItemInSlot(textRenderer, stack, x, y, label);
+                } else {
+                        context.drawItemInSlot(textRenderer, stack, x, y);
                 }
-
-                PageLayout layout = getPageLayout();
-                String label = Text.translatable(COST_LABEL_TRANSLATION_KEY).getString();
-                String text = formatRequestedCount(count);
-
-                RenderSystem.disableDepthTest();
-                RenderSystem.enableBlend();
-                RenderSystem.defaultBlendFunc();
-                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
-                drawCostTextLine(context, label, x + layout.costTextLabelAnchorOffsetX(),
-                                y + layout.costTextLabelOffsetY(), layout.costTextScale());
-                drawCostTextLine(context, text, x + layout.costTextValueAnchorOffsetX(),
-                                y + layout.costTextValueOffsetY(), layout.costTextScale());
-
-                RenderSystem.disableBlend();
-                RenderSystem.enableDepthTest();
         }
 
         private void drawCostSlotText(DrawContext context, String label, ItemStack stack, int slotX, int slotY,
