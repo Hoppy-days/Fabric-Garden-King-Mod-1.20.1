@@ -633,7 +633,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         if (stack.isEmpty()) {
                                 continue;
                         }
-                        if (!ItemStack.canCombine(stack, comparisonStack)) {
+                        ItemStack comparisonSource = stack;
+                        if (inventory == this.costInventory) {
+                                comparisonSource = GardenShopStackHelper.copyWithoutRequestedCount(stack);
+                        }
+                        if (!ItemStack.canCombine(comparisonSource, comparisonStack)) {
                                 continue;
                         }
 
