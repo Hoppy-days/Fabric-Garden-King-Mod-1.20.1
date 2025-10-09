@@ -289,7 +289,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 }
 
                 GardenShopOffer offer = pageOffers.get(offerIndex);
-                boolean inventoryChanged = populateSelectedOffer(player, offer, true);
+                boolean inventoryChanged = populateSelectedOffer(player, offer, true, true);
                 boolean selectionChanged = this.selectedPageIndex != pageIndex || this.selectedOfferIndex != offerIndex;
                 this.selectedPageIndex = pageIndex;
                 this.selectedOfferIndex = offerIndex;
@@ -310,7 +310,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return changed || selectionChanged;
         }
 
-        private boolean populateSelectedOffer(ServerPlayerEntity player, GardenShopOffer offer, boolean returnExisting) {
+        private boolean populateSelectedOffer(ServerPlayerEntity player, GardenShopOffer offer, boolean returnExisting,
+                        boolean refillFromPlayerInventory) {
                 if (offer == null) {
                         return clearSelection(player);
                 }
@@ -324,28 +325,30 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         }
                 }
 
-                List<ItemStack> costs = offer.costStacks();
-                boolean playerChanged = false;
-                boolean slotChanged = false;
-                for (int slotIndex = 0; slotIndex < COST_SLOT_COUNT; slotIndex++) {
-                        ItemStack template = slotIndex < costs.size() ? costs.get(slotIndex) : ItemStack.EMPTY;
-                        ExtractResult result = fillCostSlotFromPlayer(playerInv, template, slotIndex);
-                        if (result.playerChanged()) {
-                                playerChanged = true;
+                if (refillFromPlayerInventory) {
+                        List<ItemStack> costs = offer.costStacks();
+                        boolean playerChanged = false;
+                        boolean slotChanged = false;
+                        for (int slotIndex = 0; slotIndex < COST_SLOT_COUNT; slotIndex++) {
+                                ItemStack template = slotIndex < costs.size() ? costs.get(slotIndex) : ItemStack.EMPTY;
+                                ExtractResult result = fillCostSlotFromPlayer(playerInv, template, slotIndex);
+                                if (result.playerChanged()) {
+                                        playerChanged = true;
+                                }
+                                if (result.slotChanged()) {
+                                        slotChanged = true;
+                                }
                         }
-                        if (result.slotChanged()) {
-                                slotChanged = true;
+
+                        if (playerChanged) {
+                                playerInv.markDirty();
+                                changed = true;
                         }
-                }
 
-                if (playerChanged) {
-                        playerInv.markDirty();
-                        changed = true;
-                }
-
-                if (slotChanged) {
-                        this.costInventory.markDirty();
-                        changed = true;
+                        if (slotChanged) {
+                                this.costInventory.markDirty();
+                                changed = true;
+                        }
                 }
 
                 if (updateResultSlot(offer)) {
@@ -532,7 +535,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                 }
                         }
                 }
-                populateSelectedOffer(player, offer, false);
+                populateSelectedOffer(player, offer, false, false);
                 playerInv.markDirty();
                 if (costSlotsChanged) {
                         this.costInventory.markDirty();
