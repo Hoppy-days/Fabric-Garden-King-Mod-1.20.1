@@ -241,7 +241,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         if (slot.inventory instanceof GardenShopCostInventory && slot.hasStack()) {
                                 int slotX = this.x + slot.x;
                                 int slotY = this.y + slot.y;
-                                drawStackCountOverlay(context, slot.getStack(), slotX, slotY, true);
+                                ItemStack stack = slot.getStack();
+                                context.drawItem(stack, slotX, slotY);
+                                drawStackCountOverlay(context, stack, slotX, slotY, false);
                         }
                 }
         }
