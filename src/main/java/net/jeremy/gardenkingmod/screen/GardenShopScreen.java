@@ -243,7 +243,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 int slotY = this.y + slot.y;
                                 ItemStack stack = slot.getStack();
                                 context.drawItem(stack, slotX, slotY);
-                                drawStackCountOverlay(context, stack, slotX, slotY, false);
+                                drawStackCountOverlay(context, stack, slotX, slotY, true);
                         }
                 }
         }
