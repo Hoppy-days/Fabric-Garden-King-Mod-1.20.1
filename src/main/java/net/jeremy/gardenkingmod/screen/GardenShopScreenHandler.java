@@ -39,7 +39,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static final int RESULT_SLOT_COUNT = 1;
 
         private static final PageSlotLayout DEFAULT_PAGE_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51,
-                        DEFAULT_SLOT_SPACING);
+                        DEFAULT_SLOT_SPACING - 10);
         private static final PageSlotLayout PAGE_ONE_SLOT_LAYOUT = new PageSlotLayout(145, 46, 250, 48,
                         DEFAULT_SLOT_SPACING);
         private static final PageSlotLayout PAGE_TWO_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51,
