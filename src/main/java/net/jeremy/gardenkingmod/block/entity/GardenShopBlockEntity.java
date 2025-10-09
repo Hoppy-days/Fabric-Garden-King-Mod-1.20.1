@@ -58,6 +58,7 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
                 buf.writeVarInt(costs.size());
                 for (ItemStack cost : costs) {
                     buf.writeItemStack(cost);
+                    buf.writeVarInt(GardenShopStackHelper.getRequestedCount(cost));
                 }
             }
         }
