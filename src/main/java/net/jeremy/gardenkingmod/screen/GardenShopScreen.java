@@ -78,6 +78,14 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_ARROW_HEIGHT = 9;
         private static final int OFFER_ARROW_OFFSET_X = 53;
         private static final int OFFER_ARROW_OFFSET_Y = 6;
+        private static final int COST_TEXT_COLOR = 0xFF0000;
+        private static final String COST_LABEL_TRANSLATION_KEY = "screen.gardenkingmod.garden_shop.cost_label";
+        private static final int DEFAULT_COST_LABEL_ANCHOR_X = 8;
+        private static final int DEFAULT_COST_LABEL_OFFSET_Y = 20;
+        private static final int DEFAULT_COST_VALUE_ANCHOR_X = 8;
+        private static final int DEFAULT_COST_VALUE_OFFSET_Y = 30;
+        private static final float DEFAULT_COST_TEXT_SCALE = 0.6F;
+
         private static final PageLayout DEFAULT_PAGE_LAYOUT = buildLayout(builder -> {
         });
         /**
@@ -90,6 +98,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
                 /* Cost stack spacing */
                 builder.costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING);
+                /* Cost text placement */
+                builder.costText(DEFAULT_COST_LABEL_ANCHOR_X, DEFAULT_COST_LABEL_OFFSET_Y,
+                                DEFAULT_COST_VALUE_ANCHOR_X, DEFAULT_COST_VALUE_OFFSET_Y, DEFAULT_COST_TEXT_SCALE);
                 /* Result slot position */
                 builder.resultItem(OFFER_RESULT_ITEM_OFFSET_X);
                 /* Arrow position */
@@ -105,14 +116,17 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
          * that texture's custom layout.
          */
         private static final PageLayout PAGE2_LAYOUT = buildLayout(builder -> {
-                    int BUY_BUTTON_OFFSET_X = 148;
-                    int BUY_BUTTON_OFFSET_Y = 94;
-                    int BUY_LABEL_X = 163;
-                    int BUY_LABEL_Y = 97;
+                int BUY_BUTTON_OFFSET_X = 148;
+                int BUY_BUTTON_OFFSET_Y = 94;
+                int BUY_LABEL_X = 163;
+                int BUY_LABEL_Y = 97;
                 /* Offer list placement */
                 builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
                 /* Cost stack spacing */
                 builder.costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING);
+                /* Cost text placement */
+                builder.costText(DEFAULT_COST_LABEL_ANCHOR_X, DEFAULT_COST_LABEL_OFFSET_Y,
+                                DEFAULT_COST_VALUE_ANCHOR_X, DEFAULT_COST_VALUE_OFFSET_Y, DEFAULT_COST_TEXT_SCALE);
                 /* Result slot position */
                 builder.resultItem(OFFER_RESULT_ITEM_OFFSET_X);
                 /* Arrow position */
@@ -415,22 +429,37 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return;
                 }
 
+                PageLayout layout = getPageLayout();
+                String label = Text.translatable(COST_LABEL_TRANSLATION_KEY).getString();
                 String text = formatRequestedCount(count);
-                int textWidth = textRenderer.getWidth(text);
+
                 RenderSystem.disableDepthTest();
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+                drawCostTextLine(context, label, x + layout.costTextLabelAnchorOffsetX(),
+                                y + layout.costTextLabelOffsetY(), layout.costTextScale());
+                drawCostTextLine(context, text, x + layout.costTextValueAnchorOffsetX(),
+                                y + layout.costTextValueOffsetY(), layout.costTextScale());
+
+                RenderSystem.disableBlend();
+                RenderSystem.enableDepthTest();
+        }
+
+        private void drawCostTextLine(DrawContext context, String text, int anchorX, int baselineY, float scale) {
+                if (text == null || text.isEmpty()) {
+                        return;
+                }
+
+                float scaledWidth = textRenderer.getWidth(text) * scale;
+                float drawX = anchorX - scaledWidth / 2.0F;
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
-                matrices.translate(0.0F, 0.0F, 300.0F);
-                int overlayX = x + 19 - 2 - textWidth;
-                int overlayY = y + 6 + 3;
-            RenderSystem.disableDepthTest();
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            context.drawTextWithShadow(textRenderer, text, overlayX, overlayY, 0xFFFFFF);
-            RenderSystem.disableBlend();
-            RenderSystem.enableDepthTest();
-            matrices.pop();
+                matrices.translate(drawX, baselineY, 300.0F);
+                matrices.scale(scale, scale, 1.0F);
+                context.drawText(textRenderer, text, 0, 0, COST_TEXT_COLOR, false);
+                matrices.pop();
         }
 
         private List<CostSlotSnapshot> suppressVanillaCostCounts() {
@@ -683,11 +712,16 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private record PageLayout(int offerListX, int offerListY, int costItemOffsetX, int costItemSpacing,
                         int resultItemOffsetX, int arrowOffsetX, int arrowOffsetY, int buyButtonOffsetX,
-                        int buyButtonOffsetY, int buyButtonWidth, int buyButtonHeight, int buyLabelX, int buyLabelY) {
+                        int buyButtonOffsetY, int buyButtonWidth, int buyButtonHeight, int buyLabelX, int buyLabelY,
+                        int costTextLabelAnchorOffsetX, int costTextLabelOffsetY, int costTextValueAnchorOffsetX,
+                        int costTextValueOffsetY, float costTextScale) {
                 static Builder defaults() {
                         return new Builder()
                                         .offerList(OFFER_LIST_X, OFFER_LIST_Y)
                                         .costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING)
+                                        .costText(DEFAULT_COST_LABEL_ANCHOR_X, DEFAULT_COST_LABEL_OFFSET_Y,
+                                                        DEFAULT_COST_VALUE_ANCHOR_X, DEFAULT_COST_VALUE_OFFSET_Y,
+                                                        DEFAULT_COST_TEXT_SCALE)
                                         .resultItem(OFFER_RESULT_ITEM_OFFSET_X)
                                         .arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y)
                                         .buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH,
@@ -709,6 +743,11 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         private int buyButtonHeight;
                         private int buyLabelX;
                         private int buyLabelY;
+                        private int costTextLabelAnchorOffsetX;
+                        private int costTextLabelOffsetY;
+                        private int costTextValueAnchorOffsetX;
+                        private int costTextValueOffsetY;
+                        private float costTextScale;
 
                         Builder offerList(int x, int y) {
                                 this.offerListX = x;
@@ -747,10 +786,22 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 return this;
                         }
 
+                        Builder costText(int labelAnchorOffsetX, int labelOffsetY, int valueAnchorOffsetX,
+                                        int valueOffsetY, float scale) {
+                                this.costTextLabelAnchorOffsetX = labelAnchorOffsetX;
+                                this.costTextLabelOffsetY = labelOffsetY;
+                                this.costTextValueAnchorOffsetX = valueAnchorOffsetX;
+                                this.costTextValueOffsetY = valueOffsetY;
+                                this.costTextScale = scale;
+                                return this;
+                        }
+
                         PageLayout build() {
                                 return new PageLayout(offerListX, offerListY, costItemOffsetX, costItemSpacing,
                                                 resultItemOffsetX, arrowOffsetX, arrowOffsetY, buyButtonOffsetX,
-                                                buyButtonOffsetY, buyButtonWidth, buyButtonHeight, buyLabelX, buyLabelY);
+                                                buyButtonOffsetY, buyButtonWidth, buyButtonHeight, buyLabelX, buyLabelY,
+                                                costTextLabelAnchorOffsetX, costTextLabelOffsetY,
+                                                costTextValueAnchorOffsetX, costTextValueOffsetY, costTextScale);
                         }
                 }
         }
