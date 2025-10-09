@@ -57,6 +57,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int BUY_BUTTON_HOVER_V = 96;
         private static final int BUY_BUTTON_WIDTH = 46;
         private static final int BUY_BUTTON_HEIGHT = 14;
+        private static final float BUY_LABEL_SCALE = 1.5F;
 
         private static final int OFFER_LIST_X = 29;
         private static final int OFFER_LIST_Y = 17;
@@ -226,8 +227,25 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.offers"), OFFERS_LABEL_X,
                                 OFFERS_LABEL_Y, 0x404040, false);
                 if (isBuyButtonVisible()) {
-                        context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.buy_button"),
-                                        layout.buyLabelX(), layout.buyLabelY(), 0xFFFFFF, false);
+                        Text buyText = Text.translatable("screen.gardenkingmod.garden_shop.buy_button");
+                        MatrixStack matrices = context.getMatrices();
+                        matrices.push();
+                        float scale = BUY_LABEL_SCALE;
+                        double labelX = layout.buyLabelX();
+                        double labelY = layout.buyLabelY();
+                        if (scale != 1.0F) {
+                                float textWidth = textRenderer.getWidth(buyText);
+                                float textHeight = textRenderer.fontHeight;
+                                labelX += (1.0F - scale) * textWidth / 2.0F;
+                                labelY += (1.0F - scale) * textHeight / 2.0F;
+                                matrices.translate(labelX, labelY, 0.0F);
+                                matrices.scale(scale, scale, 1.0F);
+                                context.drawText(textRenderer, buyText, 0, 0, 0xFFFFFF, false);
+                        } else {
+                                context.drawText(textRenderer, buyText, layout.buyLabelX(), layout.buyLabelY(), 0xFFFFFF,
+                                                false);
+                        }
+                        matrices.pop();
                 }
         }
 
