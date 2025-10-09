@@ -36,13 +36,13 @@ public class GardenShopCostInventory extends SimpleInventory {
             return super.removeStack(slot, amount);
         }
 
-        ItemStack removed = GardenShopStackHelper.copyWithoutRequestedCount(stack);
-        int removedCount = Math.min(Math.min(amount, requestedCount), removed.getMaxCount());
-        removed.setCount(removedCount);
+        int removedCount = Math.min(amount, requestedCount);
+        ItemStack removed = stack.copy();
+        GardenShopStackHelper.applyRequestedCount(removed, removedCount);
 
         int remaining = requestedCount - removedCount;
         if (remaining > 0) {
-            ItemStack replacement = GardenShopStackHelper.copyWithoutRequestedCount(stack);
+            ItemStack replacement = stack.copy();
             GardenShopStackHelper.applyRequestedCount(replacement, remaining);
             setStack(slot, replacement);
         } else {
@@ -61,24 +61,10 @@ public class GardenShopCostInventory extends SimpleInventory {
         }
 
         int requestedCount = GardenShopStackHelper.getRequestedCount(stack);
-        if (requestedCount <= stack.getCount()) {
-            return super.removeStack(slot);
+        if (requestedCount <= 0) {
+            return ItemStack.EMPTY;
         }
 
-        ItemStack removed = GardenShopStackHelper.copyWithoutRequestedCount(stack);
-        int removedCount = Math.min(requestedCount, removed.getMaxCount());
-        removed.setCount(removedCount);
-
-        int remaining = requestedCount - removedCount;
-        if (remaining > 0) {
-            ItemStack replacement = GardenShopStackHelper.copyWithoutRequestedCount(stack);
-            GardenShopStackHelper.applyRequestedCount(replacement, remaining);
-            setStack(slot, replacement);
-        } else {
-            setStack(slot, ItemStack.EMPTY);
-        }
-
-        markDirty();
-        return removed;
+        return removeStack(slot, requestedCount);
     }
 }
