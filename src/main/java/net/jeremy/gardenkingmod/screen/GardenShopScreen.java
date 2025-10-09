@@ -144,8 +144,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         @Override
         protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-                int originX = (width - backgroundWidth) / 2;
-                int originY = (height - backgroundHeight) / 2;
+                int originX = x;
+                int originY = y;
                 Identifier backgroundTexture = getBackgroundTexture();
                 context.drawTexture(backgroundTexture, originX, originY, 0, 0, backgroundWidth, backgroundHeight,
                                 TEXTURE_WIDTH,
@@ -418,10 +418,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private boolean isPointWithinScrollbar(double mouseX, double mouseY) {
-                int originX = (width - backgroundWidth) / 2;
-                int originY = (height - backgroundHeight) / 2;
-                int scrollbarX = originX + SCROLLBAR_OFFSET_X;
-                int scrollbarY = originY + SCROLLBAR_OFFSET_Y;
+                int scrollbarX = x + SCROLLBAR_OFFSET_X;
+                int scrollbarY = y + SCROLLBAR_OFFSET_Y;
                 return mouseX >= scrollbarX && mouseX < scrollbarX + SCROLLBAR_TRACK_WIDTH && mouseY >= scrollbarY
                                 && mouseY < scrollbarY + SCROLLBAR_TRACK_HEIGHT;
         }
@@ -431,10 +429,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return false;
                 }
 
-                int originX = (width - backgroundWidth) / 2;
-                int originY = (height - backgroundHeight) / 2;
-                int buttonX = originX + BUY_BUTTON_OFFSET_X;
-                int buttonY = originY + BUY_BUTTON_OFFSET_Y;
+                int buttonX = x + BUY_BUTTON_OFFSET_X;
+                int buttonY = y + BUY_BUTTON_OFFSET_Y;
                 return mouseX >= buttonX && mouseX < buttonX + BUY_BUTTON_WIDTH && mouseY >= buttonY
                                 && mouseY < buttonY + BUY_BUTTON_HEIGHT;
         }
@@ -453,8 +449,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private void updateScrollFromMouse(double mouseY) {
-                int originY = (height - backgroundHeight) / 2;
-                int scrollbarY = originY + SCROLLBAR_OFFSET_Y;
+                int scrollbarY = y + SCROLLBAR_OFFSET_Y;
                 double relativeY = mouseY - scrollbarY - (SCROLLBAR_KNOB_HEIGHT / 2.0);
                 double available = SCROLLBAR_TRACK_HEIGHT - SCROLLBAR_KNOB_HEIGHT;
                 setScrollAmount((float) (relativeY / available));
@@ -507,12 +502,10 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private int getTabIndexAt(double mouseX, double mouseY) {
-                int originX = (width - backgroundWidth) / 2;
-                int originY = (height - backgroundHeight) / 2;
-                int tabX = originX + TAB_X;
+                int tabX = x + TAB_X;
                 for (int i = 0; i < TAB_DEFINITIONS.length; i++) {
                         TabDefinition definition = TAB_DEFINITIONS[i];
-                        int tabY = originY + definition.yOffset();
+                        int tabY = y + definition.yOffset();
                         if (isPointWithinTab(mouseX, mouseY, tabX, tabY)) {
                                 return i;
                         }
@@ -535,10 +528,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         }
 
         private int getOfferIndexAt(double mouseX, double mouseY) {
-                int originX = (width - backgroundWidth) / 2;
-                int originY = (height - backgroundHeight) / 2;
-                int listLeft = originX + OFFER_LIST_X;
-                int listTop = originY + OFFER_LIST_Y;
+                int listLeft = x + OFFER_LIST_X;
+                int listTop = y + OFFER_LIST_Y;
 
                 if (mouseX < listLeft || mouseX >= listLeft + OFFER_ENTRY_WIDTH) {
                         return -1;
@@ -565,10 +556,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return Optional.empty();
                 }
 
-                int originX = (width - backgroundWidth) / 2;
-                int originY = (height - backgroundHeight) / 2;
-                int listLeft = originX + OFFER_LIST_X;
-                int listTop = originY + OFFER_LIST_Y;
+                int listLeft = x + OFFER_LIST_X;
+                int listTop = y + OFFER_LIST_Y;
                 int relativeMouseY = mouseY - listTop;
                 if (relativeMouseY < 0) {
                         return Optional.empty();

@@ -19,6 +19,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 
 public class GardenShopScreenHandler extends ScreenHandler {
         private static final int HOTBAR_SLOT_COUNT = 9;
@@ -26,15 +27,15 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
         private static final int PLAYER_INVENTORY_SLOT_COUNT = PLAYER_INVENTORY_ROW_COUNT * PLAYER_INVENTORY_COLUMN_COUNT;
         private static final int SLOT_SIZE = 18;
+        private static final int SLOT_SPACING = SLOT_SIZE * 2;
         private static final int SHOP_SLOT_START_X = 8;
         private static final int PLAYER_INVENTORY_START_Y = 123;
         private static final int PLAYER_INVENTORY_START_X = 132;
         private static final int PLAYER_HOTBAR_Y = 181;
         private static final int PLAYER_HOTBAR_X = 132;
-        private static final int COST_SLOT_COUNT = 2;
+        public static final int COST_SLOT_COUNT = 2;
         private static final int RESULT_SLOT_COUNT = 1;
-        private static final int COST_SLOT_ONE_X = 144;
-        private static final int COST_SLOT_TWO_X = 180;
+        private static final int COST_SLOT_START_X = 144;
         private static final int COST_SLOTS_Y = 45;
         private static final int RESULT_SLOT_X = 244;
         private static final int RESULT_SLOT_Y = 52;
@@ -84,6 +85,15 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static int decodeOfferIndex(int id) {
                 int value = id & OFFER_INDEX_MASK;
                 return value == OFFER_INDEX_MASK ? -1 : value;
+        }
+
+        public static int getCostSlotX(int slotIndex) {
+                int clampedIndex = MathHelper.clamp(slotIndex, 0, COST_SLOT_COUNT - 1);
+                return COST_SLOT_START_X + clampedIndex * SLOT_SPACING;
+        }
+
+        public static int getCostSlotY() {
+                return COST_SLOTS_Y;
         }
 
         public GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
@@ -829,8 +839,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private void addCostSlots() {
-                this.addSlot(new Slot(this.costInventory, 0, COST_SLOT_ONE_X, COST_SLOTS_Y));
-                this.addSlot(new Slot(this.costInventory, 1, COST_SLOT_TWO_X, COST_SLOTS_Y));
+                this.addSlot(new Slot(this.costInventory, 0, getCostSlotX(0), getCostSlotY()));
+                this.addSlot(new Slot(this.costInventory, 1, getCostSlotX(1), getCostSlotY()));
         }
 
         private void addResultSlot() {
