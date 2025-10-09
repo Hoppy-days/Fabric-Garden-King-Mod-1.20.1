@@ -628,9 +628,10 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return CostReturnResult.NO_CHANGE;
                 }
 
-                int requested = GardenShopStackHelper.getRequestedCount(originalCopy);
+                int provided = Math.max(GardenShopStackHelper.getRequestedCount(removed), removed.getCount());
+                int requested = Math.max(GardenShopStackHelper.getRequestedCount(originalCopy), provided);
                 if (requested <= 0) {
-                        requested = Math.max(GardenShopStackHelper.getRequestedCount(removed), removed.getCount());
+                        requested = provided;
                 }
 
                 ItemStack comparison = GardenShopStackHelper.copyWithoutRequestedCount(originalCopy);
