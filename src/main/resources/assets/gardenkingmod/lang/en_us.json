@@ -93,6 +93,7 @@
   "screen.gardenkingmod.market.sell": "Sell",
   "screen.gardenkingmod.garden_shop.offers": "OFFERS",
   "screen.gardenkingmod.garden_shop.buy_button": "BUY",
+  "screen.gardenkingmod.garden_shop.cost_label": "COST:",
   "screen.gardenkingmod.garden_shop.price": "%s Garden Coins",
   "screen.gardenkingmod.garden_shop.cost_count": "%s required",
   "tooltip.gardenkingmod.crop_tier": "Tier: %s",
