@@ -39,6 +39,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
         private static final int PURCHASE_BUTTON_FLAG = 1 << 30;
         private static final int SELECT_BUTTON_FLAG = 1 << 29;
+        private static final int BUTTON_FLAG_MASK = PURCHASE_BUTTON_FLAG | SELECT_BUTTON_FLAG;
         private static final int PAGE_INDEX_SHIFT = 16;
         private static final int PAGE_INDEX_MASK = 0x7FFF;
         private static final int OFFER_INDEX_MASK = 0xFFFF;
@@ -75,7 +76,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private static int decodePageIndex(int id) {
-                return (id >>> PAGE_INDEX_SHIFT) & PAGE_INDEX_MASK;
+                return ((id & ~BUTTON_FLAG_MASK) >>> PAGE_INDEX_SHIFT) & PAGE_INDEX_MASK;
         }
 
         private static int decodeOfferIndex(int id) {
