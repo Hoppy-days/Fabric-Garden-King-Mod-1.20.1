@@ -662,7 +662,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                 }
                         }
                 }
-                populateSelectedOffer(player, offer, false, false);
+                populateSelectedOffer(player, offer, false, true);
                 playerInv.markDirty();
                 if (costSlotsChanged) {
                         this.costInventory.markDirty();
