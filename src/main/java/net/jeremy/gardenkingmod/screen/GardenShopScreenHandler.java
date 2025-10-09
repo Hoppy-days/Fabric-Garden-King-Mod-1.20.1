@@ -7,6 +7,7 @@ import net.jeremy.gardenkingmod.ModScreenHandlers;
 import net.jeremy.gardenkingmod.block.entity.GardenShopBlockEntity;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
+import net.jeremy.gardenkingmod.screen.inventory.GardenShopCostInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -15,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
@@ -98,7 +100,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 this.playerInventory = playerInventory;
                 this.blockEntity = blockEntity;
                 this.inventory = blockEntity != null ? blockEntity : new SimpleInventory(GardenShopBlockEntity.INVENTORY_SIZE);
-                this.costInventory = new SimpleInventory(COST_SLOT_COUNT);
+                this.costInventory = new GardenShopCostInventory(COST_SLOT_COUNT);
                 this.resultInventory = new SimpleInventory(RESULT_SLOT_COUNT);
                 this.costInventory.addListener(inventory -> onContentChanged(inventory));
                 this.resultInventory.addListener(inventory -> onContentChanged(inventory));
@@ -233,6 +235,76 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
                 slot.onTakeItem(player, originalStack);
                 return copiedStack;
+        }
+
+        @Override
+        protected boolean insertItem(ItemStack stack, int startIndex, int endIndex, boolean fromLast) {
+                if (startIndex >= 0 && endIndex <= COST_SLOT_COUNT && stack != null && !stack.isEmpty()) {
+                        boolean inserted = false;
+                        int index = fromLast ? endIndex - 1 : startIndex;
+                        int step = fromLast ? -1 : 1;
+                        while (fromLast ? index >= startIndex : index < endIndex) {
+                                Slot slot = this.slots.get(index);
+                                ItemStack slotStack = slot.getStack();
+                                if (slotStack.isEmpty()) {
+                                        ItemStack moved = stack.copy();
+                                        int movedCount = stack.getCount();
+                                        stack.setCount(0);
+                                        GardenShopStackHelper.applyRequestedCount(moved, movedCount);
+                                        slot.setStack(moved);
+                                        slot.markDirty();
+                                        inserted = true;
+                                        break;
+                                }
+
+                                if (ItemStack.canCombine(slotStack, stack)) {
+                                        int existing = GardenShopStackHelper.getRequestedCount(slotStack);
+                                        int addition = stack.getCount();
+                                        if (addition > 0) {
+                                                GardenShopStackHelper.applyRequestedCount(slotStack, existing + addition);
+                                                slot.markDirty();
+                                                stack.setCount(0);
+                                                inserted = true;
+                                        }
+                                        break;
+                                }
+
+                                index += step;
+                        }
+
+                        if (inserted) {
+                                return true;
+                        }
+                }
+
+                return super.insertItem(stack, startIndex, endIndex, fromLast);
+        }
+
+        @Override
+        public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+                super.onSlotClick(slotIndex, button, actionType, player);
+                if (slotIndex >= 0 && slotIndex < COST_SLOT_COUNT && actionType == SlotActionType.PICKUP) {
+                        Slot slot = this.slots.get(slotIndex);
+                        if (slot != null) {
+                                ItemStack slotStack = slot.getStack();
+                                ItemStack cursor = getCursorStack();
+                                if (!slotStack.isEmpty() && !cursor.isEmpty() && ItemStack.canCombine(slotStack, cursor)) {
+                                        if (button == 0) {
+                                                int total = GardenShopStackHelper.getRequestedCount(slotStack) + cursor.getCount();
+                                                if (cursor.getCount() > 0) {
+                                                        GardenShopStackHelper.applyRequestedCount(slotStack, total);
+                                                        cursor.setCount(0);
+                                                        slot.markDirty();
+                                                }
+                                        } else if (button == 1 && cursor.getCount() > 0) {
+                                                int total = GardenShopStackHelper.getRequestedCount(slotStack) + 1;
+                                                GardenShopStackHelper.applyRequestedCount(slotStack, total);
+                                                cursor.decrement(1);
+                                                slot.markDirty();
+                                        }
+                                }
+                        }
+                }
         }
 
         @Override
