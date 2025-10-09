@@ -40,7 +40,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
         private static final PageSlotLayout DEFAULT_PAGE_SLOT_LAYOUT = new PageSlotLayout(144, 45, 244, 52);
         private static final PageSlotLayout PAGE_ONE_SLOT_LAYOUT = new PageSlotLayout(160, 51, 240, 48);
-        private static final PageSlotLayout[] PAGE_SLOT_LAYOUTS = { PAGE_ONE_SLOT_LAYOUT, DEFAULT_PAGE_SLOT_LAYOUT };
+        private static final PageSlotLayout PAGE_TWO_SLOT_LAYOUT = new PageSlotLayout(144, 45, 244, 52);
+        private static final PageSlotLayout PAGE_THREE_SLOT_LAYOUT = new PageSlotLayout(144, 45, 244, 52);
+        private static final PageSlotLayout PAGE_FOUR_SLOT_LAYOUT = new PageSlotLayout(144, 45, 244, 52);
+        private static final PageSlotLayout[] PAGE_SLOT_LAYOUTS = { DEFAULT_PAGE_SLOT_LAYOUT, PAGE_ONE_SLOT_LAYOUT,
+                        PAGE_TWO_SLOT_LAYOUT, PAGE_THREE_SLOT_LAYOUT, PAGE_FOUR_SLOT_LAYOUT };
 
         private static final int PURCHASE_BUTTON_FLAG = 1 << 30;
         private static final int SELECT_BUTTON_FLAG = 1 << 29;
