@@ -29,7 +29,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
         private static final int PLAYER_INVENTORY_SLOT_COUNT = PLAYER_INVENTORY_ROW_COUNT * PLAYER_INVENTORY_COLUMN_COUNT;
         private static final int SLOT_SIZE = 18;
-        private static final int SLOT_SPACING = SLOT_SIZE * 2;
+        private static final int DEFAULT_SLOT_SPACING = SLOT_SIZE * 2;
         private static final int SHOP_SLOT_START_X = 8;
         private static final int PLAYER_INVENTORY_START_Y = 123;
         private static final int PLAYER_INVENTORY_START_X = 132;
@@ -38,11 +38,16 @@ public class GardenShopScreenHandler extends ScreenHandler {
         public static final int COST_SLOT_COUNT = 2;
         private static final int RESULT_SLOT_COUNT = 1;
 
-        private static final PageSlotLayout DEFAULT_PAGE_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51);
-        private static final PageSlotLayout PAGE_ONE_SLOT_LAYOUT = new PageSlotLayout(145, 46, 250, 48);
-        private static final PageSlotLayout PAGE_TWO_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51);
-        private static final PageSlotLayout PAGE_THREE_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51);
-        private static final PageSlotLayout PAGE_FOUR_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51);
+        private static final PageSlotLayout DEFAULT_PAGE_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51,
+                        DEFAULT_SLOT_SPACING);
+        private static final PageSlotLayout PAGE_ONE_SLOT_LAYOUT = new PageSlotLayout(145, 46, 250, 48,
+                        DEFAULT_SLOT_SPACING);
+        private static final PageSlotLayout PAGE_TWO_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51,
+                        DEFAULT_SLOT_SPACING);
+        private static final PageSlotLayout PAGE_THREE_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51,
+                        DEFAULT_SLOT_SPACING);
+        private static final PageSlotLayout PAGE_FOUR_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51,
+                        DEFAULT_SLOT_SPACING);
         private static final PageSlotLayout[] PAGE_SLOT_LAYOUTS = { DEFAULT_PAGE_SLOT_LAYOUT, PAGE_ONE_SLOT_LAYOUT,
                         PAGE_TWO_SLOT_LAYOUT, PAGE_THREE_SLOT_LAYOUT, PAGE_FOUR_SLOT_LAYOUT };
 
@@ -99,7 +104,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
         public int getCostSlotX(int slotIndex) {
                 int clampedIndex = MathHelper.clamp(slotIndex, 0, COST_SLOT_COUNT - 1);
                 PageSlotLayout layout = getPageSlotLayout(currentPageIndex);
-                return layout.costSlotStartX() + clampedIndex * SLOT_SPACING;
+                return layout.costSlotStartX() + clampedIndex * layout.costSlotSpacing();
         }
 
         public int getCostSlotY() {
@@ -907,7 +912,9 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 for (int index = 0; index < costSlots.length; index++) {
                         Slot slot = costSlots[index];
                         if (slot != null) {
-                                updateSlotPosition(slot, layout.costSlotStartX() + index * SLOT_SPACING, layout.costSlotsY());
+                                updateSlotPosition(slot,
+                                                layout.costSlotStartX() + index * layout.costSlotSpacing(),
+                                                layout.costSlotsY());
                         }
                 }
 
@@ -930,7 +937,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return DEFAULT_PAGE_SLOT_LAYOUT;
         }
 
-        private record PageSlotLayout(int costSlotStartX, int costSlotsY, int resultSlotX, int resultSlotY) {
+        private record PageSlotLayout(int costSlotStartX, int costSlotsY, int resultSlotX, int resultSlotY,
+                        int costSlotSpacing) {
         }
 
         private void fillInventoryFromOffers() {
