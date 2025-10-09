@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
@@ -396,16 +397,14 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 matrices.translate(0.0F, 0.0F, 200.0F);
                 int overlayX = x + 19 - 2 - textWidth;
                 int overlayY = y + 6 + 3;
-                if (hideVanillaCount && count > stack.getCount()) {
-                        int textHeight = textRenderer.fontHeight;
-                        int backgroundLeft = overlayX - 1;
-                        int backgroundTop = overlayY - 1;
-                        int backgroundRight = overlayX + textWidth + 1;
-                        int backgroundBottom = overlayY + textHeight;
-                        context.fill(backgroundLeft, backgroundTop, backgroundRight, backgroundBottom, 0xCC000000);
-                }
-                context.drawTextWithShadow(textRenderer, text, overlayX, overlayY, 0xFFFFFF);
-                matrices.pop();
+            RenderSystem.disableDepthTest();
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            context.drawTextWithShadow(textRenderer, text, overlayX, overlayY, 0xFFFFFF);
+            RenderSystem.disableBlend();
+            RenderSystem.enableDepthTest();
+            matrices.pop();
         }
 
         private List<CostSlotSnapshot> suppressVanillaCostCounts() {
