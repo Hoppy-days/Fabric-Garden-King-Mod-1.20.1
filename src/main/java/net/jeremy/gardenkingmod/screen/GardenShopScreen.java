@@ -241,7 +241,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         if (slot.inventory instanceof GardenShopCostInventory && slot.hasStack()) {
                                 int slotX = this.x + slot.x;
                                 int slotY = this.y + slot.y;
-                                drawStackCountOverlay(context, slot.getStack(), slotX, slotY);
+                                drawStackCountOverlay(context, slot.getStack(), slotX, slotY, true);
                         }
                 }
         }
@@ -373,21 +373,30 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private void drawCostStack(DrawContext context, ItemStack stack, int x, int y) {
                 context.drawItem(stack, x, y);
-                drawStackCountOverlay(context, stack, x, y);
+                drawStackCountOverlay(context, stack, x, y, false);
         }
 
-        private void drawStackCountOverlay(DrawContext context, ItemStack stack, int x, int y) {
+        private void drawStackCountOverlay(DrawContext context, ItemStack stack, int x, int y, boolean hideVanillaCount) {
                 int count = GardenShopStackHelper.getRequestedCount(stack);
                 if (count <= 1) {
                         return;
                 }
 
                 String text = formatRequestedCount(count);
+                int textWidth = textRenderer.getWidth(text);
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
                 matrices.translate(0.0F, 0.0F, 200.0F);
-                int overlayX = x + 19 - 2 - textRenderer.getWidth(text);
+                int overlayX = x + 19 - 2 - textWidth;
                 int overlayY = y + 6 + 3;
+                if (hideVanillaCount && count > stack.getCount()) {
+                        int textHeight = textRenderer.fontHeight;
+                        int backgroundLeft = overlayX - 1;
+                        int backgroundTop = overlayY - 1;
+                        int backgroundRight = overlayX + textWidth + 1;
+                        int backgroundBottom = overlayY + textHeight;
+                        context.fill(backgroundLeft, backgroundTop, backgroundRight, backgroundBottom, 0xCC000000);
+                }
                 context.drawTextWithShadow(textRenderer, text, overlayX, overlayY, 0xFFFFFF);
                 matrices.pop();
         }
