@@ -8,12 +8,14 @@ import java.util.Optional;
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
+import net.jeremy.gardenkingmod.screen.inventory.GardenShopCostInventory;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -173,7 +175,18 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
                 renderBackground(context);
                 super.render(context, mouseX, mouseY, delta);
+                drawCostSlotOverlays(context);
                 drawMouseoverTooltip(context, mouseX, mouseY);
+        }
+
+        private void drawCostSlotOverlays(DrawContext context) {
+                for (Slot slot : handler.slots) {
+                        if (slot.inventory instanceof GardenShopCostInventory && slot.hasStack()) {
+                                int slotX = this.x + slot.x;
+                                int slotY = this.y + slot.y;
+                                drawStackCountOverlay(context, slot.getStack(), slotX, slotY);
+                        }
+                }
         }
 
         @Override
