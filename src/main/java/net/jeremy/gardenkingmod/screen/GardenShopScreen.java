@@ -431,9 +431,31 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return;
                 }
 
+                PageLayout layout = getPageLayout();
+                String label = Text.translatable(COST_LABEL_TRANSLATION_KEY).getString();
                 String text = formatRequestedCount(count);
-                int textWidth = textRenderer.getWidth(text);
+
                 RenderSystem.disableDepthTest();
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+                drawCostTextLine(context, label, x + layout.costTextLabelAnchorOffsetX(),
+                                y + layout.costTextLabelOffsetY(), layout.costTextScale());
+                drawCostTextLine(context, text, x + layout.costTextValueAnchorOffsetX(),
+                                y + layout.costTextValueOffsetY(), layout.costTextScale());
+
+                RenderSystem.disableBlend();
+                RenderSystem.enableDepthTest();
+        }
+
+        private void drawCostTextLine(DrawContext context, String text, int anchorX, int baselineY, float scale) {
+                if (text == null || text.isEmpty()) {
+                        return;
+                }
+
+                float scaledWidth = textRenderer.getWidth(text) * scale;
+                float drawX = anchorX - scaledWidth / 2.0F;
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
                 matrices.translate(0.0F, 0.0F, 300.0F);
