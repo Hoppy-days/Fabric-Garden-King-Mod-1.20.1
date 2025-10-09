@@ -135,7 +135,9 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                         List<ItemStack> costs = new ArrayList<>(costCount);
                                         for (int costIndex = 0; costIndex < costCount; costIndex++) {
                                                 ItemStack costStack = buf.readItemStack();
+                                                int requestedCount = buf.readVarInt();
                                                 if (!costStack.isEmpty()) {
+                                                        GardenShopStackHelper.applyRequestedCount(costStack, requestedCount);
                                                         costs.add(costStack);
                                                 }
                                         }
