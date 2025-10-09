@@ -289,7 +289,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 }
 
                 GardenShopOffer offer = pageOffers.get(offerIndex);
-                boolean inventoryChanged = populateSelectedOffer(player, offer, true);
+                boolean inventoryChanged = populateSelectedOffer(player, offer, true, true);
                 boolean selectionChanged = this.selectedPageIndex != pageIndex || this.selectedOfferIndex != offerIndex;
                 this.selectedPageIndex = pageIndex;
                 this.selectedOfferIndex = offerIndex;
@@ -310,7 +310,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return changed || selectionChanged;
         }
 
-        private boolean populateSelectedOffer(ServerPlayerEntity player, GardenShopOffer offer, boolean returnExisting) {
+        private boolean populateSelectedOffer(ServerPlayerEntity player, GardenShopOffer offer, boolean returnExisting,
+                        boolean refillFromPlayerInventory) {
                 if (offer == null) {
                         return clearSelection(player);
                 }
@@ -324,28 +325,30 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         }
                 }
 
-                List<ItemStack> costs = offer.costStacks();
-                boolean playerChanged = false;
-                boolean slotChanged = false;
-                for (int slotIndex = 0; slotIndex < COST_SLOT_COUNT; slotIndex++) {
-                        ItemStack template = slotIndex < costs.size() ? costs.get(slotIndex) : ItemStack.EMPTY;
-                        ExtractResult result = fillCostSlotFromPlayer(playerInv, template, slotIndex);
-                        if (result.playerChanged()) {
-                                playerChanged = true;
+                if (refillFromPlayerInventory) {
+                        List<ItemStack> costs = offer.costStacks();
+                        boolean playerChanged = false;
+                        boolean slotChanged = false;
+                        for (int slotIndex = 0; slotIndex < COST_SLOT_COUNT; slotIndex++) {
+                                ItemStack template = slotIndex < costs.size() ? costs.get(slotIndex) : ItemStack.EMPTY;
+                                ExtractResult result = fillCostSlotFromPlayer(playerInv, template, slotIndex);
+                                if (result.playerChanged()) {
+                                        playerChanged = true;
+                                }
+                                if (result.slotChanged()) {
+                                        slotChanged = true;
+                                }
                         }
-                        if (result.slotChanged()) {
-                                slotChanged = true;
+
+                        if (playerChanged) {
+                                playerInv.markDirty();
+                                changed = true;
                         }
-                }
 
-                if (playerChanged) {
-                        playerInv.markDirty();
-                        changed = true;
-                }
-
-                if (slotChanged) {
-                        this.costInventory.markDirty();
-                        changed = true;
+                        if (slotChanged) {
+                                this.costInventory.markDirty();
+                                changed = true;
+                        }
                 }
 
                 if (updateResultSlot(offer)) {
@@ -523,7 +526,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return false;
                 }
 
-                removeCostStacks(offer.costStacks(), playerInv);
+                boolean costSlotsChanged = removeCostStacks(offer.costStacks(), playerInv);
                 if (!resultTakenFromSlot) {
                         ItemStack result = offer.copyResultStack();
                         if (!result.isEmpty()) {
@@ -532,9 +535,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                 }
                         }
                 }
-                populateSelectedOffer(player, offer, false);
+                populateSelectedOffer(player, offer, false, false);
                 playerInv.markDirty();
-                this.costInventory.markDirty();
+                if (costSlotsChanged) {
+                        this.costInventory.markDirty();
+                }
                 return true;
         }
 
@@ -602,8 +607,10 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return providedCount >= requiredCount;
         }
 
-        private void removeCostStacks(List<ItemStack> costs, PlayerInventory playerInventory) {
-                for (ItemStack cost : costs) {
+        private boolean removeCostStacks(List<ItemStack> costs, PlayerInventory playerInventory) {
+                boolean costSlotsChanged = false;
+                for (int index = 0; index < costs.size(); index++) {
+                        ItemStack cost = costs.get(index);
                         if (cost.isEmpty()) {
                                 continue;
                         }
@@ -615,11 +622,55 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
                         ItemStack comparisonStack = GardenShopStackHelper.copyWithoutRequestedCount(cost);
                         int remaining = required;
-                        remaining = removeFromInventory(this.costInventory, comparisonStack, remaining);
+                        if (index < COST_SLOT_COUNT) {
+                                SlotConsumptionResult result = consumeCostSlot(index, comparisonStack, required);
+                                remaining = result.remaining();
+                                if (result.changed()) {
+                                        costSlotsChanged = true;
+                                }
+                        }
                         if (remaining > 0) {
                                 remaining = removeFromInventory(playerInventory, comparisonStack, remaining);
                         }
                 }
+                return costSlotsChanged;
+        }
+
+        private SlotConsumptionResult consumeCostSlot(int slotIndex, ItemStack comparisonStack, int required) {
+                if (required <= 0) {
+                        return new SlotConsumptionResult(0, false);
+                }
+
+                ItemStack slotStack = this.costInventory.getStack(slotIndex);
+                if (slotStack.isEmpty()) {
+                        return new SlotConsumptionResult(required, false);
+                }
+
+                ItemStack comparisonSource = GardenShopStackHelper.copyWithoutRequestedCount(slotStack);
+                if (!ItemStack.canCombine(comparisonSource, comparisonStack)) {
+                        return new SlotConsumptionResult(required, false);
+                }
+
+                int provided = GardenShopStackHelper.getRequestedCount(slotStack);
+                if (provided <= 0) {
+                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        return new SlotConsumptionResult(required, true);
+                }
+
+                int consumed = Math.min(provided, required);
+                int leftover = provided - consumed;
+                if (leftover > 0) {
+                        ItemStack replacement = GardenShopStackHelper.copyWithoutRequestedCount(slotStack);
+                        GardenShopStackHelper.applyRequestedCount(replacement, leftover);
+                        this.costInventory.setStack(slotIndex, replacement);
+                } else {
+                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                }
+
+                return new SlotConsumptionResult(required - consumed, true);
+        }
+
+        private record SlotConsumptionResult(int remaining, boolean changed) {
         }
 
         private int removeFromInventory(Inventory inventory, ItemStack comparisonStack, int remaining) {
@@ -633,7 +684,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         if (stack.isEmpty()) {
                                 continue;
                         }
-                        if (!ItemStack.canCombine(stack, comparisonStack)) {
+                        ItemStack comparisonSource = stack;
+                        if (inventory == this.costInventory) {
+                                comparisonSource = GardenShopStackHelper.copyWithoutRequestedCount(stack);
+                        }
+                        if (!ItemStack.canCombine(comparisonSource, comparisonStack)) {
                                 continue;
                         }
 
