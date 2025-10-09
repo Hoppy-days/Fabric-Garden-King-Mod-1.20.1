@@ -21,6 +21,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
+import net.jeremy.gardenkingmod.mixin.SlotAccessor;
+
 public class GardenShopScreenHandler extends ScreenHandler {
         private static final int HOTBAR_SLOT_COUNT = 9;
         private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
@@ -35,10 +37,10 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static final int PLAYER_HOTBAR_X = 132;
         public static final int COST_SLOT_COUNT = 2;
         private static final int RESULT_SLOT_COUNT = 1;
-        private static final int COST_SLOT_START_X = 144;
-        private static final int COST_SLOTS_Y = 45;
-        private static final int RESULT_SLOT_X = 244;
-        private static final int RESULT_SLOT_Y = 52;
+
+        private static final PageSlotLayout DEFAULT_PAGE_SLOT_LAYOUT = new PageSlotLayout(144, 45, 244, 52);
+        private static final PageSlotLayout PAGE_ONE_SLOT_LAYOUT = new PageSlotLayout(160, 51, 240, 48);
+        private static final PageSlotLayout[] PAGE_SLOT_LAYOUTS = { PAGE_ONE_SLOT_LAYOUT, DEFAULT_PAGE_SLOT_LAYOUT };
 
         private static final int PURCHASE_BUTTON_FLAG = 1 << 30;
         private static final int SELECT_BUTTON_FLAG = 1 << 29;
@@ -53,8 +55,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private final SimpleInventory resultInventory;
         private final PlayerInventory playerInventory;
         private final List<List<GardenShopOffer>> offersByPage;
+        private final Slot[] costSlots = new Slot[COST_SLOT_COUNT];
+        private Slot resultSlot;
         private int selectedPageIndex = -1;
         private int selectedOfferIndex = -1;
+        private int currentPageIndex = 0;
 
         private static int encodeOfferIndexValue(int offerIndex) {
                 return offerIndex < 0 ? OFFER_INDEX_MASK : offerIndex & OFFER_INDEX_MASK;
@@ -87,13 +92,37 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return value == OFFER_INDEX_MASK ? -1 : value;
         }
 
-        public static int getCostSlotX(int slotIndex) {
+        public int getCostSlotX(int slotIndex) {
                 int clampedIndex = MathHelper.clamp(slotIndex, 0, COST_SLOT_COUNT - 1);
-                return COST_SLOT_START_X + clampedIndex * SLOT_SPACING;
+                PageSlotLayout layout = getPageSlotLayout(currentPageIndex);
+                return layout.costSlotStartX() + clampedIndex * SLOT_SPACING;
         }
 
-        public static int getCostSlotY() {
-                return COST_SLOTS_Y;
+        public int getCostSlotY() {
+                PageSlotLayout layout = getPageSlotLayout(currentPageIndex);
+                return layout.costSlotsY();
+        }
+
+        public int getResultSlotX() {
+                PageSlotLayout layout = getPageSlotLayout(currentPageIndex);
+                return layout.resultSlotX();
+        }
+
+        public int getResultSlotY() {
+                PageSlotLayout layout = getPageSlotLayout(currentPageIndex);
+                return layout.resultSlotY();
+        }
+
+        public boolean isCostSlot(Slot slot) {
+                return slot != null && slot.inventory == this.costInventory;
+        }
+
+        public boolean isResultSlot(Slot slot) {
+                return slot != null && slot.inventory == this.resultInventory;
+        }
+
+        public int getDisplayedPageIndex() {
+                return this.currentPageIndex;
         }
 
         public GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
@@ -158,6 +187,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 addResultSlot();
                 addPlayerInventory(playerInventory);
                 addPlayerHotbar(playerInventory);
+                applyPageLayout(currentPageIndex);
         }
 
         private static GardenShopBlockEntity getBlockEntity(PlayerInventory playerInventory, BlockPos pos) {
@@ -325,6 +355,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         int pageIndex = decodePageIndex(id);
                         int offerIndex = decodeOfferIndex(id);
                         if (offerIndex < 0) {
+                                setCurrentPageIndex(pageIndex);
                                 if (clearSelection(serverPlayer)) {
                                         sendContentUpdates();
                                 }
@@ -368,12 +399,14 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 }
 
                 List<GardenShopOffer> pageOffers = this.offersByPage.get(pageIndex);
+                setCurrentPageIndex(pageIndex);
                 if (offerIndex < 0 || offerIndex >= pageOffers.size()) {
                         return clearSelection(player);
                 }
 
                 GardenShopOffer offer = pageOffers.get(offerIndex);
                 boolean inventoryChanged = populateSelectedOffer(player, offer, true, true);
+                setCurrentPageIndex(pageIndex);
                 boolean selectionChanged = this.selectedPageIndex != pageIndex || this.selectedOfferIndex != offerIndex;
                 this.selectedPageIndex = pageIndex;
                 this.selectedOfferIndex = offerIndex;
@@ -841,12 +874,59 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private void addCostSlots() {
-                this.addSlot(new Slot(this.costInventory, 0, getCostSlotX(0), getCostSlotY()));
-                this.addSlot(new Slot(this.costInventory, 1, getCostSlotX(1), getCostSlotY()));
+                for (int index = 0; index < COST_SLOT_COUNT; index++) {
+                        Slot slot = new Slot(this.costInventory, index, getCostSlotX(index), getCostSlotY());
+                        this.costSlots[index] = this.addSlot(slot);
+                }
         }
 
         private void addResultSlot() {
-                this.addSlot(new ResultSlot(this, this.resultInventory, 0, RESULT_SLOT_X, RESULT_SLOT_Y));
+                this.resultSlot = this.addSlot(new ResultSlot(this, this.resultInventory, 0, getResultSlotX(), getResultSlotY()));
+        }
+
+        public void setDisplayedPage(int pageIndex) {
+                setCurrentPageIndex(pageIndex);
+        }
+
+        private void setCurrentPageIndex(int pageIndex) {
+                int clampedIndex = Math.max(pageIndex, 0);
+                if (this.currentPageIndex != clampedIndex) {
+                        this.currentPageIndex = clampedIndex;
+                        applyPageLayout(clampedIndex);
+                } else {
+                        applyPageLayout(clampedIndex);
+                }
+        }
+
+        public void applyPageLayout(int pageIndex) {
+                PageSlotLayout layout = getPageSlotLayout(pageIndex);
+                for (int index = 0; index < costSlots.length; index++) {
+                        Slot slot = costSlots[index];
+                        if (slot != null) {
+                                updateSlotPosition(slot, layout.costSlotStartX() + index * SLOT_SPACING, layout.costSlotsY());
+                        }
+                }
+
+                if (resultSlot != null) {
+                        updateSlotPosition(resultSlot, layout.resultSlotX(), layout.resultSlotY());
+                }
+        }
+
+        private void updateSlotPosition(Slot slot, int x, int y) {
+                if (slot instanceof SlotAccessor accessor) {
+                        accessor.setX(x);
+                        accessor.setY(y);
+                }
+        }
+
+        private PageSlotLayout getPageSlotLayout(int pageIndex) {
+                if (pageIndex >= 0 && pageIndex < PAGE_SLOT_LAYOUTS.length && PAGE_SLOT_LAYOUTS[pageIndex] != null) {
+                        return PAGE_SLOT_LAYOUTS[pageIndex];
+                }
+                return DEFAULT_PAGE_SLOT_LAYOUT;
+        }
+
+        private record PageSlotLayout(int costSlotStartX, int costSlotsY, int resultSlotX, int resultSlotY) {
         }
 
         private void fillInventoryFromOffers() {
