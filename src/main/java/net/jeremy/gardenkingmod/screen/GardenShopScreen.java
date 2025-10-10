@@ -81,9 +81,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final String COST_LABEL_TRANSLATION_KEY = "screen.gardenkingmod.garden_shop.cost_label";
         private static final int DEFAULT_COST_SLOT_LABEL_ANCHOR_X = 8;
         private static final int DEFAULT_COST_SLOT_LABEL_OFFSET_Y = 20;
+            //DEFAULT_COST_SLOT_LABEL is the word "COST"//
         private static final int DEFAULT_COST_SLOT_VALUE_ANCHOR_X = 8;
         private static final int DEFAULT_COST_SLOT_VALUE_OFFSET_Y = 30;
+            //DEFAULT_COST_SLOT_VALUE is the word cost count//
         private static final float DEFAULT_COST_SLOT_TEXT_SCALE = 0.6F;
+
         private static final int DEFAULT_COST_TEXT_LABEL_ANCHOR_X = 8;
         private static final int DEFAULT_COST_TEXT_LABEL_OFFSET_Y = 20;
         private static final int DEFAULT_COST_TEXT_VALUE_ANCHOR_X = 8;
