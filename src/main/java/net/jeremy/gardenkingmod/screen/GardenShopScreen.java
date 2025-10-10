@@ -14,6 +14,7 @@ import net.jeremy.gardenkingmod.screen.inventory.GardenShopCostInventory;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.item.ItemRenderer;
@@ -723,10 +724,20 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
                 ItemRenderer renderer = minecraftClient.getItemRenderer();
                 BakedModel model = renderer.getModel(stack, null, null, 0);
-                renderer.renderItem(stack, ModelTransformationMode.GUI, false, context.getMatrices(),
-                                context.getVertexConsumers(), LightmapTextureManager.MAX_LIGHT_COORDINATE,
-                                OverlayTexture.DEFAULT_UV, model);
+                MatrixStack matrices = context.getMatrices();
+                matrices.push();
+                matrices.scale(16.0F, -16.0F, 16.0F);
+                boolean disableLighting = !model.isSideLit();
+                if (disableLighting) {
+                        DiffuseLighting.disableGuiDepthLighting();
+                }
+                renderer.renderItem(stack, ModelTransformationMode.GUI, false, matrices, context.getVertexConsumers(),
+                                LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
                 context.draw();
+                if (disableLighting) {
+                        DiffuseLighting.enableGuiDepthLighting();
+                }
+                matrices.pop();
         }
 
         private Slot getResultSlot() {
