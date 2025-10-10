@@ -688,6 +688,11 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         matrices.translate(0.0F, bobTranslation, 0.0F);
                 }
 
+                float scale = animation.scale();
+                if (scale != 1.0F) {
+                        matrices.scale(scale, scale, scale);
+                }
+
                 if (animation.rotationPeriodTicks() > 0.0F) {
                         float rotationDegrees = ((animationTicks + animation.rotationPhaseTicks())
                                         / animation.rotationPeriodTicks()) * 360.0F;
