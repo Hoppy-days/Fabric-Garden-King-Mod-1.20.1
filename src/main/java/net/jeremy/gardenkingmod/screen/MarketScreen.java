@@ -13,6 +13,9 @@ import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.screen.narration.NarrationPart;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
@@ -37,16 +40,22 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_TEXTURE_HEIGHT = 256;
         private static final int BUY_TEXTURE_U = 176;
 
-        private static final int BACKGROUND_WIDTH = 176;
-        private static final int BACKGROUND_HEIGHT = 222;
+        private static final int SELL_BACKGROUND_U = 0;
+        private static final int SELL_BACKGROUND_V = 0;
+        private static final int BACKGROUND_WIDTH = 174;
+        private static final int BACKGROUND_HEIGHT = 220;
         private static final int PLAYER_INVENTORY_LABEL_Y = BACKGROUND_HEIGHT - 94;
         private static final int TITLE_LABEL_Y = 42;
         private static final int SELL_BUTTON_WIDTH = 52;
         private static final int SELL_BUTTON_HEIGHT = 20;
-        private static final int TAB_BUTTON_WIDTH = 52;
-        private static final int TAB_BUTTON_HEIGHT = 20;
+        private static final int TAB_BUTTON_WIDTH = 35;
+        private static final int TAB_BUTTON_HEIGHT = 15;
         private static final int TAB_BUTTON_SPACING = 4;
         private static final int TAB_BUTTON_Y_OFFSET = 18;
+        private static final int SELL_TAB_TEXTURE_U = 6;
+        private static final int SELL_TAB_TEXTURE_V = 0;
+        private static final int BUY_TAB_TEXTURE_U = 45;
+        private static final int BUY_TAB_TEXTURE_V = 0;
         private static final int SCOREBOARD_BAND_TOP = 107;
         private static final int SCOREBOARD_BAND_BOTTOM = 138;
         private static final int RESULT_TEXT_TOP_OFFSET = -5;
@@ -90,8 +99,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_SCROLLBAR_KNOB_HEIGHT = 27;
 
         private ButtonWidget sellButton;
-        private ButtonWidget sellTabButton;
-        private ButtonWidget buyTabButton;
+        private TabButton sellTabButton;
+        private TabButton buyTabButton;
         private int lastItemsSold;
         private int lastPayout;
         private int lastLifetimeTotal;
@@ -145,7 +154,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         drawBuyOfferList(context, x, y, mouseX, mouseY);
                         drawBuyScrollbar(context, x, y);
                 } else {
-                        context.drawTexture(SELL_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight,
+                        context.drawTexture(SELL_TEXTURE, x, y, SELL_BACKGROUND_U, SELL_BACKGROUND_V, backgroundWidth, backgroundHeight,
                                         SELL_TEXTURE_WIDTH, SELL_TEXTURE_HEIGHT);
                 }
         }
@@ -312,13 +321,10 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 int totalWidth = TAB_BUTTON_WIDTH * 2 + TAB_BUTTON_SPACING;
                 int startX = x + (backgroundWidth - totalWidth) / 2;
                 int buttonY = y + TAB_BUTTON_Y_OFFSET;
-                sellTabButton = addDrawableChild(ButtonWidget.builder(getTabLabel(Tab.SELL), button -> {
-                        setActiveTab(Tab.SELL);
-                }).dimensions(startX, buttonY, TAB_BUTTON_WIDTH, TAB_BUTTON_HEIGHT).build());
-                buyTabButton = addDrawableChild(ButtonWidget.builder(getTabLabel(Tab.BUY), button -> {
-                        setActiveTab(Tab.BUY);
-                }).dimensions(startX + TAB_BUTTON_WIDTH + TAB_BUTTON_SPACING, buttonY, TAB_BUTTON_WIDTH,
-                                TAB_BUTTON_HEIGHT).build());
+                sellTabButton = addDrawableChild(new TabButton(startX, buttonY, Tab.SELL, getTabLabel(Tab.SELL),
+                                () -> setActiveTab(Tab.SELL)));
+                buyTabButton = addDrawableChild(new TabButton(startX + TAB_BUTTON_WIDTH + TAB_BUTTON_SPACING, buttonY,
+                                Tab.BUY, getTabLabel(Tab.BUY), () -> setActiveTab(Tab.BUY)));
         }
 
         private void setActiveTab(Tab tab) {
@@ -336,6 +342,47 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private void updateSellButtonVisibility() {
                 if (sellButton != null) {
                         sellButton.visible = activeTab == Tab.SELL;
+                }
+        }
+
+        private class TabButton extends ClickableWidget {
+                private final Tab tab;
+                private final Runnable pressAction;
+
+                private TabButton(int x, int y, Tab tab, Text message, Runnable pressAction) {
+                        super(x, y, TAB_BUTTON_WIDTH, TAB_BUTTON_HEIGHT, message);
+                        this.tab = tab;
+                        this.pressAction = pressAction;
+                }
+
+                @Override
+                public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+                        int textureU = tab == Tab.SELL ? SELL_TAB_TEXTURE_U : BUY_TAB_TEXTURE_U;
+                        int textureV = tab == Tab.SELL ? SELL_TAB_TEXTURE_V : BUY_TAB_TEXTURE_V;
+                        context.drawTexture(SELL_TEXTURE, getX(), getY(), textureU, textureV, width, height,
+                                        SELL_TEXTURE_WIDTH, SELL_TEXTURE_HEIGHT);
+
+                        int textWidth = textRenderer.getWidth(getMessage());
+                        int textX = getX() + (width - textWidth) / 2;
+                        int textY = getY() + (height - textRenderer.fontHeight) / 2;
+                        boolean selected = tab == activeTab;
+                        int baseColor = getMessage().getStyle().getColor() != null
+                                        ? getMessage().getStyle().getColor().getRgb()
+                                        : 0xFFFFFF;
+                        int color = selected || active ? baseColor : 0xA0A0A0;
+                        context.drawText(textRenderer, getMessage(), textX, textY, color, false);
+                }
+
+                @Override
+                public void onClick(double mouseX, double mouseY) {
+                        if (pressAction != null && active) {
+                                pressAction.run();
+                        }
+                }
+
+                @Override
+                protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+                        builder.put(NarrationPart.TITLE, getMessage());
                 }
         }
 
