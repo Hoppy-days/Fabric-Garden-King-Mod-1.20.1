@@ -16,6 +16,11 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
@@ -190,10 +195,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 return builder.build();
         }
 
-        private static final int OFFER_DISPLAY_X = 233;
-        private static final int OFFER_DISPLAY_Y = 27;
-        private static final int OFFER_DISPLAY_WIDTH = 52;
-        private static final int OFFER_DISPLAY_HEIGHT = 70;
         private static final float OFFER_DISPLAY_SCALE = 3.25F;
         private static final float OFFER_DISPLAY_Z = 200.0F;
         private static final float OFFER_ROTATION_SPEED = 30.0F;
@@ -277,7 +278,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 drawTabs(context, originX, originY, mouseX, mouseY);
                 drawOfferList(context, originX, originY, mouseX, mouseY);
                 drawScrollbar(context, originX, originY);
-                drawSelectedOfferDetails(context, originX, originY, delta);
         }
 
         @Override
@@ -311,12 +311,23 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+                this.currentFrameDelta = delta;
                 renderBackground(context);
+                ResultSlotSnapshot suppressedResult = suppressVanillaResultSlot();
                 List<CostSlotSnapshot> suppressedCounts = suppressVanillaCostCounts();
                 try {
                         super.render(context, mouseX, mouseY, delta);
                 } finally {
                         restoreVanillaCostCounts(suppressedCounts);
+                        restoreVanillaResultSlot(suppressedResult);
+                }
+                if (suppressedResult != null && suppressedResult.slot() != null) {
+                        if (!suppressedResult.stack().isEmpty()) {
+                                drawAnimatedResultItem(context, suppressedResult.stack(), suppressedResult.slot());
+                        } else {
+                                lastAnimatedOfferStack = ItemStack.EMPTY;
+                                selectedOfferAnimationStartTicks = Float.NaN;
+                        }
                 }
                 drawCostSlotOverlays(context);
                 drawMouseoverTooltip(context, mouseX, mouseY);
@@ -544,6 +555,40 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private record CostSlotSnapshot(Slot slot, int originalCount) {
         }
 
+        private ResultSlotSnapshot suppressVanillaResultSlot() {
+                for (Slot slot : handler.slots) {
+                        if (!handler.isResultSlot(slot)) {
+                                continue;
+                        }
+
+                        ItemStack stack = slot.getStack();
+                        if (stack.isEmpty()) {
+                                return new ResultSlotSnapshot(slot, ItemStack.EMPTY);
+                        }
+
+                        ItemStack snapshot = stack.copy();
+                        stack.setCount(0);
+                        return new ResultSlotSnapshot(slot, snapshot);
+                }
+                return null;
+        }
+
+        private void restoreVanillaResultSlot(ResultSlotSnapshot snapshot) {
+                if (snapshot == null || snapshot.slot() == null) {
+                        return;
+                }
+
+                Slot slot = snapshot.slot();
+                if (snapshot.stack().isEmpty()) {
+                        slot.setStack(ItemStack.EMPTY);
+                } else {
+                        slot.setStack(snapshot.stack().copy());
+                }
+        }
+
+        private record ResultSlotSnapshot(Slot slot, ItemStack stack) {
+        }
+
         private static String formatRequestedCount(int count) {
                 if (count < 1000) {
                         return Integer.toString(count);
@@ -608,20 +653,21 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 layout.buyButtonHeight(),
                                 TEXTURE_WIDTH, TEXTURE_HEIGHT);
         }
-
-        private void drawSelectedOfferDetails(DrawContext context, int originX, int originY, float delta) {
-                if (!isBuyButtonVisible()) {
-                        return;
+        private void drawAnimatedResultItem(DrawContext context, ItemStack stack, Slot slot) {
+                int slotX = this.x + slot.x;
+                int slotY = this.y + slot.y;
+                OfferDisplayAnimation animation = getOfferDisplayAnimation();
+                if (!ItemStack.areEqual(lastAnimatedOfferStack, stack)) {
+                        resetOfferAnimation(stack);
                 }
 
-                List<GardenShopOffer> offers = getOffersForActiveTab();
-                if (selectedOffer < 0 || selectedOffer >= offers.size()) {
-                        return;
+                if (Float.isNaN(selectedOfferAnimationStartTicks)) {
+                        selectedOfferAnimationStartTicks = getAnimationTicks(0.0F);
                 }
 
-                ItemStack resultStack = offers.get(selectedOffer).copyResultStack();
-                if (resultStack.isEmpty()) {
-                        return;
+                float animationTicks = getAnimationTicks(currentFrameDelta) - selectedOfferAnimationStartTicks;
+                if (animationTicks < 0.0F) {
+                        animationTicks = 0.0F;
                 }
 
                 int displayLeft = originX + OFFER_DISPLAY_X;
@@ -676,7 +722,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(animation.staticRoll()));
                 }
 
-                context.drawItem(resultStack, -8, -8);
+                RenderSystem.disableDepthTest();
                 matrices.pop();
                 context.disableScissor();
         }
@@ -686,6 +732,19 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 selectedOfferAnimationStartTicks = Float.NaN;
         }
 
+
+        private float getAnimationTicks(float delta) {
+                MinecraftClient minecraftClient = client;
+                if (minecraftClient != null && minecraftClient.world != null) {
+                        return minecraftClient.world.getTime() + delta;
+                }
+                return Util.getMeasuringTimeMs() / 50.0F;
+        }
+
+        private void resetOfferAnimation(ItemStack stack) {
+                lastAnimatedOfferStack = stack.copy();
+                selectedOfferAnimationStartTicks = Float.NaN;
+        }
 
         private float getAnimationTicks(float delta) {
                 MinecraftClient minecraftClient = client;
