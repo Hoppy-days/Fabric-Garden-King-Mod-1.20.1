@@ -11,6 +11,7 @@ import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
 import net.jeremy.gardenkingmod.screen.inventory.GardenShopCostInventory;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -151,6 +152,36 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final PageLayout[] PAGE_LAYOUTS = { PAGE1_LAYOUT, PAGE2_LAYOUT, DEFAULT_PAGE_LAYOUT,
                         DEFAULT_PAGE_LAYOUT, DEFAULT_PAGE_LAYOUT };
 
+        private static final OfferDisplayAnimation DEFAULT_OFFER_ANIMATION = buildAnimation(builder -> {
+        });
+        private static final OfferDisplayAnimation PAGE2_OFFER_ANIMATION = buildAnimation(builder -> {
+                builder.rotationAxis(RotationAxis.POSITIVE_X);
+                builder.rotationPeriodTicks(20.0F);
+                builder.staticPitch(0.0F);
+                builder.bobAmplitude(0.1F);
+                builder.bobOffset(0.1F);
+                builder.bobPeriodTicks(10.0F);
+        });
+        private static final OfferDisplayAnimation PAGE3_OFFER_ANIMATION = buildAnimation(builder -> {
+                builder.rotationAxis(RotationAxis.POSITIVE_X);
+                builder.rotationPeriodTicks(20.0F);
+                builder.staticPitch(0.0F);
+                builder.bobAmplitude(0.1F);
+                builder.bobOffset(0.1F);
+                builder.bobPeriodTicks(10.0F);
+        });
+        private static final OfferDisplayAnimation PAGE4_OFFER_ANIMATION = buildAnimation(builder -> {
+                builder.rotationAxis(RotationAxis.POSITIVE_X);
+                builder.rotationPeriodTicks(20.0F);
+                builder.staticPitch(0.0F);
+                builder.bobAmplitude(0.1F);
+                builder.bobOffset(0.1F);
+                builder.bobPeriodTicks(10.0F);
+        });
+
+        private static final OfferDisplayAnimation[] OFFER_DISPLAY_ANIMATIONS = { DEFAULT_OFFER_ANIMATION,
+                        PAGE2_OFFER_ANIMATION, PAGE3_OFFER_ANIMATION, PAGE4_OFFER_ANIMATION, DEFAULT_OFFER_ANIMATION };
+
         private static PageLayout buildLayout(Consumer<PageLayout.Builder> configurer) {
                 PageLayout.Builder builder = PageLayout.defaults();
                 configurer.accept(builder);
@@ -164,6 +195,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final float OFFER_DISPLAY_SCALE = 3.25F;
         private static final float OFFER_DISPLAY_Z = 200.0F;
         private static final float OFFER_ROTATION_SPEED = 30.0F;
+        private static final float OFFER_ROTATION_PERIOD_TICKS = 20.0F * (360.0F / OFFER_ROTATION_SPEED);
 
         private static final int TAB_X = 0;
         private static final int TAB_WIDTH = 24;
@@ -593,17 +625,51 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 float centerX = displayLeft + (OFFER_DISPLAY_WIDTH / 2.0F);
                 float centerY = displayTop + (OFFER_DISPLAY_HEIGHT / 2.0F);
 
+                OfferDisplayAnimation animation = getOfferDisplayAnimation();
+                float animationTicks = getAnimationTicks(delta);
+
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
-                matrices.translate(centerX, centerY, OFFER_DISPLAY_Z);
-                matrices.scale(OFFER_DISPLAY_SCALE, OFFER_DISPLAY_SCALE, OFFER_DISPLAY_SCALE);
+                matrices.translate(centerX + animation.offsetX(), centerY + animation.offsetY(),
+                                OFFER_DISPLAY_Z + animation.offsetZ());
 
-                float rotation = ((Util.getMeasuringTimeMs() % 3600000L) / 1000.0F + delta) * OFFER_ROTATION_SPEED;
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotation));
-                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(25.0F));
+                float bobTranslation = animation.bobOffset();
+                if (animation.bobPeriodTicks() > 0.0F && animation.bobAmplitude() != 0.0F) {
+                        float bobAngle = (animationTicks + animation.bobPhaseTicks()) / animation.bobPeriodTicks();
+                        bobTranslation += MathHelper.sin(bobAngle) * animation.bobAmplitude();
+                }
+                if (bobTranslation != 0.0F) {
+                        matrices.translate(0.0F, bobTranslation, 0.0F);
+                }
+
+                matrices.scale(animation.scale(), animation.scale(), animation.scale());
+
+                if (animation.rotationPeriodTicks() > 0.0F) {
+                        float rotationDegrees = ((animationTicks + animation.rotationPhaseTicks())
+                                        / animation.rotationPeriodTicks()) * 360.0F;
+                        matrices.multiply(animation.rotationAxis().rotationDegrees(rotationDegrees));
+                }
+
+                if (animation.staticYaw() != 0.0F) {
+                        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(animation.staticYaw()));
+                }
+                if (animation.staticPitch() != 0.0F) {
+                        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(animation.staticPitch()));
+                }
+                if (animation.staticRoll() != 0.0F) {
+                        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(animation.staticRoll()));
+                }
 
                 context.drawItem(resultStack, -8, -8);
                 matrices.pop();
+        }
+
+        private float getAnimationTicks(float delta) {
+                MinecraftClient minecraftClient = client;
+                if (minecraftClient != null && minecraftClient.world != null) {
+                        return minecraftClient.world.getTime() + delta;
+                }
+                return Util.getMeasuringTimeMs() / 50.0F;
         }
 
         private boolean isPointWithinScrollbar(double mouseX, double mouseY) {
@@ -718,6 +784,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private PageLayout getPageLayout() {
                 int index = MathHelper.clamp(activeTab, 0, PAGE_LAYOUTS.length - 1);
                 return PAGE_LAYOUTS[index];
+        }
+
+        private OfferDisplayAnimation getOfferDisplayAnimation() {
+                int index = MathHelper.clamp(activeTab, 0, OFFER_DISPLAY_ANIMATIONS.length - 1);
+                OfferDisplayAnimation animation = OFFER_DISPLAY_ANIMATIONS[index];
+                return animation != null ? animation : DEFAULT_OFFER_ANIMATION;
         }
 
         private record TabDefinition(int yOffset, int iconU, int iconV) {
@@ -839,6 +911,121 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                                 costTextValueAnchorOffsetX, costTextValueOffsetY, costTextScale);
                         }
                 }
+        }
+
+        private record OfferDisplayAnimation(float scale, float offsetX, float offsetY, float offsetZ,
+                        float rotationPeriodTicks, float rotationPhaseTicks, RotationAxis rotationAxis,
+                        float staticPitch, float staticYaw, float staticRoll, float bobAmplitude, float bobOffset,
+                        float bobPeriodTicks, float bobPhaseTicks) {
+                static Builder builder() {
+                        return new Builder();
+                }
+
+                static final class Builder {
+                        private float scale = OFFER_DISPLAY_SCALE;
+                        private float offsetX;
+                        private float offsetY;
+                        private float offsetZ;
+                        private float rotationPeriodTicks = OFFER_ROTATION_PERIOD_TICKS;
+                        private float rotationPhaseTicks;
+                        private RotationAxis rotationAxis = RotationAxis.POSITIVE_Y;
+                        private float staticPitch = 25.0F;
+                        private float staticYaw;
+                        private float staticRoll;
+                        private float bobAmplitude;
+                        private float bobOffset;
+                        private float bobPeriodTicks;
+                        private float bobPhaseTicks;
+
+                        Builder scale(float scale) {
+                                this.scale = scale;
+                                return this;
+                        }
+
+                        Builder offset(float x, float y, float z) {
+                                this.offsetX = x;
+                                this.offsetY = y;
+                                this.offsetZ = z;
+                                return this;
+                        }
+
+                        Builder offsetX(float x) {
+                                this.offsetX = x;
+                                return this;
+                        }
+
+                        Builder offsetY(float y) {
+                                this.offsetY = y;
+                                return this;
+                        }
+
+                        Builder offsetZ(float z) {
+                                this.offsetZ = z;
+                                return this;
+                        }
+
+                        Builder rotationPeriodTicks(float periodTicks) {
+                                this.rotationPeriodTicks = periodTicks;
+                                return this;
+                        }
+
+                        Builder rotationPhaseTicks(float phaseTicks) {
+                                this.rotationPhaseTicks = phaseTicks;
+                                return this;
+                        }
+
+                        Builder rotationAxis(RotationAxis axis) {
+                                this.rotationAxis = axis;
+                                return this;
+                        }
+
+                        Builder staticPitch(float pitch) {
+                                this.staticPitch = pitch;
+                                return this;
+                        }
+
+                        Builder staticYaw(float yaw) {
+                                this.staticYaw = yaw;
+                                return this;
+                        }
+
+                        Builder staticRoll(float roll) {
+                                this.staticRoll = roll;
+                                return this;
+                        }
+
+                        Builder bobAmplitude(float amplitude) {
+                                this.bobAmplitude = amplitude;
+                                return this;
+                        }
+
+                        Builder bobOffset(float offset) {
+                                this.bobOffset = offset;
+                                return this;
+                        }
+
+                        Builder bobPeriodTicks(float periodTicks) {
+                                this.bobPeriodTicks = periodTicks;
+                                return this;
+                        }
+
+                        Builder bobPhaseTicks(float phaseTicks) {
+                                this.bobPhaseTicks = phaseTicks;
+                                return this;
+                        }
+
+                        OfferDisplayAnimation build() {
+                                return new OfferDisplayAnimation(scale, offsetX, offsetY, offsetZ, rotationPeriodTicks,
+                                                rotationPhaseTicks, rotationAxis, staticPitch, staticYaw, staticRoll,
+                                                bobAmplitude, bobOffset, bobPeriodTicks, bobPhaseTicks);
+                        }
+                }
+        }
+
+        private static OfferDisplayAnimation buildAnimation(Consumer<OfferDisplayAnimation.Builder> configurer) {
+                OfferDisplayAnimation.Builder builder = OfferDisplayAnimation.builder();
+                configurer.accept(builder);
+                return builder.build();
         }
 
         private int getOfferIndexAt(double mouseX, double mouseY) {
