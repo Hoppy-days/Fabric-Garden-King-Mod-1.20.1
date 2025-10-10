@@ -52,10 +52,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int TAB_BUTTON_HEIGHT = 15;
         private static final int TAB_BUTTON_SPACING = 4;
         private static final int TAB_BUTTON_Y_OFFSET = 18;
-        private static final int SELL_TAB_TEXTURE_U = 7;
-        private static final int SELL_TAB_TEXTURE_V = 0;
-        private static final int BUY_TAB_TEXTURE_U = 46;
-        private static final int BUY_TAB_TEXTURE_V = 0;
+        private static final int SELL_TAB_TEXT_X = 7;
+        private static final int BUY_TAB_TEXT_X = 46;
         private static final int SCOREBOARD_BAND_TOP = 107;
         private static final int SCOREBOARD_BAND_BOTTOM = 138;
         private static final int RESULT_TEXT_TOP_OFFSET = -5;
@@ -357,14 +355,9 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
                 @Override
                 public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
-                        int textureU = tab == Tab.SELL ? SELL_TAB_TEXTURE_U : BUY_TAB_TEXTURE_U;
-                        int textureV = tab == Tab.SELL ? SELL_TAB_TEXTURE_V : BUY_TAB_TEXTURE_V;
-                        context.drawTexture(SELL_TEXTURE, getX(), getY(), textureU, textureV, width, height,
-                                        SELL_TEXTURE_WIDTH, SELL_TEXTURE_HEIGHT);
-
-                        int textWidth = textRenderer.getWidth(getMessage());
-                        int textX = getX() + (width - textWidth) / 2;
-                        int textY = getY() + (height - textRenderer.fontHeight) / 2;
+                        int textX = MarketScreen.this.x + (tab == Tab.SELL ? SELL_TAB_TEXT_X : BUY_TAB_TEXT_X);
+                        int textY = MarketScreen.this.y + TAB_BUTTON_Y_OFFSET
+                                        + (TAB_BUTTON_HEIGHT - textRenderer.fontHeight) / 2;
                         boolean selected = tab == activeTab;
                         int baseColor = getMessage().getStyle().getColor() != null
                                         ? getMessage().getStyle().getColor().getRgb()
