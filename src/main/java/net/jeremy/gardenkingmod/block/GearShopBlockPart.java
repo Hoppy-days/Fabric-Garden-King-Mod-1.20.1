@@ -28,13 +28,13 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-public class GardenShopBlockPart extends Block {
+public class GearShopBlockPart extends Block {
         public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
         public static final EnumProperty<Part> PART = EnumProperty.of("part", Part.class);
 
         private static final Map<Part, VoxelShape> BASE_SHAPES = createBaseShapes();
 
-        public GardenShopBlockPart(Settings settings) {
+        public GearShopBlockPart(Settings settings) {
                 super(settings);
                 this.setDefaultState(getStateManager().getDefaultState().with(FACING, Direction.NORTH).with(PART,
                                 Part.CENTER));
@@ -72,7 +72,7 @@ public class GardenShopBlockPart extends Block {
                         BlockHitResult hit) {
                 BlockPos origin = getOrigin(pos, state);
                 BlockState originState = world.getBlockState(origin);
-                if (!(originState.getBlock() instanceof GardenShopBlock)) {
+                if (!(originState.getBlock() instanceof GearShopBlock)) {
                         return ActionResult.PASS;
                 }
 
@@ -87,7 +87,7 @@ public class GardenShopBlockPart extends Block {
                         if (!world.isClient) {
                                 BlockPos origin = getOrigin(pos, state);
                                 BlockState originState = world.getBlockState(origin);
-                                if (originState.getBlock() instanceof GardenShopBlock) {
+                                if (originState.getBlock() instanceof GearShopBlock) {
                                         world.breakBlock(origin, true);
                                 }
                         }

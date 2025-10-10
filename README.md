@@ -2,7 +2,7 @@
 
 ## Bonus harvest drops
 
-Garden King now loads bonus crop drop definitions from JSON files under `data/gardenkingmod/bonus_harvest_drops/`. Each file maps a crop block or direct loot table identifier to one or more bonus entries with an `item`, `chance`, and integer `count` range. All of the project's data-driven loaders strip any field named `_comment`, so you can document bonus drops, garden shop offers, or rotten crop definitions with entries such as `"_comment": "This is a general comment about the file."` anywhere in the JSON tree. The new [`wheat_diamonds.json`](src/main/resources/data/gardenkingmod/bonus_harvest_drops/wheat_diamonds.json) file, for example, grants wheat a 5% chance to drop 1–3 diamonds when harvested.
+Garden King now loads bonus crop drop definitions from JSON files under `data/gardenkingmod/bonus_harvest_drops/`. Each file maps a crop block or direct loot table identifier to one or more bonus entries with an `item`, `chance`, and integer `count` range. All of the project's data-driven loaders strip any field named `_comment`, so you can document bonus drops, gear shop offers, or rotten crop definitions with entries such as `"_comment": "This is a general comment about the file."` anywhere in the JSON tree. The new [`wheat_diamonds.json`](src/main/resources/data/gardenkingmod/bonus_harvest_drops/wheat_diamonds.json) file, for example, grants wheat a 5% chance to drop 1–3 diamonds when harvested.
 
 ### Creating event packs
 
@@ -42,10 +42,10 @@ Crow spawning is configured with two JSON files so that designers can keep biome
 
 Crow models, textures, and other assets follow the same conventions as the rest of the project. Keep any `.png` textures for the crow entity under `assets/gardenkingmod/textures/entity/` so that they are picked up automatically at runtime.
 
-## Garden shop trades
+## Gear shop trades
 
-The garden shop's inventory is now data-driven. All default trades live in
-[`data/gardenkingmod/garden_shop_offers.json`](src/main/resources/data/gardenkingmod/garden_shop_offers.json), which groups
+The gear shop's inventory is now data-driven. All default trades live in
+[`data/gardenkingmod/gear_shop_offers.json`](src/main/resources/data/gardenkingmod/gear_shop_offers.json), which groups
 offers by UI tab through a `pages` array. Use `_comment` fields at the root, page, or offer level to label long files without affecting parsing:
 
 ```json
@@ -78,7 +78,7 @@ first tab.
 
 ### Adding more trades
 
-1. Open [`garden_shop_offers.json`](src/main/resources/data/gardenkingmod/garden_shop_offers.json).
+1. Open [`gear_shop_offers.json`](src/main/resources/data/gardenkingmod/gear_shop_offers.json).
 2. Decide which tab should display the trade and add a new JSON object to that page's `offers` array using the format above.
    Add a brand-new page object under `pages` if you want to populate another tab.
 3. Save the file and reload your data packs (or restart the game/server) so Fabric's resource loader picks up the change.

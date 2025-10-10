@@ -8,9 +8,9 @@ import java.util.function.Consumer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.jeremy.gardenkingmod.GardenKingMod;
-import net.jeremy.gardenkingmod.shop.GardenShopOffer;
-import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
-import net.jeremy.gardenkingmod.screen.inventory.GardenShopCostInventory;
+import net.jeremy.gardenkingmod.shop.GearShopOffer;
+import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
+import net.jeremy.gardenkingmod.screen.inventory.GearShopCostInventory;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -32,15 +32,15 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 
-public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
+public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
-                        "textures/gui/container/garden_shop_gui.png");
+                        "textures/gui/container/gear_shop_gui.png");
         private static final Identifier[] PAGE_TEXTURES = {
                         TEXTURE,
-                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/garden_shop_gui2.png"),
-                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/garden_shop_gui3.png"),
-                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/garden_shop_gui4.png"),
-                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/garden_shop_gui5.png") };
+                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/gear_shop_gui2.png"),
+                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/gear_shop_gui3.png"),
+                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/gear_shop_gui4.png"),
+                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/gear_shop_gui5.png") };
         private static final int TEXTURE_WIDTH = 512;
         private static final int TEXTURE_HEIGHT = 256;
 
@@ -84,7 +84,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_ARROW_OFFSET_X = 53;
         private static final int OFFER_ARROW_OFFSET_Y = 6;
         private static final int COST_TEXT_COLOR = 0xFFFFFF;
-        private static final String COST_LABEL_TRANSLATION_KEY = "screen.gardenkingmod.garden_shop.cost_label";
+        private static final String COST_LABEL_TRANSLATION_KEY = "screen.gardenkingmod.gear_shop.cost_label";
             //DEFAULT_COST_SLOT_LABEL is the word "COST"
         private static final int DEFAULT_COST_SLOT_LABEL_ANCHOR_X = 9;
         private static final int DEFAULT_COST_SLOT_LABEL_OFFSET_Y = 20;
@@ -143,7 +143,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 builder.resultSlotAnimationOffset(RESULT_SLOT_ANIMATION_OFFSET_X, RESULT_SLOT_ANIMATION_OFFSET_Y);
         });
         /**
-         * Layout configuration for page 1 (garden_shop_gui.png). Adjust the builder calls
+         * Layout configuration for page 1 (gear_shop_gui.png). Adjust the builder calls
          * in this lambda to reposition elements for that page without impacting the
          * others.
          */
@@ -168,7 +168,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 builder.buyLabel(BUY_LABEL_X, BUY_LABEL_Y);
         });
         /**
-         * Layout configuration for page 2 (garden_shop_gui2.png). Start with the same
+         * Layout configuration for page 2 (gear_shop_gui2.png). Start with the same
          * defaults as page 1, then tweak any of the values inside this lambda to match
          * that texture's custom layout.
          */
@@ -242,7 +242,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private float resultSlotAnimationStartTicks = Float.NaN;
         private ItemStack lastAnimatedResultSlotStack = ItemStack.EMPTY;
 
-        public GardenShopScreen(GardenShopScreenHandler handler, PlayerInventory inventory, Text title) {
+        public GearShopScreen(GearShopScreenHandler handler, PlayerInventory inventory, Text title) {
                 super(handler, inventory, title);
                 this.backgroundWidth = BACKGROUND_WIDTH;
                 this.backgroundHeight = BACKGROUND_HEIGHT;
@@ -290,10 +290,10 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
                 super.drawForeground(context, mouseX, mouseY);
                 PageLayout layout = getPageLayout();
-                context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.garden_shop.offers"), OFFERS_LABEL_X,
+                context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.gear_shop.offers"), OFFERS_LABEL_X,
                                 OFFERS_LABEL_Y, 0x404040, false);
                 if (isBuyButtonVisible()) {
-                        Text buyText = Text.translatable("screen.gardenkingmod.garden_shop.buy_button");
+                        Text buyText = Text.translatable("screen.gardenkingmod.gear_shop.buy_button");
                         MatrixStack matrices = context.getMatrices();
                         matrices.push();
                         float scale = BUY_LABEL_SCALE;
@@ -332,7 +332,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 PageLayout layout = getPageLayout();
                 String label = Text.translatable(COST_LABEL_TRANSLATION_KEY).getString();
                 for (Slot slot : handler.slots) {
-                        if (slot.inventory instanceof GardenShopCostInventory && slot.hasStack()) {
+                        if (slot.inventory instanceof GearShopCostInventory && slot.hasStack()) {
                                 int slotX = this.x + slot.x;
                                 int slotY = this.y + slot.y;
                                 ItemStack stack = slot.getStack();
@@ -417,7 +417,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private void drawOfferList(DrawContext context, int originX, int originY, int mouseX, int mouseY) {
                 PageLayout layout = getPageLayout();
-                List<GardenShopOffer> offers = getOffersForActiveTab();
+                List<GearShopOffer> offers = getOffersForActiveTab();
                 int listLeft = originX + layout.offerListX();
                 int listTop = originY + layout.offerListY();
                 int hoveredOffer = getOfferIndexAt(mouseX, mouseY);
@@ -442,7 +442,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                                 SELECTED_HIGHLIGHT_COLOR);
                         }
 
-                        GardenShopOffer offer = offers.get(offerIndex);
+                        GearShopOffer offer = offers.get(offerIndex);
                         int itemY = entryY + OFFER_ITEM_OFFSET_Y;
                         int costStartX = listLeft + layout.costItemOffsetX();
                         int arrowX = listLeft + layout.arrowOffsetX();
@@ -472,7 +472,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private void drawCostStack(DrawContext context, ItemStack stack, int x, int y) {
                 context.drawItem(stack, x, y);
 
-                int requestedCount = GardenShopStackHelper.getRequestedCount(stack);
+                int requestedCount = GearShopStackHelper.getRequestedCount(stack);
                 if (requestedCount > stack.getCount()) {
                         String label = formatRequestedCount(requestedCount);
                         context.drawItemInSlot(textRenderer, stack, x, y, label);
@@ -483,7 +483,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private void drawCostSlotText(DrawContext context, String label, ItemStack stack, int slotX, int slotY,
                         PageLayout layout) {
-                int requiredCount = GardenShopStackHelper.getRequestedCount(stack);
+                int requiredCount = GearShopStackHelper.getRequestedCount(stack);
                 if (requiredCount <= 0) {
                         return;
                 }
@@ -548,7 +548,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private List<CostSlotSnapshot> suppressVanillaCostCounts() {
                 List<CostSlotSnapshot> modified = new ArrayList<>();
                 for (Slot slot : handler.slots) {
-                        if (!(slot.inventory instanceof GardenShopCostInventory)) {
+                        if (!(slot.inventory instanceof GearShopCostInventory)) {
                                 continue;
                         }
 
@@ -608,9 +608,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private void drawCostTooltip(DrawContext context, ItemStack stack, int mouseX, int mouseY) {
                 List<Text> tooltip = new ArrayList<>(getTooltipFromItem(stack));
-                int requested = GardenShopStackHelper.getRequestedCount(stack);
+                int requested = GearShopStackHelper.getRequestedCount(stack);
                 if (requested > stack.getCount()) {
-                        tooltip.add(Text.translatable("screen.gardenkingmod.garden_shop.cost_count", requested));
+                        tooltip.add(Text.translatable("screen.gardenkingmod.gear_shop.cost_count", requested));
                 }
                 context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
         }
@@ -1157,7 +1157,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private Optional<HoveredStack> getHoveredOfferStack(int mouseX, int mouseY) {
                 int offerIndex = getOfferIndexAt(mouseX, mouseY);
-                List<GardenShopOffer> offers = getOffersForActiveTab();
+                List<GearShopOffer> offers = getOffersForActiveTab();
                 if (offerIndex < 0 || offerIndex >= offers.size()) {
                         return Optional.empty();
                 }
@@ -1181,7 +1181,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return Optional.empty();
                 }
 
-                GardenShopOffer offer = offers.get(offerIndex);
+                GearShopOffer offer = offers.get(offerIndex);
                 int costStart = listLeft + layout.costItemOffsetX();
                 int arrowLeft = listLeft + layout.arrowOffsetX();
                 int maxCostRight = arrowLeft - 2;
@@ -1204,7 +1204,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 return Optional.empty();
         }
 
-        private List<GardenShopOffer> getOffersForActiveTab() {
+        private List<GearShopOffer> getOffersForActiveTab() {
                 return handler.getOffers(activeTab);
         }
 
@@ -1228,7 +1228,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return;
                 }
 
-                int buttonId = GardenShopScreenHandler.encodeSelectButtonId(activeTab, offerIndex);
+                int buttonId = GearShopScreenHandler.encodeSelectButtonId(activeTab, offerIndex);
                 client.interactionManager.clickButton(handler.syncId, buttonId);
         }
 
@@ -1237,12 +1237,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return;
                 }
 
-                List<GardenShopOffer> offers = getOffersForActiveTab();
+                List<GearShopOffer> offers = getOffersForActiveTab();
                 if (selectedOffer < 0 || selectedOffer >= offers.size()) {
                         return;
                 }
 
-                int buttonId = GardenShopScreenHandler.encodePurchaseButtonId(activeTab, selectedOffer);
+                int buttonId = GearShopScreenHandler.encodePurchaseButtonId(activeTab, selectedOffer);
                 client.interactionManager.clickButton(handler.syncId, buttonId);
         }
 

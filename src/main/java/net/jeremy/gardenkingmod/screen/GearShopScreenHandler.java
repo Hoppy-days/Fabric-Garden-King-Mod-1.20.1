@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.jeremy.gardenkingmod.ModScreenHandlers;
-import net.jeremy.gardenkingmod.block.entity.GardenShopBlockEntity;
-import net.jeremy.gardenkingmod.shop.GardenShopOffer;
-import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
-import net.jeremy.gardenkingmod.screen.inventory.GardenShopCostInventory;
+import net.jeremy.gardenkingmod.block.entity.GearShopBlockEntity;
+import net.jeremy.gardenkingmod.shop.GearShopOffer;
+import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
+import net.jeremy.gardenkingmod.screen.inventory.GearShopCostInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -27,7 +27,7 @@ import net.minecraft.util.math.MathHelper;
 
 import net.jeremy.gardenkingmod.mixin.SlotAccessor;
 
-public class GardenShopScreenHandler extends ScreenHandler {
+public class GearShopScreenHandler extends ScreenHandler {
         private static final int HOTBAR_SLOT_COUNT = 9;
         private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
         private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
@@ -63,11 +63,11 @@ public class GardenShopScreenHandler extends ScreenHandler {
         private static final int OFFER_INDEX_MASK = 0xFFFF;
 
         private final Inventory inventory;
-        private final GardenShopBlockEntity blockEntity;
+        private final GearShopBlockEntity blockEntity;
         private final SimpleInventory costInventory;
         private final SimpleInventory resultInventory;
         private final PlayerInventory playerInventory;
-        private final List<List<GardenShopOffer>> offersByPage;
+        private final List<List<GearShopOffer>> offersByPage;
         private final Slot[] costSlots = new Slot[COST_SLOT_COUNT];
         private Slot resultSlot;
         private int selectedPageIndex = -1;
@@ -138,27 +138,27 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return this.currentPageIndex;
         }
 
-        public GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
+        public GearShopScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
                 this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()), buf);
         }
 
-        public GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, GardenShopBlockEntity blockEntity) {
+        public GearShopScreenHandler(int syncId, PlayerInventory playerInventory, GearShopBlockEntity blockEntity) {
                 this(syncId, playerInventory, blockEntity, null);
         }
 
-        private GardenShopScreenHandler(int syncId, PlayerInventory playerInventory, GardenShopBlockEntity blockEntity,
+        private GearShopScreenHandler(int syncId, PlayerInventory playerInventory, GearShopBlockEntity blockEntity,
                         PacketByteBuf buf) {
-                super(ModScreenHandlers.GARDEN_SHOP_SCREEN_HANDLER, syncId);
+                super(ModScreenHandlers.GEAR_SHOP_SCREEN_HANDLER, syncId);
                 this.playerInventory = playerInventory;
                 this.blockEntity = blockEntity;
-                this.inventory = blockEntity != null ? blockEntity : new SimpleInventory(GardenShopBlockEntity.INVENTORY_SIZE);
-                this.costInventory = new GardenShopCostInventory(COST_SLOT_COUNT);
+                this.inventory = blockEntity != null ? blockEntity : new SimpleInventory(GearShopBlockEntity.INVENTORY_SIZE);
+                this.costInventory = new GearShopCostInventory(COST_SLOT_COUNT);
                 this.resultInventory = new SimpleInventory(RESULT_SLOT_COUNT);
                 this.costInventory.addListener(this::onContentChanged);
                 this.resultInventory.addListener(this::onContentChanged);
                 this.offersByPage = new ArrayList<>();
 
-                checkSize(this.inventory, GardenShopBlockEntity.INVENTORY_SIZE);
+                checkSize(this.inventory, GearShopBlockEntity.INVENTORY_SIZE);
                 if (blockEntity != null) {
                         blockEntity.ensureOffers();
                         this.offersByPage.addAll(blockEntity.getOfferPages());
@@ -170,7 +170,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         int pageCount = buf.readVarInt();
                         for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
                                 int offerCount = buf.readVarInt();
-                                List<GardenShopOffer> pageOffers = new ArrayList<>(offerCount);
+                                List<GearShopOffer> pageOffers = new ArrayList<>(offerCount);
                                 for (int offerIndex = 0; offerIndex < offerCount; offerIndex++) {
                                         ItemStack result = buf.readItemStack();
                                         int costCount = buf.readVarInt();
@@ -179,12 +179,12 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                                 ItemStack costStack = buf.readItemStack();
                                                 int requestedCount = buf.readVarInt();
                                                 if (!costStack.isEmpty()) {
-                                                        GardenShopStackHelper.applyRequestedCount(costStack, requestedCount);
+                                                        GearShopStackHelper.applyRequestedCount(costStack, requestedCount);
                                                         costs.add(costStack);
                                                 }
                                         }
                                         if (!result.isEmpty()) {
-                                                pageOffers.add(GardenShopOffer.of(result, costs));
+                                                pageOffers.add(GearShopOffer.of(result, costs));
                                         }
                                 }
                                 this.offersByPage.add(List.copyOf(pageOffers));
@@ -203,8 +203,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 applyPageLayout(currentPageIndex);
         }
 
-        private static GardenShopBlockEntity getBlockEntity(PlayerInventory playerInventory, BlockPos pos) {
-                if (playerInventory.player.getWorld().getBlockEntity(pos) instanceof GardenShopBlockEntity shopBlockEntity) {
+        private static GearShopBlockEntity getBlockEntity(PlayerInventory playerInventory, BlockPos pos) {
+                if (playerInventory.player.getWorld().getBlockEntity(pos) instanceof GearShopBlockEntity shopBlockEntity) {
                         return shopBlockEntity;
                 }
 
@@ -316,7 +316,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                         ItemStack moved = stack.copy();
                                         int movedCount = stack.getCount();
                                         stack.setCount(0);
-                                        GardenShopStackHelper.applyRequestedCount(moved, movedCount);
+                                        GearShopStackHelper.applyRequestedCount(moved, movedCount);
                                         slot.setStack(moved);
                                         slot.markDirty();
                                         inserted = true;
@@ -324,10 +324,10 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                 }
 
                                 if (canCombineIgnoringRequestedCount(slotStack, stack)) {
-                                        int existing = GardenShopStackHelper.getRequestedCount(slotStack);
+                                        int existing = GearShopStackHelper.getRequestedCount(slotStack);
                                         int addition = stack.getCount();
                                         if (addition > 0) {
-                                                GardenShopStackHelper.applyRequestedCount(slotStack, existing + addition);
+                                                GearShopStackHelper.applyRequestedCount(slotStack, existing + addition);
                                                 slot.markDirty();
                                                 stack.setCount(0);
                                                 inserted = true;
@@ -357,15 +357,15 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                 if (!slotStack.isEmpty() && !cursor.isEmpty()
                                                 && canCombineIgnoringRequestedCount(slotStack, cursor)) {
                                         if (button == 0) {
-                                                int total = GardenShopStackHelper.getRequestedCount(slotStack) + cursor.getCount();
+                                                int total = GearShopStackHelper.getRequestedCount(slotStack) + cursor.getCount();
                                                 if (cursor.getCount() > 0) {
-                                                        GardenShopStackHelper.applyRequestedCount(slotStack, total);
+                                                        GearShopStackHelper.applyRequestedCount(slotStack, total);
                                                         cursor.setCount(0);
                                                         slot.markDirty();
                                                 }
                                         } else if (button == 1 && cursor.getCount() > 0) {
-                                                int total = GardenShopStackHelper.getRequestedCount(slotStack) + 1;
-                                                GardenShopStackHelper.applyRequestedCount(slotStack, total);
+                                                int total = GearShopStackHelper.getRequestedCount(slotStack) + 1;
+                                                GearShopStackHelper.applyRequestedCount(slotStack, total);
                                                 cursor.decrement(1);
                                                 slot.markDirty();
                                         }
@@ -406,7 +406,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return this.inventory;
         }
 
-        public List<GardenShopOffer> getOffers(int pageIndex) {
+        public List<GearShopOffer> getOffers(int pageIndex) {
                 if (pageIndex < 0 || pageIndex >= this.offersByPage.size()) {
                         return List.of();
                 }
@@ -423,13 +423,13 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return clearSelection(player);
                 }
 
-                List<GardenShopOffer> pageOffers = this.offersByPage.get(pageIndex);
+                List<GearShopOffer> pageOffers = this.offersByPage.get(pageIndex);
                 setCurrentPageIndex(pageIndex);
                 if (offerIndex < 0 || offerIndex >= pageOffers.size()) {
                         return clearSelection(player);
                 }
 
-                GardenShopOffer offer = pageOffers.get(offerIndex);
+                GearShopOffer offer = pageOffers.get(offerIndex);
                 boolean inventoryChanged = populateSelectedOffer(player, offer, true, true);
                 setCurrentPageIndex(pageIndex);
                 boolean selectionChanged = this.selectedPageIndex != pageIndex || this.selectedOfferIndex != offerIndex;
@@ -452,7 +452,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return changed || selectionChanged;
         }
 
-        private boolean populateSelectedOffer(ServerPlayerEntity player, GardenShopOffer offer, boolean returnExisting,
+        private boolean populateSelectedOffer(ServerPlayerEntity player, GearShopOffer offer, boolean returnExisting,
                         boolean refillFromPlayerInventory) {
                 if (offer == null) {
                         return clearSelection(player);
@@ -536,12 +536,12 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                 continue;
                         }
 
-                        int required = GardenShopStackHelper.getRequestedCount(cost);
+                        int required = GearShopStackHelper.getRequestedCount(cost);
                         if (required <= 0) {
                                 continue;
                         }
 
-                        ItemStack comparison = GardenShopStackHelper.copyWithoutRequestedCount(cost);
+                        ItemStack comparison = GearShopStackHelper.copyWithoutRequestedCount(cost);
                         if (comparison.isEmpty()) {
                                 continue;
                         }
@@ -576,7 +576,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return counts;
         }
 
-        private boolean updateResultSlot(GardenShopOffer offer) {
+        private boolean updateResultSlot(GearShopOffer offer) {
                 ItemStack previous = this.resultInventory.getStack(0);
                 ItemStack next = ItemStack.EMPTY;
                 if (offer != null && costSlotsMatchOffer(offer)) {
@@ -628,15 +628,15 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return CostReturnResult.NO_CHANGE;
                 }
 
-                int provided = Math.max(GardenShopStackHelper.getRequestedCount(removed), removed.getCount());
-                int requested = Math.max(GardenShopStackHelper.getRequestedCount(originalCopy), provided);
+                int provided = Math.max(GearShopStackHelper.getRequestedCount(removed), removed.getCount());
+                int requested = Math.max(GearShopStackHelper.getRequestedCount(originalCopy), provided);
                 if (requested <= 0) {
                         requested = provided;
                 }
 
-                ItemStack comparison = GardenShopStackHelper.copyWithoutRequestedCount(originalCopy);
+                ItemStack comparison = GearShopStackHelper.copyWithoutRequestedCount(originalCopy);
                 if (comparison.isEmpty()) {
-                        comparison = GardenShopStackHelper.copyWithoutRequestedCount(removed);
+                        comparison = GearShopStackHelper.copyWithoutRequestedCount(removed);
                 }
 
                 if (comparison.isEmpty()) {
@@ -689,7 +689,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return new ExtractResult(false, slotChanged);
                 }
 
-                int required = GardenShopStackHelper.getRequestedCount(template);
+                int required = GearShopStackHelper.getRequestedCount(template);
                 if (required <= 0) {
                         boolean slotChanged = !previous.isEmpty();
                         if (slotChanged) {
@@ -698,7 +698,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return new ExtractResult(false, slotChanged);
                 }
 
-                ItemStack comparison = GardenShopStackHelper.copyWithoutRequestedCount(template);
+                ItemStack comparison = GearShopStackHelper.copyWithoutRequestedCount(template);
                 if (comparison.isEmpty()) {
                         boolean slotChanged = !previous.isEmpty();
                         if (slotChanged) {
@@ -720,7 +720,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
                 boolean slotChanged = !ItemStack.areEqual(previous, collected)
                                 || previous.getCount() != collected.getCount()
-                                || GardenShopStackHelper.getRequestedCount(previous) != GardenShopStackHelper
+                                || GearShopStackHelper.getRequestedCount(previous) != GearShopStackHelper
                                                 .getRequestedCount(collected);
                 this.costInventory.setStack(slotIndex, collected);
                 return new ExtractResult(extracted.playerChanged(), slotChanged);
@@ -770,7 +770,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return new ExtractionResult(ItemStack.EMPTY, false);
                 }
 
-                GardenShopStackHelper.applyRequestedCount(collected, totalCollected);
+                GearShopStackHelper.applyRequestedCount(collected, totalCollected);
                 return new ExtractionResult(collected, true);
         }
 
@@ -784,12 +784,12 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return false;
                 }
 
-                List<GardenShopOffer> pageOffers = offersByPage.get(pageIndex);
+                List<GearShopOffer> pageOffers = offersByPage.get(pageIndex);
                 if (offerIndex < 0 || offerIndex >= pageOffers.size()) {
                         return false;
                 }
 
-                GardenShopOffer offer = pageOffers.get(offerIndex);
+                GearShopOffer offer = pageOffers.get(offerIndex);
                 PlayerInventory playerInv = player.getInventory();
                 if (!costSlotsMatchOffer(offer)) {
                         return false;
@@ -816,19 +816,19 @@ public class GardenShopScreenHandler extends ScreenHandler {
         public void onContentChanged(Inventory inventory) {
                 super.onContentChanged(inventory);
                 if (inventory == this.costInventory) {
-                        GardenShopOffer offer = getSelectedOffer();
+                        GearShopOffer offer = getSelectedOffer();
                         if (updateResultSlot(offer) && !this.playerInventory.player.getWorld().isClient) {
                                 sendContentUpdates();
                         }
                 }
         }
 
-        private GardenShopOffer getSelectedOffer() {
+        private GearShopOffer getSelectedOffer() {
                 if (this.selectedPageIndex < 0 || this.selectedPageIndex >= this.offersByPage.size()) {
                         return null;
                 }
 
-                List<GardenShopOffer> offers = this.offersByPage.get(this.selectedPageIndex);
+                List<GearShopOffer> offers = this.offersByPage.get(this.selectedPageIndex);
                 if (this.selectedOfferIndex < 0 || this.selectedOfferIndex >= offers.size()) {
                         return null;
                 }
@@ -836,7 +836,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 return offers.get(this.selectedOfferIndex);
         }
 
-        private boolean costSlotsMatchOffer(GardenShopOffer offer) {
+        private boolean costSlotsMatchOffer(GearShopOffer offer) {
                 if (offer == null) {
                         return false;
                 }
@@ -866,18 +866,18 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return false;
                 }
 
-                int requiredCount = GardenShopStackHelper.getRequestedCount(required);
+                int requiredCount = GearShopStackHelper.getRequestedCount(required);
                 if (requiredCount <= 0) {
                         return provided.isEmpty();
                 }
 
-                int providedCount = GardenShopStackHelper.getRequestedCount(provided);
+                int providedCount = GearShopStackHelper.getRequestedCount(provided);
                 return providedCount >= requiredCount;
         }
 
         private static boolean canCombineIgnoringRequestedCount(ItemStack first, ItemStack second) {
-                ItemStack firstComparison = GardenShopStackHelper.copyWithoutRequestedCount(first);
-                ItemStack secondComparison = GardenShopStackHelper.copyWithoutRequestedCount(second);
+                ItemStack firstComparison = GearShopStackHelper.copyWithoutRequestedCount(first);
+                ItemStack secondComparison = GearShopStackHelper.copyWithoutRequestedCount(second);
                 return ItemStack.canCombine(firstComparison, secondComparison);
         }
 
@@ -889,12 +889,12 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                 continue;
                         }
 
-                        int required = GardenShopStackHelper.getRequestedCount(cost);
+                        int required = GearShopStackHelper.getRequestedCount(cost);
                         if (required <= 0) {
                                 continue;
                         }
 
-                        ItemStack comparisonStack = GardenShopStackHelper.copyWithoutRequestedCount(cost);
+                        ItemStack comparisonStack = GearShopStackHelper.copyWithoutRequestedCount(cost);
                         int remaining = required;
                         if (index < COST_SLOT_COUNT) {
                                 SlotConsumptionResult result = consumeCostSlot(index, comparisonStack, required);
@@ -920,12 +920,12 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         return new SlotConsumptionResult(required, false);
                 }
 
-                ItemStack comparisonSource = GardenShopStackHelper.copyWithoutRequestedCount(slotStack);
+                ItemStack comparisonSource = GearShopStackHelper.copyWithoutRequestedCount(slotStack);
                 if (!ItemStack.canCombine(comparisonSource, comparisonStack)) {
                         return new SlotConsumptionResult(required, false);
                 }
 
-                int provided = GardenShopStackHelper.getRequestedCount(slotStack);
+                int provided = GearShopStackHelper.getRequestedCount(slotStack);
                 if (provided <= 0) {
                         this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
                         return new SlotConsumptionResult(required, true);
@@ -934,8 +934,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 int consumed = Math.min(provided, required);
                 int leftover = provided - consumed;
                 if (leftover > 0) {
-                        ItemStack replacement = GardenShopStackHelper.copyWithoutRequestedCount(slotStack);
-                        GardenShopStackHelper.applyRequestedCount(replacement, leftover);
+                        ItemStack replacement = GearShopStackHelper.copyWithoutRequestedCount(slotStack);
+                        GearShopStackHelper.applyRequestedCount(replacement, leftover);
                         this.costInventory.setStack(slotIndex, replacement);
                 } else {
                         this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
@@ -960,14 +960,14 @@ public class GardenShopScreenHandler extends ScreenHandler {
                         }
                         ItemStack comparisonSource = stack;
                         if (inventory == this.costInventory) {
-                                comparisonSource = GardenShopStackHelper.copyWithoutRequestedCount(stack);
+                                comparisonSource = GearShopStackHelper.copyWithoutRequestedCount(stack);
                         }
                         if (!ItemStack.canCombine(comparisonSource, comparisonStack)) {
                                 continue;
                         }
 
                         if (inventory == this.costInventory) {
-                                int requested = GardenShopStackHelper.getRequestedCount(stack);
+                                int requested = GearShopStackHelper.getRequestedCount(stack);
                                 if (requested <= 0) {
                                         inventory.setStack(slot, ItemStack.EMPTY);
                                         changed = true;
@@ -984,8 +984,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
 
                                 int leftover = requested - taken;
                                 if (leftover > 0) {
-                                        ItemStack replacement = GardenShopStackHelper.copyWithoutRequestedCount(stack);
-                                        GardenShopStackHelper.applyRequestedCount(replacement, leftover);
+                                        ItemStack replacement = GearShopStackHelper.copyWithoutRequestedCount(stack);
+                                        GearShopStackHelper.applyRequestedCount(replacement, leftover);
                                         inventory.setStack(slot, replacement);
                                 } else {
                                         inventory.setStack(slot, ItemStack.EMPTY);
@@ -1090,20 +1090,20 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private void fillInventoryFromOffers() {
-                List<GardenShopOffer> flattened = flattenOffers();
+                List<GearShopOffer> flattened = flattenOffers();
                 for (int index = 0; index < this.inventory.size(); index++) {
                         ItemStack stack = index < flattened.size() ? flattened.get(index).copyResultStack() : ItemStack.EMPTY;
                         this.inventory.setStack(index, stack);
                 }
         }
 
-        private List<GardenShopOffer> flattenOffers() {
+        private List<GearShopOffer> flattenOffers() {
                 if (this.offersByPage.isEmpty()) {
                         return List.of();
                 }
 
-                List<GardenShopOffer> flattened = new ArrayList<>();
-                for (List<GardenShopOffer> page : this.offersByPage) {
+                List<GearShopOffer> flattened = new ArrayList<>();
+                for (List<GearShopOffer> page : this.offersByPage) {
                         flattened.addAll(page);
                 }
                 return flattened;
@@ -1125,7 +1125,7 @@ public class GardenShopScreenHandler extends ScreenHandler {
                                 return null;
                         }
 
-                        ItemStack sanitized = GardenShopStackHelper.copyWithoutRequestedCount(stack);
+                        ItemStack sanitized = GearShopStackHelper.copyWithoutRequestedCount(stack);
                         if (sanitized.isEmpty()) {
                                 return null;
                         }
@@ -1137,9 +1137,9 @@ public class GardenShopScreenHandler extends ScreenHandler {
         }
 
         private static class ResultSlot extends Slot {
-                private final GardenShopScreenHandler handler;
+                private final GearShopScreenHandler handler;
 
-                public ResultSlot(GardenShopScreenHandler handler, Inventory inventory, int index, int x, int y) {
+                public ResultSlot(GearShopScreenHandler handler, Inventory inventory, int index, int x, int y) {
                         super(inventory, index, x, y);
                         this.handler = handler;
                 }

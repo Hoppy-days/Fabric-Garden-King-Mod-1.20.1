@@ -1,7 +1,7 @@
 package net.jeremy.gardenkingmod.block;
 
 import net.jeremy.gardenkingmod.ModBlocks;
-import net.jeremy.gardenkingmod.block.entity.GardenShopBlockEntity;
+import net.jeremy.gardenkingmod.block.entity.GearShopBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -28,10 +28,10 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
-public class GardenShopBlock extends BlockWithEntity {
+public class GearShopBlock extends BlockWithEntity {
         public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
-        public GardenShopBlock(Settings settings) {
+        public GearShopBlock(Settings settings) {
                 super(settings);
                 this.setDefaultState(getStateManager().getDefaultState().with(FACING, Direction.NORTH));
         }
@@ -47,8 +47,8 @@ public class GardenShopBlock extends BlockWithEntity {
                 BlockPos origin = ctx.getBlockPos();
                 WorldView worldView = ctx.getWorld();
 
-                for (GardenShopBlockPart.Part part : GardenShopBlockPart.Part.values()) {
-                        if (part == GardenShopBlockPart.Part.CENTER) {
+                for (GearShopBlockPart.Part part : GearShopBlockPart.Part.values()) {
+                        if (part == GearShopBlockPart.Part.CENTER) {
                                 continue;
                         }
 
@@ -70,27 +70,27 @@ public class GardenShopBlock extends BlockWithEntity {
                 }
 
                 Direction facing = state.get(FACING);
-                for (GardenShopBlockPart.Part part : GardenShopBlockPart.Part.values()) {
-                        if (part == GardenShopBlockPart.Part.CENTER) {
+                for (GearShopBlockPart.Part part : GearShopBlockPart.Part.values()) {
+                        if (part == GearShopBlockPart.Part.CENTER) {
                                 continue;
                         }
 
                         BlockPos targetPos = pos.add(part.getOffset(facing));
-                        BlockState partState = ModBlocks.GARDEN_SHOP_BLOCK_PART.getDefaultState()
-                                        .with(GardenShopBlockPart.FACING, facing)
-                                        .with(GardenShopBlockPart.PART, part);
+                        BlockState partState = ModBlocks.GEAR_SHOP_BLOCK_PART.getDefaultState()
+                                        .with(GearShopBlockPart.FACING, facing)
+                                        .with(GearShopBlockPart.PART, part);
                         world.setBlockState(targetPos, partState, Block.NOTIFY_ALL | Block.FORCE_STATE);
                 }
         }
 
         @Override
         public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-                return GardenShopBlockPart.getShape(GardenShopBlockPart.Part.CENTER, state.get(FACING));
+                return GearShopBlockPart.getShape(GearShopBlockPart.Part.CENTER, state.get(FACING));
         }
 
         @Override
         public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-                return GardenShopBlockPart.getShape(GardenShopBlockPart.Part.CENTER, state.get(FACING));
+                return GearShopBlockPart.getShape(GearShopBlockPart.Part.CENTER, state.get(FACING));
         }
 
         @Override
@@ -108,8 +108,8 @@ public class GardenShopBlock extends BlockWithEntity {
                         BlockHitResult hit) {
                 if (!world.isClient) {
                         BlockEntity blockEntity = world.getBlockEntity(pos);
-                        if (blockEntity instanceof GardenShopBlockEntity gardenShopBlockEntity) {
-                                player.openHandledScreen(gardenShopBlockEntity);
+                        if (blockEntity instanceof GearShopBlockEntity gearShopBlockEntity) {
+                                player.openHandledScreen(gearShopBlockEntity);
                         }
                 }
 
@@ -134,14 +134,14 @@ public class GardenShopBlock extends BlockWithEntity {
         }
 
         private void removePartBlocks(World world, BlockPos origin, Direction facing) {
-                for (GardenShopBlockPart.Part part : GardenShopBlockPart.Part.values()) {
-                        if (part == GardenShopBlockPart.Part.CENTER) {
+                for (GearShopBlockPart.Part part : GearShopBlockPart.Part.values()) {
+                        if (part == GearShopBlockPart.Part.CENTER) {
                                 continue;
                         }
 
                         BlockPos targetPos = origin.add(part.getOffset(facing));
                         BlockState targetState = world.getBlockState(targetPos);
-                        if (targetState.getBlock() instanceof GardenShopBlockPart) {
+                        if (targetState.getBlock() instanceof GearShopBlockPart) {
                                 world.removeBlock(targetPos, false);
                         }
                 }
@@ -149,7 +149,7 @@ public class GardenShopBlock extends BlockWithEntity {
 
         @Override
         public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-                return new GardenShopBlockEntity(pos, state);
+                return new GearShopBlockEntity(pos, state);
         }
 
         @Override

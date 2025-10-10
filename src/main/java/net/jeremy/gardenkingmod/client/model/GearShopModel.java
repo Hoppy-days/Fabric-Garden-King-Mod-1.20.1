@@ -17,9 +17,9 @@ import net.minecraft.util.Identifier;
 
 // Made with Blockbench 4.12.6
 // Exported for Minecraft version 1.17+ for Yarn
-public class GardenShopModel extends EntityModel<Entity> {
+public class GearShopModel extends EntityModel<Entity> {
         public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(
-                        new Identifier(GardenKingMod.MOD_ID, "garden_shop"),
+                        new Identifier(GardenKingMod.MOD_ID, "gear_shop"),
                         "main");
     private final ModelPart fencegate1;
     private final ModelPart fencegate2;
@@ -32,7 +32,7 @@ public class GardenShopModel extends EntityModel<Entity> {
     private final ModelPart fencegate9;
     private final ModelPart fencegate10;
     private final ModelPart bb_main;
-    public GardenShopModel(ModelPart root) {
+    public GearShopModel(ModelPart root) {
         this.fencegate1 = root.getChild("fencegate1");
         this.fencegate2 = root.getChild("fencegate2");
         this.fencegate3 = root.getChild("fencegate3");

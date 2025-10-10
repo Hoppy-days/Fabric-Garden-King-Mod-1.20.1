@@ -5,13 +5,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 
 /**
- * Utility methods for working with Garden Shop item stacks that need to
+ * Utility methods for working with Gear Shop item stacks that need to
  * represent costs larger than a single vanilla stack can hold.
  */
-public final class GardenShopStackHelper {
-    private static final String FULL_COUNT_KEY = "GardenShopFullCount";
+public final class GearShopStackHelper {
+    private static final String FULL_COUNT_KEY = "GearShopFullCount";
 
-    private GardenShopStackHelper() {
+    private GearShopStackHelper() {
     }
 
     /**

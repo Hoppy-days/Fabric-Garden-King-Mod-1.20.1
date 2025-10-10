@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.List;
 
 import net.jeremy.gardenkingmod.ModBlockEntities;
-import net.jeremy.gardenkingmod.screen.GardenShopScreenHandler;
-import net.jeremy.gardenkingmod.shop.GardenShopOffer;
-import net.jeremy.gardenkingmod.shop.GardenShopOfferManager;
-import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
+import net.jeremy.gardenkingmod.screen.GearShopScreenHandler;
+import net.jeremy.gardenkingmod.shop.GearShopOffer;
+import net.jeremy.gardenkingmod.shop.GearShopOfferManager;
+import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -31,18 +31,18 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 
-public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
+public class GearShopBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
     public static final int INVENTORY_SIZE = 27;
     private static final String OFFERS_KEY = "Offers";
     private static final String OFFER_PAGES_KEY = "OfferPages";
     private static final String OFFER_RESULT_KEY = "Result";
     private static final String OFFER_COSTS_KEY = "Costs";
     private DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
-    private final List<List<GardenShopOffer>> offersByPage = new ArrayList<>();
-    private final List<GardenShopOffer> flattenedOffers = new ArrayList<>();
+    private final List<List<GearShopOffer>> offersByPage = new ArrayList<>();
+    private final List<GearShopOffer> flattenedOffers = new ArrayList<>();
 
-        public GardenShopBlockEntity(BlockPos pos, BlockState state) {
-                super(ModBlockEntities.GARDEN_SHOP_BLOCK_ENTITY, pos, state);
+        public GearShopBlockEntity(BlockPos pos, BlockState state) {
+                super(ModBlockEntities.GEAR_SHOP_BLOCK_ENTITY, pos, state);
         }
 
         @Override
@@ -50,15 +50,15 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         ensureOffers();
         buf.writeBlockPos(getPos());
         buf.writeVarInt(offersByPage.size());
-        for (List<GardenShopOffer> page : offersByPage) {
+        for (List<GearShopOffer> page : offersByPage) {
             buf.writeVarInt(page.size());
-            for (GardenShopOffer offer : page) {
+            for (GearShopOffer offer : page) {
                 buf.writeItemStack(offer.copyResultStack());
                 List<ItemStack> costs = offer.copyCostStacks();
                 buf.writeVarInt(costs.size());
                 for (ItemStack cost : costs) {
                     buf.writeItemStack(cost);
-                    buf.writeVarInt(GardenShopStackHelper.getRequestedCount(cost));
+                    buf.writeVarInt(GearShopStackHelper.getRequestedCount(cost));
                 }
             }
         }
@@ -66,13 +66,13 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
 
         @Override
         public Text getDisplayName() {
-                return Text.translatable("container.gardenkingmod.garden_shop");
+                return Text.translatable("container.gardenkingmod.gear_shop");
         }
 
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         ensureOffers();
-        return new GardenShopScreenHandler(syncId, playerInventory, this);
+        return new GearShopScreenHandler(syncId, playerInventory, this);
     }
 
         @Override
@@ -167,10 +167,10 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         Inventories.writeNbt(nbt, items);
         NbtList offerList = new NbtList();
         NbtList pagesList = new NbtList();
-        for (List<GardenShopOffer> page : offersByPage) {
+        for (List<GearShopOffer> page : offersByPage) {
             NbtCompound pageNbt = new NbtCompound();
             NbtList pageOffers = new NbtList();
-            for (GardenShopOffer offer : page) {
+            for (GearShopOffer offer : page) {
                 NbtCompound offerNbt = writeOfferNbt(offer);
                 pageOffers.add(offerNbt.copy());
                 offerList.add(offerNbt);
@@ -194,13 +194,13 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
             NbtList pagesList = nbt.getList(OFFER_PAGES_KEY, NbtElement.COMPOUND_TYPE);
             for (int pageIndex = 0; pageIndex < pagesList.size(); pageIndex++) {
                 NbtCompound pageNbt = pagesList.getCompound(pageIndex);
-                List<GardenShopOffer> pageOffers = readOffersFromNbt(pageNbt.getList(OFFERS_KEY, NbtElement.COMPOUND_TYPE));
+                List<GearShopOffer> pageOffers = readOffersFromNbt(pageNbt.getList(OFFERS_KEY, NbtElement.COMPOUND_TYPE));
                 offersByPage.add(pageOffers);
             }
         }
 
         if (offersByPage.isEmpty() && nbt.contains(OFFERS_KEY, NbtElement.LIST_TYPE)) {
-            List<GardenShopOffer> legacyOffers = readOffersFromNbt(nbt.getList(OFFERS_KEY, NbtElement.COMPOUND_TYPE));
+            List<GearShopOffer> legacyOffers = readOffersFromNbt(nbt.getList(OFFERS_KEY, NbtElement.COMPOUND_TYPE));
             if (!legacyOffers.isEmpty()) {
                 offersByPage.add(legacyOffers);
             }
@@ -208,11 +208,11 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         syncItemsFromOffers();
     }
 
-    public List<GardenShopOffer> getOffers() {
+    public List<GearShopOffer> getOffers() {
         return Collections.unmodifiableList(flattenedOffers);
     }
 
-    public List<GardenShopOffer> getOffersForPage(int pageIndex) {
+    public List<GearShopOffer> getOffersForPage(int pageIndex) {
         if (pageIndex < 0 || pageIndex >= offersByPage.size()) {
             return List.of();
         }
@@ -220,9 +220,9 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         return Collections.unmodifiableList(offersByPage.get(pageIndex));
     }
 
-    public List<List<GardenShopOffer>> getOfferPages() {
-        List<List<GardenShopOffer>> snapshot = new ArrayList<>(offersByPage.size());
-        for (List<GardenShopOffer> page : offersByPage) {
+    public List<List<GearShopOffer>> getOfferPages() {
+        List<List<GearShopOffer>> snapshot = new ArrayList<>(offersByPage.size());
+        for (List<GearShopOffer> page : offersByPage) {
             snapshot.add(List.copyOf(page));
         }
         return List.copyOf(snapshot);
@@ -233,14 +233,14 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
     }
 
     public void ensureOffers() {
-        List<List<GardenShopOffer>> configuredPages = GardenShopOfferManager.getInstance().getOfferPages();
+        List<List<GearShopOffer>> configuredPages = GearShopOfferManager.getInstance().getOfferPages();
         if (offersMatch(configuredPages)) {
             syncItemsFromOffers();
             return;
         }
 
         offersByPage.clear();
-        for (List<GardenShopOffer> page : configuredPages) {
+        for (List<GearShopOffer> page : configuredPages) {
             offersByPage.add(new ArrayList<>(page));
         }
         syncItemsFromOffers();
@@ -249,7 +249,7 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
 
     private void syncItemsFromOffers() {
         flattenedOffers.clear();
-        for (List<GardenShopOffer> page : offersByPage) {
+        for (List<GearShopOffer> page : offersByPage) {
             flattenedOffers.addAll(page);
         }
 
@@ -259,7 +259,7 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         }
     }
 
-    private boolean offersMatch(List<List<GardenShopOffer>> configuredPages) {
+    private boolean offersMatch(List<List<GearShopOffer>> configuredPages) {
         if (offersByPage.size() != configuredPages.size()) {
             return false;
         }
@@ -273,7 +273,7 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         return true;
     }
 
-    private NbtCompound writeOfferNbt(GardenShopOffer offer) {
+    private NbtCompound writeOfferNbt(GearShopOffer offer) {
         NbtCompound offerNbt = new NbtCompound();
         offerNbt.put(OFFER_RESULT_KEY, offer.copyResultStack().writeNbt(new NbtCompound()));
         NbtList costsList = new NbtList();
@@ -284,8 +284,8 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         return offerNbt;
     }
 
-    private List<GardenShopOffer> readOffersFromNbt(NbtList list) {
-        List<GardenShopOffer> offers = new ArrayList<>();
+    private List<GearShopOffer> readOffersFromNbt(NbtList list) {
+        List<GearShopOffer> offers = new ArrayList<>();
         for (int index = 0; index < list.size(); index++) {
             NbtCompound offerNbt = list.getCompound(index);
             if (!offerNbt.contains(OFFER_RESULT_KEY, NbtElement.COMPOUND_TYPE)) {
@@ -308,7 +308,7 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
                 }
             }
 
-            offers.add(GardenShopOffer.of(result, costs));
+            offers.add(GearShopOffer.of(result, costs));
         }
         return offers;
     }
@@ -317,7 +317,7 @@ public class GardenShopBlockEntity extends BlockEntity implements ExtendedScreen
         return Registries.ITEM.getOrEmpty(itemId)
                 .map(item -> {
                     ItemStack stack = new ItemStack(item);
-                    GardenShopStackHelper.applyRequestedCount(stack, count);
+                    GearShopStackHelper.applyRequestedCount(stack, count);
                     return stack;
                 })
                 .orElse(ItemStack.EMPTY);
