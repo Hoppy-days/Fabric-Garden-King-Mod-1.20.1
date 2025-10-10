@@ -50,7 +50,6 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int SELL_BUTTON_HEIGHT = 20;
         private static final int TAB_BUTTON_WIDTH = 35;
         private static final int TAB_BUTTON_HEIGHT = 15;
-        private static final int TAB_BUTTON_SPACING = 4;
         private static final int TAB_BUTTON_Y_OFFSET = 3;
         private static final int TAB_BUTTON_TEXT_PADDING_X = 4;
         private static final int SELL_TAB_TEXT_X = 15;

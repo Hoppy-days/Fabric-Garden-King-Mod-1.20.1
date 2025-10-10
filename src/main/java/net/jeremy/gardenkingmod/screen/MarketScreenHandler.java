@@ -134,7 +134,7 @@ public class MarketScreenHandler extends ScreenHandler {
                 final int baseY = 138;
                 for (int row = 0; row < 3; ++row) {
                         for (int column = 0; column < 9; ++column) {
-                                this.addSlot(new Slot(playerInventory, column + row * 9 + 9, 7 + column * 18,
+                                this.addSlot(new Slot(playerInventory, column + row * 9 + 9, 8 + column * 18,
                                                 baseY + row * 18));
                         }
                 }
@@ -143,7 +143,7 @@ public class MarketScreenHandler extends ScreenHandler {
         private void addPlayerHotbar(PlayerInventory playerInventory) {
                 final int hotbarY = 196;
                 for (int slot = 0; slot < 9; ++slot) {
-                        this.addSlot(new Slot(playerInventory, slot, 7 + slot * 18, hotbarY));
+                        this.addSlot(new Slot(playerInventory, slot, 8 + slot * 18, hotbarY));
                 }
         }
 }

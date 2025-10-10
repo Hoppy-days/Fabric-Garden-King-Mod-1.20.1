@@ -40,7 +40,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
-        public static final int INVENTORY_SIZE = 27;
+        public static final int INVENTORY_SIZE = 36;
         public static final TagKey<Item> MARKET_UNSELLABLE =
                         TagKey.of(RegistryKeys.ITEM,
                                         new Identifier(GardenKingMod.MOD_ID, "market_unsellable"));
