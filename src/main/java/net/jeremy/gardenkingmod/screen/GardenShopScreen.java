@@ -704,10 +704,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(animation.staticRoll()));
                 }
 
-                float animationScale = animation.scale();
-                matrices.scale(animationScale, animationScale, animationScale);
-                matrices.scale(16.0F, -16.0F, 16.0F);
-
                 drawResultStack(context, stack);
                 matrices.pop();
 
