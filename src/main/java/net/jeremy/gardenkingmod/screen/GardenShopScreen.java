@@ -140,6 +140,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         private static final PageLayout DEFAULT_PAGE_LAYOUT = buildLayout(builder -> {
                 builder.resultSlotAnimationScale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE);
+                builder.resultSlotAnimationOffset(RESULT_SLOT_ANIMATION_OFFSET_X, RESULT_SLOT_ANIMATION_OFFSET_Y);
         });
         /**
          * Layout configuration for page 1 (garden_shop_gui.png). Adjust the builder calls
@@ -158,6 +159,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 /* Result slot position */
                 builder.resultItem(OFFER_RESULT_ITEM_OFFSET_X);
                 builder.resultSlotAnimationScale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE);
+                builder.resultSlotAnimationOffset(RESULT_SLOT_ANIMATION_OFFSET_X, RESULT_SLOT_ANIMATION_OFFSET_Y);
                 /* Arrow position */
                 builder.arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y);
                 /* Buy button placement & size */
@@ -188,6 +190,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 /* Result slot position */
                 builder.resultItem(OFFER_RESULT_ITEM_OFFSET_X);
                 builder.resultSlotAnimationScale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE);
+                builder.resultSlotAnimationOffset(RESULT_SLOT_ANIMATION_OFFSET_X, RESULT_SLOT_ANIMATION_OFFSET_Y);
                 /* Arrow position */
                 builder.arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y);
                 /* Buy button placement & size */
@@ -726,10 +729,13 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private OfferDisplayAnimation getResultSlotAnimation(PageLayout layout) {
                 OfferDisplayAnimation base = RESULT_SLOT_ANIMATION;
                 float scale = layout.resultSlotAnimationScale();
-                if (Float.compare(scale, base.scale()) == 0) {
+                float offsetX = layout.resultSlotAnimationOffsetX();
+                float offsetY = layout.resultSlotAnimationOffsetY();
+                if (Float.compare(scale, base.scale()) == 0 && Float.compare(offsetX, base.offsetX()) == 0
+                                && Float.compare(offsetY, base.offsetY()) == 0) {
                         return base;
                 }
-                return new OfferDisplayAnimation(scale, base.offsetX(), base.offsetY(), base.offsetZ(),
+                return new OfferDisplayAnimation(scale, offsetX, offsetY, base.offsetZ(),
                                 base.rotationPeriodTicks(), base.rotationPhaseTicks(), base.rotationAxis(),
                                 base.staticPitch(), base.staticYaw(), base.staticRoll(), base.bobAmplitude(),
                                 base.bobOffset(), base.bobPeriodTicks(), base.bobPhaseTicks());
@@ -902,7 +908,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         int resultItemOffsetX, int arrowOffsetX, int arrowOffsetY, int buyButtonOffsetX,
                         int buyButtonOffsetY, int buyButtonWidth, int buyButtonHeight, int buyLabelX, int buyLabelY,
                         int costSlotLabelAnchorOffsetX, int costSlotLabelOffsetY, int costSlotValueAnchorOffsetX,
-                        int costSlotValueOffsetY, float costSlotTextScale, float resultSlotAnimationScale) {
+                        int costSlotValueOffsetY, float costSlotTextScale, float resultSlotAnimationScale,
+                        float resultSlotAnimationOffsetX, float resultSlotAnimationOffsetY) {
                 static Builder defaults() {
                         return new Builder()
                                         .offerList(OFFER_LIST_X, OFFER_LIST_Y)
@@ -912,6 +919,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                                         DEFAULT_COST_SLOT_TEXT_SCALE)
                                         .resultItem(OFFER_RESULT_ITEM_OFFSET_X)
                                         .resultSlotAnimationScale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE)
+                                        .resultSlotAnimationOffset(RESULT_SLOT_ANIMATION_OFFSET_X,
+                                                        RESULT_SLOT_ANIMATION_OFFSET_Y)
                                         .arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y)
                                         .buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH,
                                                         BUY_BUTTON_HEIGHT)
@@ -938,6 +947,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         private int costSlotValueOffsetY;
                         private float costSlotTextScale;
                         private float resultSlotAnimationScale;
+                        private float resultSlotAnimationOffsetX;
+                        private float resultSlotAnimationOffsetY;
 
                         Builder offerList(int x, int y) {
                                 this.offerListX = x;
@@ -971,6 +982,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 return this;
                         }
 
+                        Builder resultSlotAnimationOffset(float offsetX, float offsetY) {
+                                this.resultSlotAnimationOffsetX = offsetX;
+                                this.resultSlotAnimationOffsetY = offsetY;
+                                return this;
+                        }
+
                         Builder arrow(int offsetX, int offsetY) {
                                 this.arrowOffsetX = offsetX;
                                 this.arrowOffsetY = offsetY;
@@ -997,7 +1014,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                                 buyButtonOffsetY, buyButtonWidth, buyButtonHeight, buyLabelX, buyLabelY,
                                                 costSlotLabelAnchorOffsetX, costSlotLabelOffsetY,
                                                 costSlotValueAnchorOffsetX, costSlotValueOffsetY, costSlotTextScale,
-                                                resultSlotAnimationScale);
+                                                resultSlotAnimationScale, resultSlotAnimationOffsetX,
+                                                resultSlotAnimationOffsetY);
                         }
                 }
         }
