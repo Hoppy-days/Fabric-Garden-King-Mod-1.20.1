@@ -178,8 +178,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 int BUY_LABEL_X = 163;
                 int BUY_LABEL_Y = 97;
                 final float DEFAULT_RESULT_SLOT_ANIMATION_SCALE = 2.35F;
-
-            /* Offer list placement */
+                final float RESULT_SLOT_ANIMATION_OFFSET_Y = 4.0F;
+                /* Offer list placement */
                 builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
                 /* Cost stack spacing */
                 builder.costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING);
