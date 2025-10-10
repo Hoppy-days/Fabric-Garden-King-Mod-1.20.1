@@ -628,8 +628,8 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         animationTicks = 0.0F;
                 }
 
-                int slotLeft = this.x + resultSlot.x;
-                int slotTop = this.y + resultSlot.y;
+                int slotLeft = this.x + handler.getResultSlotX();
+                int slotTop = this.y + handler.getResultSlotY();
                 float slotCenterX = slotLeft + 8.0F;
                 float slotCenterY = slotTop + 8.0F;
 
