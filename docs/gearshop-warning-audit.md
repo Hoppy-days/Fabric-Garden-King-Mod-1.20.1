@@ -18,8 +18,6 @@ changes.
 | Warning message | Reasoning |
 | --- | --- |
 | `Calls to boolean method 'canScroll()' are always inverted` | Each call site intentionally uses `!canScroll()` so the method acts as a guard clause. In the positive branch `canScroll()` is known to be `true`, which is why the IDE thinks it is inverted. The logic is correct and more readable this way. |
-| "Value of parameter '…' is always …" in the layout builder lambdas | Each builder invocation explicitly documents which constant governs a coordinate or spacing. Although the IDE flags the parameters as constant, the builder API is designed so layouts can override the values later. Keeping the constants in one place makes it easier to tweak page layouts without hunting through multiple methods. |
-| `Return value of the method is never used` for builder calls | The builder methods return `this` to support fluent chaining. Some call sites prefer statement style for readability, so the return value is intentionally ignored. The fluent contract is used in other places (e.g. `PageLayout.defaults()`), so changing the signature to `void` would break that idiom. |
 
 If new warnings appear that do not fall into these categories, give them a second
 look – they may uncover a genuine bug.

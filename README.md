@@ -66,21 +66,21 @@ offers by UI tab through a `pages` array. Use `_comment` fields at the root, pag
 }
 ```
 
-* Each object inside `pages` represents one tab from top to bottom. The example file defines five pages to match the five tab
-  buttons in the UI, but you can leave an `offers` array empty if you want a blank tab.
+* Each object inside `pages` represents one tab from top to bottom. The example file defines four pages to match the four tab
+  buttons in the UI; you can leave an `offers` array empty if you want a blank tab, but extra pages beyond the fourth are ignored.
 * `offer` is the item the shop will sell. You can provide it as a plain string (`"namespace:item"`) or as an object with
   explicit fields such as `{ "item": "croptopia:cheese", "count": 2 }`.
 * `price` accepts either a single string/object or an array if you want multiple inputs. To specify stack sizes inline, append
   `*<count>` to the identifier (for example, `"gardenkingmod:ruby*32"`).
 
-The stock configuration distributes the ruby-for-elytra upgrades across all five tabs while keeping the cheese trade on the
+The stock configuration distributes the ruby-for-elytra upgrades across all four tabs while keeping the cheese trade on the
 first tab.
 
 ### Adding more trades
 
 1. Open [`gear_shop_offers.json`](src/main/resources/data/gardenkingmod/gear_shop_offers.json).
 2. Decide which tab should display the trade and add a new JSON object to that page's `offers` array using the format above.
-   Add a brand-new page object under `pages` if you want to populate another tab.
+   If you need to repurpose a tab, edit one of the existing four page entries—the UI ignores any pages defined beyond them.
 3. Save the file and reload your data packs (or restart the game/server) so Fabric's resource loader picks up the change.
 4. If the trade produces a brand-new item, place its `.png` texture inside `assets/gardenkingmod/textures/item/` so Fabric can
    find it at runtime.

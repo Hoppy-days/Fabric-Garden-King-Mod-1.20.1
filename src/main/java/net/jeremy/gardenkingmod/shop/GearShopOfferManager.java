@@ -37,7 +37,7 @@ public final class GearShopOfferManager implements SimpleSynchronousResourceRelo
     private static final Identifier OFFERS_FILE = new Identifier(GardenKingMod.MOD_ID, "gear_shop_offers.json");
     private static final GearShopOfferManager INSTANCE = new GearShopOfferManager();
 
-    private static final int MAX_SUPPORTED_PAGES = 5;
+    private static final int MAX_SUPPORTED_PAGES = 4;
 
     private volatile List<List<GearShopOffer>> pages = List.of();
 

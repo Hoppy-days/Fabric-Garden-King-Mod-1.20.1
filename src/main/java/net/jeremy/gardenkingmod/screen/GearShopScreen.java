@@ -35,12 +35,6 @@ import net.minecraft.util.math.RotationAxis;
 public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
                         "textures/gui/container/gear_shop_gui.png");
-        private static final Identifier[] PAGE_TEXTURES = {
-                        TEXTURE,
-                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/gear_shop_gui2.png"),
-                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/gear_shop_gui3.png"),
-                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/gear_shop_gui4.png"),
-                        new Identifier(GardenKingMod.MOD_ID, "textures/gui/container/gear_shop_gui5.png") };
         private static final int TEXTURE_WIDTH = 512;
         private static final int TEXTURE_HEIGHT = 256;
 
@@ -85,13 +79,11 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
         private static final int OFFER_ARROW_OFFSET_Y = 6;
         private static final int COST_TEXT_COLOR = 0xFFFFFF;
         private static final String COST_LABEL_TRANSLATION_KEY = "screen.gardenkingmod.gear_shop.cost_label";
-            //DEFAULT_COST_SLOT_LABEL is the word "COST"
-        private static final int DEFAULT_COST_SLOT_LABEL_ANCHOR_X = 9;
-        private static final int DEFAULT_COST_SLOT_LABEL_OFFSET_Y = 20;
-            //DEFAULT_COST_SLOT_VALUE is the cost item count
-        private static final int DEFAULT_COST_SLOT_VALUE_ANCHOR_X = 9;
-        private static final int DEFAULT_COST_SLOT_VALUE_OFFSET_Y = 29;
-        private static final float DEFAULT_COST_SLOT_TEXT_SCALE = 0.8F;
+        private static final int COST_SLOT_LABEL_ANCHOR_X = 9;
+        private static final int COST_SLOT_LABEL_OFFSET_Y = 20;
+        private static final int COST_SLOT_VALUE_ANCHOR_X = 9;
+        private static final int COST_SLOT_VALUE_OFFSET_Y = 29;
+        private static final float COST_SLOT_TEXT_SCALE = 0.8F;
 
         private static final int TAB_X = 0;
         private static final int TAB_WIDTH = 24;
@@ -105,8 +97,7 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                 new TabDefinition(16, 30, 205),
                 new TabDefinition(46, 46, 205),
                 new TabDefinition(76, 62, 205),
-                new TabDefinition(106, 78, 205),
-                new TabDefinition(136, 94, 205) };
+                new TabDefinition(106, 78, 205) };
 
         private static final int SCROLLBAR_OFFSET_X = 118;
         private static final int SCROLLBAR_OFFSET_Y = 17;
@@ -122,7 +113,7 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
         private static final float OFFER_DISPLAY_SCALE = 3.25F;
         private static final float OFFER_ROTATION_SPEED = 30.0F;
         private static final float OFFER_ROTATION_PERIOD_TICKS = 20.0F * (360.0F / OFFER_ROTATION_SPEED);
-        private static final float DEFAULT_RESULT_SLOT_ANIMATION_SCALE = 1.35F;
+        private static final float RESULT_SLOT_ANIMATION_SCALE = 1.35F;
         private static final float RESULT_SLOT_ANIMATION_OFFSET_X = 0.0F;
         private static final float RESULT_SLOT_ANIMATION_OFFSET_Y = -1.5F;
         private static final float RESULT_SLOT_ANIMATION_OFFSET_Z = 0.0F;
@@ -138,84 +129,8 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
         private static final float RESULT_SLOT_BOB_PERIOD_TICKS = 20.0F;
         private static final float RESULT_SLOT_BOB_PHASE_TICKS = 0.0F;
 
-        private static final PageLayout DEFAULT_PAGE_LAYOUT = buildLayout(builder -> {
-                builder.resultSlotAnimationScale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE);
-                builder.resultSlotAnimationOffset(RESULT_SLOT_ANIMATION_OFFSET_X, RESULT_SLOT_ANIMATION_OFFSET_Y);
-        });
-        /**
-         * Layout configuration for page 1 (gear_shop_gui.png). Adjust the builder calls
-         * in this lambda to reposition elements for that page without impacting the
-         * others.
-         */
-        private static final PageLayout PAGE1_LAYOUT = buildLayout(builder -> {
-            /* Offer list placement */
-                builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
-                /* Cost stack spacing */
-                builder.costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING);
-                /* Cost text placement */
-                builder.costSlotText(DEFAULT_COST_SLOT_LABEL_ANCHOR_X, DEFAULT_COST_SLOT_LABEL_OFFSET_Y,
-                                DEFAULT_COST_SLOT_VALUE_ANCHOR_X, DEFAULT_COST_SLOT_VALUE_OFFSET_Y,
-                                DEFAULT_COST_SLOT_TEXT_SCALE);
-                /* Result slot position */
-                builder.resultItem(OFFER_RESULT_ITEM_OFFSET_X);
-                builder.resultSlotAnimationScale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE);
-                builder.resultSlotAnimationOffset(RESULT_SLOT_ANIMATION_OFFSET_X, RESULT_SLOT_ANIMATION_OFFSET_Y);
-                /* Arrow position */
-                builder.arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y);
-                /* Buy button placement & size */
-                builder.buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH, BUY_BUTTON_HEIGHT);
-                /* Buy label position */
-                builder.buyLabel(BUY_LABEL_X, BUY_LABEL_Y);
-        });
-        /**
-         * Layout configuration for page 2 (gear_shop_gui2.png). Start with the same
-         * defaults as page 1, then tweak any of the values inside this lambda to match
-         * that texture's custom layout.
-         */
-        private static final PageLayout PAGE2_LAYOUT = buildLayout(builder -> {
-                int BUY_BUTTON_OFFSET_X = 148;
-                int BUY_BUTTON_OFFSET_Y = 94;
-                int BUY_LABEL_X = 163;
-                int BUY_LABEL_Y = 97;
-                final float DEFAULT_RESULT_SLOT_ANIMATION_SCALE = 2.35F;
-                final float RESULT_SLOT_ANIMATION_OFFSET_Y = 4.0F;
-                /* Offer list placement */
-                builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
-                /* Cost stack spacing */
-                builder.costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING);
-                /* Cost text placement */
-                builder.costSlotText(DEFAULT_COST_SLOT_LABEL_ANCHOR_X, DEFAULT_COST_SLOT_LABEL_OFFSET_Y,
-                                DEFAULT_COST_SLOT_VALUE_ANCHOR_X, DEFAULT_COST_SLOT_VALUE_OFFSET_Y,
-                                DEFAULT_COST_SLOT_TEXT_SCALE);
-                /* Result slot position */
-                builder.resultItem(OFFER_RESULT_ITEM_OFFSET_X);
-                builder.resultSlotAnimationScale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE);
-                builder.resultSlotAnimationOffset(RESULT_SLOT_ANIMATION_OFFSET_X, RESULT_SLOT_ANIMATION_OFFSET_Y);
-                /* Arrow position */
-                builder.arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y);
-                /* Buy button placement & size */
-                builder.buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH, BUY_BUTTON_HEIGHT);
-                /* Buy label position */
-                builder.buyLabel(BUY_LABEL_X, BUY_LABEL_Y);
-
-        });
-        /**
-         * Page-specific layout overrides for offer list item positions. Update the
-         * existing layout lambdas or add new {@code buildLayout(...)} constants (e.g.
-         * PAGE3_LAYOUT) and append them here to move slots for a given page without
-         * affecting the others.
-         */
-        private static final PageLayout[] PAGE_LAYOUTS = { PAGE1_LAYOUT, PAGE2_LAYOUT, DEFAULT_PAGE_LAYOUT,
-                        DEFAULT_PAGE_LAYOUT, DEFAULT_PAGE_LAYOUT };
-
-        private static PageLayout buildLayout(Consumer<PageLayout.Builder> configurer) {
-                PageLayout.Builder builder = PageLayout.defaults();
-                configurer.accept(builder);
-                return builder.build();
-        }
-
         private static final OfferDisplayAnimation RESULT_SLOT_ANIMATION = buildAnimation(builder -> {
-                builder.scale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE);
+                builder.scale(RESULT_SLOT_ANIMATION_SCALE);
                 builder.offset(RESULT_SLOT_ANIMATION_OFFSET_X, RESULT_SLOT_ANIMATION_OFFSET_Y,
                                 RESULT_SLOT_ANIMATION_OFFSET_Z);
                 builder.rotationAxis(RESULT_SLOT_ROTATION_AXIS);
@@ -289,7 +204,6 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
         @Override
         protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
                 super.drawForeground(context, mouseX, mouseY);
-                PageLayout layout = getPageLayout();
                 context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.gear_shop.offers"), OFFERS_LABEL_X,
                                 OFFERS_LABEL_Y, 0x404040, false);
                 if (isBuyButtonVisible()) {
@@ -299,8 +213,8 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                         float scale = BUY_LABEL_SCALE;
                         float textWidth = textRenderer.getWidth(buyText);
                         float textHeight = textRenderer.fontHeight;
-                        double adjustedX = layout.buyLabelX() + (1.0F - scale) * textWidth / 2.0F;
-                        double adjustedY = layout.buyLabelY() + (1.0F - scale) * textHeight / 2.0F;
+                        double adjustedX = BUY_LABEL_X + (1.0F - scale) * textWidth / 2.0F;
+                        double adjustedY = BUY_LABEL_Y + (1.0F - scale) * textHeight / 2.0F;
                         matrices.translate(adjustedX, adjustedY, 0.0F);
                         matrices.scale(scale, scale, 1.0F);
                         context.drawText(textRenderer, buyText, 0, 0, 0xFFFFFF, false);
@@ -329,7 +243,6 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
 
 
         private void drawCostSlotOverlays(DrawContext context) {
-                PageLayout layout = getPageLayout();
                 String label = Text.translatable(COST_LABEL_TRANSLATION_KEY).getString();
                 for (Slot slot : handler.slots) {
                         if (slot.inventory instanceof GearShopCostInventory && slot.hasStack()) {
@@ -337,7 +250,7 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                                 int slotY = this.y + slot.y;
                                 ItemStack stack = slot.getStack();
                                 context.drawItem(stack, slotX, slotY);
-                                drawCostSlotText(context, label, stack, slotX, slotY, layout);
+                                drawCostSlotText(context, label, stack, slotX, slotY);
                         }
                 }
         }
@@ -416,10 +329,9 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
         }
 
         private void drawOfferList(DrawContext context, int originX, int originY, int mouseX, int mouseY) {
-                PageLayout layout = getPageLayout();
                 List<GearShopOffer> offers = getOffersForActiveTab();
-                int listLeft = originX + layout.offerListX();
-                int listTop = originY + layout.offerListY();
+                int listLeft = originX + OFFER_LIST_X;
+                int listTop = originY + OFFER_LIST_Y;
                 int hoveredOffer = getOfferIndexAt(mouseX, mouseY);
                 int clampedVisibleOffers = Math.min(MAX_VISIBLE_OFFERS, Math.max(offers.size() - scrollOffset, 0));
                 int scissorHeight = Math.min(MAX_VISIBLE_OFFERS, offers.size()) * OFFER_ENTRY_HEIGHT;
@@ -444,12 +356,12 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
 
                         GearShopOffer offer = offers.get(offerIndex);
                         int itemY = entryY + OFFER_ITEM_OFFSET_Y;
-                        int costStartX = listLeft + layout.costItemOffsetX();
-                        int arrowX = listLeft + layout.arrowOffsetX();
+                        int costStartX = listLeft + OFFER_COST_ITEM_OFFSET_X;
+                        int arrowX = listLeft + OFFER_ARROW_OFFSET_X;
                         int maxCostRight = arrowX - 2;
                         List<ItemStack> costStacks = offer.costStacks();
                         for (int costIndex = 0; costIndex < costStacks.size(); costIndex++) {
-                                int costX = costStartX + costIndex * layout.costItemSpacing();
+                                int costX = costStartX + costIndex * OFFER_COST_ITEM_SPACING;
                                 if (costX + 16 > maxCostRight) {
                                         break;
                                 }
@@ -457,12 +369,12 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                                 drawCostStack(context, costStack, costX, itemY);
                         }
 
-                        int arrowY = entryY + layout.arrowOffsetY();
+                        int arrowY = entryY + OFFER_ARROW_OFFSET_Y;
                         context.drawTexture(TEXTURE, arrowX, arrowY, OFFER_ARROW_U, OFFER_ARROW_V, OFFER_ARROW_WIDTH,
                                         OFFER_ARROW_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
 
                         ItemStack displayStack = offer.copyResultStack();
-                        int resultX = listLeft + layout.resultItemOffsetX();
+                        int resultX = listLeft + OFFER_RESULT_ITEM_OFFSET_X;
                         context.drawItem(displayStack, resultX, itemY);
                         context.drawItemInSlot(textRenderer, displayStack, resultX, itemY);
                 }
@@ -481,8 +393,7 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                 }
         }
 
-        private void drawCostSlotText(DrawContext context, String label, ItemStack stack, int slotX, int slotY,
-                        PageLayout layout) {
+        private void drawCostSlotText(DrawContext context, String label, ItemStack stack, int slotX, int slotY) {
                 int requiredCount = GearShopStackHelper.getRequestedCount(stack);
                 if (requiredCount <= 0) {
                         return;
@@ -495,10 +406,10 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                 RenderSystem.defaultBlendFunc();
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-                drawCostTextLine(context, label, slotX + layout.costSlotLabelAnchorOffsetX(),
-                                slotY + layout.costSlotLabelOffsetY(), layout.costSlotTextScale());
-                drawCostTextLine(context, valueText, slotX + layout.costSlotValueAnchorOffsetX(),
-                                slotY + layout.costSlotValueOffsetY(), layout.costSlotTextScale());
+                drawCostTextLine(context, label, slotX + COST_SLOT_LABEL_ANCHOR_X,
+                                slotY + COST_SLOT_LABEL_OFFSET_Y, COST_SLOT_TEXT_SCALE);
+                drawCostTextLine(context, valueText, slotX + COST_SLOT_VALUE_ANCHOR_X,
+                                slotY + COST_SLOT_VALUE_OFFSET_Y, COST_SLOT_TEXT_SCALE);
 
                 RenderSystem.disableBlend();
                 RenderSystem.enableDepthTest();
@@ -637,12 +548,11 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                         return;
                 }
 
-                PageLayout layout = getPageLayout();
-                int buttonX = originX + layout.buyButtonOffsetX();
-                int buttonY = originY + layout.buyButtonOffsetY();
+                int buttonX = originX + BUY_BUTTON_OFFSET_X;
+                int buttonY = originY + BUY_BUTTON_OFFSET_Y;
                 int v = isPointWithinBuyButton(mouseX, mouseY) ? BUY_BUTTON_HOVER_V : BUY_BUTTON_V;
-                context.drawTexture(TEXTURE, buttonX, buttonY, BUY_BUTTON_U, v, layout.buyButtonWidth(),
-                                layout.buyButtonHeight(),
+                context.drawTexture(TEXTURE, buttonX, buttonY, BUY_BUTTON_U, v, BUY_BUTTON_WIDTH,
+                                BUY_BUTTON_HEIGHT,
                                 TEXTURE_WIDTH, TEXTURE_HEIGHT);
         }
 
@@ -678,8 +588,7 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                 float slotCenterX = slotLeft + 8.0F;
                 float slotCenterY = slotTop + 8.0F;
 
-                PageLayout layout = getPageLayout();
-                OfferDisplayAnimation animation = getResultSlotAnimation(layout);
+                OfferDisplayAnimation animation = RESULT_SLOT_ANIMATION;
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
                 matrices.translate(slotCenterX + animation.offsetX(), slotCenterY + animation.offsetY(),
@@ -719,21 +628,6 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                 matrices.pop();
 
                 context.drawItemInSlot(textRenderer, stack, slotLeft, slotTop);
-        }
-
-        private OfferDisplayAnimation getResultSlotAnimation(PageLayout layout) {
-                OfferDisplayAnimation base = RESULT_SLOT_ANIMATION;
-                float scale = layout.resultSlotAnimationScale();
-                float offsetX = layout.resultSlotAnimationOffsetX();
-                float offsetY = layout.resultSlotAnimationOffsetY();
-                if (Float.compare(scale, base.scale()) == 0 && Float.compare(offsetX, base.offsetX()) == 0
-                                && Float.compare(offsetY, base.offsetY()) == 0) {
-                        return base;
-                }
-                return new OfferDisplayAnimation(scale, offsetX, offsetY, base.offsetZ(),
-                                base.rotationPeriodTicks(), base.rotationPhaseTicks(), base.rotationAxis(),
-                                base.staticPitch(), base.staticYaw(), base.staticRoll(), base.bobAmplitude(),
-                                base.bobOffset(), base.bobPeriodTicks(), base.bobPhaseTicks());
         }
 
         private void drawResultStack(DrawContext context, ItemStack stack) {
@@ -794,11 +688,10 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                         return false;
                 }
 
-                PageLayout layout = getPageLayout();
-                int buttonX = x + layout.buyButtonOffsetX();
-                int buttonY = y + layout.buyButtonOffsetY();
-                return mouseX >= buttonX && mouseX < buttonX + layout.buyButtonWidth() && mouseY >= buttonY
-                                && mouseY < buttonY + layout.buyButtonHeight();
+                int buttonX = x + BUY_BUTTON_OFFSET_X;
+                int buttonY = y + BUY_BUTTON_OFFSET_Y;
+                return mouseX >= buttonX && mouseX < buttonX + BUY_BUTTON_WIDTH && mouseY >= buttonY
+                                && mouseY < buttonY + BUY_BUTTON_HEIGHT;
         }
 
         private void updateScrollLimits() {
@@ -841,8 +734,7 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
         }
 
         private Identifier getBackgroundTexture() {
-                int index = MathHelper.clamp(activeTab, 0, PAGE_TEXTURES.length - 1);
-                return PAGE_TEXTURES[index];
+                return TEXTURE;
         }
 
         private void drawTabs(DrawContext context, int originX, int originY, int mouseX, int mouseY) {
@@ -893,128 +785,7 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                 }
         }
 
-        private PageLayout getPageLayout() {
-                int index = MathHelper.clamp(activeTab, 0, PAGE_LAYOUTS.length - 1);
-                return PAGE_LAYOUTS[index];
-        }
-
         private record TabDefinition(int yOffset, int iconU, int iconV) {
-        }
-
-        private record PageLayout(int offerListX, int offerListY, int costItemOffsetX, int costItemSpacing,
-                        int resultItemOffsetX, int arrowOffsetX, int arrowOffsetY, int buyButtonOffsetX,
-                        int buyButtonOffsetY, int buyButtonWidth, int buyButtonHeight, int buyLabelX, int buyLabelY,
-                        int costSlotLabelAnchorOffsetX, int costSlotLabelOffsetY, int costSlotValueAnchorOffsetX,
-                        int costSlotValueOffsetY, float costSlotTextScale, float resultSlotAnimationScale,
-                        float resultSlotAnimationOffsetX, float resultSlotAnimationOffsetY) {
-                static Builder defaults() {
-                        return new Builder()
-                                        .offerList(OFFER_LIST_X, OFFER_LIST_Y)
-                                        .costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING)
-                                        .costSlotText(DEFAULT_COST_SLOT_LABEL_ANCHOR_X, DEFAULT_COST_SLOT_LABEL_OFFSET_Y,
-                                                        DEFAULT_COST_SLOT_VALUE_ANCHOR_X, DEFAULT_COST_SLOT_VALUE_OFFSET_Y,
-                                                        DEFAULT_COST_SLOT_TEXT_SCALE)
-                                        .resultItem(OFFER_RESULT_ITEM_OFFSET_X)
-                                        .resultSlotAnimationScale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE)
-                                        .resultSlotAnimationOffset(RESULT_SLOT_ANIMATION_OFFSET_X,
-                                                        RESULT_SLOT_ANIMATION_OFFSET_Y)
-                                        .arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y)
-                                        .buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH,
-                                                        BUY_BUTTON_HEIGHT)
-                                        .buyLabel(BUY_LABEL_X, BUY_LABEL_Y);
-                }
-
-                static final class Builder {
-                        private int offerListX;
-                        private int offerListY;
-                        private int costItemOffsetX;
-                        private int costItemSpacing;
-                        private int resultItemOffsetX;
-                        private int arrowOffsetX;
-                        private int arrowOffsetY;
-                        private int buyButtonOffsetX;
-                        private int buyButtonOffsetY;
-                        private int buyButtonWidth;
-                        private int buyButtonHeight;
-                        private int buyLabelX;
-                        private int buyLabelY;
-                        private int costSlotLabelAnchorOffsetX;
-                        private int costSlotLabelOffsetY;
-                        private int costSlotValueAnchorOffsetX;
-                        private int costSlotValueOffsetY;
-                        private float costSlotTextScale;
-                        private float resultSlotAnimationScale;
-                        private float resultSlotAnimationOffsetX;
-                        private float resultSlotAnimationOffsetY;
-
-                        Builder offerList(int x, int y) {
-                                this.offerListX = x;
-                                this.offerListY = y;
-                                return this;
-                        }
-
-                        Builder costStacks(int offsetX, int spacing) {
-                                this.costItemOffsetX = offsetX;
-                                this.costItemSpacing = spacing;
-                                return this;
-                        }
-
-                        Builder costSlotText(int labelAnchorOffsetX, int labelOffsetY, int valueAnchorOffsetX,
-                                        int valueOffsetY, float scale) {
-                                this.costSlotLabelAnchorOffsetX = labelAnchorOffsetX;
-                                this.costSlotLabelOffsetY = labelOffsetY;
-                                this.costSlotValueAnchorOffsetX = valueAnchorOffsetX;
-                                this.costSlotValueOffsetY = valueOffsetY;
-                                this.costSlotTextScale = scale;
-                                return this;
-                        }
-
-                        Builder resultItem(int offsetX) {
-                                this.resultItemOffsetX = offsetX;
-                                return this;
-                        }
-
-                        Builder resultSlotAnimationScale(float scale) {
-                                this.resultSlotAnimationScale = scale;
-                                return this;
-                        }
-
-                        Builder resultSlotAnimationOffset(float offsetX, float offsetY) {
-                                this.resultSlotAnimationOffsetX = offsetX;
-                                this.resultSlotAnimationOffsetY = offsetY;
-                                return this;
-                        }
-
-                        Builder arrow(int offsetX, int offsetY) {
-                                this.arrowOffsetX = offsetX;
-                                this.arrowOffsetY = offsetY;
-                                return this;
-                        }
-
-                        Builder buyButton(int offsetX, int offsetY, int width, int height) {
-                                this.buyButtonOffsetX = offsetX;
-                                this.buyButtonOffsetY = offsetY;
-                                this.buyButtonWidth = width;
-                                this.buyButtonHeight = height;
-                                return this;
-                        }
-
-                        Builder buyLabel(int x, int y) {
-                                this.buyLabelX = x;
-                                this.buyLabelY = y;
-                                return this;
-                        }
-
-                        PageLayout build() {
-                                return new PageLayout(offerListX, offerListY, costItemOffsetX, costItemSpacing,
-                                                resultItemOffsetX, arrowOffsetX, arrowOffsetY, buyButtonOffsetX,
-                                                buyButtonOffsetY, buyButtonWidth, buyButtonHeight, buyLabelX, buyLabelY,
-                                                costSlotLabelAnchorOffsetX, costSlotLabelOffsetY,
-                                                costSlotValueAnchorOffsetX, costSlotValueOffsetY, costSlotTextScale,
-                                                resultSlotAnimationScale, resultSlotAnimationOffsetX,
-                                                resultSlotAnimationOffsetY);
-                        }
-                }
         }
 
         private record OfferDisplayAnimation(float scale, float offsetX, float offsetY, float offsetZ,
@@ -1133,9 +904,8 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
         }
 
         private int getOfferIndexAt(double mouseX, double mouseY) {
-                PageLayout layout = getPageLayout();
-                int listLeft = x + layout.offerListX();
-                int listTop = y + layout.offerListY();
+                int listLeft = x + OFFER_LIST_X;
+                int listTop = y + OFFER_LIST_Y;
 
                 if (mouseX < listLeft || mouseX >= listLeft + OFFER_ENTRY_WIDTH) {
                         return -1;
@@ -1162,9 +932,8 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                         return Optional.empty();
                 }
 
-                PageLayout layout = getPageLayout();
-                int listLeft = x + layout.offerListX();
-                int listTop = y + layout.offerListY();
+                int listLeft = x + OFFER_LIST_X;
+                int listTop = y + OFFER_LIST_Y;
                 int relativeMouseY = mouseY - listTop;
                 if (relativeMouseY < 0) {
                         return Optional.empty();
@@ -1182,12 +951,12 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                 }
 
                 GearShopOffer offer = offers.get(offerIndex);
-                int costStart = listLeft + layout.costItemOffsetX();
-                int arrowLeft = listLeft + layout.arrowOffsetX();
+                int costStart = listLeft + OFFER_COST_ITEM_OFFSET_X;
+                int arrowLeft = listLeft + OFFER_ARROW_OFFSET_X;
                 int maxCostRight = arrowLeft - 2;
                 List<ItemStack> costStacks = offer.costStacks();
                 for (int costIndex = 0; costIndex < costStacks.size(); costIndex++) {
-                        int costX = costStart + costIndex * layout.costItemSpacing();
+                        int costX = costStart + costIndex * OFFER_COST_ITEM_SPACING;
                         if (costX + 16 > maxCostRight) {
                                 break;
                         }
@@ -1196,7 +965,7 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
                         }
                 }
 
-                int resultLeft = listLeft + layout.resultItemOffsetX();
+                int resultLeft = listLeft + OFFER_RESULT_ITEM_OFFSET_X;
                 if (mouseX >= resultLeft && mouseX < resultLeft + 16) {
                         return Optional.of(new HoveredStack(offer.copyResultStack(), false));
                 }
