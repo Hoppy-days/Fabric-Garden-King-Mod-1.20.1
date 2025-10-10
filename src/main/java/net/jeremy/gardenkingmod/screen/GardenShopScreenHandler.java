@@ -154,8 +154,8 @@ public class GardenShopScreenHandler extends ScreenHandler {
                 this.inventory = blockEntity != null ? blockEntity : new SimpleInventory(GardenShopBlockEntity.INVENTORY_SIZE);
                 this.costInventory = new GardenShopCostInventory(COST_SLOT_COUNT);
                 this.resultInventory = new SimpleInventory(RESULT_SLOT_COUNT);
-                this.costInventory.addListener(inventory -> onContentChanged(inventory));
-                this.resultInventory.addListener(inventory -> onContentChanged(inventory));
+                this.costInventory.addListener(this::onContentChanged);
+                this.resultInventory.addListener(this::onContentChanged);
                 this.offersByPage = new ArrayList<>();
 
                 checkSize(this.inventory, GardenShopBlockEntity.INVENTORY_SIZE);
