@@ -25,35 +25,24 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-import net.jeremy.gardenkingmod.mixin.SlotAccessor;
-
 public class GearShopScreenHandler extends ScreenHandler {
         private static final int HOTBAR_SLOT_COUNT = 9;
         private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
         private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
         private static final int PLAYER_INVENTORY_SLOT_COUNT = PLAYER_INVENTORY_ROW_COUNT * PLAYER_INVENTORY_COLUMN_COUNT;
         private static final int SLOT_SIZE = 18;
-        private static final int DEFAULT_SLOT_SPACING = SLOT_SIZE * 2;
-        private static final int SHOP_SLOT_START_X = 8;
+        private static final int COST_SLOT_SPACING = SLOT_SIZE * 2;
         private static final int PLAYER_INVENTORY_START_Y = 123;
         private static final int PLAYER_INVENTORY_START_X = 132;
         private static final int PLAYER_HOTBAR_Y = 181;
         private static final int PLAYER_HOTBAR_X = 132;
         public static final int COST_SLOT_COUNT = 2;
         private static final int RESULT_SLOT_COUNT = 1;
-
-        private static final PageSlotLayout DEFAULT_PAGE_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51,
-                        DEFAULT_SLOT_SPACING - 10);
-        private static final PageSlotLayout PAGE_ONE_SLOT_LAYOUT = new PageSlotLayout(145, 44, 250, 48,
-                        DEFAULT_SLOT_SPACING);
-        private static final PageSlotLayout PAGE_TWO_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51,
-                        DEFAULT_SLOT_SPACING);
-        private static final PageSlotLayout PAGE_THREE_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51,
-                        DEFAULT_SLOT_SPACING);
-        private static final PageSlotLayout PAGE_FOUR_SLOT_LAYOUT = new PageSlotLayout(160, 51, 244, 51,
-                        DEFAULT_SLOT_SPACING);
-        private static final PageSlotLayout[] PAGE_SLOT_LAYOUTS = { DEFAULT_PAGE_SLOT_LAYOUT, PAGE_ONE_SLOT_LAYOUT,
-                        PAGE_TWO_SLOT_LAYOUT, PAGE_THREE_SLOT_LAYOUT, PAGE_FOUR_SLOT_LAYOUT };
+        private static final int COST_SLOT_START_X = 145;
+        private static final int COST_SLOT_Y = 44;
+        private static final int RESULT_SLOT_X = 250;
+        private static final int RESULT_SLOT_Y = 48;
+        private static final int MAX_PAGE_INDEX = 3;
 
         private static final int PURCHASE_BUTTON_FLAG = 1 << 30;
         private static final int SELECT_BUTTON_FLAG = 1 << 29;
@@ -107,23 +96,19 @@ public class GearShopScreenHandler extends ScreenHandler {
 
         public int getCostSlotX(int slotIndex) {
                 int clampedIndex = MathHelper.clamp(slotIndex, 0, COST_SLOT_COUNT - 1);
-                PageSlotLayout layout = getPageSlotLayout(currentPageIndex);
-                return layout.costSlotStartX() + clampedIndex * layout.costSlotSpacing();
+                return COST_SLOT_START_X + clampedIndex * COST_SLOT_SPACING;
         }
 
         public int getCostSlotY() {
-                PageSlotLayout layout = getPageSlotLayout(currentPageIndex);
-                return layout.costSlotsY();
+                return COST_SLOT_Y;
         }
 
         public int getResultSlotX() {
-                PageSlotLayout layout = getPageSlotLayout(currentPageIndex);
-                return layout.resultSlotX();
+                return RESULT_SLOT_X;
         }
 
         public int getResultSlotY() {
-                PageSlotLayout layout = getPageSlotLayout(currentPageIndex);
-                return layout.resultSlotY();
+                return RESULT_SLOT_Y;
         }
 
         public boolean isCostSlot(Slot slot) {
@@ -200,7 +185,6 @@ public class GearShopScreenHandler extends ScreenHandler {
                 addResultSlot();
                 addPlayerInventory(playerInventory);
                 addPlayerHotbar(playerInventory);
-                applyPageLayout(currentPageIndex);
         }
 
         private static GearShopBlockEntity getBlockEntity(PlayerInventory playerInventory, BlockPos pos) {
@@ -1046,47 +1030,8 @@ public class GearShopScreenHandler extends ScreenHandler {
         }
 
         private void setCurrentPageIndex(int pageIndex) {
-                int clampedIndex = Math.max(pageIndex, 0);
-                if (this.currentPageIndex != clampedIndex) {
-                        this.currentPageIndex = clampedIndex;
-                        applyPageLayout(clampedIndex);
-                } else {
-                        applyPageLayout(clampedIndex);
-                }
-        }
-
-        public void applyPageLayout(int pageIndex) {
-                PageSlotLayout layout = getPageSlotLayout(pageIndex);
-                for (int index = 0; index < costSlots.length; index++) {
-                        Slot slot = costSlots[index];
-                        if (slot != null) {
-                                updateSlotPosition(slot,
-                                                layout.costSlotStartX() + index * layout.costSlotSpacing(),
-                                                layout.costSlotsY());
-                        }
-                }
-
-                if (resultSlot != null) {
-                        updateSlotPosition(resultSlot, layout.resultSlotX(), layout.resultSlotY());
-                }
-        }
-
-        private void updateSlotPosition(Slot slot, int x, int y) {
-                if (slot instanceof SlotAccessor accessor) {
-                        accessor.setX(x);
-                        accessor.setY(y);
-                }
-        }
-
-        private PageSlotLayout getPageSlotLayout(int pageIndex) {
-                if (pageIndex >= 0 && pageIndex < PAGE_SLOT_LAYOUTS.length && PAGE_SLOT_LAYOUTS[pageIndex] != null) {
-                        return PAGE_SLOT_LAYOUTS[pageIndex];
-                }
-                return DEFAULT_PAGE_SLOT_LAYOUT;
-        }
-
-        private record PageSlotLayout(int costSlotStartX, int costSlotsY, int resultSlotX, int resultSlotY,
-                        int costSlotSpacing) {
+                int highestAllowed = Math.min(MAX_PAGE_INDEX, Math.max(offersByPage.size() - 1, 0));
+                this.currentPageIndex = MathHelper.clamp(pageIndex, 0, highestAllowed);
         }
 
         private void fillInventoryFromOffers() {

@@ -227,19 +227,6 @@
           "price": "gardenkingmod:dollar*128"
         }
       ]
-    },
-    {
-      "_comment": "Page 5: Crops",
-      "offers": [
-        {
-          "offer": "minecraft:elytra",
-          "price": "gardenkingmod:ruby*9"
-        },
-        {
-          "offer": "minecraft:elytra",
-          "price": "gardenkingmod:ruby*10"
-        }
-      ]
     }
   ]
 }
