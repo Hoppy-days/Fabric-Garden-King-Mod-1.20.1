@@ -36,13 +36,10 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
         private static final int SELL_TEXTURE_WIDTH = 256;
         private static final int SELL_TEXTURE_HEIGHT = 256;
-        private static final int BUY_TEXTURE_WIDTH = 512;
-        private static final int BUY_TEXTURE_HEIGHT = 256;
-        private static final int BUY_TEXTURE_U = 176;
 
         private static final int SELL_BACKGROUND_U = 0;
         private static final int SELL_BACKGROUND_V = 0;
-        private static final int BACKGROUND_WIDTH = 175;
+        private static final int SELL_BACKGROUND_WIDTH = 175;
         private static final int BACKGROUND_HEIGHT = 220;
         private static final int PLAYER_INVENTORY_LABEL_Y = BACKGROUND_HEIGHT - 94;
         private static final int TITLE_LABEL_Y = 22;
@@ -87,6 +84,18 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_OFFER_ARROW_HEIGHT = 9;
         private static final int SELECTED_HIGHLIGHT_COLOR = 0x40FFFFFF;
 
+        private static final class BuyBackground {
+                private static final int TEXTURE_WIDTH = 512;
+                private static final int TEXTURE_HEIGHT = 256;
+                private static final int BACKGROUND_WIDTH = 276;
+                private static final int BACKGROUND_HEIGHT = 220;
+                private static final int U = 0;
+                private static final int V = 0;
+
+                private BuyBackground() {
+                }
+        }
+
         private static final int BUY_SCROLLBAR_OFFSET_X = BUY_OFFER_LIST_X + BUY_OFFER_ENTRY_WIDTH + 2;
         private static final int BUY_SCROLLBAR_OFFSET_Y = BUY_OFFER_LIST_Y;
         private static final int BUY_SCROLLBAR_TRACK_WIDTH = 6;
@@ -115,7 +124,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
         public MarketScreen(MarketScreenHandler handler, PlayerInventory inventory, Text title) {
                 super(handler, inventory, title);
-                this.backgroundWidth = BACKGROUND_WIDTH;
+                this.backgroundWidth = SELL_BACKGROUND_WIDTH;
                 this.backgroundHeight = BACKGROUND_HEIGHT;
                 this.playerInventoryTitleY = PLAYER_INVENTORY_LABEL_Y;
                 this.titleY = TITLE_LABEL_Y;
@@ -142,15 +151,19 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 updateTabButtonState();
                 updateSellButtonVisibility();
                 resetBuyTabState();
+                updateTabButtonPositions();
         }
 
         @Override
         protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
                 if (activeTab == Tab.BUY) {
-                        context.drawTexture(BUY_TEXTURE, x, y, BUY_TEXTURE_U, 0, backgroundWidth, backgroundHeight,
-                                        BUY_TEXTURE_WIDTH, BUY_TEXTURE_HEIGHT);
-                        drawBuyOfferList(context, x, y, mouseX, mouseY);
-                        drawBuyScrollbar(context, x, y);
+                        int originX = getBuyBackgroundX();
+                        int originY = getBuyBackgroundY();
+                        context.drawTexture(BUY_TEXTURE, originX, originY, BuyBackground.U, BuyBackground.V,
+                                        BuyBackground.BACKGROUND_WIDTH, BuyBackground.BACKGROUND_HEIGHT,
+                                        BuyBackground.TEXTURE_WIDTH, BuyBackground.TEXTURE_HEIGHT);
+                        drawBuyOfferList(context, originX, originY, mouseX, mouseY);
+                        drawBuyScrollbar(context, originX, originY);
                 } else {
                         context.drawTexture(SELL_TEXTURE, x, y, SELL_BACKGROUND_U, SELL_BACKGROUND_V, backgroundWidth, backgroundHeight,
                                         SELL_TEXTURE_WIDTH, SELL_TEXTURE_HEIGHT);
@@ -233,7 +246,11 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 super.drawForeground(context, mouseX, mouseY);
 
                 if (activeTab == Tab.BUY) {
+                        context.getMatrices().push();
+                        context.getMatrices().translate(getBuyBackgroundX() - this.x,
+                                        getBuyBackgroundY() - this.y, 0);
                         drawBuyLabels(context);
+                        context.getMatrices().pop();
                         return;
                 }
 
@@ -335,6 +352,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 if (tab == Tab.BUY) {
                         resetBuyTabState();
                 }
+                updateTabButtonPositions();
         }
 
         private void updateSellButtonVisibility() {
@@ -351,6 +369,10 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         super(x, y, TAB_BUTTON_WIDTH, TAB_BUTTON_HEIGHT, message);
                         this.tab = tab;
                         this.pressAction = pressAction;
+                }
+
+                private void reposition(int x, int y) {
+                        setPosition(x, y);
                 }
 
                 @Override
@@ -394,6 +416,26 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 return base.copy().formatted(tab == activeTab ? Formatting.GOLD : Formatting.WHITE);
         }
 
+        private void updateTabButtonPositions() {
+                int baseX = activeTab == Tab.BUY ? getBuyBackgroundX() : this.x;
+                int baseY = activeTab == Tab.BUY ? getBuyBackgroundY() : this.y;
+                int buttonY = baseY + TAB_BUTTON_Y_OFFSET;
+                if (sellTabButton != null) {
+                        sellTabButton.reposition(baseX + SELL_TAB_TEXT_X - TAB_BUTTON_TEXT_PADDING_X, buttonY);
+                }
+                if (buyTabButton != null) {
+                        buyTabButton.reposition(baseX + BUY_TAB_TEXT_X - TAB_BUTTON_TEXT_PADDING_X, buttonY);
+                }
+        }
+
+        private int getBuyBackgroundX() {
+                return (this.width - BuyBackground.BACKGROUND_WIDTH) / 2;
+        }
+
+        private int getBuyBackgroundY() {
+                return (this.height - BuyBackground.BACKGROUND_HEIGHT) / 2;
+        }
+
         private void resetBuyTabState() {
                 selectedOffer = -1;
                 setScrollAmount(0.0F);
@@ -432,8 +474,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         int backgroundV = offerIndex == hoveredOffer ? BUY_OFFER_HOVER_BACKGROUND_V
                                         : BUY_OFFER_BACKGROUND_V;
                         context.drawTexture(BUY_TEXTURE, listLeft, entryY, BUY_OFFER_BACKGROUND_U, backgroundV,
-                                        BUY_OFFER_ENTRY_WIDTH, BUY_OFFER_ENTRY_HEIGHT, BUY_TEXTURE_WIDTH,
-                                        BUY_TEXTURE_HEIGHT);
+                                        BUY_OFFER_ENTRY_WIDTH, BUY_OFFER_ENTRY_HEIGHT, BuyBackground.TEXTURE_WIDTH,
+                                        BuyBackground.TEXTURE_HEIGHT);
 
                         if (offerIndex == selectedOffer) {
                                 context.fill(listLeft, entryY, listLeft + BUY_OFFER_ENTRY_WIDTH,
@@ -457,8 +499,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
                         int arrowY = entryY + BUY_OFFER_ITEM_OFFSET_Y + 4;
                         context.drawTexture(BUY_TEXTURE, arrowX, arrowY, BUY_OFFER_ARROW_U, BUY_OFFER_ARROW_V,
-                                        BUY_OFFER_ARROW_WIDTH, BUY_OFFER_ARROW_HEIGHT, BUY_TEXTURE_WIDTH,
-                                        BUY_TEXTURE_HEIGHT);
+                                        BUY_OFFER_ARROW_WIDTH, BUY_OFFER_ARROW_HEIGHT, BuyBackground.TEXTURE_WIDTH,
+                                        BuyBackground.TEXTURE_HEIGHT);
 
                         ItemStack displayStack = offer.copyResultStack();
                         int resultX = listLeft + BUY_OFFER_RESULT_ITEM_OFFSET_X;
@@ -493,8 +535,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 }
 
                 context.drawTexture(BUY_TEXTURE, scrollbarX, knobY, BUY_SCROLLBAR_KNOB_U, BUY_SCROLLBAR_KNOB_V,
-                                BUY_SCROLLBAR_KNOB_WIDTH, BUY_SCROLLBAR_KNOB_HEIGHT, BUY_TEXTURE_WIDTH,
-                                BUY_TEXTURE_HEIGHT);
+                                BUY_SCROLLBAR_KNOB_WIDTH, BUY_SCROLLBAR_KNOB_HEIGHT, BuyBackground.TEXTURE_WIDTH,
+                                BuyBackground.TEXTURE_HEIGHT);
         }
 
         private void updateBuyScrollLimits() {
@@ -512,7 +554,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         }
 
         private void updateScrollFromMouse(double mouseY) {
-                int scrollbarY = y + BUY_SCROLLBAR_OFFSET_Y;
+                int scrollbarY = getBuyBackgroundY() + BUY_SCROLLBAR_OFFSET_Y;
                 double relativeY = mouseY - scrollbarY - (BUY_SCROLLBAR_KNOB_HEIGHT / 2.0);
                 double available = BUY_SCROLLBAR_TRACK_HEIGHT - BUY_SCROLLBAR_KNOB_HEIGHT;
                 if (available <= 0) {
@@ -539,8 +581,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         }
 
         private boolean isPointWithinBuyScrollbar(double mouseX, double mouseY) {
-                int scrollbarX = x + BUY_SCROLLBAR_OFFSET_X;
-                int scrollbarY = y + BUY_SCROLLBAR_OFFSET_Y;
+                int scrollbarX = getBuyBackgroundX() + BUY_SCROLLBAR_OFFSET_X;
+                int scrollbarY = getBuyBackgroundY() + BUY_SCROLLBAR_OFFSET_Y;
                 return mouseX >= scrollbarX && mouseX < scrollbarX + BUY_SCROLLBAR_TRACK_WIDTH && mouseY >= scrollbarY
                                 && mouseY < scrollbarY + BUY_SCROLLBAR_TRACK_HEIGHT;
         }
@@ -550,8 +592,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         return -1;
                 }
 
-                int listLeft = x + BUY_OFFER_LIST_X;
-                int listTop = y + BUY_OFFER_LIST_Y;
+                int listLeft = getBuyBackgroundX() + BUY_OFFER_LIST_X;
+                int listTop = getBuyBackgroundY() + BUY_OFFER_LIST_Y;
 
                 if (mouseX < listLeft || mouseX >= listLeft + BUY_OFFER_ENTRY_WIDTH) {
                         return -1;
@@ -578,8 +620,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         return Optional.empty();
                 }
 
-                int listLeft = x + BUY_OFFER_LIST_X;
-                int listTop = y + BUY_OFFER_LIST_Y;
+                int listLeft = getBuyBackgroundX() + BUY_OFFER_LIST_X;
+                int listTop = getBuyBackgroundY() + BUY_OFFER_LIST_Y;
                 int relativeMouseY = mouseY - listTop;
                 if (relativeMouseY < 0) {
                         return Optional.empty();
