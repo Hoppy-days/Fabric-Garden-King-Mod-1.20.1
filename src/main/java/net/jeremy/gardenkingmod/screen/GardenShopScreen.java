@@ -693,6 +693,14 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 return Util.getMeasuringTimeMs() / 50.0F;
         }
 
+        private float getAnimationTicks(float delta) {
+                MinecraftClient minecraftClient = client;
+                if (minecraftClient != null && minecraftClient.world != null) {
+                        return minecraftClient.world.getTime() + delta;
+                }
+                return Util.getMeasuringTimeMs() / 50.0F;
+        }
+
         private boolean isPointWithinScrollbar(double mouseX, double mouseY) {
                 int scrollbarX = x + SCROLLBAR_OFFSET_X;
                 int scrollbarY = y + SCROLLBAR_OFFSET_Y;
