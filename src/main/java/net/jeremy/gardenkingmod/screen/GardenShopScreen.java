@@ -11,10 +11,16 @@ import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.shop.GardenShopOffer;
 import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
 import net.jeremy.gardenkingmod.screen.inventory.GardenShopCostInventory;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
@@ -151,19 +157,46 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final PageLayout[] PAGE_LAYOUTS = { PAGE1_LAYOUT, PAGE2_LAYOUT, DEFAULT_PAGE_LAYOUT,
                         DEFAULT_PAGE_LAYOUT, DEFAULT_PAGE_LAYOUT };
 
+        private static final OfferDisplayAnimation DEFAULT_OFFER_ANIMATION = buildAnimation(builder -> {
+        });
+        private static final OfferDisplayAnimation PAGE2_OFFER_ANIMATION = buildAnimation(builder -> {
+                builder.rotationAxis(RotationAxis.POSITIVE_X);
+                builder.rotationPeriodTicks(40.0F);
+                builder.staticPitch(0.0F);
+                builder.bobAmplitude(0.1F);
+                builder.bobOffset(0.1F);
+                builder.bobPeriodTicks(20.0F);
+        });
+        private static final OfferDisplayAnimation PAGE3_OFFER_ANIMATION = buildAnimation(builder -> {
+                builder.rotationAxis(RotationAxis.POSITIVE_X);
+                builder.rotationPeriodTicks(40.0F);
+                builder.staticPitch(0.0F);
+                builder.bobAmplitude(0.1F);
+                builder.bobOffset(0.1F);
+                builder.bobPeriodTicks(20.0F);
+        });
+        private static final OfferDisplayAnimation PAGE4_OFFER_ANIMATION = buildAnimation(builder -> {
+                builder.rotationAxis(RotationAxis.POSITIVE_X);
+                builder.rotationPeriodTicks(40.0F);
+                builder.staticPitch(0.0F);
+                builder.bobAmplitude(0.1F);
+                builder.bobOffset(0.1F);
+                builder.bobPeriodTicks(20.0F);
+        });
+
+        private static final OfferDisplayAnimation[] OFFER_DISPLAY_ANIMATIONS = { DEFAULT_OFFER_ANIMATION,
+                        PAGE2_OFFER_ANIMATION, PAGE3_OFFER_ANIMATION, PAGE4_OFFER_ANIMATION, DEFAULT_OFFER_ANIMATION };
+
         private static PageLayout buildLayout(Consumer<PageLayout.Builder> configurer) {
                 PageLayout.Builder builder = PageLayout.defaults();
                 configurer.accept(builder);
                 return builder.build();
         }
 
-        private static final int OFFER_DISPLAY_X = 233;
-        private static final int OFFER_DISPLAY_Y = 27;
-        private static final int OFFER_DISPLAY_WIDTH = 52;
-        private static final int OFFER_DISPLAY_HEIGHT = 70;
         private static final float OFFER_DISPLAY_SCALE = 3.25F;
         private static final float OFFER_DISPLAY_Z = 200.0F;
         private static final float OFFER_ROTATION_SPEED = 30.0F;
+        private static final float OFFER_ROTATION_PERIOD_TICKS = 20.0F * (360.0F / OFFER_ROTATION_SPEED);
 
         private static final int TAB_X = 0;
         private static final int TAB_WIDTH = 24;
@@ -198,6 +231,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private int selectedOffer = -1;
         private int lastOfferCount = -1;
         private int activeTab = 0;
+        private float selectedOfferAnimationStartTicks = Float.NaN;
+        private ItemStack lastAnimatedOfferStack = ItemStack.EMPTY;
+        private float currentFrameDelta;
 
         public GardenShopScreen(GardenShopScreenHandler handler, PlayerInventory inventory, Text title) {
                 super(handler, inventory, title);
@@ -241,7 +277,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 drawTabs(context, originX, originY, mouseX, mouseY);
                 drawOfferList(context, originX, originY, mouseX, mouseY);
                 drawScrollbar(context, originX, originY);
-                drawSelectedOfferDetails(context, originX, originY, delta);
         }
 
         @Override
@@ -275,12 +310,23 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
 
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+                this.currentFrameDelta = delta;
                 renderBackground(context);
+                ResultSlotSnapshot suppressedResult = suppressVanillaResultSlot();
                 List<CostSlotSnapshot> suppressedCounts = suppressVanillaCostCounts();
                 try {
                         super.render(context, mouseX, mouseY, delta);
                 } finally {
                         restoreVanillaCostCounts(suppressedCounts);
+                        restoreVanillaResultSlot(suppressedResult);
+                }
+                if (suppressedResult != null && suppressedResult.slot() != null) {
+                        if (!suppressedResult.stack().isEmpty()) {
+                                drawAnimatedResultItem(context, suppressedResult.stack(), suppressedResult.slot());
+                        } else {
+                                lastAnimatedOfferStack = ItemStack.EMPTY;
+                                selectedOfferAnimationStartTicks = Float.NaN;
+                        }
                 }
                 drawCostSlotOverlays(context);
                 drawMouseoverTooltip(context, mouseX, mouseY);
@@ -508,6 +554,40 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private record CostSlotSnapshot(Slot slot, int originalCount) {
         }
 
+        private ResultSlotSnapshot suppressVanillaResultSlot() {
+                for (Slot slot : handler.slots) {
+                        if (!handler.isResultSlot(slot)) {
+                                continue;
+                        }
+
+                        ItemStack stack = slot.getStack();
+                        if (stack.isEmpty()) {
+                                return new ResultSlotSnapshot(slot, ItemStack.EMPTY);
+                        }
+
+                        ItemStack snapshot = stack.copy();
+                        stack.setCount(0);
+                        return new ResultSlotSnapshot(slot, snapshot);
+                }
+                return null;
+        }
+
+        private void restoreVanillaResultSlot(ResultSlotSnapshot snapshot) {
+                if (snapshot == null || snapshot.slot() == null) {
+                        return;
+                }
+
+                Slot slot = snapshot.slot();
+                if (snapshot.stack().isEmpty()) {
+                        slot.setStack(ItemStack.EMPTY);
+                } else {
+                        slot.setStack(snapshot.stack().copy());
+                }
+        }
+
+        private record ResultSlotSnapshot(Slot slot, ItemStack stack) {
+        }
+
         private static String formatRequestedCount(int count) {
                 if (count < 1000) {
                         return Integer.toString(count);
@@ -572,38 +652,84 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 layout.buyButtonHeight(),
                                 TEXTURE_WIDTH, TEXTURE_HEIGHT);
         }
-
-        private void drawSelectedOfferDetails(DrawContext context, int originX, int originY, float delta) {
-                if (!isBuyButtonVisible()) {
-                        return;
+        private void drawAnimatedResultItem(DrawContext context, ItemStack stack, Slot slot) {
+                int slotX = this.x + slot.x;
+                int slotY = this.y + slot.y;
+                OfferDisplayAnimation animation = getOfferDisplayAnimation();
+                if (!ItemStack.areEqual(lastAnimatedOfferStack, stack)) {
+                        resetOfferAnimation(stack);
                 }
 
-                List<GardenShopOffer> offers = getOffersForActiveTab();
-                if (selectedOffer < 0 || selectedOffer >= offers.size()) {
-                        return;
+                if (Float.isNaN(selectedOfferAnimationStartTicks)) {
+                        selectedOfferAnimationStartTicks = getAnimationTicks(0.0F);
                 }
 
-                ItemStack resultStack = offers.get(selectedOffer).copyResultStack();
-                if (resultStack.isEmpty()) {
-                        return;
+                float animationTicks = getAnimationTicks(currentFrameDelta) - selectedOfferAnimationStartTicks;
+                if (animationTicks < 0.0F) {
+                        animationTicks = 0.0F;
                 }
-
-                int displayLeft = originX + OFFER_DISPLAY_X;
-                int displayTop = originY + OFFER_DISPLAY_Y;
-                float centerX = displayLeft + (OFFER_DISPLAY_WIDTH / 2.0F);
-                float centerY = displayTop + (OFFER_DISPLAY_HEIGHT / 2.0F);
 
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
-                matrices.translate(centerX, centerY, OFFER_DISPLAY_Z);
-                matrices.scale(OFFER_DISPLAY_SCALE, OFFER_DISPLAY_SCALE, OFFER_DISPLAY_SCALE);
+                RenderSystem.enableDepthTest();
 
-                float rotation = ((Util.getMeasuringTimeMs() % 3600000L) / 1000.0F + delta) * OFFER_ROTATION_SPEED;
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotation));
-                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(25.0F));
+                matrices.translate(slotX + 8.0F + animation.offsetX(), slotY + 8.0F + animation.offsetY(),
+                                OFFER_DISPLAY_Z + animation.offsetZ());
 
-                context.drawItem(resultStack, -8, -8);
+                float bobTranslation = animation.bobOffset();
+                if (animation.bobPeriodTicks() > 0.0F && animation.bobAmplitude() != 0.0F) {
+                        float bobAngle = (animationTicks + animation.bobPhaseTicks()) / animation.bobPeriodTicks();
+                        bobTranslation += MathHelper.sin(bobAngle) * animation.bobAmplitude();
+                }
+                if (bobTranslation != 0.0F) {
+                        matrices.translate(0.0F, bobTranslation, 0.0F);
+                }
+
+                float scale = animation.scale();
+                matrices.scale(scale, scale, scale);
+
+                if (animation.rotationPeriodTicks() > 0.0F) {
+                        float rotationDegrees = ((animationTicks + animation.rotationPhaseTicks())
+                                        / animation.rotationPeriodTicks()) * 360.0F;
+                        matrices.multiply(animation.rotationAxis().rotationDegrees(rotationDegrees));
+                }
+
+                if (animation.staticYaw() != 0.0F) {
+                        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(animation.staticYaw()));
+                }
+                if (animation.staticPitch() != 0.0F) {
+                        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(animation.staticPitch()));
+                }
+                if (animation.staticRoll() != 0.0F) {
+                        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(animation.staticRoll()));
+                }
+
+                MinecraftClient minecraftClient = client != null ? client : MinecraftClient.getInstance();
+                if (minecraftClient != null) {
+                        ItemRenderer itemRenderer = minecraftClient.getItemRenderer();
+                        BakedModel model = itemRenderer.getModel(stack, minecraftClient.world,
+                                        minecraftClient.player, 0);
+                        itemRenderer.renderItem(stack, ModelTransformationMode.GROUND, false, matrices,
+                                        context.getVertexConsumers(), LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                                        OverlayTexture.DEFAULT_UV, model);
+                        context.draw();
+                }
+
+                RenderSystem.disableDepthTest();
                 matrices.pop();
+        }
+
+        private void resetOfferAnimation(ItemStack stack) {
+                lastAnimatedOfferStack = stack.copy();
+                selectedOfferAnimationStartTicks = Float.NaN;
+        }
+
+        private float getAnimationTicks(float delta) {
+                MinecraftClient minecraftClient = client;
+                if (minecraftClient != null && minecraftClient.world != null) {
+                        return minecraftClient.world.getTime() + delta;
+                }
+                return Util.getMeasuringTimeMs() / 50.0F;
         }
 
         private boolean isPointWithinScrollbar(double mouseX, double mouseY) {
@@ -718,6 +844,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private PageLayout getPageLayout() {
                 int index = MathHelper.clamp(activeTab, 0, PAGE_LAYOUTS.length - 1);
                 return PAGE_LAYOUTS[index];
+        }
+
+        private OfferDisplayAnimation getOfferDisplayAnimation() {
+                int index = MathHelper.clamp(activeTab, 0, OFFER_DISPLAY_ANIMATIONS.length - 1);
+                OfferDisplayAnimation animation = OFFER_DISPLAY_ANIMATIONS[index];
+                return animation != null ? animation : DEFAULT_OFFER_ANIMATION;
         }
 
         private record TabDefinition(int yOffset, int iconU, int iconV) {
@@ -841,6 +973,121 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
         }
 
+        private record OfferDisplayAnimation(float scale, float offsetX, float offsetY, float offsetZ,
+                        float rotationPeriodTicks, float rotationPhaseTicks, RotationAxis rotationAxis,
+                        float staticPitch, float staticYaw, float staticRoll, float bobAmplitude, float bobOffset,
+                        float bobPeriodTicks, float bobPhaseTicks) {
+                static Builder builder() {
+                        return new Builder();
+                }
+
+                static final class Builder {
+                        private float scale = OFFER_DISPLAY_SCALE;
+                        private float offsetX;
+                        private float offsetY;
+                        private float offsetZ;
+                        private float rotationPeriodTicks = OFFER_ROTATION_PERIOD_TICKS;
+                        private float rotationPhaseTicks;
+                        private RotationAxis rotationAxis = RotationAxis.POSITIVE_Y;
+                        private float staticPitch = 25.0F;
+                        private float staticYaw;
+                        private float staticRoll;
+                        private float bobAmplitude;
+                        private float bobOffset;
+                        private float bobPeriodTicks;
+                        private float bobPhaseTicks;
+
+                        Builder scale(float scale) {
+                                this.scale = scale;
+                                return this;
+                        }
+
+                        Builder offset(float x, float y, float z) {
+                                this.offsetX = x;
+                                this.offsetY = y;
+                                this.offsetZ = z;
+                                return this;
+                        }
+
+                        Builder offsetX(float x) {
+                                this.offsetX = x;
+                                return this;
+                        }
+
+                        Builder offsetY(float y) {
+                                this.offsetY = y;
+                                return this;
+                        }
+
+                        Builder offsetZ(float z) {
+                                this.offsetZ = z;
+                                return this;
+                        }
+
+                        Builder rotationPeriodTicks(float periodTicks) {
+                                this.rotationPeriodTicks = periodTicks;
+                                return this;
+                        }
+
+                        Builder rotationPhaseTicks(float phaseTicks) {
+                                this.rotationPhaseTicks = phaseTicks;
+                                return this;
+                        }
+
+                        Builder rotationAxis(RotationAxis axis) {
+                                this.rotationAxis = axis;
+                                return this;
+                        }
+
+                        Builder staticPitch(float pitch) {
+                                this.staticPitch = pitch;
+                                return this;
+                        }
+
+                        Builder staticYaw(float yaw) {
+                                this.staticYaw = yaw;
+                                return this;
+                        }
+
+                        Builder staticRoll(float roll) {
+                                this.staticRoll = roll;
+                                return this;
+                        }
+
+                        Builder bobAmplitude(float amplitude) {
+                                this.bobAmplitude = amplitude;
+                                return this;
+                        }
+
+                        Builder bobOffset(float offset) {
+                                this.bobOffset = offset;
+                                return this;
+                        }
+
+                        Builder bobPeriodTicks(float periodTicks) {
+                                this.bobPeriodTicks = periodTicks;
+                                return this;
+                        }
+
+                        Builder bobPhaseTicks(float phaseTicks) {
+                                this.bobPhaseTicks = phaseTicks;
+                                return this;
+                        }
+
+                        OfferDisplayAnimation build() {
+                                return new OfferDisplayAnimation(scale, offsetX, offsetY, offsetZ, rotationPeriodTicks,
+                                                rotationPhaseTicks, rotationAxis, staticPitch, staticYaw, staticRoll,
+                                                bobAmplitude, bobOffset, bobPeriodTicks, bobPhaseTicks);
+                        }
+                }
+        }
+
+        private static OfferDisplayAnimation buildAnimation(Consumer<OfferDisplayAnimation.Builder> configurer) {
+                OfferDisplayAnimation.Builder builder = OfferDisplayAnimation.builder();
+                configurer.accept(builder);
+                return builder.build();
+        }
+
         private int getOfferIndexAt(double mouseX, double mouseY) {
                 PageLayout layout = getPageLayout();
                 int listLeft = x + layout.offerListX();
@@ -923,10 +1170,14 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private void selectOffer(int offerIndex) {
                 selectedOffer = offerIndex;
                 sendOfferSelectionUpdate(offerIndex);
+                selectedOfferAnimationStartTicks = Float.NaN;
+                lastAnimatedOfferStack = ItemStack.EMPTY;
         }
 
         private void clearSelectedOffer() {
                 selectedOffer = -1;
+                selectedOfferAnimationStartTicks = Float.NaN;
+                lastAnimatedOfferStack = ItemStack.EMPTY;
                 sendOfferSelectionUpdate(-1);
         }
 
