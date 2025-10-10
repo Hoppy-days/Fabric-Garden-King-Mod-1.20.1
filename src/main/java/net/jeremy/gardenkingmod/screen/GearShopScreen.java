@@ -47,10 +47,10 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
 
         private static final int OFFERS_LABEL_X = 32;
         private static final int OFFERS_LABEL_Y = 6;
-        private static final int BUY_LABEL_X = 203;
-        private static final int BUY_LABEL_Y = 91;
-        private static final int BUY_BUTTON_OFFSET_X = 188;
-        private static final int BUY_BUTTON_OFFSET_Y = 88;
+        private static final int BUY_LABEL_X = 163;
+        private static final int BUY_LABEL_Y = 95;
+        private static final int BUY_BUTTON_OFFSET_X = 148;
+        private static final int BUY_BUTTON_OFFSET_Y = 92;
         private static final int BUY_BUTTON_U = 301;
         private static final int BUY_BUTTON_V = 81;
         private static final int BUY_BUTTON_HOVER_V = 96;
