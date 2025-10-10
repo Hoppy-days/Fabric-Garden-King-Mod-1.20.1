@@ -86,9 +86,12 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final String COST_LABEL_TRANSLATION_KEY = "screen.gardenkingmod.garden_shop.cost_label";
         private static final int DEFAULT_COST_SLOT_LABEL_ANCHOR_X = 8;
         private static final int DEFAULT_COST_SLOT_LABEL_OFFSET_Y = 20;
+            //DEFAULT_COST_SLOT_LABEL is the word "COST"//
         private static final int DEFAULT_COST_SLOT_VALUE_ANCHOR_X = 8;
         private static final int DEFAULT_COST_SLOT_VALUE_OFFSET_Y = 30;
+            //DEFAULT_COST_SLOT_VALUE is the word cost count//
         private static final float DEFAULT_COST_SLOT_TEXT_SCALE = 0.6F;
+
         private static final int DEFAULT_COST_TEXT_LABEL_ANCHOR_X = 8;
         private static final int DEFAULT_COST_TEXT_LABEL_OFFSET_Y = 20;
         private static final int DEFAULT_COST_TEXT_VALUE_ANCHOR_X = 8;
@@ -157,36 +160,35 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final PageLayout[] PAGE_LAYOUTS = { PAGE1_LAYOUT, PAGE2_LAYOUT, DEFAULT_PAGE_LAYOUT,
                         DEFAULT_PAGE_LAYOUT, DEFAULT_PAGE_LAYOUT };
 
-        private static final OfferDisplayAnimation DEFAULT_OFFER_ANIMATION = buildAnimation(builder -> {
-        });
-        private static final OfferDisplayAnimation PAGE2_OFFER_ANIMATION = buildAnimation(builder -> {
-                builder.rotationAxis(RotationAxis.POSITIVE_X);
-                builder.rotationPeriodTicks(40.0F);
-                builder.staticPitch(0.0F);
-                builder.bobAmplitude(0.1F);
-                builder.bobOffset(0.1F);
-                builder.bobPeriodTicks(20.0F);
-        });
-        private static final OfferDisplayAnimation PAGE3_OFFER_ANIMATION = buildAnimation(builder -> {
-                builder.rotationAxis(RotationAxis.POSITIVE_X);
-                builder.rotationPeriodTicks(40.0F);
-                builder.staticPitch(0.0F);
-                builder.bobAmplitude(0.1F);
-                builder.bobOffset(0.1F);
-                builder.bobPeriodTicks(20.0F);
-        });
-        private static final OfferDisplayAnimation PAGE4_OFFER_ANIMATION = buildAnimation(builder -> {
-                builder.rotationAxis(RotationAxis.POSITIVE_X);
-                builder.rotationPeriodTicks(40.0F);
-                builder.staticPitch(0.0F);
-                builder.bobAmplitude(0.1F);
-                builder.bobOffset(0.1F);
-                builder.bobPeriodTicks(20.0F);
-        });
+    private static final OfferDisplayAnimation DEFAULT_OFFER_ANIMATION = buildAnimation(builder -> {
+    });
+    private static final OfferDisplayAnimation PAGE2_OFFER_ANIMATION = buildAnimation(builder -> {
+        builder.rotationAxis(RotationAxis.POSITIVE_X);
+        builder.rotationPeriodTicks(40.0F);
+        builder.staticPitch(0.0F);
+        builder.bobAmplitude(0.1F);
+        builder.bobOffset(0.1F);
+        builder.bobPeriodTicks(20.0F);
+    });
+    private static final OfferDisplayAnimation PAGE3_OFFER_ANIMATION = buildAnimation(builder -> {
+        builder.rotationAxis(RotationAxis.POSITIVE_X);
+        builder.rotationPeriodTicks(40.0F);
+        builder.staticPitch(0.0F);
+        builder.bobAmplitude(0.1F);
+        builder.bobOffset(0.1F);
+        builder.bobPeriodTicks(20.0F);
+    });
+    private static final OfferDisplayAnimation PAGE4_OFFER_ANIMATION = buildAnimation(builder -> {
+        builder.rotationAxis(RotationAxis.POSITIVE_X);
+        builder.rotationPeriodTicks(40.0F);
+        builder.staticPitch(0.0F);
+        builder.bobAmplitude(0.1F);
+        builder.bobOffset(0.1F);
+        builder.bobPeriodTicks(20.0F);
+    });
 
-        private static final OfferDisplayAnimation[] OFFER_DISPLAY_ANIMATIONS = { DEFAULT_OFFER_ANIMATION,
-                        PAGE2_OFFER_ANIMATION, PAGE3_OFFER_ANIMATION, PAGE4_OFFER_ANIMATION, DEFAULT_OFFER_ANIMATION };
-
+    private static final OfferDisplayAnimation[] OFFER_DISPLAY_ANIMATIONS = { DEFAULT_OFFER_ANIMATION,
+            PAGE2_OFFER_ANIMATION, PAGE3_OFFER_ANIMATION, PAGE4_OFFER_ANIMATION, DEFAULT_OFFER_ANIMATION };
         private static PageLayout buildLayout(Consumer<PageLayout.Builder> configurer) {
                 PageLayout.Builder builder = PageLayout.defaults();
                 configurer.accept(builder);
@@ -233,7 +235,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private int activeTab = 0;
         private float selectedOfferAnimationStartTicks = Float.NaN;
         private ItemStack lastAnimatedOfferStack = ItemStack.EMPTY;
-        private float currentFrameDelta;
 
         public GardenShopScreen(GardenShopScreenHandler handler, PlayerInventory inventory, Text title) {
                 super(handler, inventory, title);
@@ -669,11 +670,29 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         animationTicks = 0.0F;
                 }
 
+                int displayLeft = originX + OFFER_DISPLAY_X;
+                int displayTop = originY + OFFER_DISPLAY_Y;
+                float centerX = displayLeft + (OFFER_DISPLAY_WIDTH / 2.0F);
+                float centerY = displayTop + (OFFER_DISPLAY_HEIGHT / 2.0F);
+
+            OfferDisplayAnimation animation = getOfferDisplayAnimation();
+            if (!ItemStack.areEqual(lastAnimatedOfferStack, resultStack)) {
+                resetOfferAnimation(resultStack);
+            }
+
+            if (Float.isNaN(selectedOfferAnimationStartTicks)) {
+                selectedOfferAnimationStartTicks = getAnimationTicks(0.0F);
+            }
+
+            float animationTicks = getAnimationTicks(delta) - selectedOfferAnimationStartTicks;
+            if (animationTicks < 0.0F) {
+                animationTicks = 0.0F;
+            }
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
-                RenderSystem.enableDepthTest();
-
-                matrices.translate(slotX + 8.0F + animation.offsetX(), slotY + 8.0F + animation.offsetY(),
+                context.enableScissor(displayLeft, displayTop, displayLeft + OFFER_DISPLAY_WIDTH,
+                                displayTop + OFFER_DISPLAY_HEIGHT);
+                matrices.translate(centerX + animation.offsetX(), centerY + animation.offsetY(),
                                 OFFER_DISPLAY_Z + animation.offsetZ());
 
                 float bobTranslation = animation.bobOffset();
@@ -685,8 +704,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         matrices.translate(0.0F, bobTranslation, 0.0F);
                 }
 
-                float scale = animation.scale();
-                matrices.scale(scale, scale, scale);
+                matrices.scale(animation.scale(), animation.scale(), animation.scale());
 
                 if (animation.rotationPeriodTicks() > 0.0F) {
                         float rotationDegrees = ((animationTicks + animation.rotationPhaseTicks())
@@ -704,19 +722,23 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(animation.staticRoll()));
                 }
 
-                MinecraftClient minecraftClient = client != null ? client : MinecraftClient.getInstance();
-                if (minecraftClient != null) {
-                        ItemRenderer itemRenderer = minecraftClient.getItemRenderer();
-                        BakedModel model = itemRenderer.getModel(stack, minecraftClient.world,
-                                        minecraftClient.player, 0);
-                        itemRenderer.renderItem(stack, ModelTransformationMode.GROUND, false, matrices,
-                                        context.getVertexConsumers(), LightmapTextureManager.MAX_LIGHT_COORDINATE,
-                                        OverlayTexture.DEFAULT_UV, model);
-                        context.draw();
-                }
-
                 RenderSystem.disableDepthTest();
                 matrices.pop();
+                context.disableScissor();
+        }
+
+        private void resetOfferAnimation(ItemStack stack) {
+                lastAnimatedOfferStack = stack.copy();
+                selectedOfferAnimationStartTicks = Float.NaN;
+        }
+
+
+        private float getAnimationTicks(float delta) {
+                MinecraftClient minecraftClient = client;
+                if (minecraftClient != null && minecraftClient.world != null) {
+                        return minecraftClient.world.getTime() + delta;
+                }
+                return Util.getMeasuringTimeMs() / 50.0F;
         }
 
         private void resetOfferAnimation(ItemStack stack) {
