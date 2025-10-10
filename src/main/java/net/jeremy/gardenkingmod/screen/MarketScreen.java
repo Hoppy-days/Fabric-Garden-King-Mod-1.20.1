@@ -42,7 +42,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
         private static final int SELL_BACKGROUND_U = 0;
         private static final int SELL_BACKGROUND_V = 0;
-        private static final int BACKGROUND_WIDTH = 174;
+        private static final int BACKGROUND_WIDTH = 175;
         private static final int BACKGROUND_HEIGHT = 220;
         private static final int PLAYER_INVENTORY_LABEL_Y = BACKGROUND_HEIGHT - 94;
         private static final int TITLE_LABEL_Y = 42;
@@ -52,9 +52,9 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int TAB_BUTTON_HEIGHT = 15;
         private static final int TAB_BUTTON_SPACING = 4;
         private static final int TAB_BUTTON_Y_OFFSET = 18;
-        private static final int SELL_TAB_TEXTURE_U = 6;
+        private static final int SELL_TAB_TEXTURE_U = 7;
         private static final int SELL_TAB_TEXTURE_V = 0;
-        private static final int BUY_TAB_TEXTURE_U = 45;
+        private static final int BUY_TAB_TEXTURE_U = 46;
         private static final int BUY_TAB_TEXTURE_V = 0;
         private static final int SCOREBOARD_BAND_TOP = 107;
         private static final int SCOREBOARD_BAND_BOTTOM = 138;
