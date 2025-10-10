@@ -1,9 +1,9 @@
 package net.jeremy.gardenkingmod.client.render;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
-import net.jeremy.gardenkingmod.block.GardenShopBlock;
-import net.jeremy.gardenkingmod.block.entity.GardenShopBlockEntity;
-import net.jeremy.gardenkingmod.client.model.GardenShopModel;
+import net.jeremy.gardenkingmod.block.GearShopBlock;
+import net.jeremy.gardenkingmod.block.entity.GearShopBlockEntity;
+import net.jeremy.gardenkingmod.client.model.GearShopModel;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -19,23 +19,23 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 
-public class GardenShopBlockEntityRenderer implements BlockEntityRenderer<GardenShopBlockEntity> {
+public class GearShopBlockEntityRenderer implements BlockEntityRenderer<GearShopBlockEntity> {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
-                        "textures/entity/shop/garden_shop.png");
+                        "textures/entity/shop/gear_shop.png");
 
-        private final GardenShopModel model;
+        private final GearShopModel model;
 
-        public GardenShopBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
-                this.model = new GardenShopModel(context.getLayerModelPart(GardenShopModel.LAYER_LOCATION));
+        public GearShopBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
+                this.model = new GearShopModel(context.getLayerModelPart(GearShopModel.LAYER_LOCATION));
         }
 
         @Override
-        public void render(GardenShopBlockEntity entity, float tickDelta, MatrixStack matrices,
+        public void render(GearShopBlockEntity entity, float tickDelta, MatrixStack matrices,
                         VertexConsumerProvider vertexConsumers, int light, int overlay) {
                 matrices.push();
                 matrices.translate(0.5f, 1.5f, 0.5f);
 
-                Direction facing = entity.getCachedState() != null ? entity.getCachedState().get(GardenShopBlock.FACING) : null;
+                Direction facing = entity.getCachedState() != null ? entity.getCachedState().get(GearShopBlock.FACING) : null;
                 if (facing != null) {
                         float yRotation = switch (facing) {
                                 case NORTH -> 0.0f;

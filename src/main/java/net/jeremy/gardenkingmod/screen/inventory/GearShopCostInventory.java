@@ -1,17 +1,17 @@
 package net.jeremy.gardenkingmod.screen.inventory;
 
-import net.jeremy.gardenkingmod.shop.GardenShopStackHelper;
+import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 
 /**
- * Specialized inventory for Garden Shop cost slots that allows storing stack
+ * Specialized inventory for Gear Shop cost slots that allows storing stack
  * counts beyond the vanilla stack limit so large offers can be displayed and
  * validated without splitting across multiple slots.
  */
-public class GardenShopCostInventory extends SimpleInventory {
+public class GearShopCostInventory extends SimpleInventory {
 
-    public GardenShopCostInventory(int size) {
+    public GearShopCostInventory(int size) {
         super(size);
     }
 
@@ -31,19 +31,19 @@ public class GardenShopCostInventory extends SimpleInventory {
             return ItemStack.EMPTY;
         }
 
-        int requestedCount = GardenShopStackHelper.getRequestedCount(stack);
+        int requestedCount = GearShopStackHelper.getRequestedCount(stack);
         if (requestedCount <= stack.getCount()) {
             return super.removeStack(slot, amount);
         }
 
         int removedCount = Math.min(amount, requestedCount);
         ItemStack removed = stack.copy();
-        GardenShopStackHelper.applyRequestedCount(removed, removedCount);
+        GearShopStackHelper.applyRequestedCount(removed, removedCount);
 
         int remaining = requestedCount - removedCount;
         if (remaining > 0) {
             ItemStack replacement = stack.copy();
-            GardenShopStackHelper.applyRequestedCount(replacement, remaining);
+            GearShopStackHelper.applyRequestedCount(replacement, remaining);
             setStack(slot, replacement);
         } else {
             setStack(slot, ItemStack.EMPTY);
@@ -60,7 +60,7 @@ public class GardenShopCostInventory extends SimpleInventory {
             return ItemStack.EMPTY;
         }
 
-        int requestedCount = GardenShopStackHelper.getRequestedCount(stack);
+        int requestedCount = GearShopStackHelper.getRequestedCount(stack);
         if (requestedCount <= 0) {
             return ItemStack.EMPTY;
         }

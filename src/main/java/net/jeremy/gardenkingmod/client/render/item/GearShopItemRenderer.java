@@ -2,7 +2,7 @@ package net.jeremy.gardenkingmod.client.render.item;
 
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.jeremy.gardenkingmod.GardenKingMod;
-import net.jeremy.gardenkingmod.client.model.GardenShopModel;
+import net.jeremy.gardenkingmod.client.model.GearShopModel;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -13,13 +13,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 
-public class GardenShopItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
+public class GearShopItemRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
         private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
-                        "textures/entity/shop/garden_shop.png");
+                        "textures/entity/shop/gear_shop.png");
 
-        private GardenShopModel model;
+        private GearShopModel model;
 
-        public GardenShopItemRenderer() {
+        public GearShopItemRenderer() {
         }
 
         @Override
@@ -54,8 +54,8 @@ public class GardenShopItemRenderer implements BuiltinItemRendererRegistry.Dynam
                 }
 
                 if (this.model == null) {
-                        this.model = new GardenShopModel(MinecraftClient.getInstance().getEntityModelLoader()
-                                        .getModelPart(GardenShopModel.LAYER_LOCATION));
+                        this.model = new GearShopModel(MinecraftClient.getInstance().getEntityModelLoader()
+                                        .getModelPart(GearShopModel.LAYER_LOCATION));
                 }
 
                 VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));

@@ -11,21 +11,21 @@ import net.minecraft.item.ItemStack;
  * Represents a single shop offer consisting of the resulting stack and a list
  * of ItemStacks required to purchase it.
  */
-public record GardenShopOffer(ItemStack resultStack, List<ItemStack> costStacks) {
+public record GearShopOffer(ItemStack resultStack, List<ItemStack> costStacks) {
 
-    public GardenShopOffer {
+    public GearShopOffer {
         Objects.requireNonNull(resultStack, "resultStack");
         Objects.requireNonNull(costStacks, "costStacks");
         resultStack = resultStack.copy();
         costStacks = toImmutableCostList(costStacks);
     }
 
-    public static GardenShopOffer of(ItemStack result, ItemStack... costs) {
-        return new GardenShopOffer(result, Arrays.asList(costs));
+    public static GearShopOffer of(ItemStack result, ItemStack... costs) {
+        return new GearShopOffer(result, Arrays.asList(costs));
     }
 
-    public static GardenShopOffer of(ItemStack result, List<ItemStack> costs) {
-        return new GardenShopOffer(result, costs);
+    public static GearShopOffer of(ItemStack result, List<ItemStack> costs) {
+        return new GearShopOffer(result, costs);
     }
 
     private static List<ItemStack> toImmutableCostList(List<ItemStack> source) {
