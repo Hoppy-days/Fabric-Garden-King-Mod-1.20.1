@@ -294,20 +294,13 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         MatrixStack matrices = context.getMatrices();
                         matrices.push();
                         float scale = BUY_LABEL_SCALE;
-                        double labelX = layout.buyLabelX();
-                        double labelY = layout.buyLabelY();
-                        if (scale != 1.0F) {
-                                float textWidth = textRenderer.getWidth(buyText);
-                                float textHeight = textRenderer.fontHeight;
-                                labelX += (1.0F - scale) * textWidth / 2.0F;
-                                labelY += (1.0F - scale) * textHeight / 2.0F;
-                                matrices.translate(labelX, labelY, 0.0F);
-                                matrices.scale(scale, scale, 1.0F);
-                                context.drawText(textRenderer, buyText, 0, 0, 0xFFFFFF, false);
-                        } else {
-                                context.drawText(textRenderer, buyText, layout.buyLabelX(), layout.buyLabelY(), 0xFFFFFF,
-                                                false);
-                        }
+                        float textWidth = textRenderer.getWidth(buyText);
+                        float textHeight = textRenderer.fontHeight;
+                        double adjustedX = layout.buyLabelX() + (1.0F - scale) * textWidth / 2.0F;
+                        double adjustedY = layout.buyLabelY() + (1.0F - scale) * textHeight / 2.0F;
+                        matrices.translate(adjustedX, adjustedY, 0.0F);
+                        matrices.scale(scale, scale, 1.0F);
+                        context.drawText(textRenderer, buyText, 0, 0, 0xFFFFFF, false);
                         matrices.pop();
                 }
         }
@@ -412,7 +405,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         return super.mouseScrolled(mouseX, mouseY, amount);
                 }
 
-                float scrollDelta = (float) (amount / (double) Math.max(maxScrollSteps, 1));
+                // At this point {@link #canScroll()} has already short-circuited when
+                // maxScrollSteps == 0, so dividing by maxScrollSteps is safe.
+                float scrollDelta = (float) (amount / (double) maxScrollSteps);
                 setScrollAmount(scrollAmount - scrollDelta);
                 return true;
         }
@@ -830,7 +825,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 float clampedAmount = MathHelper.clamp(amount, 0.0F, 1.0F);
                 int calculatedOffset = MathHelper.floor(clampedAmount * maxScrollSteps + 0.5F);
                 scrollOffset = MathHelper.clamp(calculatedOffset, 0, maxScrollSteps);
-                scrollAmount = maxScrollSteps > 0 ? (float) scrollOffset / (float) maxScrollSteps : 0.0F;
+                // maxScrollSteps cannot be zero here because the method returns early
+                // when {@link #canScroll()} is false.
+                scrollAmount = (float) scrollOffset / (float) maxScrollSteps;
         }
 
         private boolean canScroll() {
@@ -1132,7 +1129,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
 
                 int row = (int) (localY / OFFER_ENTRY_HEIGHT);
-                if (row < 0 || row >= MAX_VISIBLE_OFFERS) {
+                if (row >= MAX_VISIBLE_OFFERS) {
                         return -1;
                 }
 
@@ -1156,7 +1153,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
 
                 int row = relativeMouseY / OFFER_ENTRY_HEIGHT;
-                if (row < 0 || row >= MAX_VISIBLE_OFFERS) {
+                if (row >= MAX_VISIBLE_OFFERS) {
                         return Optional.empty();
                 }
 
