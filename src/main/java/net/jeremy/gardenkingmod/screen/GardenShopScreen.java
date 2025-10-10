@@ -130,7 +130,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final float RESULT_SLOT_ROTATION_PERIOD_TICKS = 60.0F;
         private static final float RESULT_SLOT_ROTATION_PHASE_TICKS = 0.0F;
         private static final RotationAxis RESULT_SLOT_ROTATION_AXIS = RotationAxis.POSITIVE_Y;
-        private static final float RESULT_SLOT_STATIC_PITCH = 20.0F;
+        private static final float RESULT_SLOT_STATIC_PITCH = 0.0F;
         private static final float RESULT_SLOT_STATIC_YAW = 0.0F;
         private static final float RESULT_SLOT_STATIC_ROLL = 0.0F;
         private static final float RESULT_SLOT_BOB_AMPLITUDE = 1.0F;
@@ -175,7 +175,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 int BUY_BUTTON_OFFSET_Y = 94;
                 int BUY_LABEL_X = 163;
                 int BUY_LABEL_Y = 97;
-                /* Offer list placement */
+                final float DEFAULT_RESULT_SLOT_ANIMATION_SCALE = 2.35F;
+
+            /* Offer list placement */
                 builder.offerList(OFFER_LIST_X, OFFER_LIST_Y);
                 /* Cost stack spacing */
                 builder.costStacks(OFFER_COST_ITEM_OFFSET_X, OFFER_COST_ITEM_SPACING);
