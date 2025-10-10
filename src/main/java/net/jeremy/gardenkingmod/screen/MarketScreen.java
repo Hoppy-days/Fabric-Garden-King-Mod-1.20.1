@@ -51,7 +51,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int TAB_BUTTON_WIDTH = 35;
         private static final int TAB_BUTTON_HEIGHT = 15;
         private static final int TAB_BUTTON_SPACING = 4;
-        private static final int TAB_BUTTON_Y_OFFSET = 2;
+        private static final int TAB_BUTTON_Y_OFFSET = 3;
+        private static final int TAB_BUTTON_TEXT_PADDING_X = 4;
         private static final int SELL_TAB_TEXT_X = 15;
         private static final int BUY_TAB_TEXT_X = 54;
         private static final int SCOREBOARD_BAND_TOP = 107;
@@ -316,13 +317,13 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         }
 
         private void addTabButtons() {
-                int totalWidth = TAB_BUTTON_WIDTH * 2 + TAB_BUTTON_SPACING;
-                int startX = x + (backgroundWidth - totalWidth) / 2;
                 int buttonY = y + TAB_BUTTON_Y_OFFSET;
-                sellTabButton = addDrawableChild(new TabButton(startX, buttonY, Tab.SELL, getTabLabel(Tab.SELL),
+                int sellButtonX = x + SELL_TAB_TEXT_X - TAB_BUTTON_TEXT_PADDING_X;
+                int buyButtonX = x + BUY_TAB_TEXT_X - TAB_BUTTON_TEXT_PADDING_X;
+                sellTabButton = addDrawableChild(new TabButton(sellButtonX, buttonY, Tab.SELL, getTabLabel(Tab.SELL),
                                 () -> setActiveTab(Tab.SELL)));
-                buyTabButton = addDrawableChild(new TabButton(startX + TAB_BUTTON_WIDTH + TAB_BUTTON_SPACING, buttonY,
-                                Tab.BUY, getTabLabel(Tab.BUY), () -> setActiveTab(Tab.BUY)));
+                buyTabButton = addDrawableChild(new TabButton(buyButtonX, buttonY, Tab.BUY, getTabLabel(Tab.BUY),
+                                () -> setActiveTab(Tab.BUY)));
         }
 
         private void setActiveTab(Tab tab) {
@@ -355,9 +356,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
                 @Override
                 public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
-                        int textX = MarketScreen.this.x + (tab == Tab.SELL ? SELL_TAB_TEXT_X : BUY_TAB_TEXT_X);
-                        int textY = MarketScreen.this.y + TAB_BUTTON_Y_OFFSET
-                                        + (TAB_BUTTON_HEIGHT - textRenderer.fontHeight) / 2;
+                        int textX = getX() + TAB_BUTTON_TEXT_PADDING_X;
+                        int textY = getY() + (TAB_BUTTON_HEIGHT - textRenderer.fontHeight) / 2;
                         boolean selected = tab == activeTab;
                         int baseColor = getMessage().getStyle().getColor() != null
                                         ? getMessage().getStyle().getColor().getRgb()
