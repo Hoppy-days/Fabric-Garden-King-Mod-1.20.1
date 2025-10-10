@@ -84,11 +84,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int DEFAULT_COST_SLOT_VALUE_ANCHOR_X = 8;
         private static final int DEFAULT_COST_SLOT_VALUE_OFFSET_Y = 30;
         private static final float DEFAULT_COST_SLOT_TEXT_SCALE = 0.6F;
-        private static final int DEFAULT_COST_TEXT_LABEL_ANCHOR_X = 8;
-        private static final int DEFAULT_COST_TEXT_LABEL_OFFSET_Y = 20;
-        private static final int DEFAULT_COST_TEXT_VALUE_ANCHOR_X = 8;
-        private static final int DEFAULT_COST_TEXT_VALUE_OFFSET_Y = 30;
-        private static final float DEFAULT_COST_TEXT_SCALE = 0.6F;
 
         private static final PageLayout DEFAULT_PAGE_LAYOUT = buildLayout(builder -> {
         });
@@ -820,9 +815,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         int resultItemOffsetX, int arrowOffsetX, int arrowOffsetY, int buyButtonOffsetX,
                         int buyButtonOffsetY, int buyButtonWidth, int buyButtonHeight, int buyLabelX, int buyLabelY,
                         int costSlotLabelAnchorOffsetX, int costSlotLabelOffsetY, int costSlotValueAnchorOffsetX,
-                        int costSlotValueOffsetY, float costSlotTextScale, int costTextLabelAnchorOffsetX,
-                        int costTextLabelOffsetY, int costTextValueAnchorOffsetX, int costTextValueOffsetY,
-                        float costTextScale) {
+                        int costSlotValueOffsetY, float costSlotTextScale) {
                 static Builder defaults() {
                         return new Builder()
                                         .offerList(OFFER_LIST_X, OFFER_LIST_Y)
@@ -830,9 +823,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                         .costSlotText(DEFAULT_COST_SLOT_LABEL_ANCHOR_X, DEFAULT_COST_SLOT_LABEL_OFFSET_Y,
                                                         DEFAULT_COST_SLOT_VALUE_ANCHOR_X, DEFAULT_COST_SLOT_VALUE_OFFSET_Y,
                                                         DEFAULT_COST_SLOT_TEXT_SCALE)
-                                        .costText(DEFAULT_COST_TEXT_LABEL_ANCHOR_X, DEFAULT_COST_TEXT_LABEL_OFFSET_Y,
-                                                        DEFAULT_COST_TEXT_VALUE_ANCHOR_X, DEFAULT_COST_TEXT_VALUE_OFFSET_Y,
-                                                        DEFAULT_COST_TEXT_SCALE)
                                         .resultItem(OFFER_RESULT_ITEM_OFFSET_X)
                                         .arrow(OFFER_ARROW_OFFSET_X, OFFER_ARROW_OFFSET_Y)
                                         .buyButton(BUY_BUTTON_OFFSET_X, BUY_BUTTON_OFFSET_Y, BUY_BUTTON_WIDTH,
@@ -859,11 +849,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         private int costSlotValueAnchorOffsetX;
                         private int costSlotValueOffsetY;
                         private float costSlotTextScale;
-                        private int costTextLabelAnchorOffsetX;
-                        private int costTextLabelOffsetY;
-                        private int costTextValueAnchorOffsetX;
-                        private int costTextValueOffsetY;
-                        private float costTextScale;
 
                         Builder offerList(int x, int y) {
                                 this.offerListX = x;
@@ -884,16 +869,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 this.costSlotValueAnchorOffsetX = valueAnchorOffsetX;
                                 this.costSlotValueOffsetY = valueOffsetY;
                                 this.costSlotTextScale = scale;
-                                return this;
-                        }
-
-                        Builder costText(int labelAnchorOffsetX, int labelOffsetY, int valueAnchorOffsetX,
-                                        int valueOffsetY, float scale) {
-                                this.costTextLabelAnchorOffsetX = labelAnchorOffsetX;
-                                this.costTextLabelOffsetY = labelOffsetY;
-                                this.costTextValueAnchorOffsetX = valueAnchorOffsetX;
-                                this.costTextValueOffsetY = valueOffsetY;
-                                this.costTextScale = scale;
                                 return this;
                         }
 
@@ -927,9 +902,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                                 resultItemOffsetX, arrowOffsetX, arrowOffsetY, buyButtonOffsetX,
                                                 buyButtonOffsetY, buyButtonWidth, buyButtonHeight, buyLabelX, buyLabelY,
                                                 costSlotLabelAnchorOffsetX, costSlotLabelOffsetY,
-                                                costSlotValueAnchorOffsetX, costSlotValueOffsetY, costSlotTextScale,
-                                                costTextLabelAnchorOffsetX, costTextLabelOffsetY,
-                                                costTextValueAnchorOffsetX, costTextValueOffsetY, costTextScale);
+                                                costSlotValueAnchorOffsetX, costSlotValueOffsetY, costSlotTextScale);
                         }
                 }
         }
