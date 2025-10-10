@@ -14,6 +14,11 @@ import net.jeremy.gardenkingmod.screen.inventory.GardenShopCostInventory;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
@@ -300,19 +305,25 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 }
         }
 
+        private float lastRenderDelta;
+
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+                lastRenderDelta = delta;
                 renderBackground(context);
+                ResultSlotSnapshot suppressedResult = suppressVanillaResultSlot();
                 List<CostSlotSnapshot> suppressedCounts = suppressVanillaCostCounts();
                 try {
                         super.render(context, mouseX, mouseY, delta);
                 } finally {
                         restoreVanillaCostCounts(suppressedCounts);
+                        restoreVanillaResultSlot(suppressedResult);
                 }
-                drawAnimatedResultSlot(context, delta);
+                drawAnimatedResultSlot(context);
                 drawCostSlotOverlays(context);
                 drawMouseoverTooltip(context, mouseX, mouseY);
         }
+
 
         private void drawCostSlotOverlays(DrawContext context) {
                 PageLayout layout = getPageLayout();
@@ -503,6 +514,32 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 matrices.pop();
         }
 
+        private ResultSlotSnapshot suppressVanillaResultSlot() {
+                Slot resultSlot = getResultSlot();
+                if (resultSlot == null) {
+                        return null;
+                }
+
+                ItemStack stack = resultSlot.getStack();
+                if (stack.isEmpty()) {
+                        return null;
+                }
+
+                int originalCount = stack.getCount();
+                stack.setCount(0);
+                return new ResultSlotSnapshot(resultSlot, stack, originalCount);
+        }
+
+        private void restoreVanillaResultSlot(ResultSlotSnapshot snapshot) {
+                if (snapshot == null) {
+                        return;
+                }
+
+                if (snapshot.slot().getStack() == snapshot.stack()) {
+                        snapshot.stack().setCount(snapshot.originalCount());
+                }
+        }
+
         private List<CostSlotSnapshot> suppressVanillaCostCounts() {
                 List<CostSlotSnapshot> modified = new ArrayList<>();
                 for (Slot slot : handler.slots) {
@@ -531,6 +568,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 stack.setCount(snapshot.originalCount());
                         }
                 }
+        }
+
+        private record ResultSlotSnapshot(Slot slot, ItemStack stack, int originalCount) {
         }
 
         private record CostSlotSnapshot(Slot slot, int originalCount) {
@@ -601,9 +641,9 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                                 TEXTURE_WIDTH, TEXTURE_HEIGHT);
         }
 
-        private void drawAnimatedResultSlot(DrawContext context, float delta) {
+        private void drawAnimatedResultSlot(DrawContext context) {
                 Slot resultSlot = getResultSlot();
-                if (resultSlot == null) {
+                if (resultSlot == null || !resultSlot.isEnabled()) {
                         return;
                 }
 
@@ -623,13 +663,13 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         resultSlotAnimationStartTicks = getAnimationTicks(0.0F);
                 }
 
-                float animationTicks = getAnimationTicks(delta) - resultSlotAnimationStartTicks;
+                float animationTicks = getAnimationTicks(lastRenderDelta) - resultSlotAnimationStartTicks;
                 if (animationTicks < 0.0F) {
                         animationTicks = 0.0F;
                 }
 
-                int slotLeft = this.x + handler.getResultSlotX();
-                int slotTop = this.y + handler.getResultSlotY();
+                int slotLeft = this.x + resultSlot.x;
+                int slotTop = this.y + resultSlot.y;
                 float slotCenterX = slotLeft + 8.0F;
                 float slotCenterY = slotTop + 8.0F;
 
@@ -648,8 +688,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         matrices.translate(0.0F, bobTranslation, 0.0F);
                 }
 
-                matrices.scale(animation.scale(), animation.scale(), animation.scale());
-
                 if (animation.rotationPeriodTicks() > 0.0F) {
                         float rotationDegrees = ((animationTicks + animation.rotationPhaseTicks())
                                         / animation.rotationPeriodTicks()) * 360.0F;
@@ -666,10 +704,28 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(animation.staticRoll()));
                 }
 
-                context.drawItem(stack, -8, -8);
+                float animationScale = animation.scale();
+                matrices.scale(animationScale, animationScale, animationScale);
+                matrices.scale(16.0F, -16.0F, 16.0F);
+
+                drawResultStack(context, stack);
                 matrices.pop();
 
                 context.drawItemInSlot(textRenderer, stack, slotLeft, slotTop);
+        }
+
+        private void drawResultStack(DrawContext context, ItemStack stack) {
+                MinecraftClient minecraftClient = client;
+                if (minecraftClient == null) {
+                        return;
+                }
+
+                ItemRenderer renderer = minecraftClient.getItemRenderer();
+                BakedModel model = renderer.getModel(stack, null, null, 0);
+                renderer.renderItem(stack, ModelTransformationMode.GUI, false, context.getMatrices(),
+                                context.getVertexConsumers(), LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                                OverlayTexture.DEFAULT_UV, model);
+                context.draw();
         }
 
         private Slot getResultSlot() {
