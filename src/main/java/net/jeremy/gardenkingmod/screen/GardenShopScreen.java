@@ -93,7 +93,50 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int DEFAULT_COST_SLOT_VALUE_OFFSET_Y = 30;
         private static final float DEFAULT_COST_SLOT_TEXT_SCALE = 0.6F;
 
+        private static final int TAB_X = 0;
+        private static final int TAB_WIDTH = 24;
+        private static final int TAB_HEIGHT = 28;
+        private static final int TAB_ICON_SIZE = 16;
+        private static final int TAB_ICON_OFFSET_X = (TAB_WIDTH - TAB_ICON_SIZE) / 2 + 1;
+        private static final int TAB_ICON_OFFSET_Y = (TAB_HEIGHT - TAB_ICON_SIZE) / 2;
+        private static final int TAB_HOVER_U = 301;
+        private static final int TAB_HOVER_V = 52;
+        private static final TabDefinition[] TAB_DEFINITIONS = {
+                new TabDefinition(16, 30, 205),
+                new TabDefinition(46, 46, 205),
+                new TabDefinition(76, 62, 205),
+                new TabDefinition(106, 78, 205),
+                new TabDefinition(136, 94, 205) };
+
+        private static final int SCROLLBAR_OFFSET_X = 118;
+        private static final int SCROLLBAR_OFFSET_Y = 17;
+        private static final int SCROLLBAR_TRACK_WIDTH = 6;
+        private static final int SCROLLBAR_TRACK_HEIGHT = OFFER_LIST_HEIGHT;
+        private static final int SCROLLBAR_KNOB_U = 24;
+        private static final int SCROLLBAR_KNOB_V = 207;
+        private static final int SCROLLBAR_KNOB_WIDTH = 6;
+        private static final int SCROLLBAR_KNOB_HEIGHT = 27;
+
+        private static final int SELECTED_HIGHLIGHT_COLOR = 0x40FFFFFF;
+
+        private static final float OFFER_DISPLAY_SCALE = 3.25F;
+        private static final float OFFER_ROTATION_SPEED = 30.0F;
+        private static final float OFFER_ROTATION_PERIOD_TICKS = 20.0F * (360.0F / OFFER_ROTATION_SPEED);
         private static final float DEFAULT_RESULT_SLOT_ANIMATION_SCALE = 1.35F;
+        private static final float RESULT_SLOT_ANIMATION_OFFSET_X = 0.0F;
+        private static final float RESULT_SLOT_ANIMATION_OFFSET_Y = -1.5F;
+        private static final float RESULT_SLOT_ANIMATION_OFFSET_Z = 0.0F;
+        private static final float RESULT_SLOT_BASE_Z = 200.0F;
+        private static final float RESULT_SLOT_ROTATION_PERIOD_TICKS = 60.0F;
+        private static final float RESULT_SLOT_ROTATION_PHASE_TICKS = 0.0F;
+        private static final RotationAxis RESULT_SLOT_ROTATION_AXIS = RotationAxis.POSITIVE_Y;
+        private static final float RESULT_SLOT_STATIC_PITCH = 20.0F;
+        private static final float RESULT_SLOT_STATIC_YAW = 0.0F;
+        private static final float RESULT_SLOT_STATIC_ROLL = 0.0F;
+        private static final float RESULT_SLOT_BOB_AMPLITUDE = 1.0F;
+        private static final float RESULT_SLOT_BOB_OFFSET = 0.0F;
+        private static final float RESULT_SLOT_BOB_PERIOD_TICKS = 40.0F;
+        private static final float RESULT_SLOT_BOB_PHASE_TICKS = 0.0F;
 
         private static final PageLayout DEFAULT_PAGE_LAYOUT = buildLayout(builder -> {
                 builder.resultSlotAnimationScale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE);
@@ -166,25 +209,6 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 return builder.build();
         }
 
-        private static final float OFFER_DISPLAY_SCALE = 3.25F;
-        private static final float OFFER_ROTATION_SPEED = 30.0F;
-        private static final float OFFER_ROTATION_PERIOD_TICKS = 20.0F * (360.0F / OFFER_ROTATION_SPEED);
-
-        private static final float RESULT_SLOT_ANIMATION_OFFSET_X = 0.0F;
-        private static final float RESULT_SLOT_ANIMATION_OFFSET_Y = -1.5F;
-        private static final float RESULT_SLOT_ANIMATION_OFFSET_Z = 0.0F;
-        private static final float RESULT_SLOT_BASE_Z = 200.0F;
-        private static final float RESULT_SLOT_ROTATION_PERIOD_TICKS = 60.0F;
-        private static final float RESULT_SLOT_ROTATION_PHASE_TICKS = 0.0F;
-        private static final RotationAxis RESULT_SLOT_ROTATION_AXIS = RotationAxis.POSITIVE_Y;
-        private static final float RESULT_SLOT_STATIC_PITCH = 20.0F;
-        private static final float RESULT_SLOT_STATIC_YAW = 0.0F;
-        private static final float RESULT_SLOT_STATIC_ROLL = 0.0F;
-        private static final float RESULT_SLOT_BOB_AMPLITUDE = 1.0F;
-        private static final float RESULT_SLOT_BOB_OFFSET = 0.0F;
-        private static final float RESULT_SLOT_BOB_PERIOD_TICKS = 40.0F;
-        private static final float RESULT_SLOT_BOB_PHASE_TICKS = 0.0F;
-
         private static final OfferDisplayAnimation RESULT_SLOT_ANIMATION = buildAnimation(builder -> {
                 builder.scale(DEFAULT_RESULT_SLOT_ANIMATION_SCALE);
                 builder.offset(RESULT_SLOT_ANIMATION_OFFSET_X, RESULT_SLOT_ANIMATION_OFFSET_Y,
@@ -201,31 +225,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
                 builder.bobPhaseTicks(RESULT_SLOT_BOB_PHASE_TICKS);
         });
 
-        private static final int TAB_X = 0;
-        private static final int TAB_WIDTH = 24;
-        private static final int TAB_HEIGHT = 28;
-        private static final int TAB_ICON_SIZE = 16;
-        private static final int TAB_ICON_OFFSET_X = (TAB_WIDTH - TAB_ICON_SIZE) / 2 + 1;
-        private static final int TAB_ICON_OFFSET_Y = (TAB_HEIGHT - TAB_ICON_SIZE) / 2;
-        private static final int TAB_HOVER_U = 301;
-        private static final int TAB_HOVER_V = 52;
-        private static final TabDefinition[] TAB_DEFINITIONS = {
-                        new TabDefinition(16, 30, 205),
-                        new TabDefinition(46, 46, 205),
-                        new TabDefinition(76, 62, 205),
-                        new TabDefinition(106, 78, 205),
-                        new TabDefinition(136, 94, 205) };
 
-        private static final int SCROLLBAR_OFFSET_X = 118;
-        private static final int SCROLLBAR_OFFSET_Y = 17;
-        private static final int SCROLLBAR_TRACK_WIDTH = 6;
-        private static final int SCROLLBAR_TRACK_HEIGHT = OFFER_LIST_HEIGHT;
-        private static final int SCROLLBAR_KNOB_U = 24;
-        private static final int SCROLLBAR_KNOB_V = 207;
-        private static final int SCROLLBAR_KNOB_WIDTH = 6;
-        private static final int SCROLLBAR_KNOB_HEIGHT = 27;
-
-        private static final int SELECTED_HIGHLIGHT_COLOR = 0x40FFFFFF;
 
         private int maxScrollSteps;
         private int scrollOffset;
