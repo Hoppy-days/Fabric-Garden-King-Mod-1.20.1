@@ -83,15 +83,15 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final int OFFER_ARROW_HEIGHT = 9;
         private static final int OFFER_ARROW_OFFSET_X = 53;
         private static final int OFFER_ARROW_OFFSET_Y = 6;
-        private static final int COST_TEXT_COLOR = 0xFF0000;
+        private static final int COST_TEXT_COLOR = 0xFFFFFF;
         private static final String COST_LABEL_TRANSLATION_KEY = "screen.gardenkingmod.garden_shop.cost_label";
             //DEFAULT_COST_SLOT_LABEL is the word "COST"
-        private static final int DEFAULT_COST_SLOT_LABEL_ANCHOR_X = 8;
+        private static final int DEFAULT_COST_SLOT_LABEL_ANCHOR_X = 9;
         private static final int DEFAULT_COST_SLOT_LABEL_OFFSET_Y = 20;
             //DEFAULT_COST_SLOT_VALUE is the cost item count
-        private static final int DEFAULT_COST_SLOT_VALUE_ANCHOR_X = 8;
-        private static final int DEFAULT_COST_SLOT_VALUE_OFFSET_Y = 30;
-        private static final float DEFAULT_COST_SLOT_TEXT_SCALE = 0.6F;
+        private static final int DEFAULT_COST_SLOT_VALUE_ANCHOR_X = 9;
+        private static final int DEFAULT_COST_SLOT_VALUE_OFFSET_Y = 29;
+        private static final float DEFAULT_COST_SLOT_TEXT_SCALE = 0.8F;
 
         private static final int TAB_X = 0;
         private static final int TAB_WIDTH = 24;
@@ -127,7 +127,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final float RESULT_SLOT_ANIMATION_OFFSET_Y = -1.5F;
         private static final float RESULT_SLOT_ANIMATION_OFFSET_Z = 0.0F;
         private static final float RESULT_SLOT_BASE_Z = 200.0F;
-        private static final float RESULT_SLOT_ROTATION_PERIOD_TICKS = 60.0F;
+        private static final float RESULT_SLOT_ROTATION_PERIOD_TICKS = 90.0F;
         private static final float RESULT_SLOT_ROTATION_PHASE_TICKS = 0.0F;
         private static final RotationAxis RESULT_SLOT_ROTATION_AXIS = RotationAxis.POSITIVE_Y;
         private static final float RESULT_SLOT_STATIC_PITCH = 0.0F;
@@ -135,7 +135,7 @@ public class GardenShopScreen extends HandledScreen<GardenShopScreenHandler> {
         private static final float RESULT_SLOT_STATIC_ROLL = 0.0F;
         private static final float RESULT_SLOT_BOB_AMPLITUDE = 1.0F;
         private static final float RESULT_SLOT_BOB_OFFSET = 0.0F;
-        private static final float RESULT_SLOT_BOB_PERIOD_TICKS = 40.0F;
+        private static final float RESULT_SLOT_BOB_PERIOD_TICKS = 20.0F;
         private static final float RESULT_SLOT_BOB_PHASE_TICKS = 0.0F;
 
         private static final PageLayout DEFAULT_PAGE_LAYOUT = buildLayout(builder -> {
