@@ -5,18 +5,28 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.client.gui.toast.SaleResultToast;
 import net.jeremy.gardenkingmod.shop.GearShopOffer;
 import net.jeremy.gardenkingmod.shop.GardenMarketOfferManager;
 import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.narration.NarrationPart;
+import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
@@ -27,7 +37,11 @@ import net.minecraft.text.Text;
 import net.minecraft.text.Texts;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.slot.Slot;
 
 public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final Identifier SELL_TEXTURE = new Identifier(GardenKingMod.MOD_ID,
@@ -80,6 +94,49 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_OFFER_ARROW_HEIGHT = 9;
         private static final int SELECTED_HIGHLIGHT_COLOR = 0x40FFFFFF;
 
+        private static final int COST_TEXT_COLOR = 0xFFFFFF;
+        private static final String COST_LABEL_TRANSLATION_KEY = "screen.gardenkingmod.gear_shop.cost_label";
+        private static final int COST_SLOT_LABEL_ANCHOR_X = 9;
+        private static final int COST_SLOT_LABEL_OFFSET_Y = 20;
+        private static final int COST_SLOT_VALUE_ANCHOR_X = 9;
+        private static final int COST_SLOT_VALUE_OFFSET_Y = 29;
+        private static final float COST_SLOT_TEXT_SCALE = 0.8F;
+
+        private static final float OFFER_DISPLAY_SCALE = 3.25F;
+        private static final float OFFER_ROTATION_SPEED = 30.0F;
+        private static final float OFFER_ROTATION_PERIOD_TICKS = 20.0F * (360.0F / OFFER_ROTATION_SPEED);
+        private static final float RESULT_SLOT_BASE_Z = 200.0F;
+        private static final float RESULT_SLOT_ANIMATION_SCALE = 1.0F;
+        private static final float RESULT_SLOT_ANIMATION_OFFSET_X = 0.0F;
+        private static final float RESULT_SLOT_ANIMATION_OFFSET_Y = -1.5F;
+        private static final float RESULT_SLOT_ANIMATION_OFFSET_Z = 0.0F;
+        private static final float RESULT_SLOT_ROTATION_PERIOD_TICKS = 90.0F;
+        private static final float RESULT_SLOT_ROTATION_PHASE_TICKS = 0.0F;
+        private static final RotationAxis RESULT_SLOT_ROTATION_AXIS = RotationAxis.POSITIVE_Y;
+        private static final float RESULT_SLOT_STATIC_PITCH = 0.0F;
+        private static final float RESULT_SLOT_STATIC_YAW = 0.0F;
+        private static final float RESULT_SLOT_STATIC_ROLL = 0.0F;
+        private static final float RESULT_SLOT_BOB_AMPLITUDE = 1.0F;
+        private static final float RESULT_SLOT_BOB_OFFSET = 0.0F;
+        private static final float RESULT_SLOT_BOB_PERIOD_TICKS = 20.0F;
+        private static final float RESULT_SLOT_BOB_PHASE_TICKS = 0.0F;
+
+        private static final OfferDisplayAnimation RESULT_SLOT_ANIMATION = buildAnimation(builder -> {
+                builder.scale(RESULT_SLOT_ANIMATION_SCALE);
+                builder.offset(RESULT_SLOT_ANIMATION_OFFSET_X, RESULT_SLOT_ANIMATION_OFFSET_Y,
+                                RESULT_SLOT_ANIMATION_OFFSET_Z);
+                builder.rotationAxis(RESULT_SLOT_ROTATION_AXIS);
+                builder.rotationPeriodTicks(RESULT_SLOT_ROTATION_PERIOD_TICKS);
+                builder.rotationPhaseTicks(RESULT_SLOT_ROTATION_PHASE_TICKS);
+                builder.staticPitch(RESULT_SLOT_STATIC_PITCH);
+                builder.staticYaw(RESULT_SLOT_STATIC_YAW);
+                builder.staticRoll(RESULT_SLOT_STATIC_ROLL);
+                builder.bobAmplitude(RESULT_SLOT_BOB_AMPLITUDE);
+                builder.bobOffset(RESULT_SLOT_BOB_OFFSET);
+                builder.bobPeriodTicks(RESULT_SLOT_BOB_PERIOD_TICKS);
+                builder.bobPhaseTicks(RESULT_SLOT_BOB_PHASE_TICKS);
+        });
+
         private static final class BuyBackground {
                 private static final int TEXTURE_WIDTH = 512;
                 private static final int TEXTURE_HEIGHT = 256;
@@ -117,6 +174,9 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private boolean scrollbarDragging;
         private int selectedOffer = -1;
         private int lastOfferCount = -1;
+        private float lastRenderDelta;
+        private float resultSlotAnimationStartTicks = Float.NaN;
+        private ItemStack lastAnimatedResultSlotStack = ItemStack.EMPTY;
 
         public MarketScreen(MarketScreenHandler handler, PlayerInventory inventory, Text title) {
                 super(handler, inventory, title);
@@ -168,6 +228,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+                lastRenderDelta = delta;
                 renderBackground(context);
                 if (sellButton != null) {
                         sellButton.visible = activeTab == Tab.SELL;
@@ -176,7 +237,20 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 if (activeTab == Tab.BUY) {
                         updateBuyScrollLimits();
                 }
-                super.render(context, mouseX, mouseY, delta);
+                ResultSlotSnapshot suppressedResult = activeTab == Tab.BUY ? suppressVanillaResultSlot() : null;
+                List<CostSlotSnapshot> suppressedCounts = activeTab == Tab.BUY ? suppressVanillaCostCounts() : List.of();
+                try {
+                        super.render(context, mouseX, mouseY, delta);
+                } finally {
+                        if (activeTab == Tab.BUY) {
+                                restoreVanillaCostCounts(suppressedCounts);
+                                restoreVanillaResultSlot(suppressedResult);
+                        }
+                }
+                if (activeTab == Tab.BUY) {
+                        drawAnimatedResultSlot(context);
+                        drawCostSlotOverlays(context);
+                }
                 drawMouseoverTooltip(context, mouseX, mouseY);
         }
 
@@ -348,6 +422,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 this.activeTab = tab;
                 if (this.handler != null) {
                         this.handler.setMarketSlotsEnabled(tab == Tab.SELL);
+                        this.handler.setBuySlotsEnabled(tab == Tab.BUY);
                         sendTabChangeToServer(tab);
                 }
                 updateTabButtonState();
@@ -453,6 +528,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 setScrollAmount(0.0F);
                 lastOfferCount = -1;
                 updateBuyScrollLimits();
+                sendOfferSelectionToServer(-1);
         }
 
         private void drawBuyLabels(DrawContext context) {
@@ -670,7 +746,262 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         }
 
         private void selectOffer(int offerIndex) {
-                selectedOffer = MathHelper.clamp(offerIndex, -1, getBuyOffers().size() - 1);
+                int clamped = MathHelper.clamp(offerIndex, -1, getBuyOffers().size() - 1);
+                if (this.selectedOffer != clamped) {
+                        this.selectedOffer = clamped;
+                        sendOfferSelectionToServer(clamped);
+                } else if (clamped >= 0) {
+                        sendOfferSelectionToServer(clamped);
+                }
+        }
+
+        private void sendOfferSelectionToServer(int offerIndex) {
+                if (handler == null || client == null || client.interactionManager == null) {
+                        return;
+                }
+
+                int buttonId = MarketScreenHandler.encodeSelectBuyOfferButtonId(offerIndex);
+                client.interactionManager.clickButton(handler.syncId, buttonId);
+        }
+
+        private void drawCostSlotOverlays(DrawContext context) {
+                if (handler == null) {
+                        return;
+                }
+
+                String label = Text.translatable(COST_LABEL_TRANSLATION_KEY).getString();
+                for (Slot slot : handler.slots) {
+                        if (handler.isCostSlot(slot) && slot.isEnabled() && slot.hasStack()) {
+                                int slotX = this.x + slot.x;
+                                int slotY = this.y + slot.y;
+                                ItemStack stack = slot.getStack();
+                                context.drawItem(stack, slotX, slotY);
+                                drawCostSlotText(context, label, stack, slotX, slotY);
+                        }
+                }
+        }
+
+        private void drawCostSlotText(DrawContext context, String label, ItemStack stack, int slotX, int slotY) {
+                int requiredCount = GearShopStackHelper.getRequestedCount(stack);
+                if (requiredCount <= 0) {
+                        return;
+                }
+
+                String valueText = formatRequestedCount(requiredCount);
+
+                RenderSystem.disableDepthTest();
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+                drawCostTextLine(context, label, slotX + COST_SLOT_LABEL_ANCHOR_X,
+                                slotY + COST_SLOT_LABEL_OFFSET_Y, COST_SLOT_TEXT_SCALE);
+                drawCostTextLine(context, valueText, slotX + COST_SLOT_VALUE_ANCHOR_X,
+                                slotY + COST_SLOT_VALUE_OFFSET_Y, COST_SLOT_TEXT_SCALE);
+
+                RenderSystem.disableBlend();
+                RenderSystem.enableDepthTest();
+        }
+
+        private void drawCostTextLine(DrawContext context, String text, int anchorX, int baselineY, float scale) {
+                if (text == null || text.isEmpty()) {
+                        return;
+                }
+
+                float scaledWidth = textRenderer.getWidth(text) * scale;
+                float drawX = anchorX - scaledWidth / 2.0F;
+                MatrixStack matrices = context.getMatrices();
+                matrices.push();
+                matrices.translate(drawX, baselineY, 300.0F);
+                matrices.scale(scale, scale, 1.0F);
+                context.drawText(textRenderer, text, 0, 0, COST_TEXT_COLOR, false);
+                matrices.pop();
+        }
+
+        private void drawAnimatedResultSlot(DrawContext context) {
+                Slot resultSlot = getResultSlot();
+                if (resultSlot == null || !resultSlot.isEnabled()) {
+                        return;
+                }
+
+                ItemStack stack = resultSlot.getStack();
+                if (stack.isEmpty()) {
+                        resetResultSlotAnimation();
+                        return;
+                }
+
+                if (!ItemStack.areEqual(lastAnimatedResultSlotStack, stack)
+                                || stack.getCount() != lastAnimatedResultSlotStack.getCount()) {
+                        lastAnimatedResultSlotStack = stack.copy();
+                        resultSlotAnimationStartTicks = Float.NaN;
+                }
+
+                if (Float.isNaN(resultSlotAnimationStartTicks)) {
+                        resultSlotAnimationStartTicks = getAnimationTicks(0.0F);
+                }
+
+                float animationTicks = getAnimationTicks(lastRenderDelta) - resultSlotAnimationStartTicks;
+                if (animationTicks < 0.0F) {
+                        animationTicks = 0.0F;
+                }
+
+                int slotLeft = this.x + resultSlot.x;
+                int slotTop = this.y + resultSlot.y;
+                float slotCenterX = slotLeft + 8.0F;
+                float slotCenterY = slotTop + 8.0F;
+
+                OfferDisplayAnimation animation = RESULT_SLOT_ANIMATION;
+                MatrixStack matrices = context.getMatrices();
+                matrices.push();
+                matrices.translate(slotCenterX + animation.offsetX(), slotCenterY + animation.offsetY(),
+                                RESULT_SLOT_BASE_Z + animation.offsetZ());
+
+                float bobTranslation = animation.bobOffset();
+                if (animation.bobPeriodTicks() > 0.0F && animation.bobAmplitude() != 0.0F) {
+                        float bobAngle = (animationTicks + animation.bobPhaseTicks()) / animation.bobPeriodTicks();
+                        bobTranslation += MathHelper.sin(bobAngle) * animation.bobAmplitude();
+                }
+                if (bobTranslation != 0.0F) {
+                        matrices.translate(0.0F, bobTranslation, 0.0F);
+                }
+
+                float scale = animation.scale();
+                if (scale != 1.0F) {
+                        matrices.scale(scale, scale, scale);
+                }
+
+                if (animation.rotationPeriodTicks() > 0.0F) {
+                        float rotationDegrees = ((animationTicks + animation.rotationPhaseTicks())
+                                        / animation.rotationPeriodTicks()) * 360.0F;
+                        matrices.multiply(animation.rotationAxis().rotationDegrees(rotationDegrees));
+                }
+
+                if (animation.staticYaw() != 0.0F) {
+                        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(animation.staticYaw()));
+                }
+                if (animation.staticPitch() != 0.0F) {
+                        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(animation.staticPitch()));
+                }
+                if (animation.staticRoll() != 0.0F) {
+                        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(animation.staticRoll()));
+                }
+
+                drawResultStack(context, stack);
+                matrices.pop();
+
+                context.drawItemInSlot(textRenderer, stack, slotLeft, slotTop);
+        }
+
+        private void drawResultStack(DrawContext context, ItemStack stack) {
+                MinecraftClient minecraftClient = client;
+                if (minecraftClient == null) {
+                        return;
+                }
+
+                ItemRenderer renderer = minecraftClient.getItemRenderer();
+                BakedModel model = renderer.getModel(stack, null, null, 0);
+                MatrixStack matrices = context.getMatrices();
+                matrices.push();
+                matrices.scale(16.0F, -16.0F, 16.0F);
+                boolean disableLighting = !model.isSideLit();
+                if (disableLighting) {
+                        DiffuseLighting.disableGuiDepthLighting();
+                }
+                renderer.renderItem(stack, ModelTransformationMode.GUI, false, matrices, context.getVertexConsumers(),
+                                LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, model);
+                context.draw();
+                if (disableLighting) {
+                        DiffuseLighting.enableGuiDepthLighting();
+                }
+                matrices.pop();
+        }
+
+        private Slot getResultSlot() {
+                for (Slot slot : handler.slots) {
+                        if (handler.isResultSlot(slot)) {
+                                return slot;
+                        }
+                }
+                return null;
+        }
+
+        private void resetResultSlotAnimation() {
+                resultSlotAnimationStartTicks = Float.NaN;
+                lastAnimatedResultSlotStack = ItemStack.EMPTY;
+        }
+
+        private float getAnimationTicks(float delta) {
+                MinecraftClient minecraftClient = client;
+                if (minecraftClient != null && minecraftClient.world != null) {
+                        return minecraftClient.world.getTime() + delta;
+                }
+                return Util.getMeasuringTimeMs() / 50.0F;
+        }
+
+        private ResultSlotSnapshot suppressVanillaResultSlot() {
+                Slot resultSlot = getResultSlot();
+                if (resultSlot == null) {
+                        return null;
+                }
+
+                ItemStack stack = resultSlot.getStack();
+                if (stack.isEmpty()) {
+                        return null;
+                }
+
+                int originalCount = stack.getCount();
+                stack.setCount(0);
+                return new ResultSlotSnapshot(resultSlot, stack, originalCount);
+        }
+
+        private void restoreVanillaResultSlot(ResultSlotSnapshot snapshot) {
+                if (snapshot == null) {
+                        return;
+                }
+
+                if (snapshot.slot().getStack() == snapshot.stack()) {
+                        snapshot.stack().setCount(snapshot.originalCount());
+                }
+        }
+
+        private List<CostSlotSnapshot> suppressVanillaCostCounts() {
+                if (handler == null) {
+                        return List.of();
+                }
+
+                List<CostSlotSnapshot> modified = new ArrayList<>();
+                for (Slot slot : handler.slots) {
+                        if (!handler.isCostSlot(slot)) {
+                                continue;
+                        }
+
+                        ItemStack stack = slot.getStack();
+                        if (stack.isEmpty()) {
+                                continue;
+                        }
+
+                        int originalCount = stack.getCount();
+                        int requested = GearShopStackHelper.getRequestedCount(stack);
+                        if (requested <= stack.getCount()) {
+                                continue;
+                        }
+
+                        stack.setCount(Math.min(requested, stack.getMaxCount()));
+                        modified.add(new CostSlotSnapshot(slot, stack, originalCount));
+                }
+                return modified;
+        }
+
+        private void restoreVanillaCostCounts(List<CostSlotSnapshot> snapshots) {
+                if (snapshots == null) {
+                        return;
+                }
+
+                for (CostSlotSnapshot snapshot : snapshots) {
+                        if (snapshot.slot().getStack() == snapshot.stack()) {
+                                snapshot.stack().setCount(snapshot.originalCount());
+                        }
+                }
         }
 
         private void drawCostTooltip(DrawContext context, ItemStack stack, int mouseX, int mouseY) {
@@ -716,6 +1047,127 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         return;
                 }
                 client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        }
+
+        private record ResultSlotSnapshot(Slot slot, ItemStack stack, int originalCount) {
+        }
+
+        private record CostSlotSnapshot(Slot slot, ItemStack stack, int originalCount) {
+        }
+
+        private record OfferDisplayAnimation(float scale, float offsetX, float offsetY, float offsetZ,
+                        float rotationPeriodTicks, float rotationPhaseTicks, RotationAxis rotationAxis,
+                        float staticPitch, float staticYaw, float staticRoll, float bobAmplitude, float bobOffset,
+                        float bobPeriodTicks, float bobPhaseTicks) {
+                static Builder builder() {
+                        return new Builder();
+                }
+
+                static final class Builder {
+                        private float scale = OFFER_DISPLAY_SCALE;
+                        private float offsetX;
+                        private float offsetY;
+                        private float offsetZ;
+                        private float rotationPeriodTicks = OFFER_ROTATION_PERIOD_TICKS;
+                        private float rotationPhaseTicks;
+                        private RotationAxis rotationAxis = RotationAxis.POSITIVE_Y;
+                        private float staticPitch = 25.0F;
+                        private float staticYaw;
+                        private float staticRoll;
+                        private float bobAmplitude;
+                        private float bobOffset;
+                        private float bobPeriodTicks;
+                        private float bobPhaseTicks;
+
+                        Builder scale(float scale) {
+                                this.scale = scale;
+                                return this;
+                        }
+
+                        Builder offset(float x, float y, float z) {
+                                this.offsetX = x;
+                                this.offsetY = y;
+                                this.offsetZ = z;
+                                return this;
+                        }
+
+                        Builder offsetX(float x) {
+                                this.offsetX = x;
+                                return this;
+                        }
+
+                        Builder offsetY(float y) {
+                                this.offsetY = y;
+                                return this;
+                        }
+
+                        Builder offsetZ(float z) {
+                                this.offsetZ = z;
+                                return this;
+                        }
+
+                        Builder rotationPeriodTicks(float periodTicks) {
+                                this.rotationPeriodTicks = periodTicks;
+                                return this;
+                        }
+
+                        Builder rotationPhaseTicks(float phaseTicks) {
+                                this.rotationPhaseTicks = phaseTicks;
+                                return this;
+                        }
+
+                        Builder rotationAxis(RotationAxis axis) {
+                                this.rotationAxis = axis;
+                                return this;
+                        }
+
+                        Builder staticPitch(float pitch) {
+                                this.staticPitch = pitch;
+                                return this;
+                        }
+
+                        Builder staticYaw(float yaw) {
+                                this.staticYaw = yaw;
+                                return this;
+                        }
+
+                        Builder staticRoll(float roll) {
+                                this.staticRoll = roll;
+                                return this;
+                        }
+
+                        Builder bobAmplitude(float amplitude) {
+                                this.bobAmplitude = amplitude;
+                                return this;
+                        }
+
+                        Builder bobOffset(float offset) {
+                                this.bobOffset = offset;
+                                return this;
+                        }
+
+                        Builder bobPeriodTicks(float periodTicks) {
+                                this.bobPeriodTicks = periodTicks;
+                                return this;
+                        }
+
+                        Builder bobPhaseTicks(float phaseTicks) {
+                                this.bobPhaseTicks = phaseTicks;
+                                return this;
+                        }
+
+                        OfferDisplayAnimation build() {
+                                return new OfferDisplayAnimation(scale, offsetX, offsetY, offsetZ, rotationPeriodTicks,
+                                                rotationPhaseTicks, rotationAxis, staticPitch, staticYaw, staticRoll,
+                                                bobAmplitude, bobOffset, bobPeriodTicks, bobPhaseTicks);
+                        }
+                }
+        }
+
+        private static OfferDisplayAnimation buildAnimation(Consumer<OfferDisplayAnimation.Builder> configurer) {
+                OfferDisplayAnimation.Builder builder = OfferDisplayAnimation.builder();
+                configurer.accept(builder);
+                return builder.build();
         }
 
         private record HoveredStack(ItemStack stack, boolean isCostStack) {
