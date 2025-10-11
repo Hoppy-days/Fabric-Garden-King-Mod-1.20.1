@@ -75,8 +75,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_OFFER_COST_ITEM_SPACING = 22;
         private static final int BUY_OFFER_ARROW_OFFSET_X = 96;
         private static final int BUY_OFFER_RESULT_ITEM_OFFSET_X = 120;
-        private static final int BUY_OFFER_BACKGROUND_U = 301;
-        private static final int BUY_OFFER_BACKGROUND_V = 0;
+        private static final int BUY_OFFER_BACKGROUND_U = 277;
+        private static final int BUY_OFFER_BACKGROUND_V = 15;
         private static final int BUY_OFFER_HOVER_BACKGROUND_V = 21;
         private static final int BUY_OFFER_ARROW_U = 301;
         private static final int BUY_OFFER_ARROW_V = 42;
