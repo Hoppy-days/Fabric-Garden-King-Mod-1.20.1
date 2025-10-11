@@ -17,11 +17,16 @@ public class SaleResultToast implements Toast {
         private static final int HEIGHT = 32;
         private static final int TEXT_START_X = 30;
         private static final int TEXT_START_Y = 7;
+        private static final int BOTTOM_MARGIN = 7;
         private static final int LINE_SPACING = 2;
         private static final int MAX_LINES = 3;
+        private static final int BACKGROUND_TOP_SLICE_HEIGHT = 4;
+        private static final int BACKGROUND_BOTTOM_SLICE_HEIGHT = 4;
+        private static final int BACKGROUND_MIDDLE_SLICE_HEIGHT = HEIGHT - BACKGROUND_TOP_SLICE_HEIGHT - BACKGROUND_BOTTOM_SLICE_HEIGHT;
 
         private final List<OrderedText> wrappedPrimaryLines;
         private final List<OrderedText> wrappedSecondaryLines;
+        private final int backgroundHeight;
 
         public SaleResultToast(Text primaryLine, Text secondaryLine) {
                 Text sanitizedPrimary = primaryLine == null ? Text.empty() : primaryLine;
@@ -31,15 +36,17 @@ public class SaleResultToast implements Toast {
                 if (textRenderer != null) {
                         this.wrappedPrimaryLines = wrapText(textRenderer, sanitizedPrimary);
                         this.wrappedSecondaryLines = wrapText(textRenderer, sanitizedSecondary);
+                        this.backgroundHeight = calculateBackgroundHeight(textRenderer);
                 } else {
                         this.wrappedPrimaryLines = Collections.emptyList();
                         this.wrappedSecondaryLines = Collections.emptyList();
+                        this.backgroundHeight = HEIGHT;
                 }
         }
 
         @Override
         public Visibility draw(DrawContext context, ToastManager manager, long startTime) {
-                context.drawTexture(TEXTURE, 0, 0, 0, 0, WIDTH, HEIGHT);
+                drawBackground(context);
 
                 TextRenderer textRenderer = manager.getClient().textRenderer;
                 int currentY = TEXT_START_Y;
@@ -60,6 +67,11 @@ public class SaleResultToast implements Toast {
                 }
 
                 return startTime >= DISPLAY_DURATION_MS ? Visibility.HIDE : Visibility.SHOW;
+        }
+
+        @Override
+        public int getHeight() {
+                return backgroundHeight;
         }
 
         private int drawWrappedLines(DrawContext context, TextRenderer textRenderer, List<OrderedText> lines, int startY, int alreadyRendered) {
@@ -89,5 +101,36 @@ public class SaleResultToast implements Toast {
 
                 int availableWidth = WIDTH - TEXT_START_X - 8;
                 return textRenderer.wrapLines(text, availableWidth);
+        }
+
+        private int calculateBackgroundHeight(TextRenderer textRenderer) {
+                int primaryLines = Math.min(MAX_LINES, wrappedPrimaryLines.size());
+                int linesRemaining = MAX_LINES - primaryLines;
+                int secondaryLines = Math.min(linesRemaining, wrappedSecondaryLines.size());
+                if (primaryLines == 0 && secondaryLines == 0) {
+                        return HEIGHT;
+                }
+
+                int totalLines = primaryLines + secondaryLines;
+                int contentHeight = totalLines * textRenderer.fontHeight
+                                + Math.max(0, totalLines - 1) * LINE_SPACING
+                                + (primaryLines > 0 && secondaryLines > 0 ? LINE_SPACING : 0);
+                int calculatedHeight = TEXT_START_Y + contentHeight + BOTTOM_MARGIN;
+                return Math.max(HEIGHT, calculatedHeight);
+        }
+
+        private void drawBackground(DrawContext context) {
+                context.drawTexture(TEXTURE, 0, 0, 0, 0, WIDTH, BACKGROUND_TOP_SLICE_HEIGHT);
+
+                int remainingHeight = backgroundHeight - BACKGROUND_TOP_SLICE_HEIGHT - BACKGROUND_BOTTOM_SLICE_HEIGHT;
+                int drawY = BACKGROUND_TOP_SLICE_HEIGHT;
+                while (remainingHeight > 0) {
+                        int drawHeight = Math.min(BACKGROUND_MIDDLE_SLICE_HEIGHT, remainingHeight);
+                        context.drawTexture(TEXTURE, 0, drawY, 0, BACKGROUND_TOP_SLICE_HEIGHT, WIDTH, drawHeight);
+                        drawY += drawHeight;
+                        remainingHeight -= drawHeight;
+                }
+
+                context.drawTexture(TEXTURE, 0, drawY, 0, HEIGHT - BACKGROUND_BOTTOM_SLICE_HEIGHT, WIDTH, BACKGROUND_BOTTOM_SLICE_HEIGHT);
         }
 }
