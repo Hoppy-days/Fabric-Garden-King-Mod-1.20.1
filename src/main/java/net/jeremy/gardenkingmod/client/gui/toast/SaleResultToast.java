@@ -15,7 +15,8 @@ public class SaleResultToast implements Toast {
         private static final long DISPLAY_DURATION_MS = 5000L;
         private static final int WIDTH = 160;
         private static final int HEIGHT = 32;
-        private static final int TEXT_START_X = 30;
+        private static final int DEFAULT_TEXT_START_X = 30;
+        private static final int TEXT_WRAP_WIDTH = WIDTH - DEFAULT_TEXT_START_X - 8;
         private static final int TEXT_START_Y = 7;
         private static final int BOTTOM_MARGIN = 7;
         private static final int LINE_SPACING = 2;
@@ -27,6 +28,7 @@ public class SaleResultToast implements Toast {
         private final List<OrderedText> wrappedPrimaryLines;
         private final List<OrderedText> wrappedSecondaryLines;
         private final int backgroundHeight;
+        private final int textStartX;
 
         public SaleResultToast(Text primaryLine, Text secondaryLine) {
                 Text sanitizedPrimary = primaryLine == null ? Text.empty() : primaryLine;
@@ -37,10 +39,12 @@ public class SaleResultToast implements Toast {
                         this.wrappedPrimaryLines = wrapText(textRenderer, sanitizedPrimary);
                         this.wrappedSecondaryLines = wrapText(textRenderer, sanitizedSecondary);
                         this.backgroundHeight = calculateBackgroundHeight(textRenderer);
+                        this.textStartX = calculateTextStartX(textRenderer);
                 } else {
                         this.wrappedPrimaryLines = Collections.emptyList();
                         this.wrappedSecondaryLines = Collections.emptyList();
                         this.backgroundHeight = HEIGHT;
+                        this.textStartX = DEFAULT_TEXT_START_X;
                 }
         }
 
@@ -86,7 +90,7 @@ public class SaleResultToast implements Toast {
                                 break;
                         }
 
-                        context.drawTextWithShadow(textRenderer, orderedText, TEXT_START_X, y, 0xFFFFFF);
+                        context.drawTextWithShadow(textRenderer, orderedText, textStartX, y, 0xFFFFFF);
                         y += textRenderer.fontHeight + LINE_SPACING;
                         rendered++;
                 }
@@ -99,8 +103,7 @@ public class SaleResultToast implements Toast {
                         return Collections.emptyList();
                 }
 
-                int availableWidth = WIDTH - TEXT_START_X - 8;
-                return textRenderer.wrapLines(text, availableWidth);
+                return textRenderer.wrapLines(text, TEXT_WRAP_WIDTH);
         }
 
         private int calculateBackgroundHeight(TextRenderer textRenderer) {
@@ -117,6 +120,38 @@ public class SaleResultToast implements Toast {
                                 + (primaryLines > 0 && secondaryLines > 0 ? LINE_SPACING : 0);
                 int calculatedHeight = TEXT_START_Y + contentHeight + BOTTOM_MARGIN;
                 return Math.max(HEIGHT, calculatedHeight);
+        }
+
+        private int calculateTextStartX(TextRenderer textRenderer) {
+                int linesRemaining = MAX_LINES;
+                int maxWidth = 0;
+
+                for (OrderedText orderedText : wrappedPrimaryLines) {
+                        if (linesRemaining == 0) {
+                                break;
+                        }
+
+                        maxWidth = Math.max(maxWidth, textRenderer.getWidth(orderedText));
+                        linesRemaining--;
+                }
+
+                if (linesRemaining > 0) {
+                        for (OrderedText orderedText : wrappedSecondaryLines) {
+                                if (linesRemaining == 0) {
+                                        break;
+                                }
+
+                                maxWidth = Math.max(maxWidth, textRenderer.getWidth(orderedText));
+                                linesRemaining--;
+                        }
+                }
+
+                if (maxWidth <= 0) {
+                        return DEFAULT_TEXT_START_X;
+                }
+
+                int centeredStart = (WIDTH - maxWidth) / 2;
+                return Math.max(0, centeredStart);
         }
 
         private void drawBackground(DrawContext context) {
