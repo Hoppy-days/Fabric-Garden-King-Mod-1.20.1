@@ -63,8 +63,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_RESULT_LABEL_X = 156;
         private static final int BUY_RESULT_LABEL_Y = 20;
 
-        private static final int BUY_OFFER_LIST_X = 30;
-        private static final int BUY_OFFER_LIST_Y = 34;
+        private static final int BUY_OFFER_LIST_X = 5;
+        private static final int BUY_OFFER_LIST_Y = 32;
         private static final int BUY_OFFER_ENTRY_WIDTH = 88;
         private static final int BUY_OFFER_ENTRY_HEIGHT = 20;
         private static final int BUY_OFFER_LIST_HEIGHT = 180;
@@ -77,7 +77,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_OFFER_RESULT_ITEM_OFFSET_X = 68;
         private static final int BUY_OFFER_BACKGROUND_U = 277;
         private static final int BUY_OFFER_BACKGROUND_V = 15;
-        private static final int BUY_OFFER_HOVER_BACKGROUND_V = 21;
+        private static final int BUY_OFFER_HOVER_BACKGROUND_V = 36;
         private static final int BUY_OFFER_ARROW_U = 301;
         private static final int BUY_OFFER_ARROW_V = 42;
         private static final int BUY_OFFER_ARROW_WIDTH = 10;
@@ -96,12 +96,12 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 }
         }
 
-        private static final int BUY_SCROLLBAR_OFFSET_X = BUY_OFFER_LIST_X + BUY_OFFER_ENTRY_WIDTH + 2;
-        private static final int BUY_SCROLLBAR_OFFSET_Y = BUY_OFFER_LIST_Y;
+        private static final int BUY_SCROLLBAR_OFFSET_X = 94;
+        private static final int BUY_SCROLLBAR_OFFSET_Y = 32;
         private static final int BUY_SCROLLBAR_TRACK_WIDTH = 6;
         private static final int BUY_SCROLLBAR_TRACK_HEIGHT = BUY_OFFER_LIST_HEIGHT;
-        private static final int BUY_SCROLLBAR_KNOB_U = 24;
-        private static final int BUY_SCROLLBAR_KNOB_V = 207;
+        private static final int BUY_SCROLLBAR_KNOB_U = 277;
+        private static final int BUY_SCROLLBAR_KNOB_V = 97;
         private static final int BUY_SCROLLBAR_KNOB_WIDTH = 6;
         private static final int BUY_SCROLLBAR_KNOB_HEIGHT = 27;
 
