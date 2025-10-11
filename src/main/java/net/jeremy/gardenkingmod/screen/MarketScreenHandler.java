@@ -1,5 +1,8 @@
 package net.jeremy.gardenkingmod.screen;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.jeremy.gardenkingmod.ModScreenHandlers;
 import net.jeremy.gardenkingmod.block.entity.MarketBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,8 +17,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class MarketScreenHandler extends ScreenHandler {
+        public static final int BUTTON_SELL = 0;
+        public static final int BUTTON_SELECT_SELL_TAB = 1;
+        public static final int BUTTON_SELECT_BUY_TAB = 2;
+
         private final Inventory inventory;
         private final MarketBlockEntity blockEntity;
+        private final List<MarketSellSlot> marketSlots;
+        private boolean marketSlotsEnabled;
 
         public MarketScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
                 this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()));
@@ -25,6 +34,8 @@ public class MarketScreenHandler extends ScreenHandler {
                 super(ModScreenHandlers.MARKET_SCREEN_HANDLER, syncId);
                 this.blockEntity = blockEntity;
                 this.inventory = blockEntity != null ? blockEntity : new SimpleInventory(MarketBlockEntity.INVENTORY_SIZE);
+                this.marketSlots = new ArrayList<>();
+                this.marketSlotsEnabled = true;
 
                 checkSize(this.inventory, MarketBlockEntity.INVENTORY_SIZE);
                 this.inventory.onOpen(playerInventory.player);
@@ -46,12 +57,52 @@ public class MarketScreenHandler extends ScreenHandler {
                         int row = slotIndex / slotsPerRow;
                         int x = startX + column * slotSize;
                         int y = startY + row * slotSize;
-                        this.addSlot(new Slot(this.inventory, slotIndex, x, y) {
-                                @Override
-                                public boolean canInsert(ItemStack stack) {
-                                        return MarketBlockEntity.isSellable(stack);
-                                }
-                        });
+                        MarketSellSlot slot = new MarketSellSlot(this.inventory, slotIndex, x, y);
+                        this.addSlot(slot);
+                        this.marketSlots.add(slot);
+                }
+        }
+
+        public void setMarketSlotsEnabled(boolean enabled) {
+                if (this.marketSlotsEnabled == enabled) {
+                        return;
+                }
+
+                this.marketSlotsEnabled = enabled;
+
+                for (MarketSellSlot slot : this.marketSlots) {
+                        slot.setEnabled(enabled);
+                }
+        }
+
+        public boolean areMarketSlotsEnabled() {
+                return this.marketSlotsEnabled;
+        }
+
+        private static class MarketSellSlot extends Slot {
+                private boolean enabled = true;
+
+                protected MarketSellSlot(Inventory inventory, int index, int x, int y) {
+                        super(inventory, index, x, y);
+                }
+
+                @Override
+                public boolean canInsert(ItemStack stack) {
+                        return this.enabled && MarketBlockEntity.isSellable(stack);
+                }
+
+                @Override
+                public boolean canTakeItems(PlayerEntity player) {
+                        return this.enabled && super.canTakeItems(player);
+                }
+
+                @Override
+                public boolean isEnabled() {
+                        return this.enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                        this.enabled = enabled;
                 }
         }
 
@@ -94,7 +145,7 @@ public class MarketScreenHandler extends ScreenHandler {
                                                 true)) {
                                         return ItemStack.EMPTY;
                                 }
-                        } else if (!MarketBlockEntity.isSellable(originalStack)
+                        } else if (!this.marketSlotsEnabled || !MarketBlockEntity.isSellable(originalStack)
                                         || !this.insertItem(originalStack, 0, MarketBlockEntity.INVENTORY_SIZE, false)) {
                                 return ItemStack.EMPTY;
                         }
@@ -111,11 +162,23 @@ public class MarketScreenHandler extends ScreenHandler {
 
         @Override
         public boolean onButtonClick(PlayerEntity player, int id) {
-                if (id == 0 && blockEntity != null && player instanceof ServerPlayerEntity serverPlayer) {
-                        if (blockEntity.sell(serverPlayer)) {
-                                sendContentUpdates();
+                if (blockEntity != null) {
+                        if (id == BUTTON_SELL && player instanceof ServerPlayerEntity serverPlayer) {
+                                if (blockEntity.sell(serverPlayer)) {
+                                        sendContentUpdates();
+                                }
+                                return true;
                         }
-                        return true;
+
+                        if (id == BUTTON_SELECT_SELL_TAB) {
+                                setMarketSlotsEnabled(true);
+                                return true;
+                        }
+
+                        if (id == BUTTON_SELECT_BUY_TAB) {
+                                setMarketSlotsEnabled(false);
+                                return true;
+                        }
                 }
 
                 return super.onButtonClick(player, id);

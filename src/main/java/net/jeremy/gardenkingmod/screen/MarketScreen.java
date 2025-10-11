@@ -347,6 +347,10 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         return;
                 }
                 this.activeTab = tab;
+                if (this.handler != null) {
+                        this.handler.setMarketSlotsEnabled(tab == Tab.SELL);
+                        sendTabChangeToServer(tab);
+                }
                 updateTabButtonState();
                 updateSellButtonVisibility();
                 if (tab == Tab.BUY) {
@@ -359,6 +363,16 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 if (sellButton != null) {
                         sellButton.visible = activeTab == Tab.SELL;
                 }
+        }
+
+        private void sendTabChangeToServer(Tab tab) {
+                if (client == null || client.interactionManager == null) {
+                        return;
+                }
+
+                int buttonId = tab == Tab.SELL ? MarketScreenHandler.BUTTON_SELECT_SELL_TAB
+                                : MarketScreenHandler.BUTTON_SELECT_BUY_TAB;
+                client.interactionManager.clickButton(handler.syncId, buttonId);
         }
 
         private class TabButton extends ClickableWidget {
