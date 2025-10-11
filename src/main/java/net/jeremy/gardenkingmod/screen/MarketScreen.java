@@ -262,23 +262,31 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
                 if (success) {
                         MutableText payoutText = Text.literal(Integer.toString(payout)).formatted(Formatting.GREEN);
+                        MutableText soldLine;
                         if (soldItemCounts != null && !soldItemCounts.isEmpty()) {
                                 Text soldItemsText = buildSoldItemsText(soldItemCounts);
-                                this.saleResultLine = Text.translatable(
-                                                "screen.gardenkingmod.market.sale_result_detailed", soldItemsText,
-                                                payoutText).formatted(Formatting.YELLOW);
+                                soldLine = Text.translatable("screen.gardenkingmod.market.sale_result_sold_detailed",
+                                                soldItemsText);
                         } else {
-                                this.saleResultLine = Text
-                                                .translatable("screen.gardenkingmod.market.sale_result", itemsSold,
-                                                                payoutText)
-                                                .formatted(Formatting.YELLOW);
+                                soldLine = Text.translatable("screen.gardenkingmod.market.sale_result_sold", itemsSold);
                         }
+
+                        MutableText earnedLine = Text
+                                        .translatable("screen.gardenkingmod.market.sale_result_earned", payoutText);
+                        MutableText saleResult = soldLine.copy();
+                        if (!earnedLine.getString().isEmpty()) {
+                                if (!saleResult.getString().isEmpty()) {
+                                        saleResult.append(Text.literal("\n"));
+                                }
+                                saleResult.append(earnedLine);
+                        }
+                        this.saleResultLine = saleResult.formatted(Formatting.YELLOW);
 
                         if (this.lastLifetimeTotal >= 0) {
                                 MutableText lifetimeText = Text.literal(Integer.toString(this.lastLifetimeTotal))
                                                 .formatted(Formatting.GREEN);
-                                this.lifetimeResultLine = Text
-                                                .translatable("screen.gardenkingmod.market.lifetime", lifetimeText)
+                                this.lifetimeResultLine = Text.translatable(
+                                                "screen.gardenkingmod.market.sale_result_lifetime", lifetimeText)
                                                 .formatted(Formatting.YELLOW);
                         } else {
                                 this.lifetimeResultLine = Text.empty();

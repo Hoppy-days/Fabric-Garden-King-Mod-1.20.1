@@ -31,13 +31,11 @@ public final class RottenLanguageProvider extends FabricLanguageProvider {
                 translationBuilder.add("screen.gardenkingmod.market.tab.buy", "Buy");
                 translationBuilder.add("screen.gardenkingmod.market.offers", "OFFERS");
                 translationBuilder.add("screen.gardenkingmod.market.cost_count", "%s required");
-                translationBuilder.add("screen.gardenkingmod.market.sale_result",
-                                "You sold %1$s crops and earned %2$s garden coins.");
-                translationBuilder.add("screen.gardenkingmod.market.sale_result_detailed",
-                                "You sold %1$s and earned %2$s garden coins.");
+                translationBuilder.add("screen.gardenkingmod.market.sale_result_sold", "You sold %1$s crops");
+                translationBuilder.add("screen.gardenkingmod.market.sale_result_sold_detailed", "You sold %1$s");
+                translationBuilder.add("screen.gardenkingmod.market.sale_result_earned", "You earned %1$s Garden Coins");
                 translationBuilder.add("screen.gardenkingmod.market.sale_result_item", "%1$s %2$s");
-                translationBuilder.add("screen.gardenkingmod.market.lifetime",
-                                "Lifetime earnings: %1$s garden coins.");
+                translationBuilder.add("screen.gardenkingmod.market.sale_result_lifetime", "Lifetime earnings: %1$s");
                 translationBuilder.add("message.gardenkingmod.market.sold",
                                 "Sold %1$s Croptopia crops for %2$s coins.");
                 translationBuilder.add("message.gardenkingmod.market.sold.lifetime",
