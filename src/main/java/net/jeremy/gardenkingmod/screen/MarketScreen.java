@@ -431,14 +431,12 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         }
 
         private void updateTabButtonPositions() {
-                int baseX = activeTab == Tab.BUY ? getBuyBackgroundX() : this.x;
-                int baseY = activeTab == Tab.BUY ? getBuyBackgroundY() : this.y;
-                int buttonY = baseY + TAB_BUTTON_Y_OFFSET;
+                int buttonY = this.y + TAB_BUTTON_Y_OFFSET;
                 if (sellTabButton != null) {
-                        sellTabButton.reposition(baseX + SELL_TAB_TEXT_X - TAB_BUTTON_TEXT_PADDING_X, buttonY);
+                        sellTabButton.reposition(this.x + SELL_TAB_TEXT_X - TAB_BUTTON_TEXT_PADDING_X, buttonY);
                 }
                 if (buyTabButton != null) {
-                        buyTabButton.reposition(baseX + BUY_TAB_TEXT_X - TAB_BUTTON_TEXT_PADDING_X, buttonY);
+                        buyTabButton.reposition(this.x + BUY_TAB_TEXT_X - TAB_BUTTON_TEXT_PADDING_X, buttonY);
                 }
         }
 
