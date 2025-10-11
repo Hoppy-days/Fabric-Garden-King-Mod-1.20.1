@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.shop.GearShopOffer;
-import net.jeremy.gardenkingmod.shop.GearShopOfferManager;
+import net.jeremy.gardenkingmod.shop.GardenMarketOfferManager;
 import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -57,24 +57,25 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int RESULT_TEXT_LINE_SPACING = 12;
 
         private static final int BUY_HEADER_COLOR = 0x404040;
-        private static final int BUY_OFFERS_LABEL_X = 10;
-        private static final int BUY_OFFERS_LABEL_Y = 24;
-        private static final int BUY_COST_LABEL_X = 30;
-        private static final int BUY_COST_LABEL_Y = 24;
-        private static final int BUY_RESULT_LABEL_X = 118;
-        private static final int BUY_RESULT_LABEL_Y = 24;
+        private static final int BUY_OFFERS_LABEL_X = 30;
+        private static final int BUY_OFFERS_LABEL_Y = 20;
+        private static final int BUY_COST_LABEL_X = 58;
+        private static final int BUY_COST_LABEL_Y = 20;
+        private static final int BUY_RESULT_LABEL_X = 156;
+        private static final int BUY_RESULT_LABEL_Y = 20;
 
-        private static final int BUY_OFFER_LIST_X = 10;
-        private static final int BUY_OFFER_LIST_Y = 36;
-        private static final int BUY_OFFER_ENTRY_WIDTH = 144;
+        private static final int BUY_OFFER_LIST_X = 30;
+        private static final int BUY_OFFER_LIST_Y = 34;
+        private static final int BUY_OFFER_ENTRY_WIDTH = 88;
         private static final int BUY_OFFER_ENTRY_HEIGHT = 20;
-        private static final int BUY_MAX_VISIBLE_OFFERS = 6;
-        private static final int BUY_OFFER_LIST_HEIGHT = BUY_MAX_VISIBLE_OFFERS * BUY_OFFER_ENTRY_HEIGHT;
+        private static final int BUY_OFFER_LIST_HEIGHT = 180;
+        private static final int BUY_MAX_VISIBLE_OFFERS = BUY_OFFER_LIST_HEIGHT / BUY_OFFER_ENTRY_HEIGHT;
         private static final int BUY_OFFER_ITEM_OFFSET_Y = 2;
         private static final int BUY_OFFER_COST_ITEM_OFFSET_X = 6;
         private static final int BUY_OFFER_COST_ITEM_SPACING = 22;
-        private static final int BUY_OFFER_ARROW_OFFSET_X = 96;
-        private static final int BUY_OFFER_RESULT_ITEM_OFFSET_X = 120;
+        private static final int BUY_OFFER_ARROW_OFFSET_X = 53;
+        private static final int BUY_OFFER_ARROW_OFFSET_Y = 6;
+        private static final int BUY_OFFER_RESULT_ITEM_OFFSET_X = 68;
         private static final int BUY_OFFER_BACKGROUND_U = 277;
         private static final int BUY_OFFER_BACKGROUND_V = 15;
         private static final int BUY_OFFER_HOVER_BACKGROUND_V = 21;
@@ -510,7 +511,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                                 drawCostStack(context, costStack, costX, itemY);
                         }
 
-                        int arrowY = entryY + BUY_OFFER_ITEM_OFFSET_Y + 4;
+                        int arrowY = entryY + BUY_OFFER_ARROW_OFFSET_Y;
                         context.drawTexture(BUY_TEXTURE, arrowX, arrowY, BUY_OFFER_ARROW_U, BUY_OFFER_ARROW_V,
                                         BUY_OFFER_ARROW_WIDTH, BUY_OFFER_ARROW_HEIGHT, BuyBackground.TEXTURE_WIDTH,
                                         BuyBackground.TEXTURE_HEIGHT);
@@ -713,7 +714,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         }
 
         private List<GearShopOffer> getBuyOffers() {
-                return GearShopOfferManager.getInstance().getOffers();
+                return GardenMarketOfferManager.getInstance().getOffers();
         }
 
         private void playClickSound() {
