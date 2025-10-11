@@ -94,6 +94,16 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_OFFER_ARROW_HEIGHT = 9;
         private static final int SELECTED_HIGHLIGHT_COLOR = 0x40FFFFFF;
 
+        private static final int SLOT_ICON_SIZE = 16;
+        private static final int BUY_BUTTON_WIDTH = 46;
+        private static final int BUY_BUTTON_HEIGHT = 14;
+        private static final int BUY_BUTTON_U = 277;
+        private static final int BUY_BUTTON_V = 67;
+        private static final int BUY_BUTTON_HOVER_V = 82;
+        private static final int BUY_BUTTON_CENTER_OFFSET_Y = 8;
+        private static final int BUY_BUTTON_LABEL_COLOR = 0xFFFFFF;
+        private static final Text BUY_BUTTON_TEXT = Text.literal("BUY");
+
         private static final int COST_TEXT_COLOR = 0xFFFFFF;
         private static final String COST_LABEL_TRANSLATION_KEY = "screen.gardenkingmod.gear_shop.cost_label";
         private static final int COST_SLOT_LABEL_ANCHOR_X = 9;
@@ -220,6 +230,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                                         BuyBackground.TEXTURE_WIDTH, BuyBackground.TEXTURE_HEIGHT);
                         drawBuyOfferList(context, originX, originY, mouseX, mouseY);
                         drawBuyScrollbar(context, originX, originY);
+                        drawBuyButton(context, mouseX, mouseY);
                 } else {
                         context.drawTexture(SELL_TEXTURE, x, y, SELL_BACKGROUND_U, SELL_BACKGROUND_V, backgroundWidth, backgroundHeight,
                                         SELL_TEXTURE_WIDTH, SELL_TEXTURE_HEIGHT);
@@ -330,6 +341,11 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         context.getMatrices().translate(getBuyBackgroundX() - this.x,
                                         getBuyBackgroundY() - this.y, 0);
                         drawBuyLabels(context);
+                        if (isBuyButtonVisible()) {
+                                getBuyButtonArea().ifPresent(area -> drawBuyButtonLabel(context,
+                                                area.left() - getBuyBackgroundX(),
+                                                area.top() - getBuyBackgroundY()));
+                        }
                         context.getMatrices().pop();
                         return;
                 }
@@ -373,6 +389,12 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         if (isPointWithinBuyScrollbar(mouseX, mouseY)) {
                                 scrollbarDragging = true;
                                 updateScrollFromMouse(mouseY);
+                                return true;
+                        }
+
+                        if (isPointWithinBuyButton(mouseX, mouseY)) {
+                                playClickSound();
+                                attemptPurchase();
                                 return true;
                         }
 
@@ -629,6 +651,85 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 context.drawTexture(BUY_TEXTURE, scrollbarX, knobY, BUY_SCROLLBAR_KNOB_U, BUY_SCROLLBAR_KNOB_V,
                                 BUY_SCROLLBAR_KNOB_WIDTH, BUY_SCROLLBAR_KNOB_HEIGHT, BuyBackground.TEXTURE_WIDTH,
                                 BuyBackground.TEXTURE_HEIGHT);
+        }
+
+        private boolean isBuyButtonVisible() {
+                return activeTab == Tab.BUY && handler != null && handler.areBuySlotsEnabled()
+                                && !getBuyOffers().isEmpty();
+        }
+
+        private Optional<ButtonArea> getBuyButtonArea() {
+                if (handler == null) {
+                        return Optional.empty();
+                }
+
+                double sumCenterX = 0.0;
+                double centerY = Double.NaN;
+                int count = 0;
+                for (Slot slot : handler.slots) {
+                        if (handler.isCostSlot(slot)) {
+                                double slotCenterX = this.x + slot.x + SLOT_ICON_SIZE / 2.0;
+                                double slotCenterY = this.y + slot.y + SLOT_ICON_SIZE / 2.0;
+                                sumCenterX += slotCenterX;
+                                centerY = slotCenterY;
+                                count++;
+                        }
+                }
+
+                if (count <= 0 || Double.isNaN(centerY)) {
+                        return Optional.empty();
+                }
+
+                double centerX = sumCenterX / count;
+                double buttonCenterY = centerY + BUY_BUTTON_CENTER_OFFSET_Y;
+                int left = (int) Math.round(centerX - BUY_BUTTON_WIDTH / 2.0);
+                int top = (int) Math.round(buttonCenterY - BUY_BUTTON_HEIGHT / 2.0);
+                return Optional.of(new ButtonArea(left, top, BUY_BUTTON_WIDTH, BUY_BUTTON_HEIGHT));
+        }
+
+        private void attemptPurchase() {
+                if (!isBuyButtonVisible() || client == null || client.interactionManager == null) {
+                        return;
+                }
+
+                List<GearShopOffer> offers = getBuyOffers();
+                if (selectedOffer < 0 || selectedOffer >= offers.size()) {
+                        return;
+                }
+
+                client.interactionManager.clickButton(handler.syncId, MarketScreenHandler.BUTTON_BUY);
+        }
+
+        private void drawBuyButton(DrawContext context, int mouseX, int mouseY) {
+                if (!isBuyButtonVisible()) {
+                        return;
+                }
+
+                Optional<ButtonArea> area = getBuyButtonArea();
+                if (area.isEmpty()) {
+                        return;
+                }
+
+                ButtonArea button = area.get();
+                int v = button.contains(mouseX, mouseY) ? BUY_BUTTON_HOVER_V : BUY_BUTTON_V;
+                context.drawTexture(BUY_TEXTURE, button.left(), button.top(), BUY_BUTTON_U, v, BUY_BUTTON_WIDTH,
+                                BUY_BUTTON_HEIGHT, BuyBackground.TEXTURE_WIDTH, BuyBackground.TEXTURE_HEIGHT);
+        }
+
+        private boolean isPointWithinBuyButton(double mouseX, double mouseY) {
+                if (!isBuyButtonVisible()) {
+                        return false;
+                }
+
+                return getBuyButtonArea().map(area -> area.contains(mouseX, mouseY)).orElse(false);
+        }
+
+        private void drawBuyButtonLabel(DrawContext context, int relativeLeft, int relativeTop) {
+                int textWidth = textRenderer.getWidth(BUY_BUTTON_TEXT);
+                int textHeight = textRenderer.fontHeight;
+                int textX = relativeLeft + (BUY_BUTTON_WIDTH - textWidth) / 2;
+                int textY = relativeTop + (BUY_BUTTON_HEIGHT - textHeight) / 2;
+                context.drawText(textRenderer, BUY_BUTTON_TEXT, textX, textY, BUY_BUTTON_LABEL_COLOR, false);
         }
 
         private void updateBuyScrollLimits() {
@@ -1055,6 +1156,12 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         return;
                 }
                 client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        }
+
+        private record ButtonArea(int left, int top, int width, int height) {
+                boolean contains(double x, double y) {
+                        return x >= left && x < left + width && y >= top && y < top + height;
+                }
         }
 
         private record ResultSlotSnapshot(Slot slot, ItemStack stack, int originalCount) {

@@ -30,6 +30,7 @@ public class MarketScreenHandler extends ScreenHandler {
         public static final int BUTTON_SELL = 0;
         public static final int BUTTON_SELECT_SELL_TAB = 1;
         public static final int BUTTON_SELECT_BUY_TAB = 2;
+        public static final int BUTTON_BUY = 3;
         private static final int BUTTON_SELECT_BUY_OFFER_BASE = 1000;
 
         private static final int SLOT_SIZE = 18;
@@ -421,6 +422,13 @@ public class MarketScreenHandler extends ScreenHandler {
                                 setMarketSlotsEnabled(false);
                                 setBuySlotsEnabled(true);
                                 if (returnedItems) {
+                                        sendContentUpdates();
+                                }
+                                return true;
+                        }
+
+                        if (id == BUTTON_BUY && player instanceof ServerPlayerEntity serverPlayer) {
+                                if (processPurchase(serverPlayer, this.selectedOfferIndex, false)) {
                                         sendContentUpdates();
                                 }
                                 return true;
