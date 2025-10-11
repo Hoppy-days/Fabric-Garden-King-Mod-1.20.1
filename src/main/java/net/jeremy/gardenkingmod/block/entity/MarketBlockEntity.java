@@ -156,16 +156,25 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
         @Override
         public void onClose(PlayerEntity player) {
                 Inventory.super.onClose(player);
+                returnItemsToPlayer(player);
+        }
+
+        public boolean returnItemsToPlayer(PlayerEntity player) {
                 if (!(player instanceof ServerPlayerEntity serverPlayer)) {
-                        return;
+                        return false;
                 }
+
+                boolean changed = false;
 
                 for (int slot = 0; slot < size(); slot++) {
                         ItemStack remainingStack = removeStack(slot);
                         if (!remainingStack.isEmpty()) {
                                 insertOrDrop(serverPlayer, remainingStack);
+                                changed = true;
                         }
                 }
+
+                return changed;
         }
 
         @Override

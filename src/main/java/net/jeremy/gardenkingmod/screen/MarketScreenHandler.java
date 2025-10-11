@@ -176,7 +176,11 @@ public class MarketScreenHandler extends ScreenHandler {
                         }
 
                         if (id == BUTTON_SELECT_BUY_TAB) {
+                                boolean returnedItems = blockEntity.returnItemsToPlayer(player);
                                 setMarketSlotsEnabled(false);
+                                if (returnedItems) {
+                                        sendContentUpdates();
+                                }
                                 return true;
                         }
                 }
