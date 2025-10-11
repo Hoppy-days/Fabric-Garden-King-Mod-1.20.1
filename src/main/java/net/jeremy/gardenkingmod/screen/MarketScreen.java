@@ -429,11 +429,12 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         }
 
         private int getBuyBackgroundX() {
-                return (this.width - BuyBackground.BACKGROUND_WIDTH) / 2;
+                int extraWidth = Math.max(0, BuyBackground.BACKGROUND_WIDTH - this.backgroundWidth);
+                return this.x - extraWidth;
         }
 
         private int getBuyBackgroundY() {
-                return (this.height - BuyBackground.BACKGROUND_HEIGHT) / 2;
+                return this.y;
         }
 
         private void resetBuyTabState() {
