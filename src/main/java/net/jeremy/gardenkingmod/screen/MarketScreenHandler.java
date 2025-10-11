@@ -35,10 +35,17 @@ public class MarketScreenHandler extends ScreenHandler {
         private static final int SLOT_SIZE = 18;
         private static final int COST_SLOT_COUNT = 2;
         private static final int RESULT_SLOT_COUNT = 1;
-        private static final int COST_SLOT_FIRST_X = 159;
+        /**
+         * The buy tab background is 100 pixels wider than the sell tab texture. The
+         * wider texture extends equally to the left of the default GUI origin, so we
+         * shift the slot anchors by that amount to keep them centered on the slot
+         * frames drawn in {@link MarketScreen}.
+         */
+        private static final int BUY_BACKGROUND_X_OFFSET = 100;
+        private static final int COST_SLOT_FIRST_X = 159 - BUY_BACKGROUND_X_OFFSET;
         private static final int COST_SLOT_Y = 50;
         private static final int COST_SLOT_SPACING = 26;
-        private static final int RESULT_SLOT_X = 239;
+        private static final int RESULT_SLOT_X = 239 - BUY_BACKGROUND_X_OFFSET;
         private static final int RESULT_SLOT_Y = 46;
 
         private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
