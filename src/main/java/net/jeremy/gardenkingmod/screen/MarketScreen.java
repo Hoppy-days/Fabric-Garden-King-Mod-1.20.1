@@ -100,7 +100,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_BUTTON_U = 277;
         private static final int BUY_BUTTON_V = 67;
         private static final int BUY_BUTTON_HOVER_V = 82;
-        private static final int BUY_BUTTON_CENTER_OFFSET_Y = 28;
+        private static final int BUY_BUTTON_CENTER_OFFSET_Y = 48;
         private static final int BUY_BUTTON_LABEL_COLOR = 0xFFFFFF;
         private static final Text BUY_BUTTON_TEXT = Text.literal("BUY");
 
