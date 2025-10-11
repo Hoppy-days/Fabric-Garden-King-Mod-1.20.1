@@ -88,8 +88,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_OFFER_BACKGROUND_U = 277;
         private static final int BUY_OFFER_BACKGROUND_V = 15;
         private static final int BUY_OFFER_HOVER_BACKGROUND_V = 36;
-        private static final int BUY_OFFER_ARROW_U = 301;
-        private static final int BUY_OFFER_ARROW_V = 42;
+        private static final int BUY_OFFER_ARROW_U = 277;
+        private static final int BUY_OFFER_ARROW_V = 57;
         private static final int BUY_OFFER_ARROW_WIDTH = 10;
         private static final int BUY_OFFER_ARROW_HEIGHT = 9;
         private static final int SELECTED_HIGHLIGHT_COLOR = 0x40FFFFFF;
@@ -100,7 +100,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_BUTTON_U = 277;
         private static final int BUY_BUTTON_V = 67;
         private static final int BUY_BUTTON_HOVER_V = 82;
-        private static final int BUY_BUTTON_CENTER_OFFSET_Y = 8;
+        private static final int BUY_BUTTON_CENTER_OFFSET_Y = 28;
         private static final int BUY_BUTTON_LABEL_COLOR = 0xFFFFFF;
         private static final Text BUY_BUTTON_TEXT = Text.literal("BUY");
 
