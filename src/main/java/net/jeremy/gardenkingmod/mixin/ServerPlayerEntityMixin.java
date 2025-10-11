@@ -14,5 +14,6 @@ public abstract class ServerPlayerEntityMixin {
                 GardenCurrencyHolder newHolder = (GardenCurrencyHolder) this;
                 GardenCurrencyHolder oldHolder = (GardenCurrencyHolder) oldPlayer;
                 newHolder.gardenkingmod$setLifetimeCurrency(oldHolder.gardenkingmod$getLifetimeCurrency());
+                newHolder.gardenkingmod$setBankBalance(oldHolder.gardenkingmod$getBankBalance());
         }
 }
