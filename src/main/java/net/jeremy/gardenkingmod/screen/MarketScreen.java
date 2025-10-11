@@ -56,8 +56,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int SCOREBOARD_BAND_BOTTOM = 138;
 
         private static final int BUY_HEADER_COLOR = 0x404040;
-        private static final int BUY_OFFERS_LABEL_X = 30;
-        private static final int BUY_OFFERS_LABEL_Y = 20;
+        private static final int BUY_OFFERS_LABEL_X = 6;
+        private static final int BUY_OFFERS_LABEL_Y = 22;
         private static final int BUY_COST_LABEL_X = 58;
         private static final int BUY_COST_LABEL_Y = 20;
         private static final int BUY_RESULT_LABEL_X = 156;
