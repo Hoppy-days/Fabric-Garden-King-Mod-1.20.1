@@ -4,24 +4,37 @@
     {
       "offer": "minecraft:wheat_seeds*16",
       "price": "gardenkingmod:garden_coin*4"
-    },
-    {
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:garden_coin*4"
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:garden_coin*4"
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:garden_coin*4"
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:garden_coin*4"
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:garden_coin*4"
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:garden_coin*4"
+    },{
       "offer": "minecraft:carrot*16",
       "price": "gardenkingmod:garden_coin*6"
-    },
-    {
+    },{
       "offer": "minecraft:potato*16",
       "price": "gardenkingmod:garden_coin*6"
-    },
-    {
+    },{
       "offer": "minecraft:melon_seeds*8",
       "price": "gardenkingmod:garden_coin*10"
-    },
-    {
+    },{
       "offer": "minecraft:pumpkin_seeds*8",
       "price": "gardenkingmod:garden_coin*10"
-    },
-    {
+    },{
       "offer": "minecraft:bee_nest",
       "price": [
         "gardenkingmod:garden_coin*64",
