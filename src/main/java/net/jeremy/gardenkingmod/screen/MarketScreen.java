@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
+import net.jeremy.gardenkingmod.client.gui.toast.SaleResultToast;
 import net.jeremy.gardenkingmod.shop.GearShopOffer;
 import net.jeremy.gardenkingmod.shop.GearShopOfferManager;
 import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
@@ -53,8 +54,6 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_TAB_TEXT_X = 54;
         private static final int SCOREBOARD_BAND_TOP = 107;
         private static final int SCOREBOARD_BAND_BOTTOM = 138;
-        private static final int RESULT_TEXT_TOP_OFFSET = -5;
-        private static final int RESULT_TEXT_LINE_SPACING = 12;
 
         private static final int BUY_HEADER_COLOR = 0x404040;
         private static final int BUY_OFFERS_LABEL_X = 10;
@@ -222,6 +221,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         }
                         this.lifetimeResultLine = Text.empty();
                 }
+
+                showSaleResultToast();
         }
 
         private Text buildSoldItemsText(Map<Item, Integer> soldItemCounts) {
@@ -253,20 +254,21 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         context.getMatrices().pop();
                         return;
                 }
+        }
 
-                if (lastItemsSold < 0 || saleResultLine == null || saleResultLine.getString().isEmpty()) {
+        private void showSaleResultToast() {
+                if (client == null || client.getToastManager() == null) {
                         return;
                 }
 
-                int firstLineY = RESULT_TEXT_TOP_OFFSET;
-                int firstLineX = (backgroundWidth - textRenderer.getWidth(saleResultLine)) / 2;
-                context.drawText(textRenderer, saleResultLine, firstLineX, firstLineY, 0xFFFFFF, false);
-
-                if (lastLifetimeTotal >= 0 && lifetimeResultLine != null && !lifetimeResultLine.getString().isEmpty()) {
-                        int secondLineY = firstLineY + RESULT_TEXT_LINE_SPACING;
-                        int secondLineX = (backgroundWidth - textRenderer.getWidth(lifetimeResultLine)) / 2;
-                        context.drawText(textRenderer, lifetimeResultLine, secondLineX, secondLineY, 0xFFFFFF, false);
+                if (saleResultLine == null || saleResultLine.getString().isEmpty()) {
+                        return;
                 }
+
+                Text secondaryLine = lifetimeResultLine != null && !lifetimeResultLine.getString().isEmpty()
+                                ? lifetimeResultLine
+                                : Text.empty();
+                client.getToastManager().add(new SaleResultToast(saleResultLine, secondaryLine));
         }
 
         @Override
