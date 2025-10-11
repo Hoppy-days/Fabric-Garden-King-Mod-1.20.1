@@ -1,5 +1,8 @@
 package net.jeremy.gardenkingmod.screen;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.jeremy.gardenkingmod.ModScreenHandlers;
 import net.jeremy.gardenkingmod.block.entity.MarketBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 public class MarketScreenHandler extends ScreenHandler {
         private final Inventory inventory;
         private final MarketBlockEntity blockEntity;
+        private final List<MarketSellSlot> marketSlots;
 
         public MarketScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
                 this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()));
@@ -25,6 +29,7 @@ public class MarketScreenHandler extends ScreenHandler {
                 super(ModScreenHandlers.MARKET_SCREEN_HANDLER, syncId);
                 this.blockEntity = blockEntity;
                 this.inventory = blockEntity != null ? blockEntity : new SimpleInventory(MarketBlockEntity.INVENTORY_SIZE);
+                this.marketSlots = new ArrayList<>();
 
                 checkSize(this.inventory, MarketBlockEntity.INVENTORY_SIZE);
                 this.inventory.onOpen(playerInventory.player);
@@ -46,12 +51,42 @@ public class MarketScreenHandler extends ScreenHandler {
                         int row = slotIndex / slotsPerRow;
                         int x = startX + column * slotSize;
                         int y = startY + row * slotSize;
-                        this.addSlot(new Slot(this.inventory, slotIndex, x, y) {
-                                @Override
-                                public boolean canInsert(ItemStack stack) {
-                                        return MarketBlockEntity.isSellable(stack);
-                                }
-                        });
+                        MarketSellSlot slot = new MarketSellSlot(this.inventory, slotIndex, x, y);
+                        this.addSlot(slot);
+                        this.marketSlots.add(slot);
+                }
+        }
+
+        public void setMarketSlotsEnabled(boolean enabled) {
+                for (MarketSellSlot slot : this.marketSlots) {
+                        slot.setEnabled(enabled);
+                }
+        }
+
+        private static class MarketSellSlot extends Slot {
+                private boolean enabled = true;
+
+                protected MarketSellSlot(Inventory inventory, int index, int x, int y) {
+                        super(inventory, index, x, y);
+                }
+
+                @Override
+                public boolean canInsert(ItemStack stack) {
+                        return this.enabled && MarketBlockEntity.isSellable(stack);
+                }
+
+                @Override
+                public boolean canTakeItems(PlayerEntity player) {
+                        return this.enabled && super.canTakeItems(player);
+                }
+
+                @Override
+                public boolean isEnabled() {
+                        return this.enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                        this.enabled = enabled;
                 }
         }
 

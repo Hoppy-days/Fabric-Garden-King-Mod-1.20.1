@@ -347,6 +347,9 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         return;
                 }
                 this.activeTab = tab;
+                if (this.handler != null) {
+                        this.handler.setMarketSlotsEnabled(tab == Tab.SELL);
+                }
                 updateTabButtonState();
                 updateSellButtonVisibility();
                 if (tab == Tab.BUY) {
