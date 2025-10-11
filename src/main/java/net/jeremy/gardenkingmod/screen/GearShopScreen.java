@@ -383,14 +383,6 @@ public class GearShopScreen extends HandledScreen<GearShopScreenHandler> {
 
         private void drawCostStack(DrawContext context, ItemStack stack, int x, int y) {
                 context.drawItem(stack, x, y);
-
-                int requestedCount = GearShopStackHelper.getRequestedCount(stack);
-                if (requestedCount > stack.getCount()) {
-                        String label = formatRequestedCount(requestedCount);
-                        context.drawItemInSlot(textRenderer, stack, x, y, label);
-                } else {
-                        context.drawItemInSlot(textRenderer, stack, x, y);
-                }
         }
 
         private void drawCostSlotText(DrawContext context, String label, ItemStack stack, int slotX, int slotY) {

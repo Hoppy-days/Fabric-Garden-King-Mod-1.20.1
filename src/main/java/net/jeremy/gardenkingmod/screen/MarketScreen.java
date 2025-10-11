@@ -626,6 +626,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
         private void drawCostStack(DrawContext context, ItemStack stack, int x, int y) {
                 context.drawItem(stack, x, y);
+
                 int requestedCount = GearShopStackHelper.getRequestedCount(stack);
                 if (requestedCount > stack.getCount()) {
                         String label = formatRequestedCount(requestedCount);
@@ -1090,12 +1091,11 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         }
 
                         int originalCount = stack.getCount();
-                        int requested = GearShopStackHelper.getRequestedCount(stack);
-                        if (requested <= stack.getCount()) {
+                        if (originalCount <= 1) {
                                 continue;
                         }
 
-                        stack.setCount(Math.min(requested, stack.getMaxCount()));
+                        stack.setCount(1);
                         modified.add(new CostSlotSnapshot(slot, stack, originalCount));
                 }
                 return modified;
