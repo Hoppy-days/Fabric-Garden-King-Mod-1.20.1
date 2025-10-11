@@ -3,7 +3,10 @@
   "offers": [
     {
       "offer": "minecraft:wheat_seeds*16",
-      "price": "gardenkingmod:garden_coin*4"
+      "price": [
+        "gardenkingmod:garden_coin*4",
+        "gardenkingmod:garden_coin*4"
+        ]
     },{
       "offer": "minecraft:wheat_seeds*16",
       "price": "gardenkingmod:garden_coin*4"
