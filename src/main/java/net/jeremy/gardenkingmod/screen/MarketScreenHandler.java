@@ -42,11 +42,11 @@ public class MarketScreenHandler extends ScreenHandler {
          * frames drawn in {@link MarketScreen}.
          */
         private static final int BUY_BACKGROUND_X_OFFSET = 100;
-        private static final int COST_SLOT_FIRST_X = 159 - BUY_BACKGROUND_X_OFFSET;
-        private static final int COST_SLOT_Y = 50;
+        private static final int COST_SLOT_FIRST_X = 136 - BUY_BACKGROUND_X_OFFSET;
+        private static final int COST_SLOT_Y = 66;
         private static final int COST_SLOT_SPACING = 26;
-        private static final int RESULT_SLOT_X = 239 - BUY_BACKGROUND_X_OFFSET;
-        private static final int RESULT_SLOT_Y = 46;
+        private static final int RESULT_SLOT_X = 220 - BUY_BACKGROUND_X_OFFSET;
+        private static final int RESULT_SLOT_Y = 66;
 
         private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
         private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
