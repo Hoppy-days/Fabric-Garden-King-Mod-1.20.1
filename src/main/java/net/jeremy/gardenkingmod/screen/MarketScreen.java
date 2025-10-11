@@ -58,10 +58,6 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_HEADER_COLOR = 0x404040;
         private static final int BUY_OFFERS_LABEL_X = 6;
         private static final int BUY_OFFERS_LABEL_Y = 22;
-        private static final int BUY_COST_LABEL_X = 58;
-        private static final int BUY_COST_LABEL_Y = 20;
-        private static final int BUY_RESULT_LABEL_X = 156;
-        private static final int BUY_RESULT_LABEL_Y = 20;
 
         private static final int BUY_OFFER_LIST_X = 5;
         private static final int BUY_OFFER_LIST_Y = 32;
@@ -462,10 +458,6 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private void drawBuyLabels(DrawContext context) {
                 context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.market.offers"),
                                 BUY_OFFERS_LABEL_X, BUY_OFFERS_LABEL_Y, BUY_HEADER_COLOR, false);
-                context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.market.cost_label"),
-                                BUY_COST_LABEL_X, BUY_COST_LABEL_Y, BUY_HEADER_COLOR, false);
-                context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.market.buy_label"),
-                                BUY_RESULT_LABEL_X, BUY_RESULT_LABEL_Y, BUY_HEADER_COLOR, false);
         }
 
         private void drawBuyOfferList(DrawContext context, int originX, int originY, int mouseX, int mouseY) {

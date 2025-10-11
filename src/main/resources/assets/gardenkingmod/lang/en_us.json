@@ -94,8 +94,6 @@
   "screen.gardenkingmod.market.tab.sell": "Sell",
   "screen.gardenkingmod.market.tab.buy": "Buy",
   "screen.gardenkingmod.market.offers": "OFFERS",
-  "screen.gardenkingmod.market.cost_label": "COST",
-  "screen.gardenkingmod.market.buy_label": "BUY",
   "screen.gardenkingmod.market.cost_count": "%s required",
   "screen.gardenkingmod.gear_shop.offers": "OFFERS",
   "screen.gardenkingmod.gear_shop.buy_button": "BUY",
