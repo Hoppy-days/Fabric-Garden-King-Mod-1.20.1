@@ -64,12 +64,12 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_RESULT_LABEL_X = 118;
         private static final int BUY_RESULT_LABEL_Y = 24;
 
-        private static final int BUY_OFFER_LIST_X = 10;
-        private static final int BUY_OFFER_LIST_Y = 36;
-        private static final int BUY_OFFER_ENTRY_WIDTH = 144;
+        private static final int BUY_OFFER_LIST_X = 5;
+        private static final int BUY_OFFER_LIST_Y = 32;
+        private static final int BUY_OFFER_ENTRY_WIDTH = 88;
         private static final int BUY_OFFER_ENTRY_HEIGHT = 20;
         private static final int BUY_MAX_VISIBLE_OFFERS = 6;
-        private static final int BUY_OFFER_LIST_HEIGHT = BUY_MAX_VISIBLE_OFFERS * BUY_OFFER_ENTRY_HEIGHT;
+        private static final int BUY_OFFER_LIST_HEIGHT = 180;
         private static final int BUY_OFFER_ITEM_OFFSET_Y = 2;
         private static final int BUY_OFFER_COST_ITEM_OFFSET_X = 6;
         private static final int BUY_OFFER_COST_ITEM_SPACING = 22;
