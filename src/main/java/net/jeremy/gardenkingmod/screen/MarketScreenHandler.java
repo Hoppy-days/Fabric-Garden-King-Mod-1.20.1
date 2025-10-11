@@ -270,7 +270,17 @@ public class MarketScreenHandler extends ScreenHandler {
                                 return ItemStack.EMPTY;
                         }
                 } else if (index < hotbarEnd) {
-                        if (!this.insertItem(originalStack, costSlotStart, costSlotEnd, false)) {
+                        boolean inserted = false;
+
+                        if (this.areMarketSlotsEnabled()) {
+                                inserted = this.insertItem(originalStack, 0, marketEnd, false);
+                        }
+
+                        if (!inserted && this.areBuySlotsEnabled()) {
+                                inserted = this.insertItem(originalStack, costSlotStart, costSlotEnd, false);
+                        }
+
+                        if (!inserted) {
                                 if (index < playerInventoryEnd) {
                                         if (!this.insertItem(originalStack, hotbarStart, hotbarEnd, false)) {
                                                 return ItemStack.EMPTY;
