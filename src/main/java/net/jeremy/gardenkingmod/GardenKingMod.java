@@ -7,6 +7,7 @@ import net.jeremy.gardenkingmod.armor.ModArmorSetEffects;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager;
 import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
+import net.jeremy.gardenkingmod.network.ModServerNetworking;
 import net.jeremy.gardenkingmod.registry.ModEntities;
 import net.jeremy.gardenkingmod.registry.ModSoundEvents;
 import net.jeremy.gardenkingmod.shop.GardenMarketOfferManager;
@@ -31,6 +32,7 @@ public class GardenKingMod implements ModInitializer {
                 ModScreenHandlers.registerScreenHandlers();
                 ModScoreboards.registerScoreboards();
                 ModArmorSetEffects.register();
+                ModServerNetworking.register();
 
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(BonusHarvestDropManager.getInstance());
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(GearShopOfferManager.getInstance());
