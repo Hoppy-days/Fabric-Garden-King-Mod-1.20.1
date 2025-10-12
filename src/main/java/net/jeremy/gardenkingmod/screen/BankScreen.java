@@ -5,7 +5,6 @@ import org.lwjgl.glfw.GLFW;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.jeremy.gardenkingmod.GardenKingMod;
-import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.network.ModPackets;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -15,7 +14,6 @@ import net.minecraft.client.gui.screen.narration.NarrationPart;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -29,8 +27,12 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     private static final int WITHDRAW_TITLE_Y_OFFSET = 6;
     private static final int DEPOSIT_TITLE_X_OFFSET = 188;
     private static final int DEPOSIT_TITLE_Y_OFFSET = 94;
-    private static final ItemStack DOLLAR_STACK = new ItemStack(ModItems.DOLLAR);
-
+    private static final Identifier DOLLAR_ITEM_TEXTURE = new Identifier(GardenKingMod.MOD_ID,
+            "textures/item/dollar.png");
+    private static final int DOLLAR_TEXTURE_WIDTH = 16;
+    private static final int DOLLAR_TEXTURE_HEIGHT = 16;
+    private static final int DOLLAR_TEXTURE_X_OFFSET = 80;
+    private static final int DOLLAR_TEXTURE_Y_OFFSET = 36;
     private static final int TEXTURE_WIDTH = 300;
     private static final int TEXTURE_HEIGHT = 256;
     private static final int BASE_GUI_WIDTH = 176;
@@ -127,7 +129,7 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         int slotOriginX = x + BALANCE_SLOT_X_OFFSET;
         int slotY = y + BALANCE_SLOT_Y_OFFSET;
 
-        drawSlot(context, slotOriginX, slotY, DOLLAR_STACK, handler.getTotalDollars(),
+        drawSlot(context, slotOriginX, slotY, handler.getTotalDollars(),
                 Text.translatable("screen.gardenkingmod.bank.slot.dollar"));
 
         Text totalText = Text.translatable("screen.gardenkingmod.bank.total", handler.getTotalDollars());
@@ -136,10 +138,9 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
                 0x404040, false);
     }
 
-    private void drawSlot(DrawContext context, int slotX, int slotY, ItemStack stack, int count, Text label) {
+    private void drawSlot(DrawContext context, int slotX, int slotY, int count, Text label) {
         context.drawTexture(BACKGROUND_TEXTURE, slotX, slotY, 7, 83, BankScreenHandler.SLOT_SIZE, BankScreenHandler.SLOT_SIZE,
                 BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
-        context.drawItem(stack, slotX + 1, slotY + 1);
         String countText = Integer.toString(count);
         int countWidth = textRenderer.getWidth(countText);
         context.drawText(textRenderer, countText,
