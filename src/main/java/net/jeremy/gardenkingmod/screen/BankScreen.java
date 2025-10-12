@@ -22,15 +22,9 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
             "textures/gui/container/bank_gui.png");
     private static final int BACKGROUND_TEXTURE_WIDTH = 300;
     private static final int BACKGROUND_TEXTURE_HEIGHT = 256;
-    private static final int WITHDRAW_TITLE_U = 188;
-    private static final int WITHDRAW_TITLE_V = 6;
-    private static final int WITHDRAW_TITLE_WIDTH = 96;
-    private static final int WITHDRAW_TITLE_HEIGHT = 16;
+    private static final int WITHDRAW_TITLE_X_OFFSET = 188;
     private static final int WITHDRAW_TITLE_Y_OFFSET = 6;
-    private static final int DEPOSIT_TITLE_U = 188;
-    private static final int DEPOSIT_TITLE_V = 94;
-    private static final int DEPOSIT_TITLE_WIDTH = 96;
-    private static final int DEPOSIT_TITLE_HEIGHT = 16;
+    private static final int DEPOSIT_TITLE_X_OFFSET = 188;
     private static final int DEPOSIT_TITLE_Y_OFFSET = 94;
     private static final ItemStack DOLLAR_STACK = new ItemStack(ModItems.DOLLAR);
 
@@ -92,13 +86,18 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
         context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight,
                 BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
-        int titleX = x + (backgroundWidth - WITHDRAW_TITLE_WIDTH) / 2;
-        context.drawTexture(BACKGROUND_TEXTURE, titleX, y + WITHDRAW_TITLE_Y_OFFSET,
-                WITHDRAW_TITLE_U, WITHDRAW_TITLE_V, WITHDRAW_TITLE_WIDTH, WITHDRAW_TITLE_HEIGHT,
-                BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
-        context.drawTexture(BACKGROUND_TEXTURE, titleX, y + DEPOSIT_TITLE_Y_OFFSET,
-                DEPOSIT_TITLE_U, DEPOSIT_TITLE_V, DEPOSIT_TITLE_WIDTH, DEPOSIT_TITLE_HEIGHT,
-                BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
+        context.drawText(this.textRenderer,
+                Text.translatable("screen.gardenkingmod.bank.withdraw"),
+                x + WITHDRAW_TITLE_X_OFFSET,
+                y + WITHDRAW_TITLE_Y_OFFSET,
+                0x404040,
+                false);
+        context.drawText(this.textRenderer,
+                Text.translatable("screen.gardenkingmod.bank.deposit"),
+                x + DEPOSIT_TITLE_X_OFFSET,
+                y + DEPOSIT_TITLE_Y_OFFSET,
+                0x404040,
+                false);
         int slotOriginX = x + BALANCE_SLOT_X_OFFSET;
         int slotY = y + BALANCE_SLOT_Y_OFFSET;
 
