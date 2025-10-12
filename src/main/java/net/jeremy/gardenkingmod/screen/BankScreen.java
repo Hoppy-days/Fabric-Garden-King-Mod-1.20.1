@@ -132,6 +132,16 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         drawSlot(context, slotOriginX, slotY, handler.getTotalDollars(),
                 Text.translatable("screen.gardenkingmod.bank.slot.dollar"));
 
+        context.drawTexture(DOLLAR_ITEM_TEXTURE,
+                x + DOLLAR_TEXTURE_X_OFFSET,
+                y + DOLLAR_TEXTURE_Y_OFFSET,
+                0,
+                0,
+                DOLLAR_TEXTURE_WIDTH,
+                DOLLAR_TEXTURE_HEIGHT,
+                DOLLAR_TEXTURE_WIDTH,
+                DOLLAR_TEXTURE_HEIGHT);
+
         Text totalText = Text.translatable("screen.gardenkingmod.bank.total", handler.getTotalDollars());
         context.drawText(textRenderer, totalText, x + (BASE_GUI_WIDTH - textRenderer.getWidth(totalText)) / 2,
                 y + BALANCE_TEXT_Y_OFFSET,
