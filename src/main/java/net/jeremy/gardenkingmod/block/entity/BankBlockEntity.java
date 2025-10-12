@@ -20,6 +20,7 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
@@ -87,7 +88,16 @@ public class BankBlockEntity extends BlockEntity implements ExtendedScreenHandle
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         if (player instanceof ServerPlayerEntity serverPlayer) {
-            sendBalanceUpdate(serverPlayer);
+            MinecraftServer server = serverPlayer.getServer();
+            if (server != null) {
+                BlockPos bankPos = getPos();
+                server.execute(() -> {
+                    if (serverPlayer.currentScreenHandler instanceof BankScreenHandler handler
+                            && handler.getBankPos().equals(bankPos)) {
+                        sendBalanceUpdate(serverPlayer);
+                    }
+                });
+            }
         }
         return new BankScreenHandler(syncId, playerInventory, this);
     }
