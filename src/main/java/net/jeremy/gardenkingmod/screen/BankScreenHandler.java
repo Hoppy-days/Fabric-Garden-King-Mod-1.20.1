@@ -21,11 +21,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class BankScreenHandler extends ScreenHandler {
-    public static final int GUI_WIDTH = 176;
+    public static final int GUI_WIDTH = 284;
     public static final int GUI_HEIGHT = 222;
     public static final int SLOT_SIZE = 18;
-    public static final int DEPOSIT_SLOT_X = (GUI_WIDTH - SLOT_SIZE) / 2;
-    public static final int DEPOSIT_SLOT_Y = 70;
+    public static final int DEPOSIT_SLOT_X = 223;
+    public static final int DEPOSIT_SLOT_Y = 114;
     public static final int PLAYER_INVENTORY_X = 8;
     public static final int PLAYER_INVENTORY_Y = 140;
     public static final int PLAYER_INVENTORY_TITLE_Y = PLAYER_INVENTORY_Y - 10;
