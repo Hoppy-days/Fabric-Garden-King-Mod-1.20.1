@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.ModScoreboards;
+import net.jeremy.gardenkingmod.currency.GardenCurrencyHolder;
 import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.screen.BankScreenHandler;
 import net.minecraft.block.BlockState;
@@ -16,9 +17,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
@@ -115,12 +113,17 @@ public class BankBlockEntity extends BlockEntity implements ExtendedScreenHandle
     }
 
     private static int getBankBalance(ServerPlayerEntity player) {
-        Scoreboard scoreboard = player.getScoreboard();
-        ScoreboardObjective objective = scoreboard.getObjective(ModScoreboards.CURRENCY_OBJECTIVE);
-        if (objective == null) {
+        long balance;
+        if (player instanceof GardenCurrencyHolder holder) {
+            balance = holder.gardenkingmod$getBankBalance();
+        } else {
+            balance = ModScoreboards.getBankBalance(player);
+        }
+
+        if (balance <= 0L) {
             return 0;
         }
-        ScoreboardPlayerScore score = scoreboard.getPlayerScore(player.getEntityName(), objective);
-        return Math.max(0, score.getScore());
+
+        return balance > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) balance;
     }
 }
