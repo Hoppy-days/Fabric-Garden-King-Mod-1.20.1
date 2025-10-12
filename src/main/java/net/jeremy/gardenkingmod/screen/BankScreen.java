@@ -59,6 +59,10 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     private static final int BUTTON_HOVER_U = 0;
     private static final int BUTTON_HOVER_V = 223;
 
+    private static final Text WITHDRAW_PLACEHOLDER = Text
+            .translatable("screen.gardenkingmod.bank.withdraw_placeholder");
+    private static final int PLACEHOLDER_COLOR = 0xA0A0A0;
+
     private TextFieldWidget withdrawField;
     private BankActionButton withdrawButton;
     private BankActionButton depositButton;
@@ -84,12 +88,13 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
                 top + WITHDRAW_FIELD_Y_OFFSET,
                 WITHDRAW_FIELD_WIDTH,
                 WITHDRAW_FIELD_HEIGHT,
-                Text.translatable("screen.gardenkingmod.bank.withdraw_placeholder"));
+                Text.empty());
         this.withdrawField.setMaxLength(12);
         this.withdrawField.setTextPredicate(text -> text == null || text.chars().allMatch(Character::isDigit));
-        this.withdrawField.setPlaceholder(Text.translatable("screen.gardenkingmod.bank.withdraw_placeholder"));
         this.withdrawField.setDrawsBackground(false);
         this.addDrawableChild(this.withdrawField);
+        this.setFocused(this.withdrawField);
+        this.withdrawField.setFocused(true);
 
         this.withdrawButton = new BankActionButton(
                 left + WITHDRAW_BUTTON_X_OFFSET,
@@ -162,6 +167,7 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
         drawMouseoverTooltip(context, mouseX, mouseY);
+        renderWithdrawPlaceholder(context);
     }
 
     @Override
@@ -199,10 +205,26 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.withdrawField != null && this.withdrawField.mouseClicked(mouseX, mouseY, button)) {
+            this.setFocused(this.withdrawField);
             return true;
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private void renderWithdrawPlaceholder(DrawContext context) {
+        if (this.withdrawField == null || !this.withdrawField.getText().isEmpty()
+                || this.withdrawField.isFocused()) {
+            return;
+        }
+
+        Text placeholder = WITHDRAW_PLACEHOLDER;
+        int placeholderWidth = this.textRenderer.getWidth(placeholder);
+        int placeholderX = this.withdrawField.getX() + (this.withdrawField.getWidth() - placeholderWidth) / 2;
+        int placeholderY = this.withdrawField.getY()
+                + (this.withdrawField.getHeight() - this.textRenderer.fontHeight) / 2;
+
+        context.drawText(this.textRenderer, placeholder, placeholderX, placeholderY, PLACEHOLDER_COLOR, false);
     }
 
     private void attemptDeposit() {
