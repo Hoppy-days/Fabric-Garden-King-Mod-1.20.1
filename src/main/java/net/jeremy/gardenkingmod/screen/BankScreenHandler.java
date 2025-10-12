@@ -24,8 +24,8 @@ public class BankScreenHandler extends ScreenHandler {
     public static final int GUI_WIDTH = 284;
     public static final int GUI_HEIGHT = 222;
     public static final int SLOT_SIZE = 18;
-    public static final int DEPOSIT_SLOT_X = 223;
-    public static final int DEPOSIT_SLOT_Y = 114;
+    public static final int DEPOSIT_SLOT_X = 224;
+    public static final int DEPOSIT_SLOT_Y = 115;
     public static final int PLAYER_INVENTORY_X = 8;
     public static final int PLAYER_INVENTORY_Y = 140;
     public static final int PLAYER_INVENTORY_TITLE_Y = PLAYER_INVENTORY_Y - 10;
