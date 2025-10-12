@@ -2,6 +2,8 @@ package net.jeremy.gardenkingmod.screen;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.jeremy.gardenkingmod.GardenKingMod;
@@ -125,6 +127,7 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight,
                 BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
         context.drawText(this.textRenderer,
@@ -321,6 +324,7 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
             }
 
             if ((this.isHovered() || this.isFocused()) && this.active) {
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 context.drawTexture(BACKGROUND_TEXTURE, this.getX(), this.getY(), BUTTON_HOVER_U, BUTTON_HOVER_V,
                         this.width, this.height, TEXTURE_WIDTH, TEXTURE_HEIGHT);
             }
