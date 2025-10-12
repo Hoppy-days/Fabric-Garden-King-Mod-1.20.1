@@ -20,6 +20,18 @@ import net.minecraft.util.Identifier;
 public class BankScreen extends HandledScreen<BankScreenHandler> {
     private static final Identifier BACKGROUND_TEXTURE = new Identifier(GardenKingMod.MOD_ID,
             "textures/gui/container/bank_gui.png");
+    private static final int BACKGROUND_TEXTURE_WIDTH = 300;
+    private static final int BACKGROUND_TEXTURE_HEIGHT = 256;
+    private static final int WITHDRAW_TITLE_U = 188;
+    private static final int WITHDRAW_TITLE_V = 6;
+    private static final int WITHDRAW_TITLE_WIDTH = 96;
+    private static final int WITHDRAW_TITLE_HEIGHT = 16;
+    private static final int WITHDRAW_TITLE_Y_OFFSET = 6;
+    private static final int DEPOSIT_TITLE_U = 188;
+    private static final int DEPOSIT_TITLE_V = 94;
+    private static final int DEPOSIT_TITLE_WIDTH = 96;
+    private static final int DEPOSIT_TITLE_HEIGHT = 16;
+    private static final int DEPOSIT_TITLE_Y_OFFSET = 94;
     private static final ItemStack DOLLAR_STACK = new ItemStack(ModItems.DOLLAR);
 
     private static final int TEXTURE_WIDTH = 300;
@@ -78,23 +90,15 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight, TEXTURE_WIDTH,
-                TEXTURE_HEIGHT);
-
-        if (isPointWithinBounds(WITHDRAW_BUTTON_X_OFFSET, WITHDRAW_BUTTON_Y_OFFSET, WITHDRAW_BUTTON_WIDTH,
-                WITHDRAW_BUTTON_HEIGHT, mouseX, mouseY)) {
-            context.drawTexture(BACKGROUND_TEXTURE, x + WITHDRAW_BUTTON_X_OFFSET, y + WITHDRAW_BUTTON_Y_OFFSET,
-                    BUTTON_HOVER_U, BUTTON_HOVER_V, WITHDRAW_BUTTON_WIDTH, WITHDRAW_BUTTON_HEIGHT, TEXTURE_WIDTH,
-                    TEXTURE_HEIGHT);
-        }
-
-        if (isPointWithinBounds(DEPOSIT_BUTTON_X_OFFSET, DEPOSIT_BUTTON_Y_OFFSET, DEPOSIT_BUTTON_WIDTH,
-                DEPOSIT_BUTTON_HEIGHT, mouseX, mouseY)) {
-            context.drawTexture(BACKGROUND_TEXTURE, x + DEPOSIT_BUTTON_X_OFFSET, y + DEPOSIT_BUTTON_Y_OFFSET,
-                    BUTTON_HOVER_U, BUTTON_HOVER_V, DEPOSIT_BUTTON_WIDTH, DEPOSIT_BUTTON_HEIGHT, TEXTURE_WIDTH,
-                    TEXTURE_HEIGHT);
-        }
-
+        context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight,
+                BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
+        int titleX = x + (backgroundWidth - WITHDRAW_TITLE_WIDTH) / 2;
+        context.drawTexture(BACKGROUND_TEXTURE, titleX, y + WITHDRAW_TITLE_Y_OFFSET,
+                WITHDRAW_TITLE_U, WITHDRAW_TITLE_V, WITHDRAW_TITLE_WIDTH, WITHDRAW_TITLE_HEIGHT,
+                BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
+        context.drawTexture(BACKGROUND_TEXTURE, titleX, y + DEPOSIT_TITLE_Y_OFFSET,
+                DEPOSIT_TITLE_U, DEPOSIT_TITLE_V, DEPOSIT_TITLE_WIDTH, DEPOSIT_TITLE_HEIGHT,
+                BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
         int slotOriginX = x + BALANCE_SLOT_X_OFFSET;
         int slotY = y + BALANCE_SLOT_Y_OFFSET;
 
@@ -108,9 +112,8 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     }
 
     private void drawSlot(DrawContext context, int slotX, int slotY, ItemStack stack, int count, Text label) {
-        context.drawTexture(BACKGROUND_TEXTURE, slotX, slotY, 7, 83, BankScreenHandler.SLOT_SIZE,
-                BankScreenHandler.SLOT_SIZE,
-                TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        context.drawTexture(BACKGROUND_TEXTURE, slotX, slotY, 7, 83, BankScreenHandler.SLOT_SIZE, BankScreenHandler.SLOT_SIZE,
+                BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
         context.drawItem(stack, slotX + 1, slotY + 1);
         String countText = Integer.toString(count);
         int countWidth = textRenderer.getWidth(countText);
