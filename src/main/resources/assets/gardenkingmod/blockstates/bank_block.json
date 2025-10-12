@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,half=lower": { "model": "gardenkingmod:block/bank_lower" },
+    "facing=south,half=lower": { "model": "gardenkingmod:block/bank_lower", "y": 180 },
+    "facing=west,half=lower": { "model": "gardenkingmod:block/bank_lower", "y": 270 },
+    "facing=east,half=lower": { "model": "gardenkingmod:block/bank_lower", "y": 90 },
+    "facing=north,half=upper": { "model": "gardenkingmod:block/bank_upper" },
+    "facing=south,half=upper": { "model": "gardenkingmod:block/bank_upper", "y": 180 },
+    "facing=west,half=upper": { "model": "gardenkingmod:block/bank_upper", "y": 270 },
+    "facing=east,half=upper": { "model": "gardenkingmod:block/bank_upper", "y": 90 }
+  }
+}

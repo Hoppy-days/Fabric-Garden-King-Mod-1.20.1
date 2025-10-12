@@ -1,6 +1,7 @@
 package net.jeremy.gardenkingmod;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.jeremy.gardenkingmod.block.entity.BankBlockEntity;
 import net.jeremy.gardenkingmod.block.entity.GearShopBlockEntity;
 import net.jeremy.gardenkingmod.block.entity.MarketBlockEntity;
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlockEntity;
@@ -21,6 +22,10 @@ public final class ModBlockEntities {
         public static final BlockEntityType<ScarecrowBlockEntity> SCARECROW_BLOCK_ENTITY = Registry.register(
                         Registries.BLOCK_ENTITY_TYPE, new Identifier(GardenKingMod.MOD_ID, "scarecrow"),
                         FabricBlockEntityTypeBuilder.create(ScarecrowBlockEntity::new, ModBlocks.SCARECROW_BLOCK).build());
+
+        public static final BlockEntityType<BankBlockEntity> BANK_BLOCK_ENTITY = Registry.register(
+                        Registries.BLOCK_ENTITY_TYPE, new Identifier(GardenKingMod.MOD_ID, "bank_block"),
+                        FabricBlockEntityTypeBuilder.create(BankBlockEntity::new, ModBlocks.BANK_BLOCK).build());
 
         private ModBlockEntities() {
         }
