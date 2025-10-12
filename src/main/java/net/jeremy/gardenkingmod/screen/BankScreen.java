@@ -10,7 +10,6 @@ import net.jeremy.gardenkingmod.network.ModPackets;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -23,25 +22,28 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
             "textures/gui/container/bank_gui.png");
     private static final ItemStack DOLLAR_STACK = new ItemStack(ModItems.DOLLAR);
 
-    private static final int BALANCE_SLOT_X_OFFSET = (BankScreenHandler.GUI_WIDTH - BankScreenHandler.SLOT_SIZE) / 2;
+    private static final int TEXTURE_WIDTH = 300;
+    private static final int TEXTURE_HEIGHT = 256;
+    private static final int BASE_GUI_WIDTH = 176;
+    private static final int BALANCE_SLOT_X_OFFSET = (BASE_GUI_WIDTH - BankScreenHandler.SLOT_SIZE) / 2;
     private static final int BALANCE_SLOT_Y_OFFSET = 24;
     private static final int BALANCE_TEXT_Y_OFFSET = BALANCE_SLOT_Y_OFFSET + BankScreenHandler.SLOT_SIZE + 20;
-    private static final int WITHDRAW_FIELD_WIDTH = 70;
-    private static final int WITHDRAW_FIELD_HEIGHT = 18;
-    private static final int WITHDRAW_FIELD_X_OFFSET = 53;
-    private static final int WITHDRAW_FIELD_Y_OFFSET = 112;
-    private static final int WITHDRAW_BUTTON_WIDTH = 70;
-    private static final int WITHDRAW_BUTTON_HEIGHT = 20;
-    private static final int WITHDRAW_BUTTON_X_OFFSET = WITHDRAW_FIELD_X_OFFSET;
-    private static final int WITHDRAW_BUTTON_Y_OFFSET = WITHDRAW_FIELD_Y_OFFSET + 22;
-    private static final int DEPOSIT_BUTTON_WIDTH = 70;
-    private static final int DEPOSIT_BUTTON_HEIGHT = 20;
-    private static final int DEPOSIT_BUTTON_X_OFFSET = BankScreenHandler.GUI_WIDTH - DEPOSIT_BUTTON_WIDTH - 53;
-    private static final int DEPOSIT_BUTTON_Y_OFFSET = WITHDRAW_BUTTON_Y_OFFSET;
+    private static final int WITHDRAW_FIELD_WIDTH = 72;
+    private static final int WITHDRAW_FIELD_HEIGHT = 22;
+    private static final int WITHDRAW_FIELD_X_OFFSET = 196;
+    private static final int WITHDRAW_FIELD_Y_OFFSET = 24;
+    private static final int WITHDRAW_BUTTON_WIDTH = 72;
+    private static final int WITHDRAW_BUTTON_HEIGHT = 22;
+    private static final int WITHDRAW_BUTTON_X_OFFSET = 205;
+    private static final int WITHDRAW_BUTTON_Y_OFFSET = 52;
+    private static final int DEPOSIT_BUTTON_WIDTH = 72;
+    private static final int DEPOSIT_BUTTON_HEIGHT = 22;
+    private static final int DEPOSIT_BUTTON_X_OFFSET = 205;
+    private static final int DEPOSIT_BUTTON_Y_OFFSET = 140;
+    private static final int BUTTON_HOVER_U = 0;
+    private static final int BUTTON_HOVER_V = 223;
 
     private TextFieldWidget withdrawField;
-    private ButtonWidget withdrawButton;
-    private ButtonWidget depositButton;
 
     public BankScreen(BankScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -53,7 +55,8 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     @Override
     protected void init() {
         super.init();
-        this.titleX = (this.backgroundWidth - this.textRenderer.getWidth(title)) / 2;
+        this.x = (this.width - BASE_GUI_WIDTH) / 2;
+        this.titleX = (BASE_GUI_WIDTH - this.textRenderer.getWidth(title)) / 2;
 
         int left = this.x;
         int top = this.y;
@@ -66,30 +69,32 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
                 Text.translatable("screen.gardenkingmod.bank.withdraw_placeholder"));
         this.withdrawField.setMaxLength(12);
         this.withdrawField.setTextPredicate(text -> text == null || text.chars().allMatch(Character::isDigit));
-        this.withdrawField.setChangedListener(text -> updateButtonStates());
         this.withdrawField.setPlaceholder(Text.translatable("screen.gardenkingmod.bank.withdraw_placeholder"));
-        this.withdrawField.setDrawsBackground(true);
+        this.withdrawField.setDrawsBackground(false);
         this.addDrawableChild(this.withdrawField);
 
-        this.withdrawButton = ButtonWidget.builder(Text.translatable("screen.gardenkingmod.bank.withdraw"), button -> {
-            attemptWithdraw();
-        }).dimensions(left + WITHDRAW_BUTTON_X_OFFSET, top + WITHDRAW_BUTTON_Y_OFFSET, WITHDRAW_BUTTON_WIDTH,
-                WITHDRAW_BUTTON_HEIGHT).build();
-        this.addDrawableChild(this.withdrawButton);
-
-        this.depositButton = ButtonWidget.builder(Text.translatable("screen.gardenkingmod.bank.deposit"), button -> {
-            attemptDeposit();
-        }).dimensions(left + DEPOSIT_BUTTON_X_OFFSET, top + DEPOSIT_BUTTON_Y_OFFSET, DEPOSIT_BUTTON_WIDTH,
-                DEPOSIT_BUTTON_HEIGHT).build();
-        this.addDrawableChild(this.depositButton);
-
-        updateButtonStates();
         setInitialFocus(this.withdrawField);
     }
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight, 256, 256);
+        context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight, TEXTURE_WIDTH,
+                TEXTURE_HEIGHT);
+
+        if (isPointWithinBounds(WITHDRAW_BUTTON_X_OFFSET, WITHDRAW_BUTTON_Y_OFFSET, WITHDRAW_BUTTON_WIDTH,
+                WITHDRAW_BUTTON_HEIGHT, mouseX, mouseY)) {
+            context.drawTexture(BACKGROUND_TEXTURE, x + WITHDRAW_BUTTON_X_OFFSET, y + WITHDRAW_BUTTON_Y_OFFSET,
+                    BUTTON_HOVER_U, BUTTON_HOVER_V, WITHDRAW_BUTTON_WIDTH, WITHDRAW_BUTTON_HEIGHT, TEXTURE_WIDTH,
+                    TEXTURE_HEIGHT);
+        }
+
+        if (isPointWithinBounds(DEPOSIT_BUTTON_X_OFFSET, DEPOSIT_BUTTON_Y_OFFSET, DEPOSIT_BUTTON_WIDTH,
+                DEPOSIT_BUTTON_HEIGHT, mouseX, mouseY)) {
+            context.drawTexture(BACKGROUND_TEXTURE, x + DEPOSIT_BUTTON_X_OFFSET, y + DEPOSIT_BUTTON_Y_OFFSET,
+                    BUTTON_HOVER_U, BUTTON_HOVER_V, DEPOSIT_BUTTON_WIDTH, DEPOSIT_BUTTON_HEIGHT, TEXTURE_WIDTH,
+                    TEXTURE_HEIGHT);
+        }
+
         int slotOriginX = x + BALANCE_SLOT_X_OFFSET;
         int slotY = y + BALANCE_SLOT_Y_OFFSET;
 
@@ -97,14 +102,15 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
                 Text.translatable("screen.gardenkingmod.bank.slot.dollar"));
 
         Text totalText = Text.translatable("screen.gardenkingmod.bank.total", handler.getTotalDollars());
-        context.drawText(textRenderer, totalText, x + (backgroundWidth - textRenderer.getWidth(totalText)) / 2,
+        context.drawText(textRenderer, totalText, x + (BASE_GUI_WIDTH - textRenderer.getWidth(totalText)) / 2,
                 y + BALANCE_TEXT_Y_OFFSET,
                 0x404040, false);
     }
 
     private void drawSlot(DrawContext context, int slotX, int slotY, ItemStack stack, int count, Text label) {
-        context.drawTexture(BACKGROUND_TEXTURE, slotX, slotY, 7, 83, BankScreenHandler.SLOT_SIZE, BankScreenHandler.SLOT_SIZE,
-                256, 256);
+        context.drawTexture(BACKGROUND_TEXTURE, slotX, slotY, 7, 83, BankScreenHandler.SLOT_SIZE,
+                BankScreenHandler.SLOT_SIZE,
+                TEXTURE_WIDTH, TEXTURE_HEIGHT);
         context.drawItem(stack, slotX + 1, slotY + 1);
         String countText = Integer.toString(count);
         int countWidth = textRenderer.getWidth(countText);
@@ -128,7 +134,6 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         if (this.withdrawField != null) {
             this.withdrawField.tick();
         }
-        updateButtonStates();
     }
 
     @Override
@@ -159,12 +164,30 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         if (this.withdrawField != null && this.withdrawField.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
+
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if (isPointWithinBounds(WITHDRAW_BUTTON_X_OFFSET, WITHDRAW_BUTTON_Y_OFFSET, WITHDRAW_BUTTON_WIDTH,
+                    WITHDRAW_BUTTON_HEIGHT, mouseX, mouseY)) {
+                attemptWithdraw();
+                return true;
+            }
+
+            if (isPointWithinBounds(DEPOSIT_BUTTON_X_OFFSET, DEPOSIT_BUTTON_Y_OFFSET, DEPOSIT_BUTTON_WIDTH,
+                    DEPOSIT_BUTTON_HEIGHT, mouseX, mouseY)) {
+                attemptDeposit();
+                return true;
+            }
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     private void attemptDeposit() {
         MinecraftClient client = this.client;
         if (client == null || client.interactionManager == null) {
+            return;
+        }
+
+        if (!this.handler.hasDepositItem()) {
             return;
         }
 
@@ -187,7 +210,6 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         buf.writeVarLong(amount);
         ClientPlayNetworking.send(ModPackets.BANK_WITHDRAW_REQUEST_PACKET, buf);
         this.withdrawField.setText("");
-        updateButtonStates();
     }
 
     private long getWithdrawAmount() {
@@ -214,16 +236,5 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         }
 
         return Math.max(value, 0L);
-    }
-
-    private void updateButtonStates() {
-        if (this.withdrawButton != null) {
-            long amount = getWithdrawAmount();
-            this.withdrawButton.active = amount > 0 && amount <= this.handler.getTotalDollars();
-        }
-
-        if (this.depositButton != null) {
-            this.depositButton.active = this.handler.hasDepositItem();
-        }
     }
 }
