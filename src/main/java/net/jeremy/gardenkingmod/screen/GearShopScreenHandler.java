@@ -1044,6 +1044,9 @@ public class GearShopScreenHandler extends ScreenHandler {
         private record SlotConsumptionResult(int remaining, boolean changed) {
         }
 
+        private record CostRemovalResult(boolean success, boolean costSlotsChanged) {
+        }
+
         private int removeFromInventory(Inventory inventory, ItemStack comparisonStack, int remaining) {
                 if (remaining <= 0) {
                         return 0;
