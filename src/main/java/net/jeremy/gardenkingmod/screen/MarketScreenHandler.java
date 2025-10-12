@@ -905,6 +905,7 @@ public class MarketScreenHandler extends ScreenHandler {
         private CostRemovalResult removeCostStacks(ServerPlayerEntity player, List<ItemStack> costs,
                         PlayerInventory playerInventory) {
                 InventoryTransaction transaction = new InventoryTransaction(this.costInventory);
+                long withdrawnCoins = 0L;
                 for (int index = 0; index < costs.size(); index++) {
                         ItemStack cost = costs.get(index);
                         if (cost.isEmpty()) {
@@ -947,9 +948,10 @@ public class MarketScreenHandler extends ScreenHandler {
                                 if (coinsRequired > 0 && player != null) {
                                         if (!WalletItem.withdrawFromBank(player, coinsRequired)) {
                                                 transaction.rollback();
+                                                refundWithdrawnCoins(player, withdrawnCoins);
                                                 return new CostRemovalResult(false, false);
                                         }
-                                        withdrawnCoins += coinsRequired;
+                                        withdrawnCoins = addClamped(withdrawnCoins, coinsRequired);
                                 }
 
                                 continue;
@@ -966,9 +968,9 @@ public class MarketScreenHandler extends ScreenHandler {
                         }
                         if (remaining > 0) {
                                 transaction.rollback();
+                                refundWithdrawnCoins(player, withdrawnCoins);
                                 return new CostRemovalResult(false, false);
                         }
-                        return new CostRemovalResult(false, touchedCostSlots);
                 }
                 transaction.commit();
                 return new CostRemovalResult(true, transaction.costInventoryChanged());
@@ -1038,9 +1040,6 @@ public class MarketScreenHandler extends ScreenHandler {
                                         continue;
                                 }
 
-                                if (originalStacks != null) {
-                                        originalStacks.putIfAbsent(slot, stack.copy());
-                                }
                                 remaining -= taken;
 
                                 int leftover = requested - taken;
@@ -1063,6 +1062,12 @@ public class MarketScreenHandler extends ScreenHandler {
                         remaining -= taken;
                 }
                 return remaining;
+        }
+
+        private static void refundWithdrawnCoins(ServerPlayerEntity player, long withdrawnCoins) {
+                if (player != null && withdrawnCoins > 0L) {
+                        WalletItem.depositToBank(player, withdrawnCoins);
+                }
         }
 
         private void restoreInventoryStacks(Inventory inventory, Map<Integer, ItemStack> originalStacks) {
