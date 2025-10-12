@@ -12,4 +12,7 @@ public final class ModPackets {
 
     public static final Identifier BANK_BALANCE_PACKET =
             new Identifier(GardenKingMod.MOD_ID, "bank_balance");
+
+    public static final Identifier BANK_WITHDRAW_REQUEST_PACKET =
+            new Identifier(GardenKingMod.MOD_ID, "bank_withdraw_request");
 }

@@ -1,55 +1,118 @@
 package net.jeremy.gardenkingmod.screen;
 
+import org.lwjgl.glfw.GLFW;
+
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.ModItems;
+import net.jeremy.gardenkingmod.network.ModPackets;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class BankScreen extends HandledScreen<BankScreenHandler> {
     private static final Identifier BACKGROUND_TEXTURE = new Identifier(GardenKingMod.MOD_ID,
             "textures/gui/container/bank_gui.png");
-    private static final int SLOT_SIZE = 18;
     private static final ItemStack DOLLAR_STACK = new ItemStack(ModItems.DOLLAR);
+
+    private static final int BALANCE_SLOT_X_OFFSET = (BankScreenHandler.GUI_WIDTH - BankScreenHandler.SLOT_SIZE) / 2;
+    private static final int BALANCE_SLOT_Y_OFFSET = 24;
+    private static final int BALANCE_TEXT_Y_OFFSET = BALANCE_SLOT_Y_OFFSET + BankScreenHandler.SLOT_SIZE + 20;
+    private static final int WITHDRAW_FIELD_WIDTH = 70;
+    private static final int WITHDRAW_FIELD_HEIGHT = 18;
+    private static final int WITHDRAW_FIELD_X_OFFSET = 53;
+    private static final int WITHDRAW_FIELD_Y_OFFSET = 112;
+    private static final int WITHDRAW_BUTTON_WIDTH = 70;
+    private static final int WITHDRAW_BUTTON_HEIGHT = 20;
+    private static final int WITHDRAW_BUTTON_X_OFFSET = WITHDRAW_FIELD_X_OFFSET;
+    private static final int WITHDRAW_BUTTON_Y_OFFSET = WITHDRAW_FIELD_Y_OFFSET + 22;
+    private static final int DEPOSIT_BUTTON_WIDTH = 70;
+    private static final int DEPOSIT_BUTTON_HEIGHT = 20;
+    private static final int DEPOSIT_BUTTON_X_OFFSET = BankScreenHandler.GUI_WIDTH - DEPOSIT_BUTTON_WIDTH - 53;
+    private static final int DEPOSIT_BUTTON_Y_OFFSET = WITHDRAW_BUTTON_Y_OFFSET;
+
+    private TextFieldWidget withdrawField;
+    private ButtonWidget withdrawButton;
+    private ButtonWidget depositButton;
 
     public BankScreen(BankScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-        this.backgroundWidth = 176;
-        this.backgroundHeight = 166;
-        this.playerInventoryTitleY = this.backgroundHeight - 94;
+        this.backgroundWidth = BankScreenHandler.GUI_WIDTH;
+        this.backgroundHeight = BankScreenHandler.GUI_HEIGHT;
+        this.playerInventoryTitleY = BankScreenHandler.PLAYER_INVENTORY_TITLE_Y;
     }
 
     @Override
     protected void init() {
         super.init();
         this.titleX = (this.backgroundWidth - this.textRenderer.getWidth(title)) / 2;
+
+        int left = this.x;
+        int top = this.y;
+
+        this.withdrawField = new TextFieldWidget(this.textRenderer,
+                left + WITHDRAW_FIELD_X_OFFSET,
+                top + WITHDRAW_FIELD_Y_OFFSET,
+                WITHDRAW_FIELD_WIDTH,
+                WITHDRAW_FIELD_HEIGHT,
+                Text.translatable("screen.gardenkingmod.bank.withdraw_placeholder"));
+        this.withdrawField.setMaxLength(12);
+        this.withdrawField.setTextPredicate(text -> text == null || text.chars().allMatch(Character::isDigit));
+        this.withdrawField.setChangedListener(text -> updateButtonStates());
+        this.withdrawField.setPlaceholder(Text.translatable("screen.gardenkingmod.bank.withdraw_placeholder"));
+        this.withdrawField.setDrawsBackground(true);
+        this.addDrawableChild(this.withdrawField);
+
+        this.withdrawButton = ButtonWidget.builder(Text.translatable("screen.gardenkingmod.bank.withdraw"), button -> {
+            attemptWithdraw();
+        }).dimensions(left + WITHDRAW_BUTTON_X_OFFSET, top + WITHDRAW_BUTTON_Y_OFFSET, WITHDRAW_BUTTON_WIDTH,
+                WITHDRAW_BUTTON_HEIGHT).build();
+        this.addDrawableChild(this.withdrawButton);
+
+        this.depositButton = ButtonWidget.builder(Text.translatable("screen.gardenkingmod.bank.deposit"), button -> {
+            attemptDeposit();
+        }).dimensions(left + DEPOSIT_BUTTON_X_OFFSET, top + DEPOSIT_BUTTON_Y_OFFSET, DEPOSIT_BUTTON_WIDTH,
+                DEPOSIT_BUTTON_HEIGHT).build();
+        this.addDrawableChild(this.depositButton);
+
+        updateButtonStates();
+        setInitialFocus(this.withdrawField);
     }
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
         context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight, 256, 256);
-        int slotOriginX = x + (backgroundWidth - SLOT_SIZE) / 2;
-        int slotY = y + 34;
+        int slotOriginX = x + BALANCE_SLOT_X_OFFSET;
+        int slotY = y + BALANCE_SLOT_Y_OFFSET;
 
         drawSlot(context, slotOriginX, slotY, DOLLAR_STACK, handler.getTotalDollars(),
                 Text.translatable("screen.gardenkingmod.bank.slot.dollar"));
 
         Text totalText = Text.translatable("screen.gardenkingmod.bank.total", handler.getTotalDollars());
-        context.drawText(textRenderer, totalText, x + (backgroundWidth - textRenderer.getWidth(totalText)) / 2, slotY + 54,
+        context.drawText(textRenderer, totalText, x + (backgroundWidth - textRenderer.getWidth(totalText)) / 2,
+                y + BALANCE_TEXT_Y_OFFSET,
                 0x404040, false);
     }
 
     private void drawSlot(DrawContext context, int slotX, int slotY, ItemStack stack, int count, Text label) {
-        context.drawTexture(BACKGROUND_TEXTURE, slotX, slotY, 7, 83, SLOT_SIZE, SLOT_SIZE, 256, 256);
+        context.drawTexture(BACKGROUND_TEXTURE, slotX, slotY, 7, 83, BankScreenHandler.SLOT_SIZE, BankScreenHandler.SLOT_SIZE,
+                256, 256);
         context.drawItem(stack, slotX + 1, slotY + 1);
         String countText = Integer.toString(count);
         int countWidth = textRenderer.getWidth(countText);
-        context.drawText(textRenderer, countText, slotX + SLOT_SIZE - 4 - countWidth, slotY + SLOT_SIZE - 9, 0x404040, false);
-        int labelX = slotX + SLOT_SIZE / 2 - textRenderer.getWidth(label) / 2;
-        context.drawText(textRenderer, label, labelX, slotY + SLOT_SIZE + 4, 0x404040, false);
+        context.drawText(textRenderer, countText,
+                slotX + BankScreenHandler.SLOT_SIZE - 4 - countWidth,
+                slotY + BankScreenHandler.SLOT_SIZE - 9, 0x404040, false);
+        int labelX = slotX + BankScreenHandler.SLOT_SIZE / 2 - textRenderer.getWidth(label) / 2;
+        context.drawText(textRenderer, label, labelX, slotY + BankScreenHandler.SLOT_SIZE + 4, 0x404040, false);
     }
 
     @Override
@@ -57,5 +120,110 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
         drawMouseoverTooltip(context, mouseX, mouseY);
+    }
+
+    @Override
+    protected void handledScreenTick() {
+        super.handledScreenTick();
+        if (this.withdrawField != null) {
+            this.withdrawField.tick();
+        }
+        updateButtonStates();
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (this.withdrawField != null && this.withdrawField.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        }
+
+        if (this.withdrawField != null && this.withdrawField.isFocused()
+                && (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER)) {
+            attemptWithdraw();
+            return true;
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        if (this.withdrawField != null && this.withdrawField.charTyped(chr, modifiers)) {
+            return true;
+        }
+        return super.charTyped(chr, modifiers);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.withdrawField != null && this.withdrawField.mouseClicked(mouseX, mouseY, button)) {
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private void attemptDeposit() {
+        MinecraftClient client = this.client;
+        if (client == null || client.interactionManager == null) {
+            return;
+        }
+
+        client.interactionManager.clickButton(this.handler.syncId, BankScreenHandler.BUTTON_DEPOSIT);
+    }
+
+    private void attemptWithdraw() {
+        long amount = getWithdrawAmount();
+        if (amount <= 0 || amount > this.handler.getTotalDollars()) {
+            return;
+        }
+
+        MinecraftClient client = this.client;
+        if (client == null || client.player == null) {
+            return;
+        }
+
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeVarInt(this.handler.syncId);
+        buf.writeVarLong(amount);
+        ClientPlayNetworking.send(ModPackets.BANK_WITHDRAW_REQUEST_PACKET, buf);
+        this.withdrawField.setText("");
+        updateButtonStates();
+    }
+
+    private long getWithdrawAmount() {
+        if (this.withdrawField == null) {
+            return 0L;
+        }
+
+        String text = this.withdrawField.getText();
+        if (text == null || text.isEmpty()) {
+            return 0L;
+        }
+
+        long value;
+        try {
+            value = Long.parseLong(text);
+        } catch (NumberFormatException ex) {
+            return 0L;
+        }
+
+        long clamped = Math.min(value, BankScreenHandler.MAX_WITHDRAW_AMOUNT);
+        if (clamped != value) {
+            this.withdrawField.setText(Long.toString(clamped));
+            value = clamped;
+        }
+
+        return Math.max(value, 0L);
+    }
+
+    private void updateButtonStates() {
+        if (this.withdrawButton != null) {
+            long amount = getWithdrawAmount();
+            this.withdrawButton.active = amount > 0 && amount <= this.handler.getTotalDollars();
+        }
+
+        if (this.depositButton != null) {
+            this.depositButton.active = this.handler.hasDepositItem();
+        }
     }
 }
