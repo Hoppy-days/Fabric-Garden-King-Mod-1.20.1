@@ -949,6 +949,7 @@ public class MarketScreenHandler extends ScreenHandler {
                                                 transaction.rollback();
                                                 return new CostRemovalResult(false, false);
                                         }
+                                        withdrawnCoins += coinsRequired;
                                 }
 
                                 continue;
@@ -967,6 +968,7 @@ public class MarketScreenHandler extends ScreenHandler {
                                 transaction.rollback();
                                 return new CostRemovalResult(false, false);
                         }
+                        return new CostRemovalResult(false, touchedCostSlots);
                 }
                 transaction.commit();
                 return new CostRemovalResult(true, transaction.costInventoryChanged());
@@ -1036,6 +1038,9 @@ public class MarketScreenHandler extends ScreenHandler {
                                         continue;
                                 }
 
+                                if (originalStacks != null) {
+                                        originalStacks.putIfAbsent(slot, stack.copy());
+                                }
                                 remaining -= taken;
 
                                 int leftover = requested - taken;
@@ -1058,6 +1063,23 @@ public class MarketScreenHandler extends ScreenHandler {
                         remaining -= taken;
                 }
                 return remaining;
+        }
+
+        private void restoreInventoryStacks(Inventory inventory, Map<Integer, ItemStack> originalStacks) {
+                if (originalStacks == null || originalStacks.isEmpty()) {
+                        return;
+                }
+
+                for (Map.Entry<Integer, ItemStack> entry : originalStacks.entrySet()) {
+                        ItemStack original = entry.getValue();
+                        if (original == null) {
+                                inventory.setStack(entry.getKey(), ItemStack.EMPTY);
+                        } else {
+                                inventory.setStack(entry.getKey(), original.copy());
+                        }
+                }
+
+                inventory.markDirty();
         }
         private boolean processPurchase(ServerPlayerEntity player, int offerIndex, boolean resultTakenFromSlot) {
                 if (offerIndex < 0 || offerIndex >= this.buyOffers.size()) {
