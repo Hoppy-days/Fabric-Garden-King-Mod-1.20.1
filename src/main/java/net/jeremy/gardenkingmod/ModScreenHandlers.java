@@ -1,6 +1,7 @@
 package net.jeremy.gardenkingmod;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.jeremy.gardenkingmod.screen.BankScreenHandler;
 import net.jeremy.gardenkingmod.screen.GearShopScreenHandler;
 import net.jeremy.gardenkingmod.screen.MarketScreenHandler;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreenHandler;
@@ -21,6 +22,10 @@ public final class ModScreenHandlers {
         public static final ScreenHandlerType<ScarecrowScreenHandler> SCARECROW_SCREEN_HANDLER = Registry.register(
                         Registries.SCREEN_HANDLER, new Identifier(GardenKingMod.MOD_ID, "scarecrow"),
                         new ExtendedScreenHandlerType<>(ScarecrowScreenHandler::new));
+
+        public static final ScreenHandlerType<BankScreenHandler> BANK_SCREEN_HANDLER = Registry.register(
+                        Registries.SCREEN_HANDLER, new Identifier(GardenKingMod.MOD_ID, "bank"),
+                        new ExtendedScreenHandlerType<>(BankScreenHandler::new));
 
         private ModScreenHandlers() {
         }

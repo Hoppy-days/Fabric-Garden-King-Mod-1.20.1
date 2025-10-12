@@ -24,6 +24,8 @@ import net.jeremy.gardenkingmod.client.render.item.ScarecrowItemRenderer;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.item.FortuneProvidingItem;
 import net.jeremy.gardenkingmod.network.ModPackets;
+import net.jeremy.gardenkingmod.screen.BankScreen;
+import net.jeremy.gardenkingmod.screen.BankScreenHandler;
 import net.jeremy.gardenkingmod.screen.GearShopScreen;
 import net.jeremy.gardenkingmod.screen.MarketScreen;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreen;
@@ -35,6 +37,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.jeremy.gardenkingmod.registry.ModEntities;
 
 public class GardenKingModClient implements ClientModInitializer {
@@ -43,6 +46,7 @@ public class GardenKingModClient implements ClientModInitializer {
         HandledScreens.register(ModScreenHandlers.GEAR_SHOP_SCREEN_HANDLER, GearShopScreen::new);
         HandledScreens.register(ModScreenHandlers.MARKET_SCREEN_HANDLER, MarketScreen::new);
         HandledScreens.register(ModScreenHandlers.SCARECROW_SCREEN_HANDLER, ScarecrowScreen::new);
+        HandledScreens.register(ModScreenHandlers.BANK_SCREEN_HANDLER, BankScreen::new);
         EntityModelLayerRegistry.registerModelLayer(MarketBlockModel.LAYER_LOCATION, MarketBlockModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(GearShopModel.LAYER_LOCATION,
                         GearShopModel::getTexturedModelData);
@@ -83,6 +87,23 @@ public class GardenKingModClient implements ClientModInitializer {
                                 if (client.currentScreen instanceof MarketScreen marketScreen) {
                                         marketScreen.updateSaleResult(success, itemsSold, payout, lifetimeTotal, feedback,
                                                         soldItemCounts);
+                                }
+                        });
+                });
+
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.BANK_BALANCE_PACKET,
+                (client, handler, buf, responseSender) -> {
+                        BlockPos bankPos = buf.readBlockPos();
+                        int totalCoins = buf.readVarInt();
+                        int dollars = buf.readVarInt();
+                        int coinSacks = buf.readVarInt();
+                        int coins = buf.readVarInt();
+
+                        client.execute(() -> {
+                                if (client.player != null
+                                                && client.player.currentScreenHandler instanceof BankScreenHandler bankHandler
+                                                && bankHandler.getBankPos().equals(bankPos)) {
+                                        bankHandler.updateBalances(totalCoins, dollars, coinSacks, coins);
                                 }
                         });
                 });

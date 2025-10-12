@@ -9,4 +9,7 @@ public final class ModPackets {
 
     public static final Identifier MARKET_SALE_RESULT_PACKET =
             new Identifier(GardenKingMod.MOD_ID, "market_sale_result");
+
+    public static final Identifier BANK_BALANCE_PACKET =
+            new Identifier(GardenKingMod.MOD_ID, "bank_balance");
 }
