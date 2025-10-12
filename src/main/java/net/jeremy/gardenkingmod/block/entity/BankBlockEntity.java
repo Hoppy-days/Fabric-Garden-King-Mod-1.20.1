@@ -106,18 +106,11 @@ public class BankBlockEntity extends BlockEntity implements ExtendedScreenHandle
         if (player == null) {
             return;
         }
-        int totalCoins = getBankBalance(player);
-        int dollars = totalCoins / 81;
-        int remainingAfterDollars = totalCoins % 81;
-        int coinSacks = remainingAfterDollars / 9;
-        int coins = remainingAfterDollars % 9;
+        int totalDollars = getBankBalance(player);
 
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeBlockPos(getPos());
-        buf.writeVarInt(totalCoins);
-        buf.writeVarInt(dollars);
-        buf.writeVarInt(coinSacks);
-        buf.writeVarInt(coins);
+        buf.writeVarInt(totalDollars);
         ServerPlayNetworking.send(player, ModPackets.BANK_BALANCE_PACKET, buf);
     }
 

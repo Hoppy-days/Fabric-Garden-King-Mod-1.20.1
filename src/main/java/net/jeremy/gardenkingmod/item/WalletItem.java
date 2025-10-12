@@ -22,7 +22,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 
 /**
- * Wallet item that links to a specific player and exposes their Garden Coin bank
+ * Wallet item that links to a specific player and exposes their Garden Dollar bank
  * balance to both client and server logic.
  */
 public class WalletItem extends Item {
@@ -61,7 +61,7 @@ public class WalletItem extends Item {
                 NbtCompound nbt = stack.getNbt();
                 if (nbt == null) {
                         tooltip.add(Text.translatable("tooltip.gardenkingmod.wallet.unbound").formatted(Formatting.GRAY));
-                        tooltip.add(Text.translatable("tooltip.gardenkingmod.wallet.balance", formatCoins(0))
+                        tooltip.add(Text.translatable("tooltip.gardenkingmod.wallet.balance", formatDollars(0))
                                         .formatted(Formatting.GOLD));
                         return;
                 }
@@ -80,7 +80,7 @@ public class WalletItem extends Item {
                 }
 
                 long balance = getBalanceSnapshot(stack);
-                tooltip.add(Text.translatable("tooltip.gardenkingmod.wallet.balance", formatCoins(balance))
+                tooltip.add(Text.translatable("tooltip.gardenkingmod.wallet.balance", formatDollars(balance))
                                 .formatted(Formatting.GOLD));
         }
 
@@ -155,29 +155,15 @@ public class WalletItem extends Item {
         }
 
         public static int getCurrencyValuePerItem(Item item) {
-                if (item == ModItems.GARDEN_COIN) {
-                        return 1;
-                }
-                if (item == ModItems.COIN_SACK) {
-                        return 9;
-                }
-                if (item == ModItems.DOLLAR) {
-                        return 81;
-                }
-                return 0;
+                return item == ModItems.DOLLAR ? 1 : 0;
         }
 
         public static long getCurrencyValue(Item item, long count) {
-                int perItem = getCurrencyValuePerItem(item);
-                if (perItem <= 0 || count <= 0) {
-                                return 0L;
+                if (item != ModItems.DOLLAR || count <= 0) {
+                        return 0L;
                 }
 
-                try {
-                        return Math.multiplyExact((long) perItem, count);
-                } catch (ArithmeticException overflow) {
-                        return Long.MAX_VALUE;
-                }
+                return count;
         }
 
         private static Optional<WalletContext> locateWallet(ServerPlayerEntity player) {
@@ -277,7 +263,7 @@ public class WalletItem extends Item {
                 return 0L;
         }
 
-        private static String formatCoins(long amount) {
+        private static String formatDollars(long amount) {
                 NumberFormat format = NumberFormat.getIntegerInstance(Locale.US);
                 format.setGroupingUsed(true);
                 return format.format(Math.max(0L, amount));
