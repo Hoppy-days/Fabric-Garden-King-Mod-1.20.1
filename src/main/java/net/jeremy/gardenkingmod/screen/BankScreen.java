@@ -48,14 +48,14 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     private static final int WITHDRAW_BUTTON_HEIGHT = 22;
     private static final int WITHDRAW_BUTTON_X_OFFSET = 205;
     private static final int WITHDRAW_BUTTON_Y_OFFSET = 52;
-    private static final int WITHDRAW_BUTTON_TEXT_X_ADJUST = 0;
-    private static final int WITHDRAW_BUTTON_TEXT_Y_ADJUST = 0;
+    private static final int WITHDRAW_BUTTON_TEXT_X_ADJUST = -9;
+    private static final int WITHDRAW_BUTTON_TEXT_Y_ADJUST = -1;
     private static final int DEPOSIT_BUTTON_WIDTH = 72;
     private static final int DEPOSIT_BUTTON_HEIGHT = 22;
     private static final int DEPOSIT_BUTTON_X_OFFSET = 205;
     private static final int DEPOSIT_BUTTON_Y_OFFSET = 140;
-    private static final int DEPOSIT_BUTTON_TEXT_X_ADJUST = 0;
-    private static final int DEPOSIT_BUTTON_TEXT_Y_ADJUST = 0;
+    private static final int DEPOSIT_BUTTON_TEXT_X_ADJUST = -9;
+    private static final int DEPOSIT_BUTTON_TEXT_Y_ADJUST = -1;
     private static final int BUTTON_HOVER_U = 0;
     private static final int BUTTON_HOVER_V = 223;
 
