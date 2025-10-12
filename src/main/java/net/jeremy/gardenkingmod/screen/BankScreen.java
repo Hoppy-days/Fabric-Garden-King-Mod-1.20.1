@@ -290,6 +290,13 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
                 context.drawTexture(BACKGROUND_TEXTURE, this.getX(), this.getY(), BUTTON_HOVER_U, BUTTON_HOVER_V,
                         this.width, this.height, TEXTURE_WIDTH, TEXTURE_HEIGHT);
             }
+
+            Text message = this.getMessage();
+            int textWidth = BankScreen.this.textRenderer.getWidth(message);
+            int textX = this.getX() + (this.width - textWidth) / 2;
+            int textY = this.getY() + (this.height - BankScreen.this.textRenderer.fontHeight) / 2;
+            int color = this.active ? 0xFFFFFF : 0xA0A0A0;
+            context.drawText(BankScreen.this.textRenderer, message, textX, textY, color, false);
         }
 
         @Override
