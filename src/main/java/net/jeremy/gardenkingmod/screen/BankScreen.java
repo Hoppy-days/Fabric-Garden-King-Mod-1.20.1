@@ -42,8 +42,8 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     private static final int BALANCE_TEXT_Y_OFFSET = BALANCE_SLOT_Y_OFFSET + BankScreenHandler.SLOT_SIZE + 38;
     private static final int WITHDRAW_FIELD_WIDTH = 72;
     private static final int WITHDRAW_FIELD_HEIGHT = 22;
-    private static final int WITHDRAW_FIELD_X_OFFSET = 196;
-    private static final int WITHDRAW_FIELD_Y_OFFSET = 24;
+    private static final int WITHDRAW_FIELD_X_OFFSET = 205;
+    private static final int WITHDRAW_FIELD_Y_OFFSET = 25;
     private static final int WITHDRAW_BUTTON_WIDTH = 72;
     private static final int WITHDRAW_BUTTON_HEIGHT = 22;
     private static final int WITHDRAW_BUTTON_X_OFFSET = 205;
