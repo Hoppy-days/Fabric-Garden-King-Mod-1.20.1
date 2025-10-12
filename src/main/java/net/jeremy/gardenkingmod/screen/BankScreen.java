@@ -129,8 +129,9 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         int slotOriginX = x + BALANCE_SLOT_X_OFFSET;
         int slotY = y + BALANCE_SLOT_Y_OFFSET;
 
-        drawSlot(context, slotOriginX, slotY, handler.getTotalDollars(),
-                Text.translatable("screen.gardenkingmod.bank.slot.dollar"));
+        Text slotLabel = Text.translatable("screen.gardenkingmod.bank.slot.dollar");
+        int labelX = slotOriginX + BankScreenHandler.SLOT_SIZE / 2 - textRenderer.getWidth(slotLabel) / 2;
+        context.drawText(textRenderer, slotLabel, labelX, slotY + BALANCE_SLOT_LABEL_OFFSET, 0x404040, false);
 
         context.drawTexture(DOLLAR_ITEM_TEXTURE,
                 x + DOLLAR_TEXTURE_X_OFFSET,
@@ -146,18 +147,6 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         context.drawText(textRenderer, totalText, x + (BASE_GUI_WIDTH - textRenderer.getWidth(totalText)) / 2,
                 y + BALANCE_TEXT_Y_OFFSET,
                 0x404040, false);
-    }
-
-    private void drawSlot(DrawContext context, int slotX, int slotY, int count, Text label) {
-        context.drawTexture(BACKGROUND_TEXTURE, slotX, slotY, 7, 83, BankScreenHandler.SLOT_SIZE, BankScreenHandler.SLOT_SIZE,
-                BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
-        String countText = Integer.toString(count);
-        int countWidth = textRenderer.getWidth(countText);
-        context.drawText(textRenderer, countText,
-                slotX + BankScreenHandler.SLOT_SIZE - 4 - countWidth,
-                slotY + BankScreenHandler.SLOT_SIZE - 9, 0x404040, false);
-        int labelX = slotX + BankScreenHandler.SLOT_SIZE / 2 - textRenderer.getWidth(label) / 2;
-        context.drawText(textRenderer, label, labelX, slotY + BALANCE_SLOT_LABEL_OFFSET, 0x404040, false);
     }
 
     @Override
