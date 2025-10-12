@@ -902,6 +902,11 @@ public class MarketScreenHandler extends ScreenHandler {
         private CostRemovalResult removeCostStacks(ServerPlayerEntity player, List<ItemStack> costs,
                         PlayerInventory playerInventory) {
                 boolean costSlotsChanged = false;
+                Map<Integer, ItemStack> originalCostSlots = new HashMap<>();
+                Map<Integer, ItemStack> originalPlayerSlots = new HashMap<>();
+                long withdrawnCoins = 0L;
+                boolean success = true;
+
                 for (int index = 0; index < costs.size(); index++) {
                         ItemStack cost = costs.get(index);
                         if (cost.isEmpty()) {
@@ -919,6 +924,8 @@ public class MarketScreenHandler extends ScreenHandler {
                                 long coinsRequired = WalletItem.getCurrencyValue(comparisonStack.getItem(), required);
                                 int remainingItems = required;
                                 if (index < COST_SLOT_COUNT) {
+                                        originalCostSlots.putIfAbsent(index,
+                                                        this.costInventory.getStack(index).copy());
                                         SlotConsumptionResult result = consumeCostSlot(index, comparisonStack, required);
                                         remainingItems = result.remaining();
                                         if (result.changed()) {
@@ -932,7 +939,8 @@ public class MarketScreenHandler extends ScreenHandler {
                                 }
 
                                 if (remainingItems > 0) {
-                                        int remainingAfterInventory = removeFromInventory(playerInventory, comparisonStack, remainingItems);
+                                        int remainingAfterInventory = removeFromInventory(playerInventory, comparisonStack,
+                                                        remainingItems, originalPlayerSlots);
                                         int consumed = remainingItems - remainingAfterInventory;
                                         if (consumed > 0) {
                                                 long coinsFromInventory = WalletItem.getCurrencyValue(comparisonStack.getItem(), consumed);
@@ -943,8 +951,10 @@ public class MarketScreenHandler extends ScreenHandler {
 
                                 if (coinsRequired > 0 && player != null) {
                                         if (!WalletItem.withdrawFromBank(player, coinsRequired)) {
-                                                return new CostRemovalResult(false, costSlotsChanged);
+                                                success = false;
+                                                break;
                                         }
+                                        withdrawnCoins += coinsRequired;
                                 }
 
                                 continue;
@@ -952,6 +962,7 @@ public class MarketScreenHandler extends ScreenHandler {
 
                         int remaining = required;
                         if (index < COST_SLOT_COUNT) {
+                                originalCostSlots.putIfAbsent(index, this.costInventory.getStack(index).copy());
                                 SlotConsumptionResult result = consumeCostSlot(index, comparisonStack, required);
                                 remaining = result.remaining();
                                 if (result.changed()) {
@@ -959,11 +970,21 @@ public class MarketScreenHandler extends ScreenHandler {
                                 }
                         }
                         if (remaining > 0) {
-                                remaining = removeFromInventory(playerInventory, comparisonStack, remaining);
+                                remaining = removeFromInventory(playerInventory, comparisonStack, remaining, originalPlayerSlots);
                         }
                         if (remaining > 0) {
-                                return new CostRemovalResult(false, costSlotsChanged);
+                                success = false;
+                                break;
                         }
+                }
+                if (!success) {
+                        boolean touchedCostSlots = costSlotsChanged || !originalCostSlots.isEmpty();
+                        restoreInventoryStacks(this.costInventory, originalCostSlots);
+                        restoreInventoryStacks(playerInventory, originalPlayerSlots);
+                        if (withdrawnCoins > 0 && player != null) {
+                                WalletItem.depositToBank(player, withdrawnCoins);
+                        }
+                        return new CostRemovalResult(false, touchedCostSlots);
                 }
                 return new CostRemovalResult(true, costSlotsChanged);
         }
@@ -1002,7 +1023,8 @@ public class MarketScreenHandler extends ScreenHandler {
                 return new SlotConsumptionResult(required - consumed, true);
         }
 
-        private int removeFromInventory(Inventory inventory, ItemStack comparisonStack, int remaining) {
+        private int removeFromInventory(Inventory inventory, ItemStack comparisonStack, int remaining,
+                        Map<Integer, ItemStack> originalStacks) {
                 if (remaining <= 0) {
                         return 0;
                 }
@@ -1034,6 +1056,9 @@ public class MarketScreenHandler extends ScreenHandler {
                                         continue;
                                 }
 
+                                if (originalStacks != null) {
+                                        originalStacks.putIfAbsent(slot, stack.copy());
+                                }
                                 remaining -= taken;
                                 changed = true;
 
@@ -1053,6 +1078,9 @@ public class MarketScreenHandler extends ScreenHandler {
                                 continue;
                         }
 
+                        if (originalStacks != null) {
+                                originalStacks.putIfAbsent(slot, stack.copy());
+                        }
                         stack.decrement(taken);
                         remaining -= taken;
                         changed = true;
@@ -1065,6 +1093,23 @@ public class MarketScreenHandler extends ScreenHandler {
                         inventory.markDirty();
                 }
                 return remaining;
+        }
+
+        private void restoreInventoryStacks(Inventory inventory, Map<Integer, ItemStack> originalStacks) {
+                if (originalStacks == null || originalStacks.isEmpty()) {
+                        return;
+                }
+
+                for (Map.Entry<Integer, ItemStack> entry : originalStacks.entrySet()) {
+                        ItemStack original = entry.getValue();
+                        if (original == null) {
+                                inventory.setStack(entry.getKey(), ItemStack.EMPTY);
+                        } else {
+                                inventory.setStack(entry.getKey(), original.copy());
+                        }
+                }
+
+                inventory.markDirty();
         }
         private boolean processPurchase(ServerPlayerEntity player, int offerIndex, boolean resultTakenFromSlot) {
                 if (offerIndex < 0 || offerIndex >= this.buyOffers.size()) {
