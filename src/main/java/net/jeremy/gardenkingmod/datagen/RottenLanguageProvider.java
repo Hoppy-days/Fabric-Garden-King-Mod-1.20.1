@@ -22,7 +22,7 @@ public final class RottenLanguageProvider extends FabricLanguageProvider {
         public void generateTranslations(TranslationBuilder translationBuilder) {
                 translationBuilder.add("block.gardenkingmod.market_block", "Garden Market");
                 translationBuilder.add("block.gardenkingmod.gear_shop_block", "Gear Shop");
-                translationBuilder.add("item.gardenkingmod.garden_coin", "Garden Coin");
+                translationBuilder.add("item.gardenkingmod.dollar", "Dollar");
                 translationBuilder.add("container.gardenkingmod.market", "Garden Market");
                 translationBuilder.add("container.gardenkingmod.gear_shop", "Gear Shop");
                 translationBuilder.add("container.gardenkingmod.scarecrow", "Field Scarecrow");
@@ -42,7 +42,8 @@ public final class RottenLanguageProvider extends FabricLanguageProvider {
                                 "Sold %1$s Croptopia crops for %2$s coins. Lifetime earnings: %3$s coins.");
                 translationBuilder.add("message.gardenkingmod.market.empty", "There are no crops to sell.");
                 translationBuilder.add("message.gardenkingmod.market.invalid", "Only Crops and Food can be sold here!");
-                translationBuilder.add("scoreboard.gardenkingmod.garden_currency", "Garden Coins");
+                translationBuilder.add("scoreboard.gardenkingmod.garden_currency", "Garden Dollars");
+                translationBuilder.add("scoreboard.gardenkingmod.garden_currency_bank", "Bank Dollars");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier", "Tier: %s");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier.tier_1", "Tier 1");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier.tier_2", "Tier 2");

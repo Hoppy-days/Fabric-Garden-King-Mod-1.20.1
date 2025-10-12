@@ -306,7 +306,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 if (totalPayout > 0) {
                         boolean deposited = WalletItem.depositToBank(player, totalPayout);
                         if (!deposited) {
-                                ItemStack currencyStack = new ItemStack(ModItems.GARDEN_COIN, totalPayout);
+                                ItemStack currencyStack = new ItemStack(ModItems.DOLLAR, totalPayout);
                                 boolean fullyInserted = player.getInventory().insertStack(currencyStack);
                                 if (!fullyInserted && !currencyStack.isEmpty()) {
                                         player.dropItem(currencyStack, false);

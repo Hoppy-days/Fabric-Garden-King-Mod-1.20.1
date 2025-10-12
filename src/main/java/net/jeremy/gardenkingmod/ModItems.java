@@ -40,8 +40,6 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public final class ModItems {
-        public static final Item GARDEN_COIN = registerItem("garden_coin", new Item(new FabricItemSettings()));
-        public static final Item COIN_SACK = registerItem("coin_sack", new Item(new FabricItemSettings()));
         public static final Item WALLET = registerItem("wallet", new WalletItem(new FabricItemSettings()));
         public static final Item DOLLAR = registerItem("dollar", new Item(new FabricItemSettings()));
         public static final Item RUBY = registerItem("ruby", new Item(new FabricItemSettings()));
@@ -242,8 +240,6 @@ public final class ModItems {
                 }
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
                                 .register(entries -> {
-                                        entries.add(GARDEN_COIN);
-                                        entries.add(COIN_SACK);
                                         entries.add(DOLLAR);
                                         entries.add(WALLET);
                                         entries.add(RUBY);

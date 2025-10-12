@@ -12,10 +12,7 @@ import net.minecraft.util.math.BlockPos;
 public class BankScreenHandler extends ScreenHandler {
     private final BankBlockEntity blockEntity;
     private final BlockPos bankPos;
-    private int totalCoins;
-    private int dollars;
-    private int coinSacks;
-    private int coins;
+    private int totalDollars;
 
     public BankScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()));
@@ -48,30 +45,15 @@ public class BankScreenHandler extends ScreenHandler {
         return ItemStack.EMPTY;
     }
 
-    public void updateBalances(int totalCoins, int dollars, int coinSacks, int coins) {
-        this.totalCoins = totalCoins;
-        this.dollars = dollars;
-        this.coinSacks = coinSacks;
-        this.coins = coins;
+    public void updateBalance(int totalDollars) {
+        this.totalDollars = totalDollars;
     }
 
     public BlockPos getBankPos() {
         return bankPos;
     }
 
-    public int getTotalCoins() {
-        return totalCoins;
-    }
-
-    public int getDollars() {
-        return dollars;
-    }
-
-    public int getCoinSacks() {
-        return coinSacks;
-    }
-
-    public int getCoins() {
-        return coins;
+    public int getTotalDollars() {
+        return totalDollars;
     }
 }

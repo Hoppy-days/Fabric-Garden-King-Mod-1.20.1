@@ -44,7 +44,7 @@ public final class GardenKingModGameTest implements FabricGameTest {
                         int coinCount = 0;
                         int tomatoCount = 0;
                         for (ItemStack inventoryStack : player.getInventory().main) {
-                                if (inventoryStack.isOf(ModItems.GARDEN_COIN)) {
+                                if (inventoryStack.isOf(ModItems.DOLLAR)) {
                                         coinCount += inventoryStack.getCount();
                                 } else if (inventoryStack.isOf(tomatoOptional.get())) {
                                         tomatoCount += inventoryStack.getCount();
@@ -52,7 +52,7 @@ public final class GardenKingModGameTest implements FabricGameTest {
                         }
 
                         if (coinCount <= 0) {
-                                helper.fail("Player did not receive any garden coins after selling tomatoes");
+                                helper.fail("Player did not receive any dollars after selling tomatoes");
                                 return;
                         }
 

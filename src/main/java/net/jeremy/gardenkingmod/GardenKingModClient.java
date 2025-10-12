@@ -94,16 +94,13 @@ public class GardenKingModClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.BANK_BALANCE_PACKET,
                 (client, handler, buf, responseSender) -> {
                         BlockPos bankPos = buf.readBlockPos();
-                        int totalCoins = buf.readVarInt();
-                        int dollars = buf.readVarInt();
-                        int coinSacks = buf.readVarInt();
-                        int coins = buf.readVarInt();
+                        int totalDollars = buf.readVarInt();
 
                         client.execute(() -> {
                                 if (client.player != null
                                                 && client.player.currentScreenHandler instanceof BankScreenHandler bankHandler
                                                 && bankHandler.getBankPos().equals(bankPos)) {
-                                        bankHandler.updateBalances(totalCoins, dollars, coinSacks, coins);
+                                        bankHandler.updateBalance(totalDollars);
                                 }
                         });
                 });
