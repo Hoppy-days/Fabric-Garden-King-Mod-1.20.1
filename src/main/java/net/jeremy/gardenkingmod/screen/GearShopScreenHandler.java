@@ -2,8 +2,11 @@ package net.jeremy.gardenkingmod.screen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.jeremy.gardenkingmod.ModScreenHandlers;
 import net.jeremy.gardenkingmod.block.entity.GearShopBlockEntity;
@@ -937,7 +940,7 @@ public class GearShopScreenHandler extends ScreenHandler {
 
         private CostRemovalResult removeCostStacks(ServerPlayerEntity player, List<ItemStack> costs,
                         PlayerInventory playerInventory) {
-                boolean costSlotsChanged = false;
+                InventoryTransaction transaction = new InventoryTransaction(this.costInventory);
                 for (int index = 0; index < costs.size(); index++) {
                         ItemStack cost = costs.get(index);
                         if (cost.isEmpty()) {
@@ -955,11 +958,9 @@ public class GearShopScreenHandler extends ScreenHandler {
                                 long coinsRequired = WalletItem.getCurrencyValue(comparisonStack.getItem(), required);
                                 int remainingItems = required;
                                 if (index < COST_SLOT_COUNT) {
-                                        SlotConsumptionResult result = consumeCostSlot(index, comparisonStack, required);
+                                        SlotConsumptionResult result = consumeCostSlot(transaction, index, comparisonStack,
+                                                        required);
                                         remainingItems = result.remaining();
-                                        if (result.changed()) {
-                                                costSlotsChanged = true;
-                                        }
                                         int consumed = required - remainingItems;
                                         if (consumed > 0) {
                                                 long coinsFromSlot = WalletItem.getCurrencyValue(comparisonStack.getItem(), consumed);
@@ -968,10 +969,12 @@ public class GearShopScreenHandler extends ScreenHandler {
                                 }
 
                                 if (remainingItems > 0) {
-                                        int remainingAfterInventory = removeFromInventory(playerInventory, comparisonStack, remainingItems);
+                                        int remainingAfterInventory = removeFromInventory(playerInventory, comparisonStack,
+                                                        remainingItems, transaction);
                                         int consumed = remainingItems - remainingAfterInventory;
                                         if (consumed > 0) {
-                                                long coinsFromInventory = WalletItem.getCurrencyValue(comparisonStack.getItem(), consumed);
+                                                long coinsFromInventory = WalletItem.getCurrencyValue(comparisonStack.getItem(),
+                                                                consumed);
                                                 coinsRequired = Math.max(0L, coinsRequired - coinsFromInventory);
                                         }
                                         remainingItems = remainingAfterInventory;
@@ -979,7 +982,8 @@ public class GearShopScreenHandler extends ScreenHandler {
 
                                 if (coinsRequired > 0 && player != null) {
                                         if (!WalletItem.withdrawFromBank(player, coinsRequired)) {
-                                                return new CostRemovalResult(false, costSlotsChanged);
+                                                transaction.rollback();
+                                                return new CostRemovalResult(false, false);
                                         }
                                 }
 
@@ -988,23 +992,23 @@ public class GearShopScreenHandler extends ScreenHandler {
 
                         int remaining = required;
                         if (index < COST_SLOT_COUNT) {
-                                SlotConsumptionResult result = consumeCostSlot(index, comparisonStack, required);
+                                SlotConsumptionResult result = consumeCostSlot(transaction, index, comparisonStack,
+                                                required);
                                 remaining = result.remaining();
-                                if (result.changed()) {
-                                        costSlotsChanged = true;
-                                }
                         }
                         if (remaining > 0) {
-                                remaining = removeFromInventory(playerInventory, comparisonStack, remaining);
+                                remaining = removeFromInventory(playerInventory, comparisonStack, remaining, transaction);
                         }
                         if (remaining > 0) {
-                                return new CostRemovalResult(false, costSlotsChanged);
+                                transaction.rollback();
+                                return new CostRemovalResult(false, false);
                         }
                 }
-                return new CostRemovalResult(true, costSlotsChanged);
+                transaction.commit();
+                return new CostRemovalResult(true, transaction.costInventoryChanged());
         }
-
-        private SlotConsumptionResult consumeCostSlot(int slotIndex, ItemStack comparisonStack, int required) {
+        private SlotConsumptionResult consumeCostSlot(InventoryTransaction transaction, int slotIndex,
+                        ItemStack comparisonStack, int required) {
                 if (required <= 0) {
                         return new SlotConsumptionResult(0, false);
                 }
@@ -1021,7 +1025,7 @@ public class GearShopScreenHandler extends ScreenHandler {
 
                 int provided = GearShopStackHelper.getRequestedCount(slotStack);
                 if (provided <= 0) {
-                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        transaction.setStack(this.costInventory, slotIndex, ItemStack.EMPTY);
                         return new SlotConsumptionResult(required, true);
                 }
 
@@ -1030,29 +1034,20 @@ public class GearShopScreenHandler extends ScreenHandler {
                 if (leftover > 0) {
                         ItemStack replacement = GearShopStackHelper.copyWithoutRequestedCount(slotStack);
                         GearShopStackHelper.applyRequestedCount(replacement, leftover);
-                        this.costInventory.setStack(slotIndex, replacement);
+                        transaction.setStack(this.costInventory, slotIndex, replacement);
                 } else {
-                        this.costInventory.setStack(slotIndex, ItemStack.EMPTY);
+                        transaction.setStack(this.costInventory, slotIndex, ItemStack.EMPTY);
                 }
 
                 return new SlotConsumptionResult(required - consumed, true);
         }
 
-        private record CostRemovalResult(boolean success, boolean costSlotsChanged) {
-        }
-
-        private record SlotConsumptionResult(int remaining, boolean changed) {
-        }
-
-        private record CostRemovalResult(boolean success, boolean costSlotsChanged) {
-        }
-
-        private int removeFromInventory(Inventory inventory, ItemStack comparisonStack, int remaining) {
+        private int removeFromInventory(Inventory inventory, ItemStack comparisonStack, int remaining,
+                        InventoryTransaction transaction) {
                 if (remaining <= 0) {
                         return 0;
                 }
 
-                boolean changed = false;
                 for (int slot = 0; slot < inventory.size() && remaining > 0; slot++) {
                         ItemStack stack = inventory.getStack(slot);
                         if (stack.isEmpty()) {
@@ -1069,8 +1064,7 @@ public class GearShopScreenHandler extends ScreenHandler {
                         if (inventory == this.costInventory) {
                                 int requested = GearShopStackHelper.getRequestedCount(stack);
                                 if (requested <= 0) {
-                                        inventory.setStack(slot, ItemStack.EMPTY);
-                                        changed = true;
+                                        transaction.setStack(inventory, slot, ItemStack.EMPTY);
                                         continue;
                                 }
 
@@ -1080,15 +1074,14 @@ public class GearShopScreenHandler extends ScreenHandler {
                                 }
 
                                 remaining -= taken;
-                                changed = true;
 
                                 int leftover = requested - taken;
                                 if (leftover > 0) {
                                         ItemStack replacement = GearShopStackHelper.copyWithoutRequestedCount(stack);
                                         GearShopStackHelper.applyRequestedCount(replacement, leftover);
-                                        inventory.setStack(slot, replacement);
+                                        transaction.setStack(inventory, slot, replacement);
                                 } else {
-                                        inventory.setStack(slot, ItemStack.EMPTY);
+                                        transaction.setStack(inventory, slot, ItemStack.EMPTY);
                                 }
                                 continue;
                         }
@@ -1098,18 +1091,82 @@ public class GearShopScreenHandler extends ScreenHandler {
                                 continue;
                         }
 
-                        stack.decrement(taken);
+                        transaction.decrementStack(inventory, slot, taken);
                         remaining -= taken;
-                        changed = true;
+                }
+                return remaining;
+        }
+
+        private record CostRemovalResult(boolean success, boolean costSlotsChanged) {
+        }
+
+        private record SlotConsumptionResult(int remaining, boolean changed) {
+        }
+
+        private static final class InventoryTransaction {
+                private final Inventory costInventory;
+                private final Map<InventorySlotKey, ItemStack> originalStacks = new LinkedHashMap<>();
+                private final Set<Inventory> dirtyInventories = new LinkedHashSet<>();
+                private boolean costInventoryChanged = false;
+
+                private InventoryTransaction(Inventory costInventory) {
+                        this.costInventory = costInventory;
+                }
+
+                private void setStack(Inventory inventory, int slot, ItemStack stack) {
+                        trackOriginal(inventory, slot);
+                        inventory.setStack(slot, stack);
+                        registerDirty(inventory);
+                }
+
+                private void decrementStack(Inventory inventory, int slot, int amount) {
+                        if (amount <= 0) {
+                                return;
+                        }
+                        trackOriginal(inventory, slot);
+                        ItemStack stack = inventory.getStack(slot);
+                        stack.decrement(amount);
                         if (stack.isEmpty()) {
                                 inventory.setStack(slot, ItemStack.EMPTY);
                         }
+                        registerDirty(inventory);
                 }
 
-                if (changed) {
-                        inventory.markDirty();
+                private void trackOriginal(Inventory inventory, int slot) {
+                        InventorySlotKey key = new InventorySlotKey(inventory, slot);
+                        originalStacks.computeIfAbsent(key, ignored -> inventory.getStack(slot).copy());
                 }
-                return remaining;
+
+                private void registerDirty(Inventory inventory) {
+                        dirtyInventories.add(inventory);
+                        if (inventory == this.costInventory) {
+                                costInventoryChanged = true;
+                        }
+                }
+
+                private boolean costInventoryChanged() {
+                        return costInventoryChanged;
+                }
+
+                private void rollback() {
+                        for (Map.Entry<InventorySlotKey, ItemStack> entry : originalStacks.entrySet()) {
+                                Inventory inventory = entry.getKey().inventory();
+                                inventory.setStack(entry.getKey().slot(), entry.getValue().copy());
+                        }
+                        for (Inventory inventory : dirtyInventories) {
+                                inventory.markDirty();
+                        }
+                        costInventoryChanged = false;
+                }
+
+                private void commit() {
+                        for (Inventory inventory : dirtyInventories) {
+                                inventory.markDirty();
+                        }
+                }
+        }
+
+        private record InventorySlotKey(Inventory inventory, int slot) {
         }
 
         private void addPlayerInventory(PlayerInventory playerInventory) {
