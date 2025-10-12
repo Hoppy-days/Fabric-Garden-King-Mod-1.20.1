@@ -14,6 +14,7 @@ import net.jeremy.gardenkingmod.ModScoreboards;
 import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.crop.CropTier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
+import net.jeremy.gardenkingmod.item.WalletItem;
 import net.jeremy.gardenkingmod.screen.MarketScreenHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -303,10 +304,13 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 markDirty();
 
                 if (totalPayout > 0) {
-                        ItemStack currencyStack = new ItemStack(ModItems.GARDEN_COIN, totalPayout);
-                        boolean fullyInserted = player.getInventory().insertStack(currencyStack);
-                        if (!fullyInserted && !currencyStack.isEmpty()) {
-                                player.dropItem(currencyStack, false);
+                        boolean deposited = WalletItem.depositToBank(player, totalPayout);
+                        if (!deposited) {
+                                ItemStack currencyStack = new ItemStack(ModItems.GARDEN_COIN, totalPayout);
+                                boolean fullyInserted = player.getInventory().insertStack(currencyStack);
+                                if (!fullyInserted && !currencyStack.isEmpty()) {
+                                        player.dropItem(currencyStack, false);
+                                }
                         }
                 }
 
