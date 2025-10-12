@@ -820,6 +820,7 @@ public class GearShopScreenHandler extends ScreenHandler {
                         }
                         return false;
                 }
+
                 if (!resultTakenFromSlot) {
                         ItemStack result = offer.copyResultStack();
                         if (!result.isEmpty()) {
@@ -1035,6 +1036,9 @@ public class GearShopScreenHandler extends ScreenHandler {
                 }
 
                 return new SlotConsumptionResult(required - consumed, true);
+        }
+
+        private record CostRemovalResult(boolean success, boolean costSlotsChanged) {
         }
 
         private record SlotConsumptionResult(int remaining, boolean changed) {

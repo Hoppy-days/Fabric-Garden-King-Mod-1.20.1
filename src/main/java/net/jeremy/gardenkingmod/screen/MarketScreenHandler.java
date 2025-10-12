@@ -1085,6 +1085,7 @@ public class MarketScreenHandler extends ScreenHandler {
                         }
                         return false;
                 }
+
                 if (!resultTakenFromSlot) {
                         ItemStack result = offer.copyResultStack();
                         if (!result.isEmpty()) {
