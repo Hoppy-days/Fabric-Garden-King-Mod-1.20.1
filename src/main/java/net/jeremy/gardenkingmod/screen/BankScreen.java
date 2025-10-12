@@ -48,10 +48,14 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     private static final int WITHDRAW_BUTTON_HEIGHT = 22;
     private static final int WITHDRAW_BUTTON_X_OFFSET = 205;
     private static final int WITHDRAW_BUTTON_Y_OFFSET = 52;
+    private static final int WITHDRAW_BUTTON_TEXT_X_ADJUST = 0;
+    private static final int WITHDRAW_BUTTON_TEXT_Y_ADJUST = 0;
     private static final int DEPOSIT_BUTTON_WIDTH = 72;
     private static final int DEPOSIT_BUTTON_HEIGHT = 22;
     private static final int DEPOSIT_BUTTON_X_OFFSET = 205;
     private static final int DEPOSIT_BUTTON_Y_OFFSET = 140;
+    private static final int DEPOSIT_BUTTON_TEXT_X_ADJUST = 0;
+    private static final int DEPOSIT_BUTTON_TEXT_Y_ADJUST = 0;
     private static final int BUTTON_HOVER_U = 0;
     private static final int BUTTON_HOVER_V = 223;
 
@@ -93,7 +97,9 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
                 WITHDRAW_BUTTON_WIDTH,
                 WITHDRAW_BUTTON_HEIGHT,
                 Text.translatable("screen.gardenkingmod.bank.withdraw"),
-                this::attemptWithdraw);
+                this::attemptWithdraw,
+                WITHDRAW_BUTTON_TEXT_X_ADJUST,
+                WITHDRAW_BUTTON_TEXT_Y_ADJUST);
         this.addDrawableChild(this.withdrawButton);
 
         this.depositButton = new BankActionButton(
@@ -102,7 +108,9 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
                 DEPOSIT_BUTTON_WIDTH,
                 DEPOSIT_BUTTON_HEIGHT,
                 Text.translatable("screen.gardenkingmod.bank.deposit"),
-                this::attemptDeposit);
+                this::attemptDeposit,
+                DEPOSIT_BUTTON_TEXT_X_ADJUST,
+                DEPOSIT_BUTTON_TEXT_Y_ADJUST);
         this.addDrawableChild(this.depositButton);
 
         updateButtonStates();
@@ -268,10 +276,15 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
 
     private class BankActionButton extends ClickableWidget {
         private final Runnable onPressAction;
+        private final int textXAdjust;
+        private final int textYAdjust;
 
-        BankActionButton(int x, int y, int width, int height, Text narration, Runnable onPressAction) {
+        BankActionButton(int x, int y, int width, int height, Text narration, Runnable onPressAction,
+                int textXAdjust, int textYAdjust) {
             super(x, y, width, height, narration);
             this.onPressAction = onPressAction;
+            this.textXAdjust = textXAdjust;
+            this.textYAdjust = textYAdjust;
         }
 
         @Override
@@ -292,8 +305,8 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
 
             Text message = this.getMessage();
             int textWidth = BankScreen.this.textRenderer.getWidth(message);
-            int textX = this.getX() + (this.width - textWidth) / 2;
-            int textY = this.getY() + (this.height - BankScreen.this.textRenderer.fontHeight) / 2;
+            int textX = this.getX() + (this.width - textWidth) / 2 + this.textXAdjust;
+            int textY = this.getY() + (this.height - BankScreen.this.textRenderer.fontHeight) / 2 + this.textYAdjust;
             int color = this.active ? 0xFFFFFF : 0xA0A0A0;
             context.drawText(BankScreen.this.textRenderer, message, textX, textY, color, false);
         }
