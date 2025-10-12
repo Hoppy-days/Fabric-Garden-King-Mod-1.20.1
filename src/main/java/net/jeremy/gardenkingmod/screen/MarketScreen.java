@@ -172,7 +172,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private TabButton sellTabButton;
         private TabButton buyTabButton;
         private int lastItemsSold;
-        private int lastPayout;
+        private int lastDollars;
         private int lastLifetimeTotal;
         private MutableText saleResultLine;
         private MutableText lifetimeResultLine;
@@ -195,7 +195,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 this.playerInventoryTitleY = PLAYER_INVENTORY_LABEL_Y;
                 this.titleY = TITLE_LABEL_Y;
                 this.lastItemsSold = -1;
-                this.lastPayout = 0;
+                this.lastDollars = 0;
                 this.lastLifetimeTotal = -1;
                 this.saleResultLine = Text.empty();
                 this.lifetimeResultLine = Text.empty();
@@ -265,14 +265,14 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 drawMouseoverTooltip(context, mouseX, mouseY);
         }
 
-        public void updateSaleResult(boolean success, int itemsSold, int payout, int lifetimeTotal, Text feedback,
+        public void updateSaleResult(boolean success, int itemsSold, int dollarsEarned, int lifetimeTotal, Text feedback,
                         Map<Item, Integer> soldItemCounts) {
                 this.lastItemsSold = itemsSold;
-                this.lastPayout = payout;
+                this.lastDollars = dollarsEarned;
                 this.lastLifetimeTotal = success && lifetimeTotal >= 0 ? lifetimeTotal : -1;
 
                 if (success) {
-                        MutableText payoutText = Text.literal(Integer.toString(payout)).formatted(Formatting.GREEN);
+                        MutableText payoutText = Text.literal(Integer.toString(dollarsEarned)).formatted(Formatting.GREEN);
                         MutableText soldLine;
                         if (soldItemCounts != null && !soldItemCounts.isEmpty()) {
                                 Text soldItemsText = buildSoldItemsText(soldItemCounts);

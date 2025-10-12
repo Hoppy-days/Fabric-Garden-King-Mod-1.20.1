@@ -210,7 +210,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
                 int inventorySize = items.size();
                 int totalItemsSold = 0;
-                int totalPayout = 0;
+                int totalDollars = 0;
                 boolean hasSellableStack = false;
                 Map<Item, Integer> soldItemCounts = new LinkedHashMap<>();
 
@@ -229,8 +229,8 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                                 continue;
                         }
 
-                        int coinsPerStack = getCoinsPerStack(optionalTier.get());
-                        if (coinsPerStack <= 0) {
+                        int dollarsPerStack = getDollarsPerStack(optionalTier.get());
+                        if (dollarsPerStack <= 0) {
                                 continue;
                         }
 
@@ -244,7 +244,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                         int fullStacks = stack.getCount() / maxStackSize;
                         if (fullStacks > 0) {
                                 totalItemsSold += fullStacks * maxStackSize;
-                                totalPayout += fullStacks * coinsPerStack;
+                                totalDollars += fullStacks * dollarsPerStack;
                                 soldItemCounts.merge(stack.getItem(), fullStacks * maxStackSize, Integer::sum);
                         }
                 }
@@ -272,8 +272,8 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                                 continue;
                         }
 
-                        int coinsPerStack = getCoinsPerStack(optionalTier.get());
-                        if (coinsPerStack <= 0) {
+                        int dollarsPerStack = getDollarsPerStack(optionalTier.get());
+                        if (dollarsPerStack <= 0) {
                                 continue;
                         }
 
@@ -303,10 +303,10 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
                 markDirty();
 
-                if (totalPayout > 0) {
-                        boolean deposited = WalletItem.depositToBank(player, totalPayout);
+                if (totalDollars > 0) {
+                        boolean deposited = WalletItem.depositToBank(player, totalDollars);
                         if (!deposited) {
-                                ItemStack currencyStack = new ItemStack(ModItems.DOLLAR, totalPayout);
+                                ItemStack currencyStack = new ItemStack(ModItems.DOLLAR, totalDollars);
                                 boolean fullyInserted = player.getInventory().insertStack(currencyStack);
                                 if (!fullyInserted && !currencyStack.isEmpty()) {
                                         player.dropItem(currencyStack, false);
@@ -314,9 +314,9 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                         }
                 }
 
-                int lifetimeTotal = ModScoreboards.addCurrency(player, totalPayout);
+                int lifetimeTotal = ModScoreboards.addCurrency(player, totalDollars);
 
-                sendSaleResult(player, true, totalItemsSold, totalPayout, lifetimeTotal, Text.empty(), soldItemCounts);
+                sendSaleResult(player, true, totalItemsSold, totalDollars, lifetimeTotal, Text.empty(), soldItemCounts);
 
                 World world = getWorld();
                 if (world != null) {
@@ -327,7 +327,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 return true;
         }
 
-        private static int getCoinsPerStack(CropTier tier) {
+        private static int getDollarsPerStack(CropTier tier) {
                 String path = tier.id().getPath();
                 return switch (path) {
                 case "crop_tiers/tier_1" -> 1;
@@ -339,13 +339,13 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 };
         }
 
-        private void sendSaleResult(ServerPlayerEntity player, boolean success, int totalItemsSold, int totalPayout,
+        private void sendSaleResult(ServerPlayerEntity player, boolean success, int totalItemsSold, int totalDollars,
                         int lifetimeTotal, Text feedback, Map<Item, Integer> soldItemCounts) {
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeBlockPos(pos);
                 buf.writeBoolean(success);
                 buf.writeVarInt(totalItemsSold);
-                buf.writeVarInt(totalPayout);
+                buf.writeVarInt(totalDollars);
                 buf.writeVarInt(lifetimeTotal);
                 buf.writeText(feedback);
                 buf.writeVarInt(soldItemCounts.size());

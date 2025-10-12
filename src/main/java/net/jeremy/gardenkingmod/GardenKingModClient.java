@@ -68,7 +68,7 @@ public class GardenKingModClient implements ClientModInitializer {
                         buf.readBlockPos();
                         boolean success = buf.readBoolean();
                         int itemsSold = buf.readVarInt();
-                        int payout = buf.readVarInt();
+                        int dollarsEarned = buf.readVarInt();
                         int lifetimeTotal = buf.readVarInt();
                         Text feedback = buf.readText();
                         int soldItemEntries = buf.readVarInt();
@@ -85,7 +85,7 @@ public class GardenKingModClient implements ClientModInitializer {
 
                         client.execute(() -> {
                                 if (client.currentScreen instanceof MarketScreen marketScreen) {
-                                        marketScreen.updateSaleResult(success, itemsSold, payout, lifetimeTotal, feedback,
+                                        marketScreen.updateSaleResult(success, itemsSold, dollarsEarned, lifetimeTotal, feedback,
                                                         soldItemCounts);
                                 }
                         });
