@@ -899,7 +899,8 @@ public class MarketScreenHandler extends ScreenHandler {
                 return true;
         }
 
-        private boolean removeCostStacks(ServerPlayerEntity player, List<ItemStack> costs, PlayerInventory playerInventory) {
+        private CostRemovalResult removeCostStacks(ServerPlayerEntity player, List<ItemStack> costs,
+                        PlayerInventory playerInventory) {
                 boolean costSlotsChanged = false;
                 for (int index = 0; index < costs.size(); index++) {
                         ItemStack cost = costs.get(index);
@@ -942,7 +943,7 @@ public class MarketScreenHandler extends ScreenHandler {
 
                                 if (coinsRequired > 0 && player != null) {
                                         if (!WalletItem.withdrawFromBank(player, coinsRequired)) {
-                                                return false;
+                                                return new CostRemovalResult(false, costSlotsChanged);
                                         }
                                 }
 
@@ -961,10 +962,10 @@ public class MarketScreenHandler extends ScreenHandler {
                                 remaining = removeFromInventory(playerInventory, comparisonStack, remaining);
                         }
                         if (remaining > 0) {
-                                return false;
+                                return new CostRemovalResult(false, costSlotsChanged);
                         }
                 }
-                return costSlotsChanged;
+                return new CostRemovalResult(true, costSlotsChanged);
         }
 
         private SlotConsumptionResult consumeCostSlot(int slotIndex, ItemStack comparisonStack, int required) {
@@ -1076,7 +1077,14 @@ public class MarketScreenHandler extends ScreenHandler {
                         return false;
                 }
 
-                boolean costSlotsChanged = removeCostStacks(player, offer.costStacks(), playerInv);
+                CostRemovalResult removalResult = removeCostStacks(player, offer.costStacks(), playerInv);
+                if (!removalResult.success()) {
+                        playerInv.markDirty();
+                        if (removalResult.costSlotsChanged()) {
+                                this.costInventory.markDirty();
+                        }
+                        return false;
+                }
                 if (!resultTakenFromSlot) {
                         ItemStack result = offer.copyResultStack();
                         if (!result.isEmpty()) {
@@ -1087,7 +1095,7 @@ public class MarketScreenHandler extends ScreenHandler {
                 }
                 populateSelectedOffer(player, offer, false, true);
                 playerInv.markDirty();
-                if (costSlotsChanged) {
+                if (removalResult.costSlotsChanged()) {
                         this.costInventory.markDirty();
                 }
                 return true;
@@ -1114,6 +1122,9 @@ public class MarketScreenHandler extends ScreenHandler {
 
         private record CostReturnResult(boolean playerChanged, boolean slotChanged, ItemStack returnedStack) {
                 static final CostReturnResult NO_CHANGE = new CostReturnResult(false, false, ItemStack.EMPTY);
+        }
+
+        private record CostRemovalResult(boolean success, boolean costSlotsChanged) {
         }
 
         private record SlotConsumptionResult(int remaining, boolean changed) {
