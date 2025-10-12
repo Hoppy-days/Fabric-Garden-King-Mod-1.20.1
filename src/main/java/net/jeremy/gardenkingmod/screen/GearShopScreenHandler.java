@@ -7,6 +7,7 @@ import java.util.Map;
 
 import net.jeremy.gardenkingmod.ModScreenHandlers;
 import net.jeremy.gardenkingmod.block.entity.GearShopBlockEntity;
+import net.jeremy.gardenkingmod.item.WalletItem;
 import net.jeremy.gardenkingmod.shop.GearShopOffer;
 import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
 import net.jeremy.gardenkingmod.screen.inventory.GearShopCostInventory;
@@ -453,7 +454,7 @@ public class GearShopScreenHandler extends ScreenHandler {
 
                 boolean shouldRefill = refillFromPlayerInventory;
                 if (shouldRefill) {
-                        shouldRefill = hasSufficientResources(playerInv, offer.costStacks());
+                        shouldRefill = hasSufficientResources(player, playerInv, offer.costStacks());
                 }
 
                 if (shouldRefill) {
@@ -509,10 +510,15 @@ public class GearShopScreenHandler extends ScreenHandler {
                 return cleared;
         }
 
-        private boolean hasSufficientResources(PlayerInventory inventory, List<ItemStack> costs) {
+        private boolean hasSufficientResources(PlayerEntity player, PlayerInventory inventory, List<ItemStack> costs) {
                 if (costs == null || costs.isEmpty()) {
                         return true;
                 }
+
+                PlayerEntity owner = player != null ? player : inventory.player;
+                long availableBankCoins = WalletItem.getAccessibleBankBalance(owner);
+                boolean walletAvailable = WalletItem.hasUsableWallet(owner);
+                long coinsNeededFromBank = 0L;
 
                 Map<StackComparisonKey, Integer> available = countInventoryStacks(inventory);
                 for (ItemStack cost : costs) {
@@ -530,6 +536,33 @@ public class GearShopScreenHandler extends ScreenHandler {
                                 continue;
                         }
 
+                        int valuePerItem = WalletItem.getCurrencyValuePerItem(comparison.getItem());
+                        if (valuePerItem > 0) {
+                                long coinsRequired = WalletItem.getCurrencyValue(comparison.getItem(), required);
+                                StackComparisonKey key = StackComparisonKey.of(comparison);
+                                int availableCount = available.getOrDefault(key, 0);
+                                if (availableCount > 0) {
+                                        int used = Math.min(availableCount, required);
+                                        available.put(key, availableCount - used);
+                                        long coinsFromInventory = WalletItem.getCurrencyValue(comparison.getItem(), used);
+                                        coinsRequired = Math.max(0L, coinsRequired - coinsFromInventory);
+                                }
+
+                                if (coinsRequired <= 0) {
+                                        continue;
+                                }
+
+                                if (!walletAvailable) {
+                                        return false;
+                                }
+
+                                coinsNeededFromBank = addClamped(coinsNeededFromBank, coinsRequired);
+                                if (coinsNeededFromBank > availableBankCoins) {
+                                        return false;
+                                }
+                                continue;
+                        }
+
                         StackComparisonKey key = StackComparisonKey.of(comparison);
                         int availableCount = available.getOrDefault(key, 0);
                         if (availableCount < required) {
@@ -539,7 +572,7 @@ public class GearShopScreenHandler extends ScreenHandler {
                         available.put(key, availableCount - required);
                 }
 
-                return true;
+                return coinsNeededFromBank <= availableBankCoins;
         }
 
         private Map<StackComparisonKey, Integer> countInventoryStacks(PlayerInventory inventory) {
@@ -779,7 +812,7 @@ public class GearShopScreenHandler extends ScreenHandler {
                         return false;
                 }
 
-                boolean costSlotsChanged = removeCostStacks(offer.costStacks(), playerInv);
+                boolean costSlotsChanged = removeCostStacks(player, offer.costStacks(), playerInv);
                 if (!resultTakenFromSlot) {
                         ItemStack result = offer.copyResultStack();
                         if (!result.isEmpty()) {
@@ -825,38 +858,67 @@ public class GearShopScreenHandler extends ScreenHandler {
                         return false;
                 }
 
+                PlayerEntity player = this.playerInventory.player;
+                long availableBankCoins = WalletItem.getAccessibleBankBalance(player);
+                boolean walletAvailable = WalletItem.hasUsableWallet(player);
+
                 List<ItemStack> costs = offer.costStacks();
                 for (int slotIndex = 0; slotIndex < COST_SLOT_COUNT; slotIndex++) {
                         ItemStack required = slotIndex < costs.size() ? costs.get(slotIndex) : ItemStack.EMPTY;
                         ItemStack provided = this.costInventory.getStack(slotIndex);
-                        if (!costMatches(required, provided)) {
+
+                        if (required == null || required.isEmpty()) {
+                                if (!provided.isEmpty()) {
+                                        return false;
+                                }
+                                continue;
+                        }
+
+                        ItemStack comparison = GearShopStackHelper.copyWithoutRequestedCount(required);
+                        int requiredCount = GearShopStackHelper.getRequestedCount(required);
+                        if (requiredCount <= 0) {
+                                if (!provided.isEmpty()) {
+                                        return false;
+                                }
+                                continue;
+                        }
+
+                        int valuePerItem = WalletItem.getCurrencyValuePerItem(comparison.getItem());
+                        if (valuePerItem > 0) {
+                                long coinsRequired = WalletItem.getCurrencyValue(comparison.getItem(), requiredCount);
+                                long coinsProvided = 0L;
+                                if (!provided.isEmpty()) {
+                                        if (!canCombineIgnoringRequestedCount(provided, required)) {
+                                                return false;
+                                        }
+                                        int providedCount = GearShopStackHelper.getRequestedCount(provided);
+                                        coinsProvided = WalletItem.getCurrencyValue(comparison.getItem(), providedCount);
+                                }
+
+                                if (coinsProvided >= coinsRequired) {
+                                        continue;
+                                }
+
+                                long coinsNeeded = coinsRequired - coinsProvided;
+                                if (!walletAvailable || availableBankCoins < coinsNeeded) {
+                                        return false;
+                                }
+
+                                availableBankCoins -= coinsNeeded;
+                                continue;
+                        }
+
+                        if (provided.isEmpty() || !canCombineIgnoringRequestedCount(provided, required)) {
+                                return false;
+                        }
+
+                        int providedCount = GearShopStackHelper.getRequestedCount(provided);
+                        if (providedCount < requiredCount) {
                                 return false;
                         }
                 }
 
                 return true;
-        }
-
-        private boolean costMatches(ItemStack required, ItemStack provided) {
-                if (required == null || required.isEmpty()) {
-                        return provided.isEmpty();
-                }
-
-                if (provided.isEmpty()) {
-                        return false;
-                }
-
-                if (!canCombineIgnoringRequestedCount(provided, required)) {
-                        return false;
-                }
-
-                int requiredCount = GearShopStackHelper.getRequestedCount(required);
-                if (requiredCount <= 0) {
-                        return provided.isEmpty();
-                }
-
-                int providedCount = GearShopStackHelper.getRequestedCount(provided);
-                return providedCount >= requiredCount;
         }
 
         private static boolean canCombineIgnoringRequestedCount(ItemStack first, ItemStack second) {
@@ -865,7 +927,7 @@ public class GearShopScreenHandler extends ScreenHandler {
                 return ItemStack.canCombine(firstComparison, secondComparison);
         }
 
-        private boolean removeCostStacks(List<ItemStack> costs, PlayerInventory playerInventory) {
+        private boolean removeCostStacks(ServerPlayerEntity player, List<ItemStack> costs, PlayerInventory playerInventory) {
                 boolean costSlotsChanged = false;
                 for (int index = 0; index < costs.size(); index++) {
                         ItemStack cost = costs.get(index);
@@ -879,6 +941,42 @@ public class GearShopScreenHandler extends ScreenHandler {
                         }
 
                         ItemStack comparisonStack = GearShopStackHelper.copyWithoutRequestedCount(cost);
+                        int valuePerItem = WalletItem.getCurrencyValuePerItem(comparisonStack.getItem());
+                        if (valuePerItem > 0) {
+                                long coinsRequired = WalletItem.getCurrencyValue(comparisonStack.getItem(), required);
+                                int remainingItems = required;
+                                if (index < COST_SLOT_COUNT) {
+                                        SlotConsumptionResult result = consumeCostSlot(index, comparisonStack, required);
+                                        remainingItems = result.remaining();
+                                        if (result.changed()) {
+                                                costSlotsChanged = true;
+                                        }
+                                        int consumed = required - remainingItems;
+                                        if (consumed > 0) {
+                                                long coinsFromSlot = WalletItem.getCurrencyValue(comparisonStack.getItem(), consumed);
+                                                coinsRequired = Math.max(0L, coinsRequired - coinsFromSlot);
+                                        }
+                                }
+
+                                if (remainingItems > 0) {
+                                        int remainingAfterInventory = removeFromInventory(playerInventory, comparisonStack, remainingItems);
+                                        int consumed = remainingItems - remainingAfterInventory;
+                                        if (consumed > 0) {
+                                                long coinsFromInventory = WalletItem.getCurrencyValue(comparisonStack.getItem(), consumed);
+                                                coinsRequired = Math.max(0L, coinsRequired - coinsFromInventory);
+                                        }
+                                        remainingItems = remainingAfterInventory;
+                                }
+
+                                if (coinsRequired > 0 && player != null) {
+                                        if (!WalletItem.withdrawFromBank(player, coinsRequired)) {
+                                                return false;
+                                        }
+                                }
+
+                                continue;
+                        }
+
                         int remaining = required;
                         if (index < COST_SLOT_COUNT) {
                                 SlotConsumptionResult result = consumeCostSlot(index, comparisonStack, required);
@@ -889,6 +987,9 @@ public class GearShopScreenHandler extends ScreenHandler {
                         }
                         if (remaining > 0) {
                                 remaining = removeFromInventory(playerInventory, comparisonStack, remaining);
+                        }
+                        if (remaining > 0) {
+                                return false;
                         }
                 }
                 return costSlotsChanged;
@@ -1078,6 +1179,14 @@ public class GearShopScreenHandler extends ScreenHandler {
                         Item item = sanitized.getItem();
                         NbtCompound nbt = sanitized.hasNbt() ? sanitized.getNbt().copy() : null;
                         return new StackComparisonKey(item, nbt);
+                }
+        }
+
+        private static long addClamped(long first, long second) {
+                try {
+                        return Math.addExact(first, second);
+                } catch (ArithmeticException overflow) {
+                        return Long.MAX_VALUE;
                 }
         }
 
