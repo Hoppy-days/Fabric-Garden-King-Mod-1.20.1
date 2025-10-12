@@ -1,5 +1,6 @@
 package net.jeremy.gardenkingmod.screen;
 
+import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.ModItems;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -9,7 +10,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class BankScreen extends HandledScreen<BankScreenHandler> {
-    private static final Identifier BACKGROUND_TEXTURE = new Identifier("minecraft", "textures/gui/container/generic_54.png");
+    private static final Identifier BACKGROUND_TEXTURE = new Identifier(GardenKingMod.MOD_ID,
+            "textures/gui/container/bank_gui.png");
     private static final int SLOT_SIZE = 18;
     private static final int SLOT_SPACING = 6;
     private static final ItemStack DOLLAR_STACK = new ItemStack(ModItems.DOLLAR);
