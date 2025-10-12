@@ -27,13 +27,20 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     private static final int DEPOSIT_TITLE_X_OFFSET = 188;
     private static final int DEPOSIT_TITLE_Y_OFFSET = 94;
     private static final ItemStack DOLLAR_STACK = new ItemStack(ModItems.DOLLAR);
+    private static final Identifier DOLLAR_ITEM_TEXTURE = new Identifier(GardenKingMod.MOD_ID,
+            "textures/item/dollar.png");
+    private static final int DOLLAR_TEXTURE_WIDTH = 16;
+    private static final int DOLLAR_TEXTURE_HEIGHT = 16;
+    private static final int DOLLAR_TEXTURE_X_OFFSET = 80;
+    private static final int DOLLAR_TEXTURE_Y_OFFSET = 36;
 
     private static final int TEXTURE_WIDTH = 300;
     private static final int TEXTURE_HEIGHT = 256;
     private static final int BASE_GUI_WIDTH = 176;
     private static final int BALANCE_SLOT_X_OFFSET = (BASE_GUI_WIDTH - BankScreenHandler.SLOT_SIZE) / 2;
     private static final int BALANCE_SLOT_Y_OFFSET = 24;
-    private static final int BALANCE_TEXT_Y_OFFSET = BALANCE_SLOT_Y_OFFSET + BankScreenHandler.SLOT_SIZE + 20;
+    private static final int BALANCE_SLOT_LABEL_OFFSET = BankScreenHandler.SLOT_SIZE + 12;
+    private static final int BALANCE_TEXT_Y_OFFSET = BALANCE_SLOT_Y_OFFSET + BankScreenHandler.SLOT_SIZE + 28;
     private static final int WITHDRAW_FIELD_WIDTH = 72;
     private static final int WITHDRAW_FIELD_HEIGHT = 22;
     private static final int WITHDRAW_FIELD_X_OFFSET = 196;
@@ -86,6 +93,9 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
         context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight,
                 BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
+        context.drawTexture(DOLLAR_ITEM_TEXTURE, x + DOLLAR_TEXTURE_X_OFFSET, y + DOLLAR_TEXTURE_Y_OFFSET, 0, 0,
+                DOLLAR_TEXTURE_WIDTH, DOLLAR_TEXTURE_HEIGHT, DOLLAR_TEXTURE_WIDTH, DOLLAR_TEXTURE_HEIGHT);
+
         context.drawText(this.textRenderer,
                 Text.translatable("screen.gardenkingmod.bank.withdraw"),
                 x + WITHDRAW_TITLE_X_OFFSET,
@@ -120,7 +130,7 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
                 slotX + BankScreenHandler.SLOT_SIZE - 4 - countWidth,
                 slotY + BankScreenHandler.SLOT_SIZE - 9, 0x404040, false);
         int labelX = slotX + BankScreenHandler.SLOT_SIZE / 2 - textRenderer.getWidth(label) / 2;
-        context.drawText(textRenderer, label, labelX, slotY + BankScreenHandler.SLOT_SIZE + 4, 0x404040, false);
+        context.drawText(textRenderer, label, labelX, slotY + BALANCE_SLOT_LABEL_OFFSET, 0x404040, false);
     }
 
     @Override
