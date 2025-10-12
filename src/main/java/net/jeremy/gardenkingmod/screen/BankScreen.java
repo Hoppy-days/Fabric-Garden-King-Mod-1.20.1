@@ -10,6 +10,9 @@ import net.jeremy.gardenkingmod.network.ModPackets;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.screen.narration.NarrationPart;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -50,6 +53,8 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     private static final int BUTTON_HOVER_V = 223;
 
     private TextFieldWidget withdrawField;
+    private BankActionButton withdrawButton;
+    private BankActionButton depositButton;
 
     public BankScreen(BankScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -78,6 +83,26 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         this.withdrawField.setPlaceholder(Text.translatable("screen.gardenkingmod.bank.withdraw_placeholder"));
         this.withdrawField.setDrawsBackground(false);
         this.addDrawableChild(this.withdrawField);
+
+        this.withdrawButton = new BankActionButton(
+                left + WITHDRAW_BUTTON_X_OFFSET,
+                top + WITHDRAW_BUTTON_Y_OFFSET,
+                WITHDRAW_BUTTON_WIDTH,
+                WITHDRAW_BUTTON_HEIGHT,
+                Text.translatable("screen.gardenkingmod.bank.withdraw"),
+                this::attemptWithdraw);
+        this.addDrawableChild(this.withdrawButton);
+
+        this.depositButton = new BankActionButton(
+                left + DEPOSIT_BUTTON_X_OFFSET,
+                top + DEPOSIT_BUTTON_Y_OFFSET,
+                DEPOSIT_BUTTON_WIDTH,
+                DEPOSIT_BUTTON_HEIGHT,
+                Text.translatable("screen.gardenkingmod.bank.deposit"),
+                this::attemptDeposit);
+        this.addDrawableChild(this.depositButton);
+
+        updateButtonStates();
 
         setInitialFocus(this.withdrawField);
     }
@@ -136,6 +161,7 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         if (this.withdrawField != null) {
             this.withdrawField.tick();
         }
+        updateButtonStates();
     }
 
     @Override
@@ -167,19 +193,6 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
             return true;
         }
 
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            if (isPointWithinBounds(WITHDRAW_BUTTON_X_OFFSET, WITHDRAW_BUTTON_Y_OFFSET, WITHDRAW_BUTTON_WIDTH,
-                    WITHDRAW_BUTTON_HEIGHT, mouseX, mouseY)) {
-                attemptWithdraw();
-                return true;
-            }
-
-            if (isPointWithinBounds(DEPOSIT_BUTTON_X_OFFSET, DEPOSIT_BUTTON_Y_OFFSET, DEPOSIT_BUTTON_WIDTH,
-                    DEPOSIT_BUTTON_HEIGHT, mouseX, mouseY)) {
-                attemptDeposit();
-                return true;
-            }
-        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -238,5 +251,52 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
         }
 
         return Math.max(value, 0L);
+    }
+
+    private void updateButtonStates() {
+        if (this.depositButton != null) {
+            this.depositButton.setActive(this.handler.hasDepositItem());
+        }
+
+        if (this.withdrawButton != null) {
+            long amount = getWithdrawAmount();
+            boolean canWithdraw = amount > 0 && amount <= this.handler.getTotalDollars();
+            this.withdrawButton.setActive(canWithdraw);
+        }
+    }
+
+    private class BankActionButton extends ClickableWidget {
+        private final Runnable onPressAction;
+
+        BankActionButton(int x, int y, int width, int height, Text narration, Runnable onPressAction) {
+            super(x, y, width, height, narration);
+            this.onPressAction = onPressAction;
+        }
+
+        @Override
+        public void onClick(double mouseX, double mouseY) {
+            this.onPressAction.run();
+        }
+
+        @Override
+        public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+            if (!this.visible) {
+                return;
+            }
+
+            if ((this.isHovered() || this.isFocused()) && this.active) {
+                context.drawTexture(BACKGROUND_TEXTURE, this.getX(), this.getY(), BUTTON_HOVER_U, BUTTON_HOVER_V,
+                        this.width, this.height, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+            }
+        }
+
+        @Override
+        protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+            builder.put(NarrationPart.TITLE, this.getMessage());
+        }
+
+        void setActive(boolean active) {
+            this.active = active;
+        }
     }
 }
