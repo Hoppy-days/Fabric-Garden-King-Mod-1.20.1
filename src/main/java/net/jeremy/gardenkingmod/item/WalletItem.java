@@ -19,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
@@ -393,7 +394,15 @@ public class WalletItem extends Item {
                 public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
                         BankScreenHandler handler = BankScreenHandler.createRemote(syncId, playerInventory);
                         if (player instanceof ServerPlayerEntity serverPlayer) {
-                                handler.sendBalanceUpdate(serverPlayer);
+                                MinecraftServer server = serverPlayer.getServer();
+                                if (server != null) {
+                                        server.execute(() -> {
+                                                if (serverPlayer.currentScreenHandler instanceof BankScreenHandler bankHandler
+                                                                && bankHandler.syncId == syncId) {
+                                                        bankHandler.sendBalanceUpdate(serverPlayer);
+                                                }
+                                        });
+                                }
                         }
                         return handler;
                 }
