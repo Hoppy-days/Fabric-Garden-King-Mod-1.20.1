@@ -334,14 +334,12 @@ public class BankScreenHandler extends ScreenHandler {
 
         ItemStack depositStack = depositSlot.getStack();
         int slotMax = depositSlot.getMaxItemCount(stack);
-        int itemMax = stack.getMaxCount();
-        if (itemMax <= 0) {
+        if (slotMax <= 0) {
             return false;
         }
-        int effectiveMax = Math.min(slotMax, itemMax);
 
         if (depositStack.isEmpty()) {
-            int insertAmount = Math.min(effectiveMax, stack.getCount());
+            int insertAmount = Math.min(slotMax, stack.getCount());
             if (insertAmount <= 0) {
                 return false;
             }
@@ -359,7 +357,7 @@ public class BankScreenHandler extends ScreenHandler {
             return false;
         }
 
-        int depositStackMax = Math.min(slotMax, depositStack.getMaxCount());
+        int depositStackMax = slotMax;
         int space = depositStackMax - depositStack.getCount();
         if (space <= 0) {
             return false;
