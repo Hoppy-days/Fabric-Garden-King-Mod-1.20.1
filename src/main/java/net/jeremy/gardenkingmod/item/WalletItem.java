@@ -193,6 +193,42 @@ public class WalletItem extends Item {
                 return true;
         }
 
+        public static void syncWalletBalances(ServerPlayerEntity player) {
+                if (player == null) {
+                        return;
+                }
+
+                if (!(player instanceof GardenCurrencyHolder holder)) {
+                        return;
+                }
+
+                long balance = holder.gardenkingmod$getBankBalance();
+                PlayerInventory inventory = player.getInventory();
+                boolean changed = false;
+
+                for (int slot = 0; slot < inventory.size(); slot++) {
+                        ItemStack stack = inventory.getStack(slot);
+                        if (!(stack.getItem() instanceof WalletItem wallet)) {
+                                continue;
+                        }
+
+                        boolean stackChanged = wallet.ensureOwner(stack, player);
+                        if (isOwnedBy(stack, player)) {
+                                if (updateBalanceSnapshot(stack, balance)) {
+                                        stackChanged = true;
+                                }
+                        }
+
+                        if (stackChanged) {
+                                changed = true;
+                        }
+                }
+
+                if (changed) {
+                        markInventoryDirty(player);
+                }
+        }
+
         public static int getCurrencyValuePerItem(Item item) {
                 return item == ModItems.DOLLAR ? 1 : 0;
         }

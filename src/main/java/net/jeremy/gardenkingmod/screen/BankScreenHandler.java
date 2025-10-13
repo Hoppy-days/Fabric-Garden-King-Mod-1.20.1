@@ -146,7 +146,7 @@ public class BankScreenHandler extends ScreenHandler {
         } else {
             int valuePerItem = WalletItem.getCurrencyValuePerItem(slotStack.getItem());
             if (valuePerItem > 0) {
-                if (!insertItem(slotStack, DEPOSIT_SLOT_INDEX, DEPOSIT_SLOT_INDEX + 1, false)) {
+                if (!insertIntoDepositSlot(slotStack)) {
                     return ItemStack.EMPTY;
                 }
             } else if (index >= PLAYER_INVENTORY_START && index < PLAYER_INVENTORY_END) {
@@ -315,6 +315,66 @@ public class BankScreenHandler extends ScreenHandler {
         int clamped = balance > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) Math.max(0L, balance);
         buf.writeVarInt(clamped);
         ServerPlayNetworking.send(player, ModPackets.BANK_BALANCE_PACKET, buf);
+    }
+
+    private boolean insertIntoDepositSlot(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+
+        int valuePerItem = WalletItem.getCurrencyValuePerItem(stack.getItem());
+        if (valuePerItem <= 0) {
+            return false;
+        }
+
+        Slot depositSlot = this.slots.get(DEPOSIT_SLOT_INDEX);
+        if (depositSlot == null) {
+            return false;
+        }
+
+        ItemStack depositStack = depositSlot.getStack();
+        int slotMax = depositSlot.getMaxItemCount(stack);
+        int itemMax = stack.getMaxCount();
+        if (itemMax <= 0) {
+            return false;
+        }
+        int effectiveMax = Math.min(slotMax, itemMax);
+
+        if (depositStack.isEmpty()) {
+            int insertAmount = Math.min(effectiveMax, stack.getCount());
+            if (insertAmount <= 0) {
+                return false;
+            }
+
+            ItemStack newStack = stack.copy();
+            newStack.setCount(insertAmount);
+            depositSlot.setStack(newStack);
+            stack.decrement(insertAmount);
+            depositSlot.markDirty();
+            this.depositInventory.markDirty();
+            return true;
+        }
+
+        if (!ItemStack.canCombine(depositStack, stack)) {
+            return false;
+        }
+
+        int depositStackMax = Math.min(slotMax, depositStack.getMaxCount());
+        int space = depositStackMax - depositStack.getCount();
+        if (space <= 0) {
+            return false;
+        }
+
+        int insertAmount = Math.min(space, stack.getCount());
+        if (insertAmount <= 0) {
+            return false;
+        }
+
+        depositStack.increment(insertAmount);
+        stack.decrement(insertAmount);
+        depositSlot.markDirty();
+        this.depositInventory.markDirty();
+        return true;
     }
 
     private void addPlayerInventory(PlayerInventory inventory) {

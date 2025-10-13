@@ -1,12 +1,14 @@
 package net.jeremy.gardenkingmod;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 
 import net.jeremy.gardenkingmod.armor.ModArmorSetEffects;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager;
 import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
+import net.jeremy.gardenkingmod.item.WalletItem;
 import net.jeremy.gardenkingmod.network.ModServerNetworking;
 import net.jeremy.gardenkingmod.registry.ModEntities;
 import net.jeremy.gardenkingmod.registry.ModSoundEvents;
@@ -40,6 +42,12 @@ public class GardenKingMod implements ModInitializer {
 
                 CropTierRegistry.init();
                 CropDropModifier.register();
+
+                ServerTickEvents.END_SERVER_TICK.register(server -> {
+                        for (var player : server.getPlayerManager().getPlayerList()) {
+                                WalletItem.syncWalletBalances(player);
+                        }
+                });
 
                 LOGGER.info("Garden King Mod initialized");
         }
