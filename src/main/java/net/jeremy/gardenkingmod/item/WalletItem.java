@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.ModScoreboards;
 import net.jeremy.gardenkingmod.currency.GardenCurrencyHolder;
+import net.jeremy.gardenkingmod.screen.BankScreenHandler;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,9 +18,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 /**
@@ -32,6 +38,39 @@ public class WalletItem extends Item {
 
         public WalletItem(Settings settings) {
                 super(settings.maxCount(1));
+        }
+
+        @Override
+        public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+                ItemStack stack = user.getStackInHand(hand);
+
+                if (world.isClient) {
+                        return TypedActionResult.success(stack);
+                }
+
+                if (!(user instanceof ServerPlayerEntity serverPlayer)) {
+                        return TypedActionResult.pass(stack);
+                }
+
+                boolean changed = ensureOwner(stack, serverPlayer);
+                if (!isOwnedBy(stack, serverPlayer)) {
+                        serverPlayer.sendMessage(Text.translatable("message.gardenkingmod.bank.not_owner"), true);
+                        return TypedActionResult.fail(stack);
+                }
+
+                if (serverPlayer instanceof GardenCurrencyHolder holder) {
+                        long balance = holder.gardenkingmod$getBankBalance();
+                        if (updateBalanceSnapshot(stack, balance)) {
+                                changed = true;
+                        }
+                }
+
+                if (changed) {
+                        markInventoryDirty(serverPlayer);
+                }
+
+                serverPlayer.openHandledScreen(new RemoteBankScreenFactory());
+                return TypedActionResult.consume(stack);
         }
 
         @Override
@@ -300,6 +339,27 @@ public class WalletItem extends Item {
                         if (player.playerScreenHandler != null) {
                                 player.playerScreenHandler.sendContentUpdates();
                         }
+                }
+        }
+
+        private static class RemoteBankScreenFactory implements ExtendedScreenHandlerFactory {
+                @Override
+                public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+                        buf.writeBlockPos(BankScreenHandler.REMOTE_BANK_POS);
+                }
+
+                @Override
+                public Text getDisplayName() {
+                        return Text.translatable("container.gardenkingmod.bank");
+                }
+
+                @Override
+                public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+                        BankScreenHandler handler = BankScreenHandler.createRemote(syncId, playerInventory);
+                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                                handler.sendBalanceUpdate(serverPlayer);
+                        }
+                        return handler;
                 }
         }
 }

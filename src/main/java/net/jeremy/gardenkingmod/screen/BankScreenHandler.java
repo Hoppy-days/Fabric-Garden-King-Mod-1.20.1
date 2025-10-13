@@ -31,37 +31,78 @@ public class BankScreenHandler extends ScreenHandler {
     public static final int PLAYER_INVENTORY_TITLE_Y = PLAYER_INVENTORY_Y - 10;
     public static final long MAX_WITHDRAW_AMOUNT = 64L * 36L;
     public static final int BUTTON_DEPOSIT = 0;
+    public static final BlockPos REMOTE_BANK_POS = new BlockPos(-33554432, -33554432, -33554432);
 
     private static final int DEPOSIT_SLOT_INDEX = 0;
     private static final int PLAYER_INVENTORY_START = 1;
     private static final int PLAYER_INVENTORY_END = PLAYER_INVENTORY_START + 27;
     private static final int HOTBAR_START = PLAYER_INVENTORY_END;
     private static final int HOTBAR_END = HOTBAR_START + 9;
+    private static final int DEPOSIT_SLOT_STACK_MULTIPLIER = 45;
+    private static final int DEPOSIT_SLOT_MAX_COUNT = ModItems.DOLLAR.getMaxCount() * DEPOSIT_SLOT_STACK_MULTIPLIER;
 
     private final BankBlockEntity blockEntity;
+    private final boolean remoteAccess;
     private final Inventory depositInventory = new SimpleInventory(1) {
         @Override
         public void markDirty() {
             super.markDirty();
             BankScreenHandler.this.sendContentUpdates();
         }
+
+        @Override
+        public int getMaxCountPerStack() {
+            return DEPOSIT_SLOT_MAX_COUNT;
+        }
     };
     private final BlockPos bankPos;
     private int totalDollars;
 
     public BankScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
-        this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()));
+        this(syncId, playerInventory, buf.readBlockPos());
     }
 
     public BankScreenHandler(int syncId, PlayerInventory playerInventory, BankBlockEntity blockEntity) {
+        this(syncId, playerInventory, blockEntity, blockEntity != null ? blockEntity.getPos() : REMOTE_BANK_POS,
+                false);
+    }
+
+    public static BankScreenHandler createRemote(int syncId, PlayerInventory playerInventory) {
+        return new BankScreenHandler(syncId, playerInventory, null, REMOTE_BANK_POS, true);
+    }
+
+    private BankScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos bankPos) {
+        this(syncId, playerInventory, getBlockEntity(playerInventory, bankPos), bankPos);
+    }
+
+    private BankScreenHandler(int syncId, PlayerInventory playerInventory, BankBlockEntity blockEntity,
+            BlockPos bankPos) {
+        this(syncId, playerInventory, blockEntity, bankPos,
+                blockEntity == null && REMOTE_BANK_POS.equals(bankPos));
+    }
+
+    private BankScreenHandler(int syncId, PlayerInventory playerInventory, BankBlockEntity blockEntity,
+            BlockPos bankPos, boolean remoteAccess) {
         super(ModScreenHandlers.BANK_SCREEN_HANDLER, syncId);
         this.blockEntity = blockEntity;
-        this.bankPos = blockEntity != null ? blockEntity.getPos() : BlockPos.ORIGIN;
+        this.bankPos = bankPos;
+        this.remoteAccess = remoteAccess;
 
         this.addSlot(new Slot(this.depositInventory, 0, DEPOSIT_SLOT_X, DEPOSIT_SLOT_Y) {
             @Override
             public boolean canInsert(ItemStack stack) {
                 return WalletItem.getCurrencyValuePerItem(stack.getItem()) > 0;
+            }
+
+            @Override
+            public int getMaxItemCount() {
+                return DEPOSIT_SLOT_MAX_COUNT;
+            }
+
+            @Override
+            public int getMaxItemCount(ItemStack stack) {
+                return Math.min(DEPOSIT_SLOT_MAX_COUNT,
+                        stack.getMaxCount() * DEPOSIT_SLOT_STACK_MULTIPLIER);
             }
         });
 
@@ -78,6 +119,9 @@ public class BankScreenHandler extends ScreenHandler {
 
     @Override
     public boolean canUse(PlayerEntity player) {
+        if (remoteAccess) {
+            return player != null && !player.isRemoved() && WalletItem.hasUsableWallet(player);
+        }
         if (blockEntity != null) {
             return blockEntity.canPlayerUse(player);
         }
@@ -259,7 +303,7 @@ public class BankScreenHandler extends ScreenHandler {
         return ModScoreboards.getBankBalance(player);
     }
 
-    private void sendBalanceUpdate(ServerPlayerEntity player) {
+    public void sendBalanceUpdate(ServerPlayerEntity player) {
         if (blockEntity != null) {
             blockEntity.sendBalanceUpdate(player);
             return;
