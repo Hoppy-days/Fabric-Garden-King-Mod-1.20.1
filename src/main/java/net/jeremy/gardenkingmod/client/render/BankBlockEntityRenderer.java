@@ -39,7 +39,7 @@ public class BankBlockEntityRenderer implements BlockEntityRenderer<BankBlockEnt
 
         Direction facing = entity.getCachedState() != null ? entity.getCachedState().get(BankBlock.FACING) : null;
         if (facing != null) {
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(facing.asRotation()));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-facing.asRotation()));
         }
 
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
