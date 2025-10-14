@@ -43,6 +43,15 @@
         "gardenkingmod:dollar*64",
         "minecraft:honeycomb*8"
       ]
+    },{
+      "offer": "gardenkingmod:rotten_tomato*8",
+      "price": "gardenkingmod:dollar*1"
+    },{
+      "offer": "gardenkingmod:rotten_potato*8",
+      "price": "gardenkingmod:dollar*1"
+    },{
+      "offer": "gardenkingmod:rotten_wheat*8",
+      "price": "gardenkingmod:dollar*1"
     }
   ]
 }

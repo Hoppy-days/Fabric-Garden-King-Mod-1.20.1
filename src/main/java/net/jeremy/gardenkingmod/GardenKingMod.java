@@ -8,6 +8,7 @@ import net.jeremy.gardenkingmod.armor.ModArmorSetEffects;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager;
 import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
+import net.jeremy.gardenkingmod.item.FertilizerBalanceConfig;
 import net.jeremy.gardenkingmod.item.WalletItem;
 import net.jeremy.gardenkingmod.network.ModServerNetworking;
 import net.jeremy.gardenkingmod.registry.ModEntities;
@@ -26,6 +27,7 @@ public class GardenKingMod implements ModInitializer {
 
         @Override
         public void onInitialize() {
+                FertilizerBalanceConfig.reload();
                 ModItems.registerModItems();
                 ModBlocks.registerModBlocks();
                 ModBlockEntities.registerBlockEntities();
