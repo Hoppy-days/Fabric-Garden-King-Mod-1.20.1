@@ -4,6 +4,7 @@ import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.block.BankBlock;
 import net.jeremy.gardenkingmod.block.entity.BankBlockEntity;
 import net.jeremy.gardenkingmod.client.model.BankBlockModel;
+import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -55,8 +56,11 @@ public class BankBlockEntityRenderer implements BlockEntityRenderer<BankBlockEnt
         World world = entity.getWorld();
         int combinedLight = LightmapTextureManager.MAX_LIGHT_COORDINATE;
         if (world != null) {
-            BlockPos posAbove = entity.getPos().up();
-            combinedLight = WorldRenderer.getLightmapCoordinates(world, posAbove);
+            BlockPos lightSamplePos = entity.getCachedState() != null
+                    && entity.getCachedState().get(BankBlock.HALF) == DoubleBlockHalf.UPPER
+                    ? entity.getPos()
+                    : entity.getPos().up();
+            combinedLight = WorldRenderer.getLightmapCoordinates(world, lightSamplePos);
         }
 
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
