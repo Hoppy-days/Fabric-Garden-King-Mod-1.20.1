@@ -2,6 +2,7 @@ package net.jeremy.gardenkingmod.client.render.item;
 
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.jeremy.gardenkingmod.GardenKingMod;
+import net.jeremy.gardenkingmod.client.config.BankItemDisplayConfig;
 import net.jeremy.gardenkingmod.client.model.BankBlockModel;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
@@ -32,26 +33,19 @@ public class BankItemRenderer implements BuiltinItemRendererRegistry.DynamicItem
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
 
         if (mode != null) {
-            switch (mode) {
-                case GUI -> {
-                    matrices.scale(0.18f, 0.18f, 0.18f);
-                    matrices.translate(0.0, 4.0, 0.0);
-                }
-                case GROUND -> {
-                    matrices.scale(0.18f, 0.18f, 0.18f);
-                    matrices.translate(0.0, 2.8, 0.0);
-                }
-                case FIXED -> {
-                    matrices.scale(0.18f, 0.18f, 0.18f);
-                    matrices.translate(0.0, 3.0, 0.0);
-                }
+            BankItemDisplayConfig config = BankItemDisplayConfig.get();
+            BankItemDisplayConfig.DisplayTransform transform = switch (mode) {
+                case GUI -> config.gui();
+                case GROUND -> config.ground();
+                case FIXED -> config.fixed();
                 case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND,
-                        THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> {
-                    matrices.scale(0.16f, 0.16f, 0.16f);
-                    matrices.translate(0.0f, 3.0f, 0.0f);
-                }
-                default -> {
-                }
+                        THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> config.hand();
+                default -> null;
+            };
+
+            if (transform != null) {
+                matrices.scale(transform.scaleX(), transform.scaleY(), transform.scaleZ());
+                matrices.translate(transform.translateX(), transform.translateY(), transform.translateZ());
             }
         }
 
