@@ -41,10 +41,10 @@ public class BankBlockEntityRenderer implements BlockEntityRenderer<BankBlockEnt
         if (facing != null) {
             float yRotation;
             switch (facing) {
-                case NORTH -> yRotation = 0.0f;
-                case EAST -> yRotation = 90.0f;
-                case SOUTH -> yRotation = 180.0f;
-                case WEST -> yRotation = 270.0f;
+                case SOUTH -> yRotation = 0.0f;
+                case WEST -> yRotation = 90.0f;
+                case NORTH -> yRotation = 180.0f;
+                case EAST -> yRotation = 270.0f;
                 default -> yRotation = 0.0f;
             }
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yRotation));
@@ -55,8 +55,12 @@ public class BankBlockEntityRenderer implements BlockEntityRenderer<BankBlockEnt
         World world = entity.getWorld();
         int combinedLight = LightmapTextureManager.MAX_LIGHT_COORDINATE;
         if (world != null) {
-            BlockPos posAbove = entity.getPos().up();
-            combinedLight = WorldRenderer.getLightmapCoordinates(world, posAbove);
+            BlockPos basePos = entity.getPos();
+            int lowerLight = WorldRenderer.getLightmapCoordinates(world, basePos);
+            int upperLight = WorldRenderer.getLightmapCoordinates(world, basePos.up());
+            int blockLight = Math.max(lowerLight & 0xFFFF, upperLight & 0xFFFF);
+            int skyLight = Math.max((lowerLight >> 16) & 0xFFFF, (upperLight >> 16) & 0xFFFF);
+            combinedLight = (skyLight << 16) | blockLight;
         }
 
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
