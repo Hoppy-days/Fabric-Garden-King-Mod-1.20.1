@@ -4,7 +4,6 @@ import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.block.BankBlock;
 import net.jeremy.gardenkingmod.block.entity.BankBlockEntity;
 import net.jeremy.gardenkingmod.client.model.BankBlockModel;
-import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -40,28 +39,20 @@ public class BankBlockEntityRenderer implements BlockEntityRenderer<BankBlockEnt
 
         Direction facing = entity.getCachedState() != null ? entity.getCachedState().get(BankBlock.FACING) : null;
         if (facing != null) {
-            float yRotation;
-            switch (facing) {
-                case SOUTH -> yRotation = 0.0f;
-                case WEST -> yRotation = 90.0f;
-                case NORTH -> yRotation = 180.0f;
-                case EAST -> yRotation = 270.0f;
-                default -> yRotation = 0.0f;
-            }
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yRotation));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(facing.asRotation()));
         }
 
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
 
         World world = entity.getWorld();
-        int combinedLight = LightmapTextureManager.MAX_LIGHT_COORDINATE;
+        int combinedLight = light;
         if (world != null) {
             BlockPos basePos = entity.getPos();
-            int lowerLight = WorldRenderer.getLightmapCoordinates(world, basePos);
-            int upperLight = WorldRenderer.getLightmapCoordinates(world, basePos.up());
+            int lowerLight = WorldRenderer.getLightmapCoordinates(world, entity.getCachedState(), basePos);
+            int upperLight = WorldRenderer.getLightmapCoordinates(world, world.getBlockState(basePos.up()), basePos.up());
             int blockLight = Math.max(lowerLight & 0xFFFF, upperLight & 0xFFFF);
             int skyLight = Math.max((lowerLight >> 16) & 0xFFFF, (upperLight >> 16) & 0xFFFF);
-            combinedLight = (skyLight << 16) | blockLight;
+            combinedLight = LightmapTextureManager.pack(blockLight, skyLight);
         }
 
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
