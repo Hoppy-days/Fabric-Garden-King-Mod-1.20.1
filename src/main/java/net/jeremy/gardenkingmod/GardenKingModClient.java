@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.jeremy.gardenkingmod.client.config.BankItemDisplayConfig;
 import net.jeremy.gardenkingmod.client.model.BankBlockModel;
 import net.jeremy.gardenkingmod.client.model.CrowEntityModel;
 import net.jeremy.gardenkingmod.client.model.GearShopModel;
@@ -48,6 +49,7 @@ import net.minecraft.util.math.BlockPos;
 public class GardenKingModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        BankItemDisplayConfig.reload();
         HandledScreens.register(ModScreenHandlers.GEAR_SHOP_SCREEN_HANDLER, GearShopScreen::new);
         HandledScreens.register(ModScreenHandlers.MARKET_SCREEN_HANDLER, MarketScreen::new);
         HandledScreens.register(ModScreenHandlers.SCARECROW_SCREEN_HANDLER, ScarecrowScreen::new);
