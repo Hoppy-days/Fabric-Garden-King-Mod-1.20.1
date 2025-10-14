@@ -4,7 +4,6 @@ import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.block.BankBlock;
 import net.jeremy.gardenkingmod.block.entity.BankBlockEntity;
 import net.jeremy.gardenkingmod.client.model.BankBlockModel;
-import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -40,29 +39,42 @@ public class BankBlockEntityRenderer implements BlockEntityRenderer<BankBlockEnt
 
         Direction facing = entity.getCachedState() != null ? entity.getCachedState().get(BankBlock.FACING) : null;
         if (facing != null) {
-            float yRotation;
-            switch (facing) {
-                case SOUTH -> yRotation = 0.0f;
-                case WEST -> yRotation = 90.0f;
-                case NORTH -> yRotation = 180.0f;
-                case EAST -> yRotation = 270.0f;
-                default -> yRotation = 0.0f;
-            }
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(yRotation));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(facing.asRotation()));
         }
 
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
 
         World world = entity.getWorld();
-        int combinedLight = LightmapTextureManager.MAX_LIGHT_COORDINATE;
+        int blockLight = 15;
+        int skyLight = 15;
         if (world != null) {
             BlockPos basePos = entity.getPos();
-            int lowerLight = WorldRenderer.getLightmapCoordinates(world, basePos);
-            int upperLight = WorldRenderer.getLightmapCoordinates(world, basePos.up());
-            int blockLight = Math.max(lowerLight & 0xFFFF, upperLight & 0xFFFF);
-            int skyLight = Math.max((lowerLight >> 16) & 0xFFFF, (upperLight >> 16) & 0xFFFF);
-            combinedLight = (skyLight << 16) | blockLight;
+            BlockPos upperPos = basePos.up();
+            BlockPos exposedPos = upperPos.up();
+
+            int brightestBlock = 0;
+            int brightestSky = 0;
+
+            int[] samples = {
+                    WorldRenderer.getLightmapCoordinates(world, basePos),
+                    WorldRenderer.getLightmapCoordinates(world, upperPos),
+                    WorldRenderer.getLightmapCoordinates(world, exposedPos)
+            };
+
+            for (int lightSample : samples) {
+                int sampleBlock = (lightSample >> 4) & 0xF;
+                int sampleSky = (lightSample >> 20) & 0xF;
+                brightestBlock = Math.max(brightestBlock, sampleBlock);
+                brightestSky = Math.max(brightestSky, sampleSky);
+            }
+
+            if (brightestBlock > 0 || brightestSky > 0) {
+                blockLight = brightestBlock;
+                skyLight = brightestSky;
+            }
         }
+
+        int combinedLight = LightmapTextureManager.pack(blockLight, skyLight);
 
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
         this.model.render(matrices, vertexConsumer, combinedLight, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);

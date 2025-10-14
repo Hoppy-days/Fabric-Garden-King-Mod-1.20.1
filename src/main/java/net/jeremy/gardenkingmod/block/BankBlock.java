@@ -58,7 +58,8 @@ public class BankBlock extends BlockWithEntity {
             return null;
         }
 
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing());
+        Direction facing = ctx.getHorizontalPlayerFacing().getOpposite();
+        return this.getDefaultState().with(FACING, facing);
     }
 
     @Override
@@ -68,8 +69,18 @@ public class BankBlock extends BlockWithEntity {
             return;
         }
 
+        Direction facing = state.get(FACING);
+        if (placer instanceof PlayerEntity player) {
+            facing = player.getHorizontalFacing().getOpposite();
+        }
+
+        BlockState lowerState = state.with(FACING, facing).with(HALF, DoubleBlockHalf.LOWER);
         BlockPos abovePos = pos.up();
-        BlockState upperState = state.with(HALF, DoubleBlockHalf.UPPER);
+        BlockState upperState = lowerState.with(HALF, DoubleBlockHalf.UPPER);
+
+        if (!state.equals(lowerState)) {
+            world.setBlockState(pos, lowerState, Block.NOTIFY_ALL);
+        }
         world.setBlockState(abovePos, upperState, Block.NOTIFY_ALL);
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
