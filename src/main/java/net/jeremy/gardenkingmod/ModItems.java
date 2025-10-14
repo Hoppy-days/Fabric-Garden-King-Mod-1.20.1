@@ -9,14 +9,17 @@ import java.util.Map;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinition;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinitions;
 import net.jeremy.gardenkingmod.item.AmethystArmorMaterial;
 import net.jeremy.gardenkingmod.item.AmethystToolMaterial;
 import net.jeremy.gardenkingmod.item.BlueSapphireArmorMaterial;
 import net.jeremy.gardenkingmod.item.BlueSapphireToolMaterial;
+import net.jeremy.gardenkingmod.item.CompostFertilizerItem;
 import net.jeremy.gardenkingmod.item.EmeraldArmorMaterial;
 import net.jeremy.gardenkingmod.item.EmeraldToolMaterial;
+import net.jeremy.gardenkingmod.item.FertilizerBalanceConfig;
 import net.jeremy.gardenkingmod.item.FortuneHoeItem;
 import net.jeremy.gardenkingmod.item.ObsidianArmorMaterial;
 import net.jeremy.gardenkingmod.item.ObsidianToolMaterial;
@@ -38,6 +41,7 @@ import net.minecraft.item.SwordItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 
 public final class ModItems {
         public static final Item WALLET = registerItem("wallet", new WalletItem(new FabricItemSettings()));
@@ -162,6 +166,8 @@ public final class ModItems {
                         new ArmorItem(AmethystArmorMaterial.INSTANCE, ArmorItem.Type.LEGGINGS, new FabricItemSettings()));
         public static final Item AMETHYST_BOOTS = registerItem("amethyst_boots",
                         new ArmorItem(AmethystArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
+        public static final Item SPECIAL_FERTILIZER = registerItem("special_fertilizer",
+                        new CompostFertilizerItem(new FabricItemSettings()));
         public static final Item OBSIDIAN_HELMET = registerItem("obsidian_helmet",
                         new ArmorItem(ObsidianArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item OBSIDIAN_CHESTPLATE = registerItem("obsidian_chestplate",
@@ -238,6 +244,7 @@ public final class ModItems {
                 if (!initializeRottenItems()) {
                         GardenKingMod.LOGGER.warn("Skipping rotten item registration until crop definitions are available");
                 }
+                registerCompostables();
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
                                 .register(entries -> {
                                         entries.add(DOLLAR);
@@ -246,6 +253,7 @@ public final class ModItems {
                                         entries.add(BLUE_SAPPHIRE);
                                         entries.add(TOPAZ);
                                         entries.add(PEARL);
+                                        entries.add(SPECIAL_FERTILIZER);
                                         rottenItems.forEach(entries::add);
                                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL)
@@ -323,5 +331,17 @@ public final class ModItems {
                                         entries.add(EMERALD_LEGGINGS);
                                         entries.add(EMERALD_BOOTS);
                                 });
+        }
+
+        private static void registerCompostables() {
+                double chanceValue = MathHelper.clamp(FertilizerBalanceConfig.get().rottenCompostChance(), 0.0, 1.0);
+                if (chanceValue <= 0.0) {
+                        return;
+                }
+
+                float chance = (float) chanceValue;
+                for (Item item : rottenItems) {
+                        CompostingChanceRegistry.INSTANCE.add(item, chance);
+                }
         }
 }

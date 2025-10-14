@@ -82,6 +82,7 @@
   "container.gardenkingmod.bank": "Village Bank",
   "item.gardenkingmod.dollar": "Dollar",
   "item.gardenkingmod.wallet": "Wallet",
+  "item.gardenkingmod.special_fertilizer": "Special Fertilizer",
   "tooltip.gardenkingmod.wallet.unbound": "Owner: Unbound",
   "tooltip.gardenkingmod.wallet.owner": "Owner: %s",
   "tooltip.gardenkingmod.wallet.balance": "Bank Balance: %s dollars",
