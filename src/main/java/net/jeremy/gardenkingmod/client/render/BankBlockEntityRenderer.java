@@ -55,8 +55,13 @@ public class BankBlockEntityRenderer implements BlockEntityRenderer<BankBlockEnt
         World world = entity.getWorld();
         int combinedLight = LightmapTextureManager.MAX_LIGHT_COORDINATE;
         if (world != null) {
-            BlockPos posAbove = entity.getPos().up();
-            combinedLight = WorldRenderer.getLightmapCoordinates(world, posAbove);
+            BlockPos lowerPos = entity.getPos();
+            BlockPos upperPos = lowerPos.up();
+            int lowerLight = WorldRenderer.getLightmapCoordinates(world, lowerPos);
+            int upperLight = WorldRenderer.getLightmapCoordinates(world, upperPos);
+            int blockLight = Math.max(lowerLight & 0xFFFF, upperLight & 0xFFFF);
+            int skyLight = Math.max((lowerLight >> 16) & 0xFFFF, (upperLight >> 16) & 0xFFFF);
+            combinedLight = (skyLight << 16) | blockLight;
         }
 
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));

@@ -58,7 +58,7 @@ public class BankBlock extends BlockWithEntity {
             return null;
         }
 
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing());
     }
 
     @Override
