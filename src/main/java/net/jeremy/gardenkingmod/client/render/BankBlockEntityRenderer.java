@@ -4,6 +4,7 @@ import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.block.BankBlock;
 import net.jeremy.gardenkingmod.block.entity.BankBlockEntity;
 import net.jeremy.gardenkingmod.client.model.BankBlockModel;
+import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
