@@ -39,13 +39,13 @@ public class BankBlockEntityRenderer implements BlockEntityRenderer<BankBlockEnt
 
         Direction facing = entity.getCachedState() != null ? entity.getCachedState().get(BankBlock.FACING) : null;
         if (facing != null) {
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(facing.asRotation()));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-facing.asRotation()));
         }
 
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
 
         World world = entity.getWorld();
-        int combinedLight = LightmapTextureManager.MAX_LIGHT_COORDINATE;
+        int combinedLight = light;
         if (world != null) {
             BlockPos basePos = entity.getPos();
             BlockPos upperPos = basePos.up();
