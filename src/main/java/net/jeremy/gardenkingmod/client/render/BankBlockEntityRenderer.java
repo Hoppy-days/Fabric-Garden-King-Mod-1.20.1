@@ -45,14 +45,36 @@ public class BankBlockEntityRenderer implements BlockEntityRenderer<BankBlockEnt
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
 
         World world = entity.getWorld();
-        int combinedLight = light;
+        int blockLight = 15;
+        int skyLight = 15;
         if (world != null) {
             BlockPos basePos = entity.getPos();
             BlockPos upperPos = basePos.up();
-            int lowerLight = WorldRenderer.getLightmapCoordinates(world, basePos);
-            int upperLight = WorldRenderer.getLightmapCoordinates(world, upperPos);
-            combinedLight = Math.max(lowerLight, upperLight);
+            BlockPos exposedPos = upperPos.up();
+
+            int brightestBlock = 0;
+            int brightestSky = 0;
+
+            int[] samples = {
+                    WorldRenderer.getLightmapCoordinates(world, basePos),
+                    WorldRenderer.getLightmapCoordinates(world, upperPos),
+                    WorldRenderer.getLightmapCoordinates(world, exposedPos)
+            };
+
+            for (int lightSample : samples) {
+                int sampleBlock = (lightSample >> 4) & 0xF;
+                int sampleSky = (lightSample >> 20) & 0xF;
+                brightestBlock = Math.max(brightestBlock, sampleBlock);
+                brightestSky = Math.max(brightestSky, sampleSky);
+            }
+
+            if (brightestBlock > 0 || brightestSky > 0) {
+                blockLight = brightestBlock;
+                skyLight = brightestSky;
+            }
         }
+
+        int combinedLight = LightmapTextureManager.pack(blockLight, skyLight);
 
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getEntityCutout(TEXTURE));
         this.model.render(matrices, vertexConsumer, combinedLight, OverlayTexture.DEFAULT_UV, 1.0f, 1.0f, 1.0f, 1.0f);
