@@ -70,10 +70,17 @@ public class BankScreen extends HandledScreen<BankScreenHandler> {
     private BankActionButton depositButton;
 
     public BankScreen(BankScreenHandler handler, PlayerInventory inventory, Text title) {
-        super(handler, inventory, title);
+        super(handler, inventory, createPlayerBankTitle(inventory));
         this.backgroundWidth = BankScreenHandler.GUI_WIDTH;
         this.backgroundHeight = BankScreenHandler.GUI_HEIGHT;
         this.playerInventoryTitleY = BankScreenHandler.PLAYER_INVENTORY_TITLE_Y;
+    }
+
+    private static Text createPlayerBankTitle(PlayerInventory inventory) {
+        if (inventory == null || inventory.player == null) {
+            return Text.translatable("container.gardenkingmod.bank");
+        }
+        return Text.translatable("screen.gardenkingmod.bank.title", inventory.player.getDisplayName());
     }
 
     @Override
