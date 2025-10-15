@@ -24,7 +24,6 @@ public class SprinklerModel extends EntityModel<Entity> {
          */
 
         private final SprinklerRotationAnimation rotationAnimation;
-        private final ModelPart rotationRoot;
         private final ModelPart rotation;
         private final ModelPart cap4;
         private final ModelPart bbMain;
@@ -33,8 +32,7 @@ public class SprinklerModel extends EntityModel<Entity> {
 
         public SprinklerModel(ModelPart root) {
                 this.rotationAnimation = SprinklerRotationAnimation.load();
-                this.rotationRoot = root.getChild("rotation_root");
-                this.rotation = this.rotationRoot.getChild("rotation");
+                this.rotation = root.getChild("rotation");
                 this.cap4 = root.getChild("cap4");
                 this.bbMain = root.getChild("bb_main");
         }
@@ -129,7 +127,6 @@ public class SprinklerModel extends EntityModel<Entity> {
         @Override
         public void render(MatrixStack matrices, VertexConsumer vertexConsumer, int light, int overlay, float red, float green,
                         float blue, float alpha) {
-                this.rotationRoot.resetTransform();
                 this.rotation.resetTransform();
                 this.rotation.yaw = this.rotationAngle;
                 this.rotationRoot.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
