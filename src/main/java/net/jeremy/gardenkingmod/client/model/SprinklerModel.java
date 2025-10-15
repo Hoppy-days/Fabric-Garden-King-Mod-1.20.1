@@ -24,6 +24,7 @@ public class SprinklerModel extends EntityModel<Entity> {
          */
 
         private final SprinklerRotationAnimation rotationAnimation;
+        private final ModelPart rotationRoot;
         private final ModelPart rotation;
         private final ModelPart cap4;
         private final ModelPart bbMain;
@@ -32,7 +33,8 @@ public class SprinklerModel extends EntityModel<Entity> {
 
         public SprinklerModel(ModelPart root) {
                 this.rotationAnimation = SprinklerRotationAnimation.load();
-                this.rotation = root.getChild("rotation");
+                this.rotationRoot = root.getChild("rotation_root");
+                this.rotation = this.rotationRoot.getChild("rotation");
                 this.cap4 = root.getChild("cap4");
                 this.bbMain = root.getChild("bb_main");
         }
