@@ -3,13 +3,13 @@ package net.jeremy.gardenkingmod.client.model;
 // Made with Blockbench 5.0.1
 // Exported for Minecraft version 1.17+ for Yarn
 // Paste this class into your mod and generate all required imports
-public class SprinklerModel2 extends EntityModel<Entity> {
+public class SprinklerModel extends EntityModel<Entity> {
 	private final ModelPart rotation;
 	private final ModelPart cap3;
 	private final ModelPart cap2;
 	private final ModelPart cap4;
 	private final ModelPart bb_main;
-	public SprinklerModel2(ModelPart root) {
+	public SprinklerModel(ModelPart root) {
 		this.rotation = root.getChild("rotation");
 		this.cap3 = this.rotation.getChild("cap3");
 		this.cap2 = this.rotation.getChild("cap2");
