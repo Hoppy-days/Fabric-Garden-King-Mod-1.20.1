@@ -131,7 +131,7 @@ public class SprinklerModel extends EntityModel<Entity> {
                         float blue, float alpha) {
                 this.rotationRoot.resetTransform();
                 this.rotation.resetTransform();
-                this.rotationRoot.yaw = this.rotationAngle;
+                this.rotation.yaw = this.rotationAngle;
                 this.rotationRoot.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
                 this.cap4.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
                 this.bbMain.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
