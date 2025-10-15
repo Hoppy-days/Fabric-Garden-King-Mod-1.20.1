@@ -14,6 +14,7 @@ import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 
 public class SprinklerModel extends EntityModel<Entity> {
         public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(
@@ -25,6 +26,9 @@ public class SprinklerModel extends EntityModel<Entity> {
 
         private final SprinklerRotationAnimation rotationAnimation;
         private final ModelPart rotationRoot;
+        private final float rotationRootPivotX;
+        private final float rotationRootPivotY;
+        private final float rotationRootPivotZ;
         private final ModelPart rotation;
         private final ModelPart cap4;
         private final ModelPart bbMain;
@@ -35,6 +39,9 @@ public class SprinklerModel extends EntityModel<Entity> {
                 this.rotationAnimation = SprinklerRotationAnimation.load();
                 this.rotationRoot = root.getChild("rotation_root");
                 this.rotation = this.rotationRoot.getChild("rotation");
+                this.rotationRootPivotX = this.rotationRoot.pivotX;
+                this.rotationRootPivotY = this.rotationRoot.pivotY;
+                this.rotationRootPivotZ = this.rotationRoot.pivotZ;
                 this.cap4 = root.getChild("cap4");
                 this.bbMain = root.getChild("bb_main");
         }
@@ -131,8 +138,24 @@ public class SprinklerModel extends EntityModel<Entity> {
                         float blue, float alpha) {
                 this.rotationRoot.resetTransform();
                 this.rotation.resetTransform();
-                this.rotationRoot.yaw = this.rotationAngle;
+
+                float pivotX = this.rotationRootPivotX / 16.0F;
+                float pivotY = this.rotationRootPivotY / 16.0F;
+                float pivotZ = this.rotationRootPivotZ / 16.0F;
+
+                matrices.push();
+                matrices.translate(pivotX, pivotY, pivotZ);
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(this.rotationAngle));
+                matrices.translate(-pivotX, -pivotY, -pivotZ);
+
+                this.rotationRoot.pivotX = 0.0F;
+                this.rotationRoot.pivotY = 0.0F;
+                this.rotationRoot.pivotZ = 0.0F;
                 this.rotationRoot.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
+                this.rotationRoot.pivotX = this.rotationRootPivotX;
+                this.rotationRoot.pivotY = this.rotationRootPivotY;
+                this.rotationRoot.pivotZ = this.rotationRootPivotZ;
+                matrices.pop();
                 this.cap4.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
                 this.bbMain.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
         }
