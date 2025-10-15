@@ -22,6 +22,7 @@ public class SprinklerBlockEntityRenderer implements BlockEntityRenderer<Sprinkl
                 matrices.push();
                 matrices.translate(0.5D, 1.5D, 0.5D);
                 matrices.scale(-1.0F, -1.0F, 1.0F);
+                this.model.setAnimationProgress(entity.getAnimationProgress(tickDelta));
                 VertexConsumer vertexConsumer = vertexConsumers
                                 .getBuffer(RenderLayer.getEntityCutoutNoCull(entity.getTier().getTexture()));
                 this.model.render(matrices, vertexConsumer, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
