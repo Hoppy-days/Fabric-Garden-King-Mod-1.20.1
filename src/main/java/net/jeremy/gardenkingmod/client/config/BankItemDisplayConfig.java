@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.jeremy.gardenkingmod.GardenKingMod;
@@ -64,6 +65,9 @@ public final class BankItemDisplayConfig {
                 }
                 instance = loaded;
             }
+        } catch (JsonParseException exception) {
+            GardenKingMod.LOGGER.warn("Failed to parse bank item config; falling back to defaults", exception);
+            instance = defaults;
         } catch (IOException exception) {
             GardenKingMod.LOGGER.warn("Failed to read bank item config; falling back to defaults", exception);
             instance = defaults;
