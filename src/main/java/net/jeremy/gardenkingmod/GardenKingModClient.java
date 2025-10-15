@@ -16,15 +16,18 @@ import net.jeremy.gardenkingmod.client.model.CrowEntityModel;
 import net.jeremy.gardenkingmod.client.model.GearShopModel;
 import net.jeremy.gardenkingmod.client.model.MarketBlockModel;
 import net.jeremy.gardenkingmod.client.model.ScarecrowModel;
+import net.jeremy.gardenkingmod.client.model.SprinklerModel;
 import net.jeremy.gardenkingmod.client.render.BankBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.CrowEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.GearShopBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.MarketBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.ScarecrowBlockEntityRenderer;
+import net.jeremy.gardenkingmod.client.render.SprinklerBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.item.BankItemRenderer;
 import net.jeremy.gardenkingmod.client.render.item.GearShopItemRenderer;
 import net.jeremy.gardenkingmod.client.render.item.MarketItemRenderer;
 import net.jeremy.gardenkingmod.client.render.item.ScarecrowItemRenderer;
+import net.jeremy.gardenkingmod.client.render.item.SprinklerItemRenderer;
 import net.jeremy.gardenkingmod.registry.ModEntities;
 import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.ModBlocks;
@@ -59,6 +62,7 @@ public class GardenKingModClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(GearShopModel.LAYER_LOCATION,
                         GearShopModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(ScarecrowModel.LAYER_LOCATION, ScarecrowModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(SprinklerModel.LAYER_LOCATION, SprinklerModel::getTexturedModelData);
 
         EntityModelLayerRegistry.registerModelLayer(CrowEntityModel.LAYER_LOCATION, CrowEntityModel::getTexturedModelData);
         BlockEntityRendererFactories.register(ModBlockEntities.BANK_BLOCK_ENTITY, BankBlockEntityRenderer::new);
@@ -66,11 +70,17 @@ public class GardenKingModClient implements ClientModInitializer {
         BlockEntityRendererFactories.register(ModBlockEntities.GEAR_SHOP_BLOCK_ENTITY,
                         GearShopBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlockEntities.SCARECROW_BLOCK_ENTITY, ScarecrowBlockEntityRenderer::new);
+        BlockEntityRendererFactories.register(ModBlockEntities.SPRINKLER_BLOCK_ENTITY, SprinklerBlockEntityRenderer::new);
         EntityRendererRegistry.register(ModEntities.CROW, CrowEntityRenderer::new);
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.BANK_BLOCK, new BankItemRenderer());
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.MARKET_BLOCK, new MarketItemRenderer());
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GEAR_SHOP_BLOCK, new GearShopItemRenderer());
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.SCARECROW_BLOCK, new ScarecrowItemRenderer());
+        SprinklerItemRenderer sprinklerItemRenderer = new SprinklerItemRenderer();
+        BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.IRON_SPRINKLER_BLOCK, sprinklerItemRenderer);
+        BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.GOLD_SPRINKLER_BLOCK, sprinklerItemRenderer);
+        BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_SPRINKLER_BLOCK, sprinklerItemRenderer);
+        BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.EMERALD_SPRINKLER_BLOCK, sprinklerItemRenderer);
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.SCARECROW_BLOCK, RenderLayer.getCutout());
 
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.MARKET_SALE_RESULT_PACKET,

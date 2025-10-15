@@ -211,7 +211,15 @@
 
   "entity.gardenkingmod.crow": "Crow",
   "block.gardenkingmod.scarecrow": "Field Scarecrow",
+  "block.gardenkingmod.iron_sprinkler": "Iron Sprinkler",
+  "block.gardenkingmod.gold_sprinkler": "Gold Sprinkler",
+  "block.gardenkingmod.diamond_sprinkler": "Diamond Sprinkler",
+  "block.gardenkingmod.emerald_sprinkler": "Emerald Sprinkler",
   "item.gardenkingmod.scarecrow": "Field Scarecrow",
+  "item.gardenkingmod.iron_sprinkler": "Iron Sprinkler",
+  "item.gardenkingmod.gold_sprinkler": "Gold Sprinkler",
+  "item.gardenkingmod.diamond_sprinkler": "Diamond Sprinkler",
+  "item.gardenkingmod.emerald_sprinkler": "Emerald Sprinkler",
   "item.gardenkingmod.crow_spawn_egg": "Crow Spawn Egg",
 
   "tooltip.gardenkingmod.scarecrow.ward_radius": "Wards crows within %s blocks.",
