@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.jeremy.gardenkingmod.block.entity.BankBlockEntity;
 import net.jeremy.gardenkingmod.block.entity.GearShopBlockEntity;
 import net.jeremy.gardenkingmod.block.entity.MarketBlockEntity;
+import net.jeremy.gardenkingmod.block.sprinkler.SprinklerBlockEntity;
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registries;
@@ -22,6 +23,12 @@ public final class ModBlockEntities {
         public static final BlockEntityType<ScarecrowBlockEntity> SCARECROW_BLOCK_ENTITY = Registry.register(
                         Registries.BLOCK_ENTITY_TYPE, new Identifier(GardenKingMod.MOD_ID, "scarecrow"),
                         FabricBlockEntityTypeBuilder.create(ScarecrowBlockEntity::new, ModBlocks.SCARECROW_BLOCK).build());
+
+        public static final BlockEntityType<SprinklerBlockEntity> SPRINKLER_BLOCK_ENTITY = Registry.register(
+                        Registries.BLOCK_ENTITY_TYPE, new Identifier(GardenKingMod.MOD_ID, "sprinkler"),
+                        FabricBlockEntityTypeBuilder.create(SprinklerBlockEntity::new, ModBlocks.IRON_SPRINKLER_BLOCK,
+                                        ModBlocks.GOLD_SPRINKLER_BLOCK, ModBlocks.DIAMOND_SPRINKLER_BLOCK,
+                                        ModBlocks.EMERALD_SPRINKLER_BLOCK).build());
 
         public static final BlockEntityType<BankBlockEntity> BANK_BLOCK_ENTITY = Registry.register(
                         Registries.BLOCK_ENTITY_TYPE, new Identifier(GardenKingMod.MOD_ID, "bank_block"),

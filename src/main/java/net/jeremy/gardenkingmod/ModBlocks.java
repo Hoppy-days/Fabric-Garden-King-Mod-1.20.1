@@ -8,6 +8,8 @@ import net.jeremy.gardenkingmod.block.GearShopBlock;
 import net.jeremy.gardenkingmod.block.GearShopBlockPart;
 import net.jeremy.gardenkingmod.block.MarketBlock;
 import net.jeremy.gardenkingmod.block.MarketBlockPart;
+import net.jeremy.gardenkingmod.block.sprinkler.SprinklerBlock;
+import net.jeremy.gardenkingmod.block.sprinkler.SprinklerTier;
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -29,6 +31,22 @@ public final class ModBlocks {
 
         public static final Block SCARECROW_BLOCK = registerBlock("scarecrow",
                         new ScarecrowBlock(FabricBlockSettings.copyOf(Blocks.HAY_BLOCK).strength(1.5f).nonOpaque()));
+
+        public static final Block IRON_SPRINKLER_BLOCK = registerBlock("iron_sprinkler",
+                        new SprinklerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).strength(1.5f).nonOpaque(),
+                                        SprinklerTier.IRON));
+
+        public static final Block GOLD_SPRINKLER_BLOCK = registerBlock("gold_sprinkler",
+                        new SprinklerBlock(FabricBlockSettings.copyOf(Blocks.GOLD_BLOCK).strength(1.5f).nonOpaque(),
+                                        SprinklerTier.GOLD));
+
+        public static final Block DIAMOND_SPRINKLER_BLOCK = registerBlock("diamond_sprinkler",
+                        new SprinklerBlock(FabricBlockSettings.copyOf(Blocks.DIAMOND_BLOCK).strength(2.0f).nonOpaque(),
+                                        SprinklerTier.DIAMOND));
+
+        public static final Block EMERALD_SPRINKLER_BLOCK = registerBlock("emerald_sprinkler",
+                        new SprinklerBlock(FabricBlockSettings.copyOf(Blocks.EMERALD_BLOCK).strength(2.0f).nonOpaque(),
+                                        SprinklerTier.EMERALD));
 
         public static final Block BANK_BLOCK = registerBlock("bank_block",
                         new BankBlock(FabricBlockSettings.copyOf(Blocks.SPRUCE_PLANKS).strength(2.5f)));
@@ -66,6 +84,10 @@ public final class ModBlocks {
                         entries.add(GEAR_SHOP_BLOCK);
                         entries.add(BANK_BLOCK);
                         entries.add(SCARECROW_BLOCK);
+                        entries.add(IRON_SPRINKLER_BLOCK);
+                        entries.add(GOLD_SPRINKLER_BLOCK);
+                        entries.add(DIAMOND_SPRINKLER_BLOCK);
+                        entries.add(EMERALD_SPRINKLER_BLOCK);
                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(entries -> entries.add(RUBY_BLOCK));
         }

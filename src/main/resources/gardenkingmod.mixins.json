@@ -12,6 +12,7 @@
                 "EnchantmentHelperMixin",
                 "BoneMealItemMixin",
                 "ComposterBlockMixin",
+                "FarmlandBlockMixin",
                 "SlotAccessor"
         ],
         "injectors": {
