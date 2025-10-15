@@ -18,7 +18,8 @@ public enum SprinklerTier {
                 this.name = name;
                 this.horizontalRadius = horizontalRadius;
                 this.verticalRadius = verticalRadius;
-                this.texture = new Identifier(GardenKingMod.MOD_ID, "textures/entity/sprinkler/sprinkler.png");
+                this.texture = new Identifier(GardenKingMod.MOD_ID,
+                                "textures/entity/sprinkler/" + name + "_sprinkler.png");
         }
 
         public String getName() {
