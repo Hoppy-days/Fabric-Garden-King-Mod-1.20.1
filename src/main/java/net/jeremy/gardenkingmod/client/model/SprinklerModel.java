@@ -1,6 +1,7 @@
 package net.jeremy.gardenkingmod.client.model;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
+import net.jeremy.gardenkingmod.client.animation.sprinkler.sprinkler_animation;
 import net.minecraft.client.model.Dilation;
 import net.minecraft.client.model.ModelData;
 import net.minecraft.client.model.ModelPart;
@@ -19,11 +20,9 @@ public class SprinklerModel extends EntityModel<Entity> {
         public static final EntityModelLayer LAYER_LOCATION = new EntityModelLayer(
                         new Identifier(GardenKingMod.MOD_ID, "sprinkler"), "main");
         /**
-         * Place future animation keyframes at
-         * {@code assets/gardenkingmod/animations/sprinkler.animation.json}.
+         * The rotation timeline is authored in Blockbench and exported to
+         * {@code assets/gardenkingmod/animations/sprinkler/sprinkler_animation.java}.
          */
-
-        private final SprinklerRotationAnimation rotationAnimation;
         private final ModelPart rotationRoot;
         private final float rotationRootPivotX;
         private final float rotationRootPivotY;
@@ -32,10 +31,9 @@ public class SprinklerModel extends EntityModel<Entity> {
         private final ModelPart cap4;
         private final ModelPart bbMain;
 
-        private float rotationAngle;
+        private float animationTimeSeconds;
 
         public SprinklerModel(ModelPart root) {
-                this.rotationAnimation = SprinklerRotationAnimation.load();
                 this.rotationRoot = root.getChild("rotation_root");
                 this.rotation = this.rotationRoot.getChild("rotation");
                 this.rotationRootPivotX = this.rotationRoot.pivotX;
@@ -129,7 +127,7 @@ public class SprinklerModel extends EntityModel<Entity> {
         }
 
         public void setAnimationProgress(float animationProgress) {
-                this.rotationAngle = this.rotationAnimation.sampleYaw(animationProgress);
+                this.animationTimeSeconds = animationProgress;
         }
 
         @Override
@@ -141,7 +139,7 @@ public class SprinklerModel extends EntityModel<Entity> {
                 this.rotationRoot.pivotX = this.rotationRootPivotX;
                 this.rotationRoot.pivotY = this.rotationRootPivotY;
                 this.rotationRoot.pivotZ = this.rotationRootPivotZ;
-                this.rotationRoot.yaw = this.rotationAngle;
+                this.rotationRoot.yaw = sprinkler_animation.sampleYawRadians(this.animationTimeSeconds);
 
                 this.rotationRoot.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
                 this.cap4.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
