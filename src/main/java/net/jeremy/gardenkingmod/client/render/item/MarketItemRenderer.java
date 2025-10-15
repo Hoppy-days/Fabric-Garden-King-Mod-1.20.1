@@ -33,25 +33,25 @@ public class MarketItemRenderer implements BuiltinItemRendererRegistry.DynamicIt
 
         if (mode != null) {
             switch (mode) {
-                case GUI -> {
-                    matrices.scale(0.16f, 0.16f, 0.16f);
-                    matrices.translate(0.0, 4.4, 0.0);
-                }
-                case GROUND -> {
-                    matrices.scale(0.18f, 0.18f, 0.18f);
-                    matrices.translate(0.0, 2.8, 0.0);
-                }
-                case FIXED -> {
-                    matrices.scale(0.18f, 0.18f, 0.18f);
-                    matrices.translate(0.0, 3.0, 0.0);
-                }
+                case GUI:
+                    matrices.scale(0.35f, 0.35f, 0.35f);
+                    matrices.translate(0.0, 2.7, 0.0);
+                    break;
+                case GROUND:
+                    matrices.scale(0.35f, 0.35f, 0.35f);
+                    matrices.translate(0.0, 1.5, 0.0);
+                    break;
+                case FIXED:
+                    matrices.scale(0.4f, 0.4f, 0.4f);
+                    matrices.translate(0.0, 2.3, 0.0);
+                    break;
                 case FIRST_PERSON_LEFT_HAND, FIRST_PERSON_RIGHT_HAND,
-                        THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND -> {
-                    matrices.scale(0.14f, 0.14f, 0.14f);
-                    matrices.translate(0.0f, 3.2f, 0.0f);
-                }
-                default -> {
-                }
+                        THIRD_PERSON_LEFT_HAND, THIRD_PERSON_RIGHT_HAND:
+                    matrices.scale(0.25F, 0.25F, 0.25F);
+                    matrices.translate(0.0F, 2.0F, 0.0F);
+                    break;
+                default:
+                    break;
             }
         }
 
