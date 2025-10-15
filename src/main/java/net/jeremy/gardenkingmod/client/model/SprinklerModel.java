@@ -39,13 +39,13 @@ public class SprinklerModel extends EntityModel<Entity> {
                 ModelData modelData = new ModelData();
                 ModelPartData modelPartData = modelData.getRoot();
                 ModelPartData rotation = modelPartData.addChild("rotation", ModelPartBuilder.create(),
-                                ModelTransform.pivot(1.5F, -4.0F, -0.5F));
+                                ModelTransform.pivot(-1.5F, -4.0F, 0.5F));
 
                 ModelPartData rotationAssembly = rotation.addChild("rotation_assembly",
                                 ModelPartBuilder.create().uv(8, 31).cuboid(-9.0F, -6.0F, -1.0F, 1.0F, 2.0F, 1.0F, new Dilation(0.0F))
                                                 .uv(12, 31).cuboid(11.0F, -3.0F, -1.0F, 1.0F, 2.0F, 1.0F, new Dilation(0.0F))
                                                 .uv(0, 27).cuboid(1.0F, -6.0F, -1.0F, 1.0F, 5.0F, 1.0F, new Dilation(0.0F)),
-                                ModelTransform.pivot(-3.0F, 0.0F, 1.0F));
+                                ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
                 rotationAssembly.addChild("cube_r1", ModelPartBuilder.create().uv(24, 11).cuboid(0.0F, -8.0F, 0.0F, 1.0F, 10.0F, 1.0F,
                                 new Dilation(0.0F)), ModelTransform.of(10.0F, -3.0F, -1.0F, 0.0F, 0.0F, -1.5708F));
