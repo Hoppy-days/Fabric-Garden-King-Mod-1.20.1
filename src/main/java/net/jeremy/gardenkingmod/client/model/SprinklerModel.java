@@ -3,13 +3,13 @@ package net.jeremy.gardenkingmod.client.model;
 // Made with Blockbench 5.0.1
 // Exported for Minecraft version 1.17+ for Yarn
 // Paste this class into your mod and generate all required imports
-public class SprinklerModel extends EntityModel<Entity> {
+public class SprinklerModel2 extends EntityModel<Entity> {
 	private final ModelPart rotation;
 	private final ModelPart cap3;
 	private final ModelPart cap2;
 	private final ModelPart cap4;
 	private final ModelPart bb_main;
-	public SprinklerModel(ModelPart root) {
+	public SprinklerModel2(ModelPart root) {
 		this.rotation = root.getChild("rotation");
 		this.cap3 = this.rotation.getChild("cap3");
 		this.cap2 = this.rotation.getChild("cap2");
@@ -23,7 +23,7 @@ public class SprinklerModel extends EntityModel<Entity> {
 		.uv(12, 31).cuboid(9.5F, 0.0F, -0.5F, 1.0F, 2.0F, 1.0F, new Dilation(0.0F))
 		.uv(0, 27).cuboid(-0.5F, -3.0F, -0.5F, 1.0F, 5.0F, 1.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, -7.0F, 0.0F));
 
-		ModelPartData cube_r1 = rotation.addChild("cube_r1", ModelPartBuilder.create().uv(24, 11).cuboid(0.0F, -8.0F, 0.0F, 1.0F, 10.0F, 1.0F, new Dilation(0.0F)), ModelTransform.of(8.5F, 0.0F, -0.5F, 0.0F, 0.0F, -1.5708F));
+		ModelPartData cube_r1 = rotation.addChild("cube_r1", ModelPartBuilder.create().uv(24, 11).cuboid(8.5F, -8.0F, -0.5F, 1.0F, 10.0F, 1.0F, new Dilation(0.0F)), ModelTransform.of(8.5F, 8.5F, 0.0F, 0.0F, 0.0F, -1.5708F));
 
 		ModelPartData cube_r2 = rotation.addChild("cube_r2", ModelPartBuilder.create().uv(24, 0).cuboid(0.0F, -10.0F, 0.0F, 1.0F, 10.0F, 1.0F, new Dilation(0.0F)), ModelTransform.of(-0.5F, 0.0F, -0.5F, 0.0F, 0.0F, -1.5708F));
 
