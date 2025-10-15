@@ -10,6 +10,7 @@ import net.jeremy.gardenkingmod.block.MarketBlock;
 import net.jeremy.gardenkingmod.block.MarketBlockPart;
 import net.jeremy.gardenkingmod.block.sprinkler.SprinklerBlock;
 import net.jeremy.gardenkingmod.block.sprinkler.SprinklerTier;
+import net.jeremy.gardenkingmod.item.SprinklerBlockItem;
 import net.jeremy.gardenkingmod.block.ward.ScarecrowBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -70,7 +71,10 @@ public final class ModBlocks {
         }
 
         private static Item registerBlockItem(String name, Block block) {
-                return Registry.register(Registries.ITEM, new Identifier(GardenKingMod.MOD_ID, name), new BlockItem(block, new FabricItemSettings()));
+                BlockItem blockItem = block instanceof SprinklerBlock sprinklerBlock
+                                ? new SprinklerBlockItem(sprinklerBlock, new FabricItemSettings())
+                                : new BlockItem(block, new FabricItemSettings());
+                return Registry.register(Registries.ITEM, new Identifier(GardenKingMod.MOD_ID, name), blockItem);
         }
 
         private static Block registerBlockWithoutItem(String name, Block block) {
