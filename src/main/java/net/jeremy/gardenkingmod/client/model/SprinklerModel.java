@@ -9,8 +9,8 @@ import net.minecraft.client.model.ModelPartData;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
@@ -23,6 +23,7 @@ public class SprinklerModel extends EntityModel<Entity> {
          * {@code assets/gardenkingmod/animations/sprinkler.animation.json}.
          */
 
+        private final SprinklerRotationAnimation rotationAnimation;
         private final ModelPart rotation;
         private final ModelPart cap4;
         private final ModelPart bbMain;
@@ -30,6 +31,7 @@ public class SprinklerModel extends EntityModel<Entity> {
         private float rotationAngle;
 
         public SprinklerModel(ModelPart root) {
+                this.rotationAnimation = SprinklerRotationAnimation.load();
                 this.rotation = root.getChild("rotation");
                 this.cap4 = root.getChild("cap4");
                 this.bbMain = root.getChild("bb_main");
@@ -119,12 +121,13 @@ public class SprinklerModel extends EntityModel<Entity> {
         }
 
         public void setAnimationProgress(float animationProgress) {
-                this.rotationAngle = animationProgress * ((float) Math.PI * 2.0F);
+                this.rotationAngle = this.rotationAnimation.sampleYaw(animationProgress);
         }
 
         @Override
         public void render(MatrixStack matrices, VertexConsumer vertexConsumer, int light, int overlay, float red, float green,
                         float blue, float alpha) {
+                this.rotation.resetTransform();
                 this.rotation.yaw = this.rotationAngle;
                 this.rotation.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
                 this.cap4.render(matrices, vertexConsumer, light, overlay, red, green, blue, alpha);
