@@ -2,27 +2,7 @@
   "_comment": "Default Gear Shop layout. Use _comment fields anywhere to annotate long pages.",
   "pages": [
     {
-      "_comment": "Page 1: Misc",
-      "offers": [
-        {
-          "offer": "croptopia:cheese*2",
-          "price": [
-            "minecraft:milk_bucket",
-            "croptopia:butter"
-          ]
-        },
-        {
-           "offer": "minecraft:elytra",
-          "price": "gardenkingmod:dollar*1"
-        },
-        {
-          "offer": "minecraft:elytra",
-          "price": "gardenkingmod:dollar*2"
-        }
-      ]
-    },
-    {
-      "_comment": "Page 2: Weapons",
+      "_comment": "Page 1: Weapons",
       "offers": [
         {
           "offer": "gardenkingmod:ruby_sword",
@@ -49,7 +29,7 @@
       ]
     },
     {
-      "_comment": "Page 3: Tools",
+      "_comment": "Page 2: Tools",
       "offers": [
         {
           "offer": "gardenkingmod:ruby_axe",
@@ -139,7 +119,7 @@
       ]
     },
     {
-      "_comment": "Page 4: Armors",
+      "_comment": "Page 3: Armor",
       "offers": [
         {
           "offer": "gardenkingmod:ruby_helmet",
@@ -225,6 +205,18 @@
         },{
           "offer": "gardenkingmod:emerald_boots",
           "price": "gardenkingmod:dollar*128"
+        }
+      ]
+    },
+    {
+      "_comment": "Page 4: Misc",
+      "offers": [
+        {
+          "offer": "gardenkingmod:iron_sprinkler",
+          "price": "gardenkingmod:dollar*1500"
+        },{
+          "offer": "gardenkingmod:gold_sprinkler",
+          "price": "gardenkingmod:dollar*3000"
         }
       ]
     }
