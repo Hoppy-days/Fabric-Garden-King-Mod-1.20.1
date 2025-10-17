@@ -16,6 +16,9 @@ public final class ModPackets {
     public static final Identifier BANK_WITHDRAW_REQUEST_PACKET =
             new Identifier(GardenKingMod.MOD_ID, "bank_withdraw_request");
 
-    public static final Identifier SKILL_PROGRESS_SYNC_PACKET =
+    public static final Identifier SKILL_PROGRESS_SYNC =
             new Identifier(GardenKingMod.MOD_ID, "skill_progress_sync");
+
+    public static final Identifier SKILL_SPEND_REQUEST =
+            new Identifier(GardenKingMod.MOD_ID, "skill_spend_request");
 }

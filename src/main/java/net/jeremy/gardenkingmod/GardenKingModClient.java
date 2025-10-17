@@ -6,6 +6,7 @@ import java.util.Map;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -22,6 +23,7 @@ import net.jeremy.gardenkingmod.client.render.GearShopBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.MarketBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.ScarecrowBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.SprinklerBlockEntityRenderer;
+import net.jeremy.gardenkingmod.client.skill.SkillState;
 import net.jeremy.gardenkingmod.client.render.item.BankItemRenderer;
 import net.jeremy.gardenkingmod.client.render.item.GearShopItemRenderer;
 import net.jeremy.gardenkingmod.client.render.item.MarketItemRenderer;
@@ -39,6 +41,7 @@ import net.jeremy.gardenkingmod.screen.GearShopScreen;
 import net.jeremy.gardenkingmod.screen.MarketScreen;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreen;
 import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
+import net.jeremy.gardenkingmod.skill.SkillProgressManager;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
@@ -124,22 +127,37 @@ public class GardenKingModClient implements ClientModInitializer {
                         });
                 });
 
-        ClientPlayNetworking.registerGlobalReceiver(ModPackets.SKILL_PROGRESS_SYNC_PACKET,
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.SKILL_PROGRESS_SYNC,
                 (client, handler, buf, responseSender) -> {
                         long experience = buf.readVarLong();
                         int level = buf.readVarInt();
+                        long progressIntoLevel = buf.readVarLong();
+                        long experienceToNextLevel = buf.readVarLong();
                         int unspentPoints = buf.readVarInt();
-                        int chefMastery = buf.readVarInt();
+                        int allocationEntries = buf.readVarInt();
+                        Map<Identifier, Integer> allocations = new LinkedHashMap<>();
+                        for (int index = 0; index < allocationEntries; index++) {
+                                Identifier skillId = buf.readIdentifier();
+                                int allocation = buf.readVarInt();
+                                allocations.put(skillId, allocation);
+                        }
 
                         client.execute(() -> {
+                                SkillState skillState = SkillState.getInstance();
+                                skillState.update(experience, level, progressIntoLevel, experienceToNextLevel,
+                                                unspentPoints, allocations);
+
                                 if (client.player instanceof SkillProgressHolder skillHolder) {
                                         skillHolder.gardenkingmod$setSkillExperience(experience);
                                         skillHolder.gardenkingmod$setSkillLevel(level);
                                         skillHolder.gardenkingmod$setUnspentSkillPoints(unspentPoints);
+                                        int chefMastery = allocations.getOrDefault(SkillProgressManager.CHEF_SKILL, 0);
                                         skillHolder.gardenkingmod$setChefMasteryLevel(chefMastery);
                                 }
                         });
                 });
+
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> SkillState.getInstance().reset());
 
         ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
                 if (stack.getItem() instanceof FortuneProvidingItem fortuneItem) {
