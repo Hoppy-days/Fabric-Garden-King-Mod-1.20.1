@@ -193,6 +193,7 @@ public final class ModItems {
 
     private static Map<Identifier, Item> rottenItemsByCrop = Collections.emptyMap();
     private static Map<Identifier, Item> rottenItemsByTarget = Collections.emptyMap();
+    private static Map<Identifier, RottenCropDefinition> rottenDefinitionsByItem = Map.of();
     private static List<Item> rottenItems = List.of();
     private static boolean rottenItemsRegistered;
 
@@ -222,17 +223,21 @@ public final class ModItems {
 
                 Map<Identifier, Item> byCrop = new LinkedHashMap<>();
                 Map<Identifier, Item> byTarget = new LinkedHashMap<>();
+                Map<Identifier, RottenCropDefinition> byItemId = new LinkedHashMap<>();
                 List<Item> items = new ArrayList<>();
 
                 for (RottenCropDefinition definition : definitions) {
-                        Item item = registerItem(definition.rottenItemId().getPath(), new Item(new FabricItemSettings()));
+                        Identifier rottenId = definition.rottenItemId();
+                        Item item = registerItem(rottenId.getPath(), new Item(new FabricItemSettings()));
                         byCrop.put(definition.cropId(), item);
                         byTarget.put(definition.targetId(), item);
+                        byItemId.put(rottenId, definition);
                         items.add(item);
                 }
 
                 rottenItemsByCrop = Collections.unmodifiableMap(byCrop);
                 rottenItemsByTarget = Collections.unmodifiableMap(byTarget);
+                rottenDefinitionsByItem = Collections.unmodifiableMap(byItemId);
                 rottenItems = List.copyOf(items);
                 rottenItemsRegistered = true;
                 return true;
@@ -281,6 +286,36 @@ public final class ModItems {
 
         public static Item getRottenItemForTarget(Identifier targetId) {
                 return initializeRottenItems() ? rottenItemsByTarget.get(targetId) : null;
+        }
+
+        public static Optional<RottenCropDefinition> getRottenDefinition(Item item) {
+                if (!initializeRottenItems()) {
+                        return Optional.empty();
+                }
+
+                if (item == null) {
+                        return Optional.empty();
+                }
+
+                Identifier id = Registries.ITEM.getId(item);
+                if (id == null) {
+                        return Optional.empty();
+                }
+
+                return Optional.ofNullable(rottenDefinitionsByItem.get(id));
+        }
+
+        public static boolean isRottenItem(Item item) {
+                if (!initializeRottenItems()) {
+                        return false;
+                }
+
+                if (item == null) {
+                        return false;
+                }
+
+                Identifier id = Registries.ITEM.getId(item);
+                return id != null && rottenDefinitionsByItem.containsKey(id);
         }
 
         public static Item getEnchantedItemForCrop(Identifier cropId) {

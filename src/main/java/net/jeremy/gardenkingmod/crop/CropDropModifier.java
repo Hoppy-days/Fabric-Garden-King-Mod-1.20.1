@@ -16,6 +16,7 @@ import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.crop.EnchantedCropDefinition;
 import net.jeremy.gardenkingmod.crop.EnchantedCropDefinitions;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager.BonusDropEntry;
+import net.jeremy.gardenkingmod.skill.HarvestXpService;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -85,6 +86,8 @@ public final class CropDropModifier {
 
                         Optional<TierScalingData> scalingData = resolveScaling(id);
                         Optional<CropTier> tier = scalingData.map(TierScalingData::tier);
+                        Identifier blockId = scalingData.map(TierScalingData::blockId).orElse(null);
+                        Identifier tierId = tier.map(CropTier::id).orElse(null);
                         float multiplier = tier.map(CropTier::dropMultiplier).orElse(1.0f);
                         float baseNoDropChance = MathHelper.clamp(tier.map(CropTier::noDropChance).orElse(0.0f), 0.0f, 1.0f);
                         float baseRottenChance = MathHelper.clamp(tier.map(CropTier::rottenChance).orElse(0.0f), 0.0f, 1.0f);
@@ -196,15 +199,20 @@ public final class CropDropModifier {
                                                         SetCountLootFunction.builder(new TierScaledCountProvider(id, multiplier)));
                                 }
 
-                                if (applyEnchanted) {
-                                        poolBuilder.apply(ApplyEnchantedHarvestFunction.builder(id, finalEnchantedItem,
-                                                        finalEnchantedChance, finalEnchantedMultiplier));
-                                }
+                        if (applyEnchanted) {
+                                poolBuilder.apply(ApplyEnchantedHarvestFunction.builder(id, blockId, tierId,
+                                                finalEnchantedItem, finalEnchantedChance, finalEnchantedMultiplier,
+                                                applyRotten));
+                        }
 
-                                if (applyRotten) {
-                                        poolBuilder.apply(ApplyRottenHarvestFunction.builder(id, rottenItem,
-                                                        combinedRottenChance));
-                                }
+                        if (applyRotten) {
+                                poolBuilder.apply(ApplyRottenHarvestFunction.builder(id, blockId, tierId, rottenItem,
+                                                combinedRottenChance));
+                        }
+
+                        if (!applyEnchanted && !applyRotten && tierId != null) {
+                                poolBuilder.apply(AwardHarvestXpFunction.builder(blockId, tierId));
+                        }
                         });
 
                         List<String> appliedEffects = new ArrayList<>();
@@ -347,23 +355,32 @@ public final class CropDropModifier {
 
         private static final class ApplyEnchantedHarvestFunction extends ConditionalLootFunction {
                 private final Identifier lootTableId;
+                private final Identifier blockId;
+                private final Identifier tierId;
                 private final Item enchantedItem;
                 private final float enchantedChance;
                 private final float valueMultiplier;
+                private final boolean expectsRottenFunction;
 
-                ApplyEnchantedHarvestFunction(LootCondition[] conditions, Identifier lootTableId, Item enchantedItem,
-                                float enchantedChance, float valueMultiplier) {
+                ApplyEnchantedHarvestFunction(LootCondition[] conditions, Identifier lootTableId, Identifier blockId,
+                                Identifier tierId, Item enchantedItem, float enchantedChance, float valueMultiplier,
+                                boolean expectsRottenFunction) {
                         super(conditions);
                         this.lootTableId = lootTableId;
+                        this.blockId = blockId;
+                        this.tierId = tierId;
                         this.enchantedItem = enchantedItem;
                         this.enchantedChance = enchantedChance;
                         this.valueMultiplier = Math.max(1.0f, valueMultiplier);
+                        this.expectsRottenFunction = expectsRottenFunction;
                 }
 
-                static ConditionalLootFunction.Builder<?> builder(Identifier lootTableId, Item enchantedItem,
-                                float enchantedChance, float valueMultiplier) {
+                static ConditionalLootFunction.Builder<?> builder(Identifier lootTableId, Identifier blockId,
+                                Identifier tierId, Item enchantedItem, float enchantedChance, float valueMultiplier,
+                                boolean expectsRottenFunction) {
                         return ConditionalLootFunction.builder(conditions -> new ApplyEnchantedHarvestFunction(conditions,
-                                        lootTableId, enchantedItem, enchantedChance, valueMultiplier));
+                                        lootTableId, blockId, tierId, enchantedItem, enchantedChance, valueMultiplier,
+                                        expectsRottenFunction));
                 }
 
                 @Override
@@ -374,10 +391,16 @@ public final class CropDropModifier {
                 @Override
                 protected ItemStack process(ItemStack stack, LootContext context) {
                         if (stack.isEmpty() || enchantedChance <= 0.0f) {
+                                if (!expectsRottenFunction) {
+                                        HarvestXpService.handleLootContext(context, blockId, tierId, stack);
+                                }
                                 return stack;
                         }
 
                         if (context.getRandom().nextFloat() >= enchantedChance) {
+                                if (!expectsRottenFunction) {
+                                        HarvestXpService.handleLootContext(context, blockId, tierId, stack);
+                                }
                                 return stack;
                         }
 
@@ -403,31 +426,38 @@ public final class CropDropModifier {
                                 GardenKingMod.LOGGER.debug(
                                                 "Enchanted harvest for loot table {} produced an empty stack; preserving original drop",
                                                 lootTableId);
+                                if (!expectsRottenFunction) {
+                                        HarvestXpService.handleLootContext(context, blockId, tierId, stack);
+                                }
                                 return stack;
                         }
 
+                        HarvestXpService.handleLootContext(context, blockId, tierId, enchantedStack);
                         return enchantedStack;
                 }
         }
 
         private static final class ApplyRottenHarvestFunction extends ConditionalLootFunction {
                 private final Identifier lootTableId;
+                private final Identifier blockId;
+                private final Identifier tierId;
                 private final Item rottenItem;
                 private final float rottenChance;
 
-                ApplyRottenHarvestFunction(LootCondition[] conditions, Identifier lootTableId, Item rottenItem,
-                                float rottenChance) {
+                ApplyRottenHarvestFunction(LootCondition[] conditions, Identifier lootTableId, Identifier blockId,
+                                Identifier tierId, Item rottenItem, float rottenChance) {
                         super(conditions);
                         this.lootTableId = lootTableId;
+                        this.blockId = blockId;
+                        this.tierId = tierId;
                         this.rottenItem = rottenItem;
                         this.rottenChance = rottenChance;
                 }
 
-                static ConditionalLootFunction.Builder<?> builder(Identifier lootTableId, Item rottenItem,
-                                float rottenChance) {
-                        return ConditionalLootFunction.builder(
-                                        conditions -> new ApplyRottenHarvestFunction(conditions, lootTableId, rottenItem,
-                                                        rottenChance));
+                static ConditionalLootFunction.Builder<?> builder(Identifier lootTableId, Identifier blockId,
+                                Identifier tierId, Item rottenItem, float rottenChance) {
+                        return ConditionalLootFunction.builder(conditions -> new ApplyRottenHarvestFunction(conditions,
+                                        lootTableId, blockId, tierId, rottenItem, rottenChance));
                 }
 
                 @Override
@@ -437,7 +467,7 @@ public final class CropDropModifier {
 
                 @Override
                 protected ItemStack process(ItemStack stack, LootContext context) {
-                        if (stack.isEmpty() || rottenChance <= 0.0f) {
+                        if (stack.isEmpty()) {
                                 return stack;
                         }
 
@@ -445,7 +475,8 @@ public final class CropDropModifier {
                                 return stack;
                         }
 
-                        if (context.getRandom().nextFloat() >= rottenChance) {
+                        if (rottenChance <= 0.0f || context.getRandom().nextFloat() >= rottenChance) {
+                                HarvestXpService.handleLootContext(context, blockId, tierId, stack);
                                 return stack;
                         }
 
@@ -454,10 +485,39 @@ public final class CropDropModifier {
                                 GardenKingMod.LOGGER.debug(
                                                 "Rotten harvest for loot table {} produced an empty stack; preserving original drop",
                                                 lootTableId);
+                                HarvestXpService.handleLootContext(context, blockId, tierId, stack);
                                 return stack;
                         }
 
+                        HarvestXpService.handleLootContext(context, blockId, tierId, rottenStack);
                         return rottenStack;
+                }
+        }
+
+        private static final class AwardHarvestXpFunction extends ConditionalLootFunction {
+                private final Identifier blockId;
+                private final Identifier tierId;
+
+                AwardHarvestXpFunction(LootCondition[] conditions, Identifier blockId, Identifier tierId) {
+                        super(conditions);
+                        this.blockId = blockId;
+                        this.tierId = tierId;
+                }
+
+                static ConditionalLootFunction.Builder<?> builder(Identifier blockId, Identifier tierId) {
+                        return ConditionalLootFunction.builder(
+                                        conditions -> new AwardHarvestXpFunction(conditions, blockId, tierId));
+                }
+
+                @Override
+                public LootFunctionType getType() {
+                        return LootFunctionTypes.SET_COUNT;
+                }
+
+                @Override
+                protected ItemStack process(ItemStack stack, LootContext context) {
+                        HarvestXpService.handleLootContext(context, blockId, tierId, stack);
+                        return stack;
                 }
         }
 
