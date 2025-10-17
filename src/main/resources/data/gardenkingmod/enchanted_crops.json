@@ -1,0 +1,620 @@
+{
+  "entries": [
+    {
+      "target": "croptopia:almond_crop",
+      "crop": "croptopia:almond",
+      "enchanted_item": "gardenkingmod:enchanted_almond",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:apple_crop",
+      "crop": "minecraft:apple",
+      "enchanted_item": "gardenkingmod:enchanted_apple",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:apricot_crop",
+      "crop": "croptopia:apricot",
+      "enchanted_item": "gardenkingmod:enchanted_apricot",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:artichoke_crop",
+      "crop": "croptopia:artichoke",
+      "enchanted_item": "gardenkingmod:enchanted_artichoke",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:asparagus_crop",
+      "crop": "croptopia:asparagus",
+      "enchanted_item": "gardenkingmod:enchanted_asparagus",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:avocado_crop",
+      "crop": "croptopia:avocado",
+      "enchanted_item": "gardenkingmod:enchanted_avocado",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:banana_crop",
+      "crop": "croptopia:banana",
+      "enchanted_item": "gardenkingmod:enchanted_banana",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:barley_crop",
+      "crop": "croptopia:barley",
+      "enchanted_item": "gardenkingmod:enchanted_barley",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:basil_crop",
+      "crop": "croptopia:basil",
+      "enchanted_item": "gardenkingmod:enchanted_basil",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "minecraft:beetroots",
+      "crop": "minecraft:beetroot",
+      "enchanted_item": "gardenkingmod:enchanted_beetroot",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:bellpepper_crop",
+      "crop": "croptopia:bellpepper",
+      "enchanted_item": "gardenkingmod:enchanted_bellpepper",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:blackbean_crop",
+      "crop": "croptopia:blackbean",
+      "enchanted_item": "gardenkingmod:enchanted_blackbean",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:blackberry_crop",
+      "crop": "croptopia:blackberry",
+      "enchanted_item": "gardenkingmod:enchanted_blackberry",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:blueberry_crop",
+      "crop": "croptopia:blueberry",
+      "enchanted_item": "gardenkingmod:enchanted_blueberry",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:broccoli_crop",
+      "crop": "croptopia:broccoli",
+      "enchanted_item": "gardenkingmod:enchanted_broccoli",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:cabbage_crop",
+      "crop": "croptopia:cabbage",
+      "enchanted_item": "gardenkingmod:enchanted_cabbage",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:cantaloupe_crop",
+      "crop": "croptopia:cantaloupe",
+      "enchanted_item": "gardenkingmod:enchanted_cantaloupe",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "minecraft:carrots",
+      "crop": "minecraft:carrot",
+      "enchanted_item": "gardenkingmod:enchanted_carrot",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:cashew_crop",
+      "crop": "croptopia:cashew",
+      "enchanted_item": "gardenkingmod:enchanted_cashew",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:cauliflower_crop",
+      "crop": "croptopia:cauliflower",
+      "enchanted_item": "gardenkingmod:enchanted_cauliflower",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:celery_crop",
+      "crop": "croptopia:celery",
+      "enchanted_item": "gardenkingmod:enchanted_celery",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:cherry_crop",
+      "crop": "croptopia:cherry",
+      "enchanted_item": "gardenkingmod:enchanted_cherry",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:chile_pepper_crop",
+      "crop": "croptopia:chile_pepper",
+      "enchanted_item": "gardenkingmod:enchanted_chile_pepper",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:coconut_crop",
+      "crop": "croptopia:coconut",
+      "enchanted_item": "gardenkingmod:enchanted_coconut",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:coffee_crop",
+      "crop": "croptopia:coffee_beans",
+      "enchanted_item": "gardenkingmod:enchanted_coffee_bean",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:corn_crop",
+      "crop": "croptopia:corn",
+      "enchanted_item": "gardenkingmod:enchanted_corn",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:cranberry_crop",
+      "crop": "croptopia:cranberry",
+      "enchanted_item": "gardenkingmod:enchanted_cranberry",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:cucumber_crop",
+      "crop": "croptopia:cucumber",
+      "enchanted_item": "gardenkingmod:enchanted_cucumber",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:currant_crop",
+      "crop": "croptopia:currant",
+      "enchanted_item": "gardenkingmod:enchanted_currant",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:date_crop",
+      "crop": "croptopia:date",
+      "enchanted_item": "gardenkingmod:enchanted_date",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:dragonfruit_crop",
+      "crop": "croptopia:dragonfruit",
+      "enchanted_item": "gardenkingmod:enchanted_dragonfruit",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:eggplant_crop",
+      "crop": "croptopia:eggplant",
+      "enchanted_item": "gardenkingmod:enchanted_eggplant",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:elderberry_crop",
+      "crop": "croptopia:elderberry",
+      "enchanted_item": "gardenkingmod:enchanted_elderberry",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:fig_crop",
+      "crop": "croptopia:fig",
+      "enchanted_item": "gardenkingmod:enchanted_fig",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:garlic_crop",
+      "crop": "croptopia:garlic",
+      "enchanted_item": "gardenkingmod:enchanted_garlic",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:ginger_crop",
+      "crop": "croptopia:ginger",
+      "enchanted_item": "gardenkingmod:enchanted_ginger",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:grape_crop",
+      "crop": "croptopia:grape",
+      "enchanted_item": "gardenkingmod:enchanted_grape",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:grapefruit_crop",
+      "crop": "croptopia:grapefruit",
+      "enchanted_item": "gardenkingmod:enchanted_grapefruit",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:greenbean_crop",
+      "crop": "croptopia:greenbean",
+      "enchanted_item": "gardenkingmod:enchanted_greenbean",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:greenonion_crop",
+      "crop": "croptopia:greenonion",
+      "enchanted_item": "gardenkingmod:enchanted_greenonion",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:honeydew_crop",
+      "crop": "croptopia:honeydew",
+      "enchanted_item": "gardenkingmod:enchanted_honeydew",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:hops_crop",
+      "crop": "croptopia:hops",
+      "enchanted_item": "gardenkingmod:enchanted_hop",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:kale_crop",
+      "crop": "croptopia:kale",
+      "enchanted_item": "gardenkingmod:enchanted_kale",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:kiwi_crop",
+      "crop": "croptopia:kiwi",
+      "enchanted_item": "gardenkingmod:enchanted_kiwi",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:kumquat_crop",
+      "crop": "croptopia:kumquat",
+      "enchanted_item": "gardenkingmod:enchanted_kumquat",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:leek_crop",
+      "crop": "croptopia:leek",
+      "enchanted_item": "gardenkingmod:enchanted_leek",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:lemon_crop",
+      "crop": "croptopia:lemon",
+      "enchanted_item": "gardenkingmod:enchanted_lemon",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:lettuce_crop",
+      "crop": "croptopia:lettuce",
+      "enchanted_item": "gardenkingmod:enchanted_lettuce",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:lime_crop",
+      "crop": "croptopia:lime",
+      "enchanted_item": "gardenkingmod:enchanted_lime",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:mango_crop",
+      "crop": "croptopia:mango",
+      "enchanted_item": "gardenkingmod:enchanted_mango",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:mustard_crop",
+      "crop": "croptopia:mustard",
+      "enchanted_item": "gardenkingmod:enchanted_mustard",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:nectarine_crop",
+      "crop": "croptopia:nectarine",
+      "enchanted_item": "gardenkingmod:enchanted_nectarine",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:nutmeg_crop",
+      "crop": "croptopia:nutmeg",
+      "enchanted_item": "gardenkingmod:enchanted_nutmeg",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:oat_crop",
+      "crop": "croptopia:oat",
+      "enchanted_item": "gardenkingmod:enchanted_oat",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:olive_crop",
+      "crop": "croptopia:olive",
+      "enchanted_item": "gardenkingmod:enchanted_olive",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:onion_crop",
+      "crop": "croptopia:onion",
+      "enchanted_item": "gardenkingmod:enchanted_onion",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:orange_crop",
+      "crop": "croptopia:orange",
+      "enchanted_item": "gardenkingmod:enchanted_orange",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:peach_crop",
+      "crop": "croptopia:peach",
+      "enchanted_item": "gardenkingmod:enchanted_peach",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:peanut_crop",
+      "crop": "croptopia:peanut",
+      "enchanted_item": "gardenkingmod:enchanted_peanut",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:pear_crop",
+      "crop": "croptopia:pear",
+      "enchanted_item": "gardenkingmod:enchanted_pear",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:pecan_crop",
+      "crop": "croptopia:pecan",
+      "enchanted_item": "gardenkingmod:enchanted_pecan",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:pepper_crop",
+      "crop": "croptopia:pepper",
+      "enchanted_item": "gardenkingmod:enchanted_pepper",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:persimmon_crop",
+      "crop": "croptopia:persimmon",
+      "enchanted_item": "gardenkingmod:enchanted_persimmon",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:pineapple_crop",
+      "crop": "croptopia:pineapple",
+      "enchanted_item": "gardenkingmod:enchanted_pineapple",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:plum_crop",
+      "crop": "croptopia:plum",
+      "enchanted_item": "gardenkingmod:enchanted_plum",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "minecraft:potatoes",
+      "crop": "minecraft:potato",
+      "enchanted_item": "gardenkingmod:enchanted_potato",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:radish_crop",
+      "crop": "croptopia:radish",
+      "enchanted_item": "gardenkingmod:enchanted_radish",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:raspberry_crop",
+      "crop": "croptopia:raspberry",
+      "enchanted_item": "gardenkingmod:enchanted_raspberry",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:rhubarb_crop",
+      "crop": "croptopia:rhubarb",
+      "enchanted_item": "gardenkingmod:enchanted_rhubarb",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:rice_crop",
+      "crop": "croptopia:rice",
+      "enchanted_item": "gardenkingmod:enchanted_rice",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:rutabaga_crop",
+      "crop": "croptopia:rutabaga",
+      "enchanted_item": "gardenkingmod:enchanted_rutabaga",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:saguaro_crop",
+      "crop": "croptopia:saguaro",
+      "enchanted_item": "gardenkingmod:enchanted_saguaro",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:soybean_crop",
+      "crop": "croptopia:soybean",
+      "enchanted_item": "gardenkingmod:enchanted_soybean",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:spinach_crop",
+      "crop": "croptopia:spinach",
+      "enchanted_item": "gardenkingmod:enchanted_spinach",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:squash_crop",
+      "crop": "croptopia:squash",
+      "enchanted_item": "gardenkingmod:enchanted_squash",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:starfruit_crop",
+      "crop": "croptopia:starfruit",
+      "enchanted_item": "gardenkingmod:enchanted_starfruit",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:strawberry_crop",
+      "crop": "croptopia:strawberry",
+      "enchanted_item": "gardenkingmod:enchanted_strawberry",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:sweetpotato_crop",
+      "crop": "croptopia:sweetpotato",
+      "enchanted_item": "gardenkingmod:enchanted_sweetpotato",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:tea_crop",
+      "crop": "croptopia:tea_leaves",
+      "enchanted_item": "gardenkingmod:enchanted_tea",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:tomatillo_crop",
+      "crop": "croptopia:tomatillo",
+      "enchanted_item": "gardenkingmod:enchanted_tomatillo",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:tomato_crop",
+      "crop": "croptopia:tomato",
+      "enchanted_item": "gardenkingmod:enchanted_tomato",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:turmeric_crop",
+      "crop": "croptopia:turmeric",
+      "enchanted_item": "gardenkingmod:enchanted_turmeric",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:turnip_crop",
+      "crop": "croptopia:turnip",
+      "enchanted_item": "gardenkingmod:enchanted_turnip",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:vanilla_crop",
+      "crop": "croptopia:vanilla",
+      "enchanted_item": "gardenkingmod:enchanted_vanilla",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:walnut_crop",
+      "crop": "croptopia:walnut",
+      "enchanted_item": "gardenkingmod:enchanted_walnut",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "minecraft:wheat",
+      "crop": "minecraft:wheat",
+      "enchanted_item": "gardenkingmod:enchanted_wheat",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:yam_crop",
+      "crop": "croptopia:yam",
+      "enchanted_item": "gardenkingmod:enchanted_yam",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    },
+    {
+      "target": "croptopia:zucchini_crop",
+      "crop": "croptopia:zucchini",
+      "enchanted_item": "gardenkingmod:enchanted_zucchini",
+      "drop_chance": 0.02,
+      "value_multiplier": 2.0
+    }
+  ]
+}

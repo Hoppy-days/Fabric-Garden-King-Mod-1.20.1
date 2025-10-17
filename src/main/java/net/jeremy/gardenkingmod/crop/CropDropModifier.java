@@ -13,6 +13,8 @@ import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.ModItems;
+import net.jeremy.gardenkingmod.crop.EnchantedCropDefinition;
+import net.jeremy.gardenkingmod.crop.EnchantedCropDefinitions;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager.BonusDropEntry;
 
 import net.minecraft.block.Block;
@@ -90,6 +92,10 @@ public final class CropDropModifier {
                                         .map(TierScalingData::blockId)
                                         .map(ModItems::getRottenItemForTarget)
                                         .orElse(null);
+                        Item baselineEnchantedItem = scalingData
+                                        .map(TierScalingData::blockId)
+                                        .map(ModItems::getEnchantedItemForTarget)
+                                        .orElse(null);
 
                         Optional<RottenCropDefinition> rottenDefinition = RottenCropDefinitions.findByLootTableId(id);
                         float extraNoDropChance = rottenDefinition.map(RottenCropDefinition::extraNoDropChance).orElse(0.0f);
@@ -98,16 +104,63 @@ public final class CropDropModifier {
                                         .map(RottenCropDefinition::targetId)
                                         .map(ModItems::getRottenItemForTarget)
                                         .orElse(null);
+
+                        Optional<EnchantedCropDefinition> enchantedDefinition = EnchantedCropDefinitions
+                                        .findByLootTableId(id);
+                        if (enchantedDefinition.isEmpty()) {
+                                enchantedDefinition = scalingData
+                                                .map(TierScalingData::blockId)
+                                                .flatMap(EnchantedCropDefinitions::findByTargetId);
+                        }
+
+                        float enchantedChance = enchantedDefinition
+                                        .map(EnchantedCropDefinition::effectiveDropChance)
+                                        .orElse(0.0f);
+                        float enchantedMultiplier = enchantedDefinition
+                                        .map(EnchantedCropDefinition::effectiveValueMultiplier)
+                                        .orElse(EnchantedCropDefinition.DEFAULT_VALUE_MULTIPLIER);
+                        Item definitionEnchantedItem = enchantedDefinition
+                                        .map(EnchantedCropDefinition::targetId)
+                                        .map(ModItems::getEnchantedItemForTarget)
+                                        .orElse(null);
+                        if (definitionEnchantedItem == null) {
+                                definitionEnchantedItem = enchantedDefinition
+                                                .map(EnchantedCropDefinition::cropId)
+                                                .map(ModItems::getEnchantedItemForCrop)
+                                                .orElse(null);
+                        }
+
+                        if (enchantedDefinition.isEmpty() && baselineEnchantedItem != null
+                                        && enchantedChance <= 0.0f) {
+                                enchantedChance = EnchantedCropDefinition.DEFAULT_DROP_CHANCE;
+                        }
+
+                        Item enchantedItem = definitionEnchantedItem != null ? definitionEnchantedItem : baselineEnchantedItem;
                         float combinedNoDropChance = MathHelper.clamp(baseNoDropChance + extraNoDropChance, 0.0f, 1.0f);
                         float combinedRottenChance = MathHelper.clamp(baseRottenChance + extraRottenChance, 0.0f, 1.0f);
                         Item rottenItem = definitionRottenItem != null ? definitionRottenItem : baselineRottenItem;
 
                         boolean applyScaling = multiplier > 1.0001f;
                         boolean applyNoDrop = combinedNoDropChance > 0.0f;
+                        boolean applyEnchanted = enchantedItem != null && enchantedChance > 0.0f;
                         boolean applyRotten = rottenItem != null && combinedRottenChance > 0.0f;
 
-                        if (!applyScaling && !applyNoDrop && !applyRotten) {
+                        if (!applyScaling && !applyNoDrop && !applyRotten && !applyEnchanted) {
                                 return;
+                        }
+
+                        if (!applyEnchanted && enchantedChance > 0.0f) {
+                                String baselineLabel = baselineEnchantedItem == null ? "none"
+                                                : Optional.ofNullable(Registries.ITEM.getId(baselineEnchantedItem))
+                                                                .map(Identifier::toString)
+                                                                .orElse("unknown");
+                                String definitionLabel = enchantedDefinition
+                                                .map(EnchantedCropDefinition::enchantedItemId)
+                                                .map(Identifier::toString)
+                                                .orElse("none");
+                                GardenKingMod.LOGGER.debug(
+                                                "Skipping enchanted harvest for loot table {} because no enchanted item is available (definition candidate: {}, tier fallback: {})",
+                                                id, definitionLabel, baselineLabel);
                         }
 
                         if (!applyRotten && combinedRottenChance > 0.0f) {
@@ -122,6 +175,9 @@ public final class CropDropModifier {
                                                 id, definitionLabel, baselineLabel);
                         }
 
+                        final Item finalEnchantedItem = enchantedItem;
+                        final float finalEnchantedChance = enchantedChance;
+                        final float finalEnchantedMultiplier = enchantedMultiplier;
                         fabricBuilder.modifyPools(poolBuilder -> {
                                 if (applyNoDrop) {
                                         poolBuilder.conditionally(RandomChanceLootCondition.builder(1.0f - combinedNoDropChance));
@@ -131,6 +187,11 @@ public final class CropDropModifier {
                                         poolBuilder.apply(CaptureStackFunction.builder());
                                         poolBuilder.apply(
                                                         SetCountLootFunction.builder(new TierScaledCountProvider(id, multiplier)));
+                                }
+
+                                if (applyEnchanted) {
+                                        poolBuilder.apply(ApplyEnchantedHarvestFunction.builder(id, finalEnchantedItem,
+                                                        finalEnchantedChance, finalEnchantedMultiplier));
                                 }
 
                                 if (applyRotten) {
@@ -146,6 +207,13 @@ public final class CropDropModifier {
                         if (applyNoDrop) {
                                 appliedEffects
                                                 .add(String.format("no-drop chance (%.2f%%)", combinedNoDropChance * 100.0f));
+                        }
+                        if (applyEnchanted) {
+                                Identifier enchantedItemId = Registries.ITEM.getId(enchantedItem);
+                                appliedEffects.add(String.format("enchanted harvest (%.2f%% -> %s, x%.2f)",
+                                                enchantedChance * 100.0f,
+                                                enchantedItemId == null ? "unknown" : enchantedItemId.toString(),
+                                                enchantedMultiplier));
                         }
                         if (applyRotten) {
                                 Identifier rottenItemId = Registries.ITEM.getId(rottenItem);
@@ -270,6 +338,71 @@ public final class CropDropModifier {
                 }
         }
 
+        private static final class ApplyEnchantedHarvestFunction extends ConditionalLootFunction {
+                private final Identifier lootTableId;
+                private final Item enchantedItem;
+                private final float enchantedChance;
+                private final float valueMultiplier;
+
+                ApplyEnchantedHarvestFunction(LootCondition[] conditions, Identifier lootTableId, Item enchantedItem,
+                                float enchantedChance, float valueMultiplier) {
+                        super(conditions);
+                        this.lootTableId = lootTableId;
+                        this.enchantedItem = enchantedItem;
+                        this.enchantedChance = enchantedChance;
+                        this.valueMultiplier = Math.max(1.0f, valueMultiplier);
+                }
+
+                static ConditionalLootFunction.Builder<?> builder(Identifier lootTableId, Item enchantedItem,
+                                float enchantedChance, float valueMultiplier) {
+                        return ConditionalLootFunction.builder(conditions -> new ApplyEnchantedHarvestFunction(conditions,
+                                        lootTableId, enchantedItem, enchantedChance, valueMultiplier));
+                }
+
+                @Override
+                public LootFunctionType getType() {
+                        return LootFunctionTypes.SET_COUNT;
+                }
+
+                @Override
+                protected ItemStack process(ItemStack stack, LootContext context) {
+                        if (stack.isEmpty() || enchantedChance <= 0.0f) {
+                                return stack;
+                        }
+
+                        if (context.getRandom().nextFloat() >= enchantedChance) {
+                                return stack;
+                        }
+
+                        int originalCount = stack.getCount();
+                        float scaled = originalCount * valueMultiplier;
+                        int baseCount = MathHelper.floor(scaled);
+                        float fractional = scaled - baseCount;
+                        int result = baseCount;
+
+                        if (fractional > 0.0f && context.getRandom().nextFloat() < fractional) {
+                                result++;
+                        }
+
+                        int maxCount = stack.getMaxCount();
+                        if (maxCount > 0) {
+                                result = MathHelper.clamp(result, 1, maxCount);
+                        } else {
+                                result = Math.max(1, result);
+                        }
+
+                        ItemStack enchantedStack = new ItemStack(enchantedItem, result);
+                        if (enchantedStack.isEmpty()) {
+                                GardenKingMod.LOGGER.debug(
+                                                "Enchanted harvest for loot table {} produced an empty stack; preserving original drop",
+                                                lootTableId);
+                                return stack;
+                        }
+
+                        return enchantedStack;
+                }
+        }
+
         private static final class ApplyRottenHarvestFunction extends ConditionalLootFunction {
                 private final Identifier lootTableId;
                 private final Item rottenItem;
@@ -298,6 +431,10 @@ public final class CropDropModifier {
                 @Override
                 protected ItemStack process(ItemStack stack, LootContext context) {
                         if (stack.isEmpty() || rottenChance <= 0.0f) {
+                                return stack;
+                        }
+
+                        if (ModItems.isEnchantedItem(stack.getItem())) {
                                 return stack;
                         }
 

@@ -6,10 +6,13 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
+import net.jeremy.gardenkingmod.crop.EnchantedCropDefinition;
+import net.jeremy.gardenkingmod.crop.EnchantedCropDefinitions;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinition;
 import net.jeremy.gardenkingmod.crop.RottenCropDefinitions;
 import net.jeremy.gardenkingmod.item.AmethystArmorMaterial;
@@ -19,6 +22,7 @@ import net.jeremy.gardenkingmod.item.BlueSapphireToolMaterial;
 import net.jeremy.gardenkingmod.item.CompostFertilizerItem;
 import net.jeremy.gardenkingmod.item.EmeraldArmorMaterial;
 import net.jeremy.gardenkingmod.item.EmeraldToolMaterial;
+import net.jeremy.gardenkingmod.item.EnchantedCropItem;
 import net.jeremy.gardenkingmod.item.FertilizerBalanceConfig;
 import net.jeremy.gardenkingmod.item.FortuneHoeItem;
 import net.jeremy.gardenkingmod.item.ObsidianArmorMaterial;
@@ -40,8 +44,10 @@ import net.minecraft.item.ShovelItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Rarity;
 
 public final class ModItems {
         public static final Item WALLET = registerItem("wallet", new WalletItem(new FabricItemSettings()));
@@ -185,10 +191,16 @@ public final class ModItems {
         public static final Item EMERALD_BOOTS = registerItem("emerald_boots",
                         new ArmorItem(EmeraldArmorMaterial.INSTANCE, ArmorItem.Type.BOOTS, new FabricItemSettings()));
 
-        private static Map<Identifier, Item> rottenItemsByCrop = Collections.emptyMap();
-        private static Map<Identifier, Item> rottenItemsByTarget = Collections.emptyMap();
-        private static List<Item> rottenItems = List.of();
-        private static boolean rottenItemsRegistered;
+    private static Map<Identifier, Item> rottenItemsByCrop = Collections.emptyMap();
+    private static Map<Identifier, Item> rottenItemsByTarget = Collections.emptyMap();
+    private static List<Item> rottenItems = List.of();
+    private static boolean rottenItemsRegistered;
+
+    private static Map<Identifier, Item> enchantedItemsByCrop = Collections.emptyMap();
+    private static Map<Identifier, Item> enchantedItemsByTarget = Collections.emptyMap();
+    private static Map<Identifier, EnchantedCropDefinition> enchantedDefinitionsByItem = Map.of();
+    private static List<Item> enchantedItems = List.of();
+    private static boolean enchantedItemsRegistered;
 
         private ModItems() {
         }
@@ -226,12 +238,96 @@ public final class ModItems {
                 return true;
         }
 
+        public static synchronized boolean initializeEnchantedItems() {
+                if (enchantedItemsRegistered) {
+                        return true;
+                }
+
+                EnchantedCropDefinitions.reload();
+                List<EnchantedCropDefinition> definitions = EnchantedCropDefinitions.all();
+                if (definitions.isEmpty()) {
+                        return false;
+                }
+
+                Map<Identifier, Item> byCrop = new LinkedHashMap<>();
+                Map<Identifier, Item> byTarget = new LinkedHashMap<>();
+                Map<Identifier, EnchantedCropDefinition> byItemId = new LinkedHashMap<>();
+                List<Item> items = new ArrayList<>();
+
+                for (EnchantedCropDefinition definition : definitions) {
+                        Identifier enchantedId = definition.enchantedItemId();
+                        Text name = Text.translatable(enchantedId.toTranslationKey("item"));
+                        Item item = registerItem(enchantedId.getPath(),
+                                        new EnchantedCropItem(new FabricItemSettings().rarity(Rarity.RARE),
+                                                        definition.effectiveValueMultiplier(), name));
+
+                        byCrop.put(definition.cropId(), item);
+                        byTarget.put(definition.targetId(), item);
+                        byItemId.put(enchantedId, definition);
+                        items.add(item);
+                }
+
+                enchantedItemsByCrop = Collections.unmodifiableMap(byCrop);
+                enchantedItemsByTarget = Collections.unmodifiableMap(byTarget);
+                enchantedDefinitionsByItem = Collections.unmodifiableMap(byItemId);
+                enchantedItems = List.copyOf(items);
+                enchantedItemsRegistered = true;
+                return true;
+        }
+
         public static Item getRottenItemForCrop(Identifier cropId) {
                 return initializeRottenItems() ? rottenItemsByCrop.get(cropId) : null;
         }
 
         public static Item getRottenItemForTarget(Identifier targetId) {
                 return initializeRottenItems() ? rottenItemsByTarget.get(targetId) : null;
+        }
+
+        public static Item getEnchantedItemForCrop(Identifier cropId) {
+                return initializeEnchantedItems() ? enchantedItemsByCrop.get(cropId) : null;
+        }
+
+        public static Item getEnchantedItemForTarget(Identifier targetId) {
+                return initializeEnchantedItems() ? enchantedItemsByTarget.get(targetId) : null;
+        }
+
+        public static Optional<EnchantedCropDefinition> getEnchantedDefinition(Item item) {
+                if (!initializeEnchantedItems()) {
+                        return Optional.empty();
+                }
+
+                if (item == null) {
+                        return Optional.empty();
+                }
+
+                Identifier id = Registries.ITEM.getId(item);
+                if (id == null) {
+                        return Optional.empty();
+                }
+
+                return Optional.ofNullable(enchantedDefinitionsByItem.get(id));
+        }
+
+        public static boolean isEnchantedItem(Item item) {
+                if (!initializeEnchantedItems()) {
+                        return false;
+                }
+
+                if (item == null) {
+                        return false;
+                }
+
+                Identifier id = Registries.ITEM.getId(item);
+                return id != null && enchantedDefinitionsByItem.containsKey(id);
+        }
+
+        public static float getEnchantedValueMultiplier(Item item) {
+                return getEnchantedDefinition(item).map(EnchantedCropDefinition::effectiveValueMultiplier).orElse(1.0f);
+        }
+
+        public static Collection<Item> getEnchantedItems() {
+                initializeEnchantedItems();
+                return enchantedItems;
         }
 
         public static Collection<Item> getRottenItems() {
@@ -244,6 +340,10 @@ public final class ModItems {
                 if (!initializeRottenItems()) {
                         GardenKingMod.LOGGER.warn("Skipping rotten item registration until crop definitions are available");
                 }
+                if (!initializeEnchantedItems()) {
+                        GardenKingMod.LOGGER.warn(
+                                        "Skipping enchanted item registration until crop definitions are available");
+                }
                 registerCompostables();
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS)
                                 .register(entries -> {
@@ -255,6 +355,7 @@ public final class ModItems {
                                         entries.add(PEARL);
                                         entries.add(SPECIAL_FERTILIZER);
                                         rottenItems.forEach(entries::add);
+                                        enchantedItems.forEach(entries::add);
                                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL)
                                 .register(entries -> {
