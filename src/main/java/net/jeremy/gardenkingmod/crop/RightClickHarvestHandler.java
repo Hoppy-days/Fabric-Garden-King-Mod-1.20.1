@@ -2,9 +2,6 @@ package net.jeremy.gardenkingmod.crop;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.jeremy.gardenkingmod.crop.CropTier;
-import net.jeremy.gardenkingmod.crop.CropTierRegistry;
-import net.jeremy.gardenkingmod.skill.HarvestXpService;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -17,7 +14,6 @@ import net.minecraft.loot.LootTable;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -86,15 +82,11 @@ public final class RightClickHarvestHandler {
                 }
 
                 LootContextParameterSet parameters = builder.build(LootContextTypes.BLOCK);
-                Identifier blockId = Registries.BLOCK.getId(state.getBlock());
-                Identifier tierId = CropTierRegistry.get(state).map(CropTier::id).orElse(null);
-
                 lootTable.generateLoot(parameters, stack -> {
                         if (stack.isEmpty()) {
                                 return;
                         }
 
-                        HarvestXpService.awardHarvestXp(player, blockId, tierId, stack);
                         Block.dropStack(world, pos, stack);
                 });
 
