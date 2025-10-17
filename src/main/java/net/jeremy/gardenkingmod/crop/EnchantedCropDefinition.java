@@ -49,6 +49,18 @@ public record EnchantedCropDefinition(
                 return Math.max(0.0f, Math.min(1.0f, dropChance));
         }
 
+        /**
+         * Returns {@code true} when this definition should defer to the tier-based
+         * enchanted roll chance instead of using the JSON-configured value. A value
+         * of {@code 0} (or any negative number, though those are clamped away during
+         * parsing) disables the per-definition override and allows the tier odds to
+         * drive the drop roll. Any positive number continues to behave like the
+         * previous implementation and overrides the tier chance.
+         */
+        public boolean usesTierChance() {
+                return dropChance <= 0.0f;
+        }
+
         public float effectiveValueMultiplier() {
                 return Math.max(1.0f, valueMultiplier);
         }
