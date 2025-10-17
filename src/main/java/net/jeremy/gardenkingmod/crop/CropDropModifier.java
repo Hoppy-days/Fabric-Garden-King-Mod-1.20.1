@@ -115,9 +115,13 @@ public final class CropDropModifier {
                                                 .flatMap(EnchantedCropDefinitions::findByTargetId);
                         }
 
-                        float enchantedChance = enchantedDefinition
-                                        .map(EnchantedCropDefinition::effectiveDropChance)
-                                        .orElse(baseEnchantedChance);
+                        boolean definitionUsesTierChance = enchantedDefinition
+                                        .map(EnchantedCropDefinition::usesTierChance)
+                                        .orElse(false);
+                        float enchantedChance = baseEnchantedChance;
+                        if (enchantedDefinition.isPresent() && !definitionUsesTierChance) {
+                                enchantedChance = enchantedDefinition.get().effectiveDropChance();
+                        }
                         float enchantedMultiplier = enchantedDefinition
                                         .map(EnchantedCropDefinition::effectiveValueMultiplier)
                                         .orElse(EnchantedCropDefinition.DEFAULT_VALUE_MULTIPLIER);
@@ -133,7 +137,7 @@ public final class CropDropModifier {
                         }
 
                         if (enchantedChance <= 0.0f && baselineEnchantedItem != null
-                                        && enchantedDefinition.isEmpty()) {
+                                        && (enchantedDefinition.isEmpty() || definitionUsesTierChance)) {
                                 enchantedChance = baseEnchantedChance > 0.0f ? baseEnchantedChance
                                                 : EnchantedCropDefinition.DEFAULT_DROP_CHANCE;
                         }
