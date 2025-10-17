@@ -8,6 +8,7 @@ import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.crop.CropTier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.crop.EnchantedCropDefinition;
+import net.jeremy.gardenkingmod.network.SkillProgressNetworking;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -17,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 /**
@@ -74,6 +76,10 @@ public final class HarvestXpService {
                 }
 
                 skillHolder.gardenkingmod$addSkillExperience(awarded);
+
+                if (harvester instanceof ServerPlayerEntity serverPlayer) {
+                        SkillProgressNetworking.sync(serverPlayer);
+                }
         }
 
         private static Identifier resolveTierId(@Nullable Identifier tierId, @Nullable Identifier blockId, Item item) {

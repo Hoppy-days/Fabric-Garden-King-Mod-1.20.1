@@ -12,6 +12,7 @@ import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.ModScoreboards;
 import net.jeremy.gardenkingmod.network.ModPackets;
+import net.jeremy.gardenkingmod.network.SkillProgressNetworking;
 import net.jeremy.gardenkingmod.crop.EnchantedCropDefinition;
 import net.jeremy.gardenkingmod.crop.CropTier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
@@ -40,6 +41,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
 
 public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, Inventory {
         public static final int INVENTORY_SIZE = 36;
@@ -216,6 +219,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 int inventorySize = items.size();
                 int totalItemsSold = 0;
                 int totalDollars = 0;
+                long totalExperience = 0L;
                 boolean hasSellableStack = false;
                 Map<Item, Integer> soldItemCounts = new LinkedHashMap<>();
                 Map<Integer, SaleDetails> saleDetailsBySlot = new LinkedHashMap<>();
@@ -239,6 +243,11 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                                 totalItemsSold += details.itemsSold();
                                 totalDollars += details.totalDollars();
                                 soldItemCounts.merge(stack.getItem(), details.itemsSold(), Integer::sum);
+
+                                long experience = getExperienceForSale(details);
+                                if (experience > 0L) {
+                                        totalExperience = accumulateExperience(totalExperience, experience);
+                                }
                         }
                 }
 
@@ -279,6 +288,21 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 }
 
                 markDirty();
+
+                if (totalExperience > 0L && player instanceof SkillProgressHolder skillHolder) {
+                        long previousExperience = skillHolder.gardenkingmod$getSkillExperience();
+                        int previousLevel = skillHolder.gardenkingmod$getSkillLevel();
+                        int previousPoints = skillHolder.gardenkingmod$getUnspentSkillPoints();
+
+                        int currentLevel = skillHolder.gardenkingmod$addSkillExperience(totalExperience);
+                        long updatedExperience = skillHolder.gardenkingmod$getSkillExperience();
+                        int updatedPoints = skillHolder.gardenkingmod$getUnspentSkillPoints();
+
+                        if (updatedExperience != previousExperience || currentLevel != previousLevel
+                                        || updatedPoints != previousPoints) {
+                                SkillProgressNetworking.sync(player);
+                        }
+                }
 
                 if (totalDollars > 0) {
                         boolean deposited = WalletItem.depositToBank(player, totalDollars);
@@ -344,7 +368,9 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 int payoutPerStack = Math.max(0, Math.round(dollarsPerStack * payoutMultiplier));
                 int totalDollars = fullStacks * payoutPerStack;
 
-                return Optional.of(new SaleDetails(item, maxStackSize, fullStacks, remainder, payoutPerStack,
+                CropTier resolvedTier = tier.get();
+
+                return Optional.of(new SaleDetails(item, resolvedTier, maxStackSize, fullStacks, remainder, payoutPerStack,
                                 totalDollars, itemsSold));
         }
 
@@ -405,7 +431,57 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 }
         }
 
-        private record SaleDetails(Item item, int maxStackSize, int fullStacks, int remainder, int payoutPerStack,
-                        int totalDollars, int itemsSold) {
+        private static long getExperienceForSale(SaleDetails details) {
+                if (details == null || details.itemsSold() <= 0 || details.fullStacks() <= 0) {
+                        return 0L;
+                }
+
+                Item item = details.item();
+                if (ModItems.isRottenItem(item)) {
+                        return 0L;
+                }
+
+                CropTier tier = details.tier();
+                if (tier == null) {
+                        return 0L;
+                }
+
+                int baseValue = getDollarsPerStack(tier);
+                if (baseValue <= 0) {
+                        return 0L;
+                }
+
+                long experience;
+                try {
+                        experience = Math.multiplyExact(baseValue, (long) details.fullStacks());
+                } catch (ArithmeticException overflow) {
+                        experience = Long.MAX_VALUE;
+                }
+
+                if (ModItems.isEnchantedItem(item)) {
+                        try {
+                                experience = Math.multiplyExact(experience, 2L);
+                        } catch (ArithmeticException overflow) {
+                                experience = Long.MAX_VALUE;
+                        }
+                }
+
+                return experience;
+        }
+
+        private static long accumulateExperience(long current, long additional) {
+                if (additional <= 0L) {
+                        return current;
+                }
+
+                try {
+                        return Math.addExact(current, additional);
+                } catch (ArithmeticException overflow) {
+                        return Long.MAX_VALUE;
+                }
+        }
+
+        private record SaleDetails(Item item, CropTier tier, int maxStackSize, int fullStacks, int remainder,
+                        int payoutPerStack, int totalDollars, int itemsSold) {
         }
 }
