@@ -132,7 +132,8 @@ public final class CropDropModifier {
                                                 .orElse(null);
                         }
 
-                        if (enchantedChance <= 0.0f && baselineEnchantedItem != null) {
+                        if (enchantedChance <= 0.0f && baselineEnchantedItem != null
+                                        && enchantedDefinition.isEmpty()) {
                                 enchantedChance = baseEnchantedChance > 0.0f ? baseEnchantedChance
                                                 : EnchantedCropDefinition.DEFAULT_DROP_CHANCE;
                         }
