@@ -15,6 +15,7 @@ import net.jeremy.gardenkingmod.registry.ModEntities;
 import net.jeremy.gardenkingmod.registry.ModSoundEvents;
 import net.jeremy.gardenkingmod.shop.GardenMarketOfferManager;
 import net.jeremy.gardenkingmod.shop.GearShopOfferManager;
+import net.jeremy.gardenkingmod.skill.HarvestXpConfig;
 
 import net.minecraft.resource.ResourceType;
 
@@ -28,6 +29,7 @@ public class GardenKingMod implements ModInitializer {
         @Override
         public void onInitialize() {
                 FertilizerBalanceConfig.reload();
+                HarvestXpConfig.reload();
                 ModItems.registerModItems();
                 ModBlocks.registerModBlocks();
                 ModBlockEntities.registerBlockEntities();
