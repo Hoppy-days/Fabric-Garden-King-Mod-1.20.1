@@ -88,6 +88,8 @@ public final class CropDropModifier {
                         float multiplier = tier.map(CropTier::dropMultiplier).orElse(1.0f);
                         float baseNoDropChance = MathHelper.clamp(tier.map(CropTier::noDropChance).orElse(0.0f), 0.0f, 1.0f);
                         float baseRottenChance = MathHelper.clamp(tier.map(CropTier::rottenChance).orElse(0.0f), 0.0f, 1.0f);
+                        float baseEnchantedChance = MathHelper
+                                        .clamp(tier.map(CropTier::enchantedChance).orElse(0.0f), 0.0f, 1.0f);
                         Item baselineRottenItem = scalingData
                                         .map(TierScalingData::blockId)
                                         .map(ModItems::getRottenItemForTarget)
@@ -115,7 +117,7 @@ public final class CropDropModifier {
 
                         float enchantedChance = enchantedDefinition
                                         .map(EnchantedCropDefinition::effectiveDropChance)
-                                        .orElse(0.0f);
+                                        .orElse(baseEnchantedChance);
                         float enchantedMultiplier = enchantedDefinition
                                         .map(EnchantedCropDefinition::effectiveValueMultiplier)
                                         .orElse(EnchantedCropDefinition.DEFAULT_VALUE_MULTIPLIER);
@@ -130,9 +132,10 @@ public final class CropDropModifier {
                                                 .orElse(null);
                         }
 
-                        if (enchantedDefinition.isEmpty() && baselineEnchantedItem != null
-                                        && enchantedChance <= 0.0f) {
-                                enchantedChance = EnchantedCropDefinition.DEFAULT_DROP_CHANCE;
+                        if (enchantedChance <= 0.0f && baselineEnchantedItem != null
+                                        && enchantedDefinition.isEmpty()) {
+                                enchantedChance = baseEnchantedChance > 0.0f ? baseEnchantedChance
+                                                : EnchantedCropDefinition.DEFAULT_DROP_CHANCE;
                         }
 
                         Item enchantedItem = definitionEnchantedItem != null ? definitionEnchantedItem : baselineEnchantedItem;
