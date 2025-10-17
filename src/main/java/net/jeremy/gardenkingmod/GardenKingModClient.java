@@ -38,6 +38,7 @@ import net.jeremy.gardenkingmod.screen.BankScreenHandler;
 import net.jeremy.gardenkingmod.screen.GearShopScreen;
 import net.jeremy.gardenkingmod.screen.MarketScreen;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreen;
+import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
@@ -119,6 +120,23 @@ public class GardenKingModClient implements ClientModInitializer {
                                                 && client.player.currentScreenHandler instanceof BankScreenHandler bankHandler
                                                 && bankHandler.getBankPos().equals(bankPos)) {
                                         bankHandler.updateBalance(totalDollars);
+                                }
+                        });
+                });
+
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.SKILL_PROGRESS_SYNC_PACKET,
+                (client, handler, buf, responseSender) -> {
+                        long experience = buf.readVarLong();
+                        int level = buf.readVarInt();
+                        int unspentPoints = buf.readVarInt();
+                        int chefMastery = buf.readVarInt();
+
+                        client.execute(() -> {
+                                if (client.player instanceof SkillProgressHolder skillHolder) {
+                                        skillHolder.gardenkingmod$setSkillExperience(experience);
+                                        skillHolder.gardenkingmod$setSkillLevel(level);
+                                        skillHolder.gardenkingmod$setUnspentSkillPoints(unspentPoints);
+                                        skillHolder.gardenkingmod$setChefMasteryLevel(chefMastery);
                                 }
                         });
                 });
