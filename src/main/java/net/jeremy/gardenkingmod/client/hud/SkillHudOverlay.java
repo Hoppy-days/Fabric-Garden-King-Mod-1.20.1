@@ -23,7 +23,7 @@ public final class SkillHudOverlay implements HudRenderCallback {
     // 1) Background slice at V=0 with height BAR_HEIGHT
     // 2) Filled slice at V=BAR_HEIGHT with height BAR_HEIGHT
     // 3) Highlight slice at V=BAR_HEIGHT*2 with height BAR_HEIGHT+2 for the glow effect
-    private static final int BAR_WIDTH = 182;
+    private static final int BAR_WIDTH = 102;
     private static final int BAR_HEIGHT = 5;
     private static final int BACKGROUND_V = 0;
     private static final int FILL_V = BAR_HEIGHT;
