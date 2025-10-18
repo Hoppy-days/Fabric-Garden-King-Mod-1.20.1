@@ -74,7 +74,7 @@ public final class RightClickHarvestHandler {
         private static void dropStacksWithXp(BlockState state, ServerWorld world, BlockPos pos,
                         @Nullable BlockEntity blockEntity, PlayerEntity player, ItemStack toolForDrops) {
                 Identifier lootTableId = state.getBlock().getLootTableId();
-                LootTable lootTable = world.getServer().getReloadableRegistries().getLootTable(lootTableId);
+                LootTable lootTable = world.getServer().getLootManager().getLootTable(lootTableId);
 
                 LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder(world)
                                 .add(LootContextParameters.ORIGIN, Vec3d.ofCenter(pos))
