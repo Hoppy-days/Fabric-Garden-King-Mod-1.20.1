@@ -22,7 +22,7 @@ public final class SkillHudOverlay implements HudRenderCallback {
     // The texture should contain three horizontal stripes, each BAR_WIDTH pixels wide:
     // 1) Background slice at V=0 with height BAR_HEIGHT
     // 2) Filled slice at V=BAR_HEIGHT with height BAR_HEIGHT
-    // 3) Highlight slice at V=BAR_HEIGHT*2 with height BAR_HEIGHT+2 for the glow effect
+    // 3) Highlight slice at V=BAR_HEIGHT*2 with height BAR_HEIGHT
     private static final int BAR_WIDTH = 81;
     private static final int BAR_HEIGHT = 5;
     private static final int BACKGROUND_V = 0;
@@ -34,6 +34,7 @@ public final class SkillHudOverlay implements HudRenderCallback {
     private float pendingLevelProgress;
     private boolean initialized;
     private boolean animatingLevelUp;
+    private int lastKnownLevel = -1;
 
     public static final SkillHudOverlay INSTANCE = new SkillHudOverlay();
 
@@ -58,7 +59,14 @@ public final class SkillHudOverlay implements HudRenderCallback {
         if (!initialized) {
             displayedProgress = targetProgress;
             previousTargetProgress = targetProgress;
+            lastKnownLevel = skillState.getLevel();
             initialized = true;
+        }
+
+        int currentLevel = Math.max(0, skillState.getLevel());
+        if (!animatingLevelUp && lastKnownLevel >= 0 && currentLevel > lastKnownLevel) {
+            animatingLevelUp = true;
+            pendingLevelProgress = targetProgress;
         }
 
         if (animatingLevelUp) {
@@ -69,17 +77,13 @@ public final class SkillHudOverlay implements HudRenderCallback {
                 pendingLevelProgress = 0.0f;
             }
         } else {
-            if (targetProgress + 0.0001f < previousTargetProgress) {
-                animatingLevelUp = true;
-                pendingLevelProgress = targetProgress;
-            } else {
-                displayedProgress = MathHelper.lerp(0.15f, displayedProgress, targetProgress);
-                if (Math.abs(displayedProgress - targetProgress) < 0.003f) {
-                    displayedProgress = targetProgress;
-                }
+            displayedProgress = MathHelper.lerp(0.15f, displayedProgress, targetProgress);
+            if (Math.abs(displayedProgress - targetProgress) < 0.003f) {
+                displayedProgress = targetProgress;
             }
         }
 
+        lastKnownLevel = currentLevel;
         previousTargetProgress = targetProgress;
 
         int scaledWidth = client.getWindow().getScaledWidth();
@@ -102,7 +106,7 @@ public final class SkillHudOverlay implements HudRenderCallback {
                     * MathHelper.sin((player.age + tickDelta) * 0.3f * MathHelper.PI);
             RenderSystem.enableBlend();
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, MathHelper.clamp(flashStrength, 0.0f, 1.0f));
-            context.drawTexture(TEXTURE, barX, barY - 1, 0, HIGHLIGHT_V, BAR_WIDTH, BAR_HEIGHT + 2);
+            context.drawTexture(TEXTURE, barX, barY, 0, HIGHLIGHT_V, BAR_WIDTH, BAR_HEIGHT);
             RenderSystem.disableBlend();
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
