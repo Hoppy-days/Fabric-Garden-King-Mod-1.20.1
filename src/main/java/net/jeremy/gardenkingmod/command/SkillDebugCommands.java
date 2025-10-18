@@ -47,6 +47,22 @@ public final class SkillDebugCommands {
                                                                                 context.getSource().getPlayerOrThrow(),
                                                                                 LongArgumentType.getLong(context,
                                                                                                 "amount")))))
+                                .then(CommandManager.literal("remove_xp")
+                                                .then(CommandManager.argument("targets", EntityArgumentType.players())
+                                                                .then(CommandManager.argument("amount",
+                                                                                LongArgumentType.longArg(1L, Long.MAX_VALUE))
+                                                                                .executes(context -> removeExperience(context,
+                                                                                                EntityArgumentType.getPlayers(
+                                                                                                                context,
+                                                                                                                "targets"),
+                                                                                                LongArgumentType.getLong(context,
+                                                                                                                "amount")))))
+                                                .then(CommandManager.argument("amount", LongArgumentType.longArg(1L,
+                                                                Long.MAX_VALUE))
+                                                                .executes(context -> removeExperience(context,
+                                                                                context.getSource().getPlayerOrThrow(),
+                                                                                LongArgumentType.getLong(context,
+                                                                                                "amount")))))
                                 .then(CommandManager.literal("add_levels")
                                                 .then(CommandManager.argument("targets", EntityArgumentType.players())
                                                                 .then(CommandManager.argument("levels",
@@ -60,6 +76,22 @@ public final class SkillDebugCommands {
                                                                                                                 "levels")))))
                                                 .then(CommandManager.argument("levels", IntegerArgumentType.integer(1))
                                                                 .executes(context -> addLevels(context,
+                                                                                context.getSource().getPlayerOrThrow(),
+                                                                                IntegerArgumentType.getInteger(context,
+                                                                                                "levels")))))
+                                .then(CommandManager.literal("remove_levels")
+                                                .then(CommandManager.argument("targets", EntityArgumentType.players())
+                                                                .then(CommandManager.argument("levels",
+                                                                                IntegerArgumentType.integer(1))
+                                                                                .executes(context -> removeLevels(context,
+                                                                                                EntityArgumentType.getPlayers(
+                                                                                                                context,
+                                                                                                                "targets"),
+                                                                                                IntegerArgumentType.getInteger(
+                                                                                                                context,
+                                                                                                                "levels")))))
+                                                .then(CommandManager.argument("levels", IntegerArgumentType.integer(1))
+                                                                .executes(context -> removeLevels(context,
                                                                                 context.getSource().getPlayerOrThrow(),
                                                                                 IntegerArgumentType.getInteger(context,
                                                                                                 "levels"))))));
@@ -85,6 +117,44 @@ public final class SkillDebugCommands {
                                         () -> Text.literal("Awarded " + amount + " Garden King XP to "
                                                         + player.getName().getString() + "."),
                                         false);
+                }
+                return affected;
+        }
+
+        private static int removeExperience(CommandContext<ServerCommandSource> context,
+                        ServerPlayerEntity target, long amount) {
+                return removeExperience(context, List.of(target), amount);
+        }
+
+        private static int removeExperience(CommandContext<ServerCommandSource> context,
+                        Collection<ServerPlayerEntity> targets, long amount) {
+                int affected = 0;
+                for (ServerPlayerEntity player : targets) {
+                        if (!(player instanceof SkillProgressHolder skillHolder)) {
+                                continue;
+                        }
+
+                        long currentExperience = Math.max(0L, skillHolder.gardenkingmod$getSkillExperience());
+                        long updatedExperience = Math.max(0L, currentExperience - amount);
+                        if (updatedExperience == currentExperience) {
+                                continue;
+                        }
+
+                        skillHolder.gardenkingmod$setSkillExperience(updatedExperience);
+                        int previousLevel = Math.max(0, skillHolder.gardenkingmod$getSkillLevel());
+                        int newLevel = SkillProgressManager.getLevelForExperience(updatedExperience);
+                        if (newLevel != previousLevel) {
+                                skillHolder.gardenkingmod$setSkillLevel(newLevel);
+                                if (skillHolder.gardenkingmod$getUnspentSkillPoints() > newLevel) {
+                                        skillHolder.gardenkingmod$setUnspentSkillPoints(newLevel);
+                                }
+                        }
+
+                        SkillProgressNetworking.sync(player);
+                        affected++;
+                        long removed = currentExperience - updatedExperience;
+                        context.getSource().sendFeedback(() -> Text.literal("Removed " + removed
+                                        + " Garden King XP from " + player.getName().getString() + "."), false);
                 }
                 return affected;
         }
@@ -123,6 +193,45 @@ public final class SkillDebugCommands {
                         context.getSource().sendFeedback(() -> Text.literal("Advanced "
                                         + player.getName().getString() + " by " + (targetLevel - startingLevel)
                                         + " level(s)."), false);
+                }
+                return affected;
+        }
+
+        private static int removeLevels(CommandContext<ServerCommandSource> context,
+                        ServerPlayerEntity target, int levels) {
+                return removeLevels(context, List.of(target), levels);
+        }
+
+        private static int removeLevels(CommandContext<ServerCommandSource> context,
+                        Collection<ServerPlayerEntity> targets, int levels) {
+                int affected = 0;
+                for (ServerPlayerEntity player : targets) {
+                        if (!(player instanceof SkillProgressHolder skillHolder)) {
+                                continue;
+                        }
+
+                        int startingLevel = Math.max(0, skillHolder.gardenkingmod$getSkillLevel());
+                        int targetLevel = Math.max(0, startingLevel - levels);
+                        if (targetLevel >= startingLevel) {
+                                continue;
+                        }
+
+                        long currentExperience = Math.max(0L, skillHolder.gardenkingmod$getSkillExperience());
+                        long targetExperience = SkillProgressManager.getExperienceForLevel(targetLevel);
+                        if (currentExperience < targetExperience) {
+                                targetExperience = currentExperience;
+                        }
+
+                        skillHolder.gardenkingmod$setSkillLevel(targetLevel);
+                        skillHolder.gardenkingmod$setSkillExperience(targetExperience);
+                        if (skillHolder.gardenkingmod$getUnspentSkillPoints() > targetLevel) {
+                                skillHolder.gardenkingmod$setUnspentSkillPoints(targetLevel);
+                        }
+
+                        SkillProgressNetworking.sync(player);
+                        affected++;
+                        context.getSource().sendFeedback(() -> Text.literal("Reduced "
+                                        + player.getName().getString() + " to level " + targetLevel + "."), false);
                 }
                 return affected;
         }
