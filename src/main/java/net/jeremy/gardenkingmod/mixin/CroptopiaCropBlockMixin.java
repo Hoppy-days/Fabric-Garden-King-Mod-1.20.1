@@ -1,24 +1,34 @@
 package net.jeremy.gardenkingmod.mixin;
 
+import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.crop.RightClickHarvestHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Pseudo
 @Mixin(targets = { "com.epherical.croptopia.blocks.CropBlock",
                 "com.epherical.croptopia.blocks.CroptopiaCropBlock" }, remap = false)
 public abstract class CroptopiaCropBlockMixin {
+
+        @ModifyVariable(method = "method_9514", at = @At(value = "STORE"), ordinal = 0, remap = false)
+        private float gardenkingmod$scaleGrowthChance(float moisture, BlockState state, ServerWorld world, BlockPos pos,
+                        Random random) {
+                return CropTierRegistry.scaleGrowthChance(state, moisture);
+        }
 
         @Inject(method = "method_9534", at = @At("HEAD"), cancellable = true, remap = false)
         private void gardenkingmod$harvestCrops(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
