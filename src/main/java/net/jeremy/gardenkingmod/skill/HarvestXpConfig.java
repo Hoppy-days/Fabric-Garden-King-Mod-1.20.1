@@ -29,11 +29,11 @@ public final class HarvestXpConfig {
                         .resolve("harvest_xp.json");
 
         private static final Map<String, Long> DEFAULT_XP = Map.of(
-                        "crop_tiers/tier_1", 10L,
-                        "crop_tiers/tier_2", 16L,
-                        "crop_tiers/tier_3", 24L,
-                        "crop_tiers/tier_4", 34L,
-                        "crop_tiers/tier_5", 48L);
+                        "crop_tiers/tier_1", 1L,
+                        "crop_tiers/tier_2", 2L,
+                        "crop_tiers/tier_3", 3L,
+                        "crop_tiers/tier_4", 4L,
+                        "crop_tiers/tier_5", 5L);
 
         private static volatile HarvestXpConfig instance = new HarvestXpConfig();
 
