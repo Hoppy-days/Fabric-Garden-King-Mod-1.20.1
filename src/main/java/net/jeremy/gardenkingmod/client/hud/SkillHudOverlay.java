@@ -23,13 +23,17 @@ public final class SkillHudOverlay implements HudRenderCallback {
     // 1) Background slice at V=0 with height BAR_HEIGHT
     // 2) Filled slice at V=BAR_HEIGHT with height BAR_HEIGHT
     // 3) Highlight slice at V=BAR_HEIGHT*2 with height BAR_HEIGHT+2 for the glow effect
-    private static final int BAR_WIDTH = 102;
+    private static final int BAR_WIDTH = 81;
     private static final int BAR_HEIGHT = 5;
     private static final int BACKGROUND_V = 0;
     private static final int FILL_V = BAR_HEIGHT;
     private static final int HIGHLIGHT_V = BAR_HEIGHT * 2;
 
     private float displayedProgress;
+    private float previousTargetProgress;
+    private float pendingLevelProgress;
+    private boolean initialized;
+    private boolean animatingLevelUp;
 
     public static final SkillHudOverlay INSTANCE = new SkillHudOverlay();
 
@@ -50,11 +54,33 @@ public final class SkillHudOverlay implements HudRenderCallback {
 
         SkillState skillState = SkillState.getInstance();
         float targetProgress = MathHelper.clamp(skillState.getProgressPercentage(), 0.0f, 1.0f);
-        // Smooth animation towards the target progress to avoid abrupt jumps.
-        displayedProgress = MathHelper.lerp(0.15f, displayedProgress, targetProgress);
-        if (Math.abs(displayedProgress - targetProgress) < 0.003f) {
+
+        if (!initialized) {
             displayedProgress = targetProgress;
+            previousTargetProgress = targetProgress;
+            initialized = true;
         }
+
+        if (animatingLevelUp) {
+            displayedProgress = MathHelper.lerp(0.35f, displayedProgress, 1.0f);
+            if (Math.abs(1.0f - displayedProgress) < 0.01f) {
+                displayedProgress = pendingLevelProgress;
+                animatingLevelUp = false;
+                pendingLevelProgress = 0.0f;
+            }
+        } else {
+            if (targetProgress + 0.0001f < previousTargetProgress) {
+                animatingLevelUp = true;
+                pendingLevelProgress = targetProgress;
+            } else {
+                displayedProgress = MathHelper.lerp(0.15f, displayedProgress, targetProgress);
+                if (Math.abs(displayedProgress - targetProgress) < 0.003f) {
+                    displayedProgress = targetProgress;
+                }
+            }
+        }
+
+        previousTargetProgress = targetProgress;
 
         int scaledWidth = client.getWindow().getScaledWidth();
         int scaledHeight = client.getWindow().getScaledHeight();
