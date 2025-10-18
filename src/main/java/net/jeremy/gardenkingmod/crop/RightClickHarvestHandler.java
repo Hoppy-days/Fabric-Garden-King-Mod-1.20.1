@@ -2,6 +2,7 @@ package net.jeremy.gardenkingmod.crop;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.crop.CropTier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.skill.HarvestXpService;
@@ -89,14 +90,30 @@ public final class RightClickHarvestHandler {
                 Identifier blockId = Registries.BLOCK.getId(state.getBlock());
                 Identifier tierId = CropTierRegistry.get(state).map(CropTier::id).orElse(null);
 
+                ItemStack enchantedCandidate = ItemStack.EMPTY;
+                ItemStack normalCandidate = ItemStack.EMPTY;
+
                 lootTable.generateLoot(parameters, stack -> {
                         if (stack.isEmpty()) {
                                 return;
                         }
 
-                        HarvestXpService.awardHarvestXp(player, blockId, tierId, stack);
+                        Item item = stack.getItem();
+                        if (ModItems.isEnchantedItem(item)) {
+                                if (enchantedCandidate.isEmpty()) {
+                                        enchantedCandidate = stack.copy();
+                                }
+                        } else if (!ModItems.isRottenItem(item) && normalCandidate.isEmpty()) {
+                                normalCandidate = stack.copy();
+                        }
+
                         Block.dropStack(world, pos, stack);
                 });
+
+                ItemStack xpStack = enchantedCandidate.isEmpty() ? normalCandidate : enchantedCandidate;
+                if (!xpStack.isEmpty()) {
+                        HarvestXpService.awardHarvestXp(player, blockId, tierId, xpStack);
+                }
 
                 state.onStacksDropped(world, pos, toolForDrops, true);
         }
