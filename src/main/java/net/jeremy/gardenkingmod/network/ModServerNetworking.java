@@ -33,13 +33,15 @@ public final class ModServerNetworking {
                     int pointsToSpend = buf.readVarInt();
 
                     server.execute(() -> {
-                        if (!(player instanceof ServerPlayerEntity serverPlayer)) {
+                        if (!(player instanceof ServerPlayerEntity)) {
                             return;
                         }
+                        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
 
-                        if (!(serverPlayer instanceof SkillProgressHolder skillHolder)) {
+                        if (!(serverPlayer instanceof SkillProgressHolder)) {
                             return;
                         }
+                        SkillProgressHolder skillHolder = (SkillProgressHolder) serverPlayer;
 
                         if (pointsToSpend <= 0) {
                             SkillProgressNetworking.sync(serverPlayer);
