@@ -93,6 +93,7 @@
   "message.gardenkingmod.bank.not_owner": "Only the account owner may use this bank.",
   "scoreboard.gardenkingmod.garden_currency": "Garden Dollars",
   "scoreboard.gardenkingmod.garden_currency_bank": "Bank Dollars",
+  "hud.gardenkingmod.skill_level": "%s",
   "screen.gardenkingmod.market.sale_result_sold": "Sold: %1$s crops",
   "screen.gardenkingmod.market.sale_result_sold_detailed": "Sold: %1$s",
   "screen.gardenkingmod.market.sale_result_earned": "Earned: %1$s dollars",
