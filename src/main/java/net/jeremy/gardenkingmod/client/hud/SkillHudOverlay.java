@@ -33,10 +33,18 @@ public final class SkillHudOverlay implements HudRenderCallback {
     private static final int BACKGROUND_V = 0;
     private static final int FILL_V = BAR_HEIGHT;
     private static final int HIGHLIGHT_V = BAR_HEIGHT * 2;
+    private static final float HIGHLIGHT_DURATION_TICKS = 6.0f;
 
     public static final SkillHudOverlay INSTANCE = new SkillHudOverlay();
 
+    private int lastKnownUnspentSkillPoints;
+    private boolean highlightActive;
+    private float highlightStartAge;
+
     private SkillHudOverlay() {
+        lastKnownUnspentSkillPoints = 0;
+        highlightActive = false;
+        highlightStartAge = 0.0f;
     }
 
     @Override
@@ -69,14 +77,21 @@ public final class SkillHudOverlay implements HudRenderCallback {
         }
 
         int unspentSkillPoints = skillState.getUnspentSkillPoints();
-        if (unspentSkillPoints > 0) {
-            float flashPeriod = 40.0f; // ticks
-            float flashDuration = 6.0f; // ticks spent showing the highlight
-            float age = player.age + tickDelta;
-            float flashTime = age % flashPeriod;
+        float age = player.age + tickDelta;
 
-            if (flashTime < flashDuration) {
-                float alpha = 1.0f - (flashTime / flashDuration);
+        if (unspentSkillPoints > lastKnownUnspentSkillPoints) {
+            highlightActive = true;
+            highlightStartAge = age;
+        } else if (unspentSkillPoints < lastKnownUnspentSkillPoints) {
+            highlightActive = false;
+        }
+        lastKnownUnspentSkillPoints = unspentSkillPoints;
+
+        if (unspentSkillPoints > 0 && highlightActive) {
+            float elapsed = Math.max(0.0f, age - highlightStartAge);
+
+            if (elapsed < HIGHLIGHT_DURATION_TICKS) {
+                float alpha = 1.0f - (elapsed / HIGHLIGHT_DURATION_TICKS);
                 RenderSystem.enableBlend();
                 RenderSystem.defaultBlendFunc();
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, MathHelper.clamp(alpha, 0.0f, 1.0f));
@@ -84,6 +99,8 @@ public final class SkillHudOverlay implements HudRenderCallback {
                         TEXTURE_HEIGHT);
                 RenderSystem.disableBlend();
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            } else {
+                highlightActive = false;
             }
         }
 
