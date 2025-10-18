@@ -13,8 +13,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 /**
- * Renders the Garden King skill progress bar directly above the vanilla
- * experience bar.
+ * Renders the Garden King skill progress bar just above the player's hunger
+ * bar in the HUD.
  */
 public final class SkillHudOverlay implements HudRenderCallback {
     private static final Identifier TEXTURE = new Identifier(GardenKingMod.MOD_ID,
@@ -58,9 +58,10 @@ public final class SkillHudOverlay implements HudRenderCallback {
 
         int scaledWidth = client.getWindow().getScaledWidth();
         int scaledHeight = client.getWindow().getScaledHeight();
-        int barX = scaledWidth / 2 - BAR_WIDTH / 2;
-        int vanillaXpBarY = scaledHeight - 32 + 3;
-        int barY = vanillaXpBarY - BAR_HEIGHT - 4;
+        int hungerBarAnchorX = scaledWidth / 2 + 91;
+        int barX = hungerBarAnchorX - BAR_WIDTH;
+        int hungerBarY = scaledHeight - 39;
+        int barY = hungerBarY - BAR_HEIGHT - 3;
 
         context.drawTexture(TEXTURE, barX, barY, 0, BACKGROUND_V, BAR_WIDTH, BAR_HEIGHT);
 
@@ -83,7 +84,7 @@ public final class SkillHudOverlay implements HudRenderCallback {
         int level = Math.max(0, skillState.getLevel());
         Text levelText = Text.translatable("hud." + GardenKingMod.MOD_ID + ".skill_level", level);
         int textWidth = client.textRenderer.getWidth(levelText);
-        int textX = scaledWidth / 2 - textWidth / 2;
+        int textX = barX + BAR_WIDTH / 2 - textWidth / 2;
         int textY = barY - 10;
 
         context.drawText(client.textRenderer, levelText, textX, textY, 0x80FF20, true);
