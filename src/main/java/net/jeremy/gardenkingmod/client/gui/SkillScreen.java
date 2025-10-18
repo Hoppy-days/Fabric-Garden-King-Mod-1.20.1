@@ -18,7 +18,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.text.OrderedText;
@@ -80,7 +79,7 @@ public class SkillScreen extends Screen {
                 this.addSelectableChild(this.skillTreeWidget);
                 this.addDrawableChild(this.skillTreeWidget);
 
-                this.closeButton = ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
+                this.closeButton = ButtonWidget.builder(Text.translatable("gui.done"), button -> this.close())
                                 .dimensions((this.width - DONE_BUTTON_WIDTH) / 2,
                                                 this.height - DONE_BUTTON_HEIGHT - TREE_MARGIN, DONE_BUTTON_WIDTH,
                                                 DONE_BUTTON_HEIGHT)
