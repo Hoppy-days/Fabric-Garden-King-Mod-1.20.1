@@ -11,6 +11,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.jeremy.gardenkingmod.client.hud.SkillHudOverlay;
 import net.jeremy.gardenkingmod.client.model.BankBlockModel;
 import net.jeremy.gardenkingmod.client.model.CrowEntityModel;
 import net.jeremy.gardenkingmod.client.model.GearShopModel;
@@ -32,6 +34,7 @@ import net.jeremy.gardenkingmod.client.render.item.SprinklerItemRenderer;
 import net.jeremy.gardenkingmod.registry.ModEntities;
 import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.ModBlocks;
+import net.jeremy.gardenkingmod.ModScreenHandlers;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.item.FortuneProvidingItem;
 import net.jeremy.gardenkingmod.network.ModPackets;
@@ -84,6 +87,7 @@ public class GardenKingModClient implements ClientModInitializer {
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.DIAMOND_SPRINKLER_BLOCK, sprinklerItemRenderer);
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.EMERALD_SPRINKLER_BLOCK, sprinklerItemRenderer);
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.SCARECROW_BLOCK, RenderLayer.getCutout());
+        HudRenderCallback.EVENT.register(SkillHudOverlay.INSTANCE);
 
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.MARKET_SALE_RESULT_PACKET,
                 (client, handler, buf, responseSender) -> {
