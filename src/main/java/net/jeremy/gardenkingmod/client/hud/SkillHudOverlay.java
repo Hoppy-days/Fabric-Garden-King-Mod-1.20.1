@@ -51,6 +51,23 @@ public final class SkillHudOverlay implements HudRenderCallback {
         SkillState skillState = SkillState.getInstance();
         float progress = MathHelper.clamp(skillState.getProgressPercentage(), 0.0f, 1.0f);
 
+        if (animatingLevelUp) {
+            displayedProgress = MathHelper.lerp(0.35f, displayedProgress, 1.0f);
+            if (Math.abs(1.0f - displayedProgress) < 0.01f) {
+                displayedProgress = pendingLevelProgress;
+                animatingLevelUp = false;
+                pendingLevelProgress = 0.0f;
+            }
+        } else {
+            displayedProgress = MathHelper.lerp(0.15f, displayedProgress, targetProgress);
+            if (Math.abs(displayedProgress - targetProgress) < 0.003f) {
+                displayedProgress = targetProgress;
+            }
+        }
+
+        lastKnownLevel = currentLevel;
+        previousTargetProgress = targetProgress;
+
         int scaledWidth = client.getWindow().getScaledWidth();
         int scaledHeight = client.getWindow().getScaledHeight();
         int hungerBarAnchorX = scaledWidth / 2 + 91;
