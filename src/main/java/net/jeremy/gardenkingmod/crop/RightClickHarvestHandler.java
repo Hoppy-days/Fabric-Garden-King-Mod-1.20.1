@@ -17,10 +17,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.HoeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.context.LootContextParameterSet;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -29,7 +25,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
@@ -77,26 +72,13 @@ public final class RightClickHarvestHandler {
 
         private static void dropStacksWithXp(BlockState state, ServerWorld world, BlockPos pos,
                         @Nullable BlockEntity blockEntity, PlayerEntity player, ItemStack toolForDrops) {
-                Identifier lootTableId = state.getBlock().getLootTableId();
-                LootTable lootTable = world.getServer().getLootManager().getLootTable(lootTableId);
-
-                LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder(world)
-                                .add(LootContextParameters.ORIGIN, Vec3d.ofCenter(pos))
-                                .add(LootContextParameters.TOOL, toolForDrops)
-                                .addOptional(LootContextParameters.THIS_ENTITY, player);
-
-                if (blockEntity != null) {
-                        builder.addOptional(LootContextParameters.BLOCK_ENTITY, blockEntity);
-                }
-
-                LootContextParameterSet parameters = builder.build(LootContextTypes.BLOCK);
+                List<ItemStack> generatedLoot = Block.getDroppedStacks(state, world, pos, blockEntity, player, toolForDrops);
                 Identifier blockId = Registries.BLOCK.getId(state.getBlock());
                 Identifier tierId = CropTierRegistry.get(state).map(CropTier::id).orElse(null);
 
                 ItemStack enchantedCandidate = ItemStack.EMPTY;
                 ItemStack normalCandidate = ItemStack.EMPTY;
 
-                List<ItemStack> generatedLoot = lootTable.generateLoot(parameters);
                 for (ItemStack stack : generatedLoot) {
                         if (stack.isEmpty()) {
                                 continue;
@@ -110,8 +92,6 @@ public final class RightClickHarvestHandler {
                         } else if (!ModItems.isRottenItem(item) && normalCandidate.isEmpty()) {
                                 normalCandidate = stack.copy();
                         }
-
-                        Block.dropStack(world, pos, stack);
                 }
 
                 ItemStack xpStack = enchantedCandidate.isEmpty() ? normalCandidate : enchantedCandidate;
@@ -119,7 +99,7 @@ public final class RightClickHarvestHandler {
                         HarvestXpService.awardHarvestXp(player, blockId, tierId, xpStack);
                 }
 
-                state.onStacksDropped(world, pos, toolForDrops, true);
+                Block.dropStacks(state, world, pos, blockEntity, player, toolForDrops);
         }
 
 }
