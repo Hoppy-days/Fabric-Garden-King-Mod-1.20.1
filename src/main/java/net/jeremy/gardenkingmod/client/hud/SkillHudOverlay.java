@@ -25,8 +25,11 @@ public final class SkillHudOverlay implements HudRenderCallback {
     // 3) Highlight slice at V=BAR_HEIGHT*2 with height BAR_HEIGHT
     private static final int BAR_WIDTH = 81;
     private static final int BAR_HEIGHT = 5;
-    private static final int TEXTURE_WIDTH = BAR_WIDTH;
-    private static final int TEXTURE_HEIGHT = BAR_HEIGHT * 3;
+    // DrawContext#drawTexture requires the full dimensions of the underlying texture atlas
+    // to avoid stretching the UVs across the image. The skill bar sprites occupy the top
+    // left corner of a 128x128 texture file.
+    private static final int TEXTURE_WIDTH = 128;
+    private static final int TEXTURE_HEIGHT = 128;
     private static final int BACKGROUND_V = 0;
     private static final int FILL_V = BAR_HEIGHT;
     private static final int HIGHLIGHT_V = BAR_HEIGHT * 2;
