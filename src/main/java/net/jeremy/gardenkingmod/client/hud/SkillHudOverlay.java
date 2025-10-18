@@ -66,18 +66,25 @@ public final class SkillHudOverlay implements HudRenderCallback {
         int filledWidth = MathHelper.ceil(progress * BAR_WIDTH);
         if (filledWidth > 0) {
             context.drawTexture(TEXTURE, barX, barY, 0, FILL_V, filledWidth, BAR_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-    }
+        }
 
         int unspentSkillPoints = skillState.getUnspentSkillPoints();
         if (unspentSkillPoints > 0) {
-            float flashStrength = 0.55f + 0.45f
-                    * MathHelper.sin((player.age + tickDelta) * 0.3f * MathHelper.PI);
-            RenderSystem.enableBlend();
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, MathHelper.clamp(flashStrength, 0.0f, 1.0f));
-            context.drawTexture(TEXTURE, barX, barY, 0, HIGHLIGHT_V, BAR_WIDTH, BAR_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-            context.drawTexture(TEXTURE, barX, barY, 0, BACKGROUND_V, BAR_WIDTH, BAR_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-            RenderSystem.disableBlend();
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            float flashPeriod = 40.0f; // ticks
+            float flashDuration = 6.0f; // ticks spent showing the highlight
+            float age = player.age + tickDelta;
+            float flashTime = age % flashPeriod;
+
+            if (flashTime < flashDuration) {
+                float alpha = 1.0f - (flashTime / flashDuration);
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, MathHelper.clamp(alpha, 0.0f, 1.0f));
+                context.drawTexture(TEXTURE, barX, barY, 0, HIGHLIGHT_V, BAR_WIDTH, BAR_HEIGHT, TEXTURE_WIDTH,
+                        TEXTURE_HEIGHT);
+                RenderSystem.disableBlend();
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            }
         }
 
         int level = Math.max(0, skillState.getLevel());
