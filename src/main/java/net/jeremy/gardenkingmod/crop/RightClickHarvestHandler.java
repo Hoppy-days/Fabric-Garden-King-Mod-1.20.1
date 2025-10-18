@@ -1,5 +1,7 @@
 package net.jeremy.gardenkingmod.crop;
 
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.jeremy.gardenkingmod.ModItems;
@@ -94,9 +96,10 @@ public final class RightClickHarvestHandler {
                 ItemStack enchantedCandidate = ItemStack.EMPTY;
                 ItemStack normalCandidate = ItemStack.EMPTY;
 
-                lootTable.generateLoot(parameters, stack -> {
+                List<ItemStack> generatedLoot = lootTable.generateLoot(parameters);
+                for (ItemStack stack : generatedLoot) {
                         if (stack.isEmpty()) {
-                                return;
+                                continue;
                         }
 
                         Item item = stack.getItem();
@@ -109,7 +112,7 @@ public final class RightClickHarvestHandler {
                         }
 
                         Block.dropStack(world, pos, stack);
-                });
+                }
 
                 ItemStack xpStack = enchantedCandidate.isEmpty() ? normalCandidate : enchantedCandidate;
                 if (!xpStack.isEmpty()) {
