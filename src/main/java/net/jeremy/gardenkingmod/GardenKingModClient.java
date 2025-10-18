@@ -54,6 +54,8 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -169,8 +171,14 @@ public class GardenKingModClient implements ClientModInitializer {
 
                         client.execute(() -> {
                                 SkillState skillState = SkillState.getInstance();
+                                int previousLevel = skillState.getLevel();
                                 skillState.update(experience, level, progressIntoLevel, experienceToNextLevel,
                                                 unspentPoints, allocations);
+
+                                if (client.player != null && level > previousLevel) {
+                                        client.player.playSound(SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS,
+                                                        1.0f, 1.0f);
+                                }
 
                                 if (client.player instanceof SkillProgressHolder skillHolder) {
                                         skillHolder.gardenkingmod$setSkillExperience(experience);
