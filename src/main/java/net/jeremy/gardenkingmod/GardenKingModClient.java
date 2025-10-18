@@ -5,13 +5,16 @@ import java.util.Map;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.jeremy.gardenkingmod.client.gui.SkillScreen;
 import net.jeremy.gardenkingmod.client.hud.SkillHudOverlay;
 import net.jeremy.gardenkingmod.client.model.BankBlockModel;
 import net.jeremy.gardenkingmod.client.model.CrowEntityModel;
@@ -48,16 +51,34 @@ import net.jeremy.gardenkingmod.skill.SkillProgressManager;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.util.InputUtil;
+
+import org.lwjgl.glfw.GLFW;
 
 public class GardenKingModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        KeyBinding openSkillScreenKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.gardenkingmod.open_skills",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_K,
+                "category.gardenkingmod"));
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (openSkillScreenKey.wasPressed()) {
+                if (client != null && client.player != null && client.currentScreen == null) {
+                    client.setScreen(new SkillScreen());
+                }
+            }
+        });
+
         HandledScreens.register(ModScreenHandlers.GEAR_SHOP_SCREEN_HANDLER, GearShopScreen::new);
         HandledScreens.register(ModScreenHandlers.MARKET_SCREEN_HANDLER, MarketScreen::new);
         HandledScreens.register(ModScreenHandlers.SCARECROW_SCREEN_HANDLER, ScarecrowScreen::new);

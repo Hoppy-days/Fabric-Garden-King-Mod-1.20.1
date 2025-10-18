@@ -330,6 +330,15 @@
   "item.gardenkingmod.enchanted_walnut": "Enchanted Walnut",
   "item.gardenkingmod.enchanted_wheat": "Enchanted Wheat",
   "item.gardenkingmod.enchanted_yam": "Enchanted Yam",
-  "item.gardenkingmod.enchanted_zucchini": "Enchanted Zucchini"
+  "item.gardenkingmod.enchanted_zucchini": "Enchanted Zucchini",
+  "screen.gardenkingmod.skills.title": "Garden Skills",
+  "screen.gardenkingmod.skills.level": "Level: %s",
+  "screen.gardenkingmod.skills.total_xp": "Total XP: %s",
+  "screen.gardenkingmod.skills.progress": "Progress: %s / %s",
+  "screen.gardenkingmod.skills.unspent_points": "Unspent Points: %s",
+  "screen.gardenkingmod.skills.allocate": "Allocate",
+  "screen.gardenkingmod.skills.points_spent": "Points Spent: %s",
+  "key.gardenkingmod.open_skills": "Open Skill Screen",
+  "category.gardenkingmod": "Garden King"
 
 }
