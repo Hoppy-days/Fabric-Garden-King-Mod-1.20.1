@@ -14,8 +14,11 @@ public class SkillScreen extends Screen {
         private static final Identifier BACKGROUND_TEXTURE = new Identifier("gardenkingmod",
                         "textures/gui/skill_screen_gui.png");
 
-        private static final int TEXTURE_WIDTH = 256;
-        private static final int TEXTURE_HEIGHT = 256;
+        private static final int BACKGROUND_WIDTH = 512;
+        private static final int BACKGROUND_HEIGHT = 512;
+
+        private static final int TEXTURE_WIDTH = 512;
+        private static final int TEXTURE_HEIGHT = 512;
 
         private int backgroundX;
         private int backgroundY;
@@ -28,8 +31,8 @@ public class SkillScreen extends Screen {
         protected void init() {
                 super.init();
 
-                this.backgroundX = (this.width - TEXTURE_WIDTH) / 2;
-                this.backgroundY = (this.height - TEXTURE_HEIGHT) / 2;
+                this.backgroundX = (this.width - BACKGROUND_WIDTH) / 2;
+                this.backgroundY = (this.height - BACKGROUND_HEIGHT) / 2;
         }
 
         @Override
@@ -39,8 +42,8 @@ public class SkillScreen extends Screen {
 
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-                context.drawTexture(BACKGROUND_TEXTURE, this.backgroundX, this.backgroundY, 0, 0, TEXTURE_WIDTH,
-                                TEXTURE_HEIGHT);
+                context.drawTexture(BACKGROUND_TEXTURE, this.backgroundX, this.backgroundY, 0, 0, BACKGROUND_WIDTH,
+                                BACKGROUND_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
                 super.render(context, mouseX, mouseY, delta);
         }
 
