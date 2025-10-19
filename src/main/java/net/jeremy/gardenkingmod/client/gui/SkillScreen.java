@@ -25,6 +25,7 @@ import net.minecraft.network.PacketByteBuf;
  */
 public class SkillScreen extends Screen {
         private static final Identifier TEXTURE = new Identifier("gardenkingmod", "textures/gui/skill_screen_gui.png");
+        private static final Identifier XP_BAR_TEXTURE = new Identifier("gardenkingmod", "textures/gui/skill_xp_bar.png");
         private static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance(Locale.US);
 
         private static final class Layout {
@@ -53,9 +54,12 @@ public class SkillScreen extends Screen {
 
                 private static final int XP_BAR_X_OFFSET = 136;
                 private static final int XP_BAR_Y_OFFSET = 24;
-                private static final int XP_BAR_WIDTH = 200;
-                private static final int XP_BAR_HEIGHT = 12;
-                private static final int XP_BAR_PADDING = 1;
+                private static final int XP_BAR_WIDTH = 81;
+                private static final int XP_BAR_HEIGHT = 5;
+                private static final int XP_BAR_TEXTURE_WIDTH = 128;
+                private static final int XP_BAR_TEXTURE_HEIGHT = 128;
+                private static final int XP_BAR_BACKGROUND_V = 0;
+                private static final int XP_BAR_FILL_V = XP_BAR_HEIGHT;
                 private static final int XP_TEXT_Y_OFFSET = XP_BAR_Y_OFFSET + XP_BAR_HEIGHT + 6;
 
                 private static final int LEVEL_LABEL_PADDING = 8;
@@ -80,8 +84,6 @@ public class SkillScreen extends Screen {
                 private static final int HIGHLIGHT = 0xFFAA5500;
                 private static final int PRIMARY_TEXT = 0xFFFFD200;
                 private static final int SECONDARY_TEXT = 0xFFC0C0C0;
-                private static final int XP_BAR_BACKGROUND = 0xFF3A3A3A;
-                private static final int XP_BAR_PROGRESS = 0xFF66C24A;
 
                 private Colors() {
                 }
@@ -175,27 +177,26 @@ public class SkillScreen extends Screen {
                                 xpBarY + (Layout.XP_BAR_HEIGHT / 2) - (this.textRenderer.fontHeight / 2),
                                 Colors.HIGHLIGHT, false);
 
-                context.fill(xpBarX, xpBarY, xpBarX + Layout.XP_BAR_WIDTH, xpBarY + Layout.XP_BAR_HEIGHT,
-                                Colors.XP_BAR_BACKGROUND);
+                context.drawTexture(XP_BAR_TEXTURE, xpBarX, xpBarY, 0, Layout.XP_BAR_BACKGROUND_V,
+                                Layout.XP_BAR_WIDTH, Layout.XP_BAR_HEIGHT, Layout.XP_BAR_TEXTURE_WIDTH,
+                                Layout.XP_BAR_TEXTURE_HEIGHT);
 
                 long required = this.skillState.getExperienceRequiredForNextLevel();
                 long progress = this.skillState.getExperienceTowardsNextLevel();
                 String progressLabel;
                 if (required > 0L) {
                         float ratio = Math.min(1.0F, Math.max(0.0F, (float) progress / (float) required));
-                        int fillWidth = Math.round((Layout.XP_BAR_WIDTH - (Layout.XP_BAR_PADDING * 2)) * ratio);
+                        int fillWidth = Math.max(1, Math.round(Layout.XP_BAR_WIDTH * ratio));
                         if (fillWidth > 0) {
-                                context.fill(xpBarX + Layout.XP_BAR_PADDING, xpBarY + Layout.XP_BAR_PADDING,
-                                                xpBarX + Layout.XP_BAR_PADDING + fillWidth,
-                                                xpBarY + Layout.XP_BAR_HEIGHT - Layout.XP_BAR_PADDING,
-                                                Colors.XP_BAR_PROGRESS);
+                                context.drawTexture(XP_BAR_TEXTURE, xpBarX, xpBarY, 0, Layout.XP_BAR_FILL_V, fillWidth,
+                                                Layout.XP_BAR_HEIGHT, Layout.XP_BAR_TEXTURE_WIDTH,
+                                                Layout.XP_BAR_TEXTURE_HEIGHT);
                         }
                         progressLabel = NUMBER_FORMAT.format(progress) + " / " + NUMBER_FORMAT.format(required);
                 } else {
-                        context.fill(xpBarX + Layout.XP_BAR_PADDING, xpBarY + Layout.XP_BAR_PADDING,
-                                        xpBarX + Layout.XP_BAR_WIDTH - Layout.XP_BAR_PADDING,
-                                        xpBarY + Layout.XP_BAR_HEIGHT - Layout.XP_BAR_PADDING,
-                                        Colors.XP_BAR_PROGRESS);
+                        context.drawTexture(XP_BAR_TEXTURE, xpBarX, xpBarY, 0, Layout.XP_BAR_FILL_V,
+                                        Layout.XP_BAR_WIDTH, Layout.XP_BAR_HEIGHT, Layout.XP_BAR_TEXTURE_WIDTH,
+                                        Layout.XP_BAR_TEXTURE_HEIGHT);
                         progressLabel = "Max Level";
                 }
 
