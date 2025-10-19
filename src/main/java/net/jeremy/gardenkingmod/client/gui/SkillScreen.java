@@ -25,11 +25,67 @@ import net.minecraft.network.PacketByteBuf;
  */
 public class SkillScreen extends Screen {
         private static final Identifier TEXTURE = new Identifier("gardenkingmod", "textures/gui/skill_screen_gui.png");
-        private static final int BACKGROUND_WIDTH = 404;
-        private static final int BACKGROUND_HEIGHT = 196;
-        private static final int XP_BAR_WIDTH = 200;
-        private static final int XP_BAR_HEIGHT = 10;
         private static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance(Locale.US);
+
+        private static final class Layout {
+                private static final int TEXTURE_WIDTH = 512;
+                private static final int TEXTURE_HEIGHT = 512;
+
+                private static final int BACKGROUND_WIDTH = 404;
+                private static final int BACKGROUND_HEIGHT = 280;
+
+                private static final int TITLE_X_OFFSET = 16;
+                private static final int TITLE_Y_OFFSET = 14;
+
+                private static final int SKILL_NAME_X_OFFSET = 32;
+                private static final int SKILL_NAME_Y_OFFSET = 54;
+
+                private static final int CURRENT_LEVEL_X_OFFSET = 36;
+                private static final int CURRENT_LEVEL_Y_OFFSET = 86;
+
+                private static final int NEXT_LEVEL_X_OFFSET = 36;
+                private static final int NEXT_LEVEL_Y_OFFSET = 102;
+
+                private static final int UPGRADE_BUTTON_X_OFFSET = 36;
+                private static final int UPGRADE_BUTTON_Y_OFFSET = 134;
+                private static final int UPGRADE_BUTTON_WIDTH = 90;
+                private static final int UPGRADE_BUTTON_HEIGHT = 20;
+
+                private static final int XP_BAR_X_OFFSET = 136;
+                private static final int XP_BAR_Y_OFFSET = 24;
+                private static final int XP_BAR_WIDTH = 200;
+                private static final int XP_BAR_HEIGHT = 12;
+                private static final int XP_BAR_PADDING = 1;
+                private static final int XP_TEXT_Y_OFFSET = XP_BAR_Y_OFFSET + XP_BAR_HEIGHT + 6;
+
+                private static final int LEVEL_LABEL_PADDING = 8;
+
+                private static final int SKILL_POINTS_TEXT_X_OFFSET = 220;
+                private static final int SKILL_POINTS_TEXT_Y_OFFSET = 20;
+
+                private static final int DESCRIPTION_TITLE_X_OFFSET = 284;
+                private static final int DESCRIPTION_TITLE_Y_OFFSET = 36;
+
+                private static final int DESCRIPTION_TEXT_X_OFFSET = DESCRIPTION_TITLE_X_OFFSET;
+                private static final int DESCRIPTION_TEXT_Y_OFFSET = 60;
+                private static final int DESCRIPTION_TEXT_WRAP_WIDTH = 108;
+                private static final int DESCRIPTION_LINE_SPACING = 2;
+
+                private Layout() {
+                }
+        }
+
+        private static final class Colors {
+                private static final int TITLE = 0xFFAA5500;
+                private static final int HIGHLIGHT = 0xFFAA5500;
+                private static final int PRIMARY_TEXT = 0xFFFFD200;
+                private static final int SECONDARY_TEXT = 0xFFC0C0C0;
+                private static final int XP_BAR_BACKGROUND = 0xFF3A3A3A;
+                private static final int XP_BAR_PROGRESS = 0xFF66C24A;
+
+                private Colors() {
+                }
+        }
 
         private final SkillState skillState = SkillState.getInstance();
 
@@ -47,14 +103,16 @@ public class SkillScreen extends Screen {
         protected void init() {
                 super.init();
 
-                this.backgroundX = (this.width - BACKGROUND_WIDTH) / 2;
-                this.backgroundY = (this.height - BACKGROUND_HEIGHT) / 2;
+                this.backgroundX = (this.width - Layout.BACKGROUND_WIDTH) / 2;
+                this.backgroundY = (this.height - Layout.BACKGROUND_HEIGHT) / 2;
 
-                int buttonX = this.backgroundX + 23;
-                int buttonY = this.backgroundY + 59;
+                int buttonX = this.backgroundX + Layout.UPGRADE_BUTTON_X_OFFSET;
+                int buttonY = this.backgroundY + Layout.UPGRADE_BUTTON_Y_OFFSET;
                 this.upgradeButton = ButtonWidget.builder(Text.literal("Upgrade"),
                                 button -> this.allocatePoint(SkillProgressManager.CHEF_SKILL))
-                                .dimensions(buttonX, buttonY, 80, 20).build();
+                                .dimensions(buttonX, buttonY, Layout.UPGRADE_BUTTON_WIDTH,
+                                                Layout.UPGRADE_BUTTON_HEIGHT)
+                                .build();
                 this.addDrawableChild(this.upgradeButton);
 
                 updateUpgradeButtonState();
@@ -79,36 +137,18 @@ public class SkillScreen extends Screen {
         }
 
         private void drawBackgroundLayer(DrawContext context) {
-                context.drawTexture(TEXTURE, this.backgroundX, this.backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
-
-                int descriptionBoxX = this.backgroundX + 284;
-                int descriptionBoxY = this.backgroundY;
-                int descriptionBoxWidth = Math.max(32, BACKGROUND_WIDTH - 284 - 12);
-                int descriptionBoxHeight = Math.max(32, BACKGROUND_HEIGHT - 12);
-
-                int borderColor = 0x80404040;
-                int backgroundColor = 0xC0101010;
-                context.fill(descriptionBoxX, descriptionBoxY, descriptionBoxX + descriptionBoxWidth,
-                                descriptionBoxY + descriptionBoxHeight, borderColor);
-                context.fill(descriptionBoxX + 2, descriptionBoxY + 2, descriptionBoxX + descriptionBoxWidth - 2,
-                                descriptionBoxY + descriptionBoxHeight - 2, backgroundColor);
+                context.drawTexture(TEXTURE, this.backgroundX, this.backgroundY, 0, 0, Layout.BACKGROUND_WIDTH,
+                                Layout.BACKGROUND_HEIGHT, Layout.TEXTURE_WIDTH, Layout.TEXTURE_HEIGHT);
         }
 
         private void drawForegroundLayer(DrawContext context) {
-                int titleColor = 0xFFAA5500;
-                int highlightColor = 0xFFAA5500;
-                int yellowColor = 0xFFFFD200;
-                int grayColor = 0xFFC0C0C0;
+                context.drawText(this.textRenderer, Text.literal("Skills"),
+                                this.backgroundX + Layout.TITLE_X_OFFSET,
+                                this.backgroundY + Layout.TITLE_Y_OFFSET, Colors.TITLE, false);
 
-                int descriptionBoxX = this.backgroundX + 284;
-                int descriptionBoxY = this.backgroundY;
-                int descriptionBoxWidth = Math.max(32, BACKGROUND_WIDTH - 284 - 12);
-
-                context.drawText(this.textRenderer, Text.literal("Skills"), this.backgroundX + 8,
-                                this.backgroundY + 8, titleColor, false);
-
-                context.drawText(this.textRenderer, Text.literal("Chef Master"), this.backgroundX + 18,
-                                this.backgroundY + 26, highlightColor, false);
+                context.drawText(this.textRenderer, Text.literal("Chef Master"),
+                                this.backgroundX + Layout.SKILL_NAME_X_OFFSET,
+                                this.backgroundY + Layout.SKILL_NAME_Y_OFFSET, Colors.HIGHLIGHT, false);
 
                 int chefLevel = this.skillState.getChefMasteryLevel();
                 int nextLevel = Math.min(chefLevel + 1, SkillProgressManager.getMaxDefinedLevel());
@@ -116,52 +156,62 @@ public class SkillScreen extends Screen {
 
                 context.drawText(this.textRenderer,
                                 Text.literal("Current Level: " + NUMBER_FORMAT.format(chefLevel)),
-                                this.backgroundX + 22, this.backgroundY + 38, yellowColor, false);
+                                this.backgroundX + Layout.CURRENT_LEVEL_X_OFFSET,
+                                this.backgroundY + Layout.CURRENT_LEVEL_Y_OFFSET, Colors.PRIMARY_TEXT, false);
 
                 String nextLevelLabel = isMax ? "Next Level: MAX"
                                 : "Next Level: " + NUMBER_FORMAT.format(nextLevel);
                 context.drawText(this.textRenderer, Text.literal(nextLevelLabel),
-                                this.backgroundX + 22, this.backgroundY + 48, grayColor, false);
+                                this.backgroundX + Layout.NEXT_LEVEL_X_OFFSET,
+                                this.backgroundY + Layout.NEXT_LEVEL_Y_OFFSET, Colors.SECONDARY_TEXT, false);
 
-                int xpBarX = this.backgroundX + 96;
-                int xpBarY = this.backgroundY + 8;
+                int xpBarX = this.backgroundX + Layout.XP_BAR_X_OFFSET;
+                int xpBarY = this.backgroundY + Layout.XP_BAR_Y_OFFSET;
 
                 int levelTextWidth = this.textRenderer.getWidth("Lv " + this.skillState.getLevel());
                 context.drawText(this.textRenderer,
                                 Text.literal("Lv " + NUMBER_FORMAT.format(this.skillState.getLevel())),
-                                xpBarX - levelTextWidth - 6, xpBarY + (XP_BAR_HEIGHT / 2) - (this.textRenderer.fontHeight / 2),
-                                highlightColor, false);
+                                xpBarX - levelTextWidth - Layout.LEVEL_LABEL_PADDING,
+                                xpBarY + (Layout.XP_BAR_HEIGHT / 2) - (this.textRenderer.fontHeight / 2),
+                                Colors.HIGHLIGHT, false);
 
-                context.fill(xpBarX, xpBarY, xpBarX + XP_BAR_WIDTH, xpBarY + XP_BAR_HEIGHT, 0xFF3A3A3A);
+                context.fill(xpBarX, xpBarY, xpBarX + Layout.XP_BAR_WIDTH, xpBarY + Layout.XP_BAR_HEIGHT,
+                                Colors.XP_BAR_BACKGROUND);
 
                 long required = this.skillState.getExperienceRequiredForNextLevel();
                 long progress = this.skillState.getExperienceTowardsNextLevel();
                 String progressLabel;
                 if (required > 0L) {
                         float ratio = Math.min(1.0F, Math.max(0.0F, (float) progress / (float) required));
-                        int fillWidth = Math.round((XP_BAR_WIDTH - 2) * ratio);
+                        int fillWidth = Math.round((Layout.XP_BAR_WIDTH - (Layout.XP_BAR_PADDING * 2)) * ratio);
                         if (fillWidth > 0) {
-                                context.fill(xpBarX + 1, xpBarY + 1, xpBarX + 1 + fillWidth, xpBarY + XP_BAR_HEIGHT - 1,
-                                                0xFF66C24A);
+                                context.fill(xpBarX + Layout.XP_BAR_PADDING, xpBarY + Layout.XP_BAR_PADDING,
+                                                xpBarX + Layout.XP_BAR_PADDING + fillWidth,
+                                                xpBarY + Layout.XP_BAR_HEIGHT - Layout.XP_BAR_PADDING,
+                                                Colors.XP_BAR_PROGRESS);
                         }
                         progressLabel = NUMBER_FORMAT.format(progress) + " / " + NUMBER_FORMAT.format(required);
                 } else {
-                        context.fill(xpBarX + 1, xpBarY + 1, xpBarX + XP_BAR_WIDTH - 1, xpBarY + XP_BAR_HEIGHT - 1,
-                                        0xFF66C24A);
+                        context.fill(xpBarX + Layout.XP_BAR_PADDING, xpBarY + Layout.XP_BAR_PADDING,
+                                        xpBarX + Layout.XP_BAR_WIDTH - Layout.XP_BAR_PADDING,
+                                        xpBarY + Layout.XP_BAR_HEIGHT - Layout.XP_BAR_PADDING,
+                                        Colors.XP_BAR_PROGRESS);
                         progressLabel = "Max Level";
                 }
 
                 int progressLabelWidth = this.textRenderer.getWidth(progressLabel);
                 context.drawText(this.textRenderer, Text.literal(progressLabel),
-                                xpBarX + (XP_BAR_WIDTH / 2) - (progressLabelWidth / 2),
-                                xpBarY + XP_BAR_HEIGHT + 3, grayColor, false);
+                                xpBarX + (Layout.XP_BAR_WIDTH / 2) - (progressLabelWidth / 2),
+                                this.backgroundY + Layout.XP_TEXT_Y_OFFSET, Colors.SECONDARY_TEXT, false);
 
                 context.drawText(this.textRenderer,
                                 Text.literal("Skill Points: " + NUMBER_FORMAT.format(this.skillState.getUnspentSkillPoints())),
-                                this.backgroundX + 198, this.backgroundY + 4, yellowColor, false);
+                                this.backgroundX + Layout.SKILL_POINTS_TEXT_X_OFFSET,
+                                this.backgroundY + Layout.SKILL_POINTS_TEXT_Y_OFFSET, Colors.PRIMARY_TEXT, false);
 
-                context.drawText(this.textRenderer, Text.literal("Description"), descriptionBoxX + 4,
-                                descriptionBoxY + 8, highlightColor, false);
+                context.drawText(this.textRenderer, Text.literal("Description"),
+                                this.backgroundX + Layout.DESCRIPTION_TITLE_X_OFFSET,
+                                this.backgroundY + Layout.DESCRIPTION_TITLE_Y_OFFSET, Colors.HIGHLIGHT, false);
 
                 String description = SkillProgressManager.getSkillDefinitions()
                                 .getOrDefault(SkillProgressManager.CHEF_SKILL,
@@ -172,12 +222,13 @@ public class SkillScreen extends Screen {
                         description = "No description available.";
                 }
 
-                int descriptionTextX = descriptionBoxX + 4;
-                int descriptionTextY = descriptionBoxY + 22;
-                int wrapWidth = descriptionBoxWidth - 8;
-                for (OrderedText line : this.textRenderer.wrapLines(Text.literal(description), wrapWidth)) {
-                        context.drawText(this.textRenderer, line, descriptionTextX, descriptionTextY, grayColor, false);
-                        descriptionTextY += this.textRenderer.fontHeight + 2;
+                int descriptionTextX = this.backgroundX + Layout.DESCRIPTION_TEXT_X_OFFSET;
+                int descriptionTextY = this.backgroundY + Layout.DESCRIPTION_TEXT_Y_OFFSET;
+                for (OrderedText line : this.textRenderer.wrapLines(Text.literal(description),
+                                Layout.DESCRIPTION_TEXT_WRAP_WIDTH)) {
+                        context.drawText(this.textRenderer, line, descriptionTextX, descriptionTextY,
+                                        Colors.SECONDARY_TEXT, false);
+                        descriptionTextY += this.textRenderer.fontHeight + Layout.DESCRIPTION_LINE_SPACING;
                 }
         }
 
