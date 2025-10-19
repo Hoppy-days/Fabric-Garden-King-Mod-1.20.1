@@ -1,10 +1,7 @@
 package net.jeremy.gardenkingmod.client.gui;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -13,16 +10,11 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.jeremy.gardenkingmod.client.skill.SkillState;
 import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.skill.SkillProgressManager;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.network.PacketByteBuf;
 
@@ -32,28 +24,20 @@ import net.minecraft.network.PacketByteBuf;
  * trees by using a scrollable list of nodes.
  */
 public class SkillScreen extends Screen {
-        private static final int INFO_PANEL_HEIGHT = 84;
-        private static final int INFO_PANEL_PADDING = 12;
-        private static final int TREE_MARGIN = 14;
-        private static final int DONE_BUTTON_WIDTH = 90;
-        private static final int DONE_BUTTON_HEIGHT = 20;
+        private static final Identifier TEXTURE = new Identifier("gardenkingmod", "textures/gui/skill_screen_gui.png");
+        private static final int BACKGROUND_WIDTH = 404;
+        private static final int BACKGROUND_HEIGHT = 196;
+        private static final int XP_BAR_WIDTH = 200;
+        private static final int XP_BAR_HEIGHT = 10;
         private static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance(Locale.US);
 
         private final SkillState skillState = SkillState.getInstance();
 
-        @Nullable
-        private SkillTreeWidget skillTreeWidget;
-        @Nullable
-        private ButtonWidget closeButton;
-
-        private int infoPanelLeft;
-        private int infoPanelTop;
-        private int infoPanelWidth;
+        private int backgroundX;
+        private int backgroundY;
 
         @Nullable
-        private SkillProgressManager.SkillDefinition hoveredDefinition;
-        private int hoveredMouseX;
-        private int hoveredMouseY;
+        private ButtonWidget upgradeButton;
 
         public SkillScreen() {
                 super(Text.translatable("screen.gardenkingmod.skills.title"));
@@ -63,35 +47,22 @@ public class SkillScreen extends Screen {
         protected void init() {
                 super.init();
 
-                this.infoPanelWidth = Math.min(320, this.width - 40);
-                this.infoPanelLeft = (this.width - this.infoPanelWidth) / 2;
-                this.infoPanelTop = 32;
-                int infoPanelBottom = this.infoPanelTop + INFO_PANEL_HEIGHT;
+                this.backgroundX = (this.width - BACKGROUND_WIDTH) / 2;
+                this.backgroundY = (this.height - BACKGROUND_HEIGHT) / 2;
 
-                int treeWidth = Math.min(360, this.width - 40);
-                int treeTop = infoPanelBottom + TREE_MARGIN;
-                int treeBottom = this.height - (TREE_MARGIN + DONE_BUTTON_HEIGHT + 8);
-                int treeHeight = Math.max(64, treeBottom - treeTop);
+                int buttonX = this.backgroundX + 23;
+                int buttonY = this.backgroundY + 59;
+                this.upgradeButton = ButtonWidget.builder(Text.literal("Upgrade"),
+                                button -> this.allocatePoint(SkillProgressManager.CHEF_SKILL))
+                                .dimensions(buttonX, buttonY, 80, 20).build();
+                this.addDrawableChild(this.upgradeButton);
 
-                this.skillTreeWidget = new SkillTreeWidget(this, this.client, treeWidth, treeHeight, treeTop, treeBottom);
-                this.skillTreeWidget.setLeftPos((this.width - treeWidth) / 2);
-                this.skillTreeWidget.rebuild(SkillProgressManager.getSkillDefinitions(), this.skillState);
-                this.addSelectableChild(this.skillTreeWidget);
-                this.addDrawableChild(this.skillTreeWidget);
-
-                this.closeButton = ButtonWidget.builder(Text.translatable("gui.done"), button -> this.close())
-                                .dimensions((this.width - DONE_BUTTON_WIDTH) / 2,
-                                                this.height - DONE_BUTTON_HEIGHT - TREE_MARGIN, DONE_BUTTON_WIDTH,
-                                                DONE_BUTTON_HEIGHT)
-                                .build();
-                this.addDrawableChild(this.closeButton);
+                updateUpgradeButtonState();
         }
 
         @Override
         public void tick() {
-                if (this.skillTreeWidget != null) {
-                        this.skillTreeWidget.refreshAllocations(this.skillState, this.skillState.getUnspentSkillPoints());
-                }
+                updateUpgradeButtonState();
         }
 
         @Override
@@ -101,76 +72,123 @@ public class SkillScreen extends Screen {
 
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-                this.hoveredDefinition = null;
+                this.renderBackground(context);
+                drawBackgroundLayer(context);
                 super.render(context, mouseX, mouseY, delta);
-                drawInfoPanel(context);
-
-                if (this.hoveredDefinition != null) {
-                        List<Text> tooltip = new ArrayList<>();
-                        tooltip.add(Text.literal(this.hoveredDefinition.displayName()).formatted(Formatting.GOLD));
-                        String description = this.hoveredDefinition.description();
-                        if (!description.isBlank()) {
-                                tooltip.add(Text.literal(description).formatted(Formatting.GRAY));
-                        }
-                        context.drawTooltip(this.textRenderer, tooltip, this.hoveredMouseX, this.hoveredMouseY);
-                }
+                drawForegroundLayer(context);
         }
 
-        private void drawInfoPanel(DrawContext context) {
-                int panelRight = this.infoPanelLeft + this.infoPanelWidth;
-                int panelBottom = this.infoPanelTop + INFO_PANEL_HEIGHT;
-                context.fill(this.infoPanelLeft - 2, this.infoPanelTop - 2, panelRight + 2, panelBottom + 2, 0x50000000);
-                context.fill(this.infoPanelLeft, this.infoPanelTop, panelRight, panelBottom, 0xB0000000);
+        private void drawBackgroundLayer(DrawContext context) {
+                context.drawTexture(TEXTURE, this.backgroundX, this.backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
-                int textX = this.infoPanelLeft + INFO_PANEL_PADDING;
-                int textY = this.infoPanelTop + INFO_PANEL_PADDING;
-                int lineHeight = this.textRenderer.fontHeight + 3;
+                int descriptionBoxX = this.backgroundX + 284;
+                int descriptionBoxY = this.backgroundY;
+                int descriptionBoxWidth = Math.max(32, BACKGROUND_WIDTH - 284 - 12);
+                int descriptionBoxHeight = Math.max(32, BACKGROUND_HEIGHT - 12);
 
-                int level = this.skillState.getLevel();
-                long totalExperience = this.skillState.getTotalExperience();
-                long progress = this.skillState.getExperienceTowardsNextLevel();
+                int borderColor = 0x80404040;
+                int backgroundColor = 0xC0101010;
+                context.fill(descriptionBoxX, descriptionBoxY, descriptionBoxX + descriptionBoxWidth,
+                                descriptionBoxY + descriptionBoxHeight, borderColor);
+                context.fill(descriptionBoxX + 2, descriptionBoxY + 2, descriptionBoxX + descriptionBoxWidth - 2,
+                                descriptionBoxY + descriptionBoxHeight - 2, backgroundColor);
+        }
+
+        private void drawForegroundLayer(DrawContext context) {
+                int titleColor = 0xFFAA5500;
+                int highlightColor = 0xFFAA5500;
+                int yellowColor = 0xFFFFD200;
+                int grayColor = 0xFFC0C0C0;
+
+                int descriptionBoxX = this.backgroundX + 284;
+                int descriptionBoxY = this.backgroundY;
+                int descriptionBoxWidth = Math.max(32, BACKGROUND_WIDTH - 284 - 12);
+
+                context.drawText(this.textRenderer, Text.literal("Skills"), this.backgroundX + 8,
+                                this.backgroundY + 8, titleColor, false);
+
+                context.drawText(this.textRenderer, Text.literal("Chef Master"), this.backgroundX + 18,
+                                this.backgroundY + 26, highlightColor, false);
+
+                int chefLevel = this.skillState.getChefMasteryLevel();
+                int nextLevel = Math.min(chefLevel + 1, SkillProgressManager.getMaxDefinedLevel());
+                boolean isMax = chefLevel >= SkillProgressManager.getMaxDefinedLevel();
+
+                context.drawText(this.textRenderer,
+                                Text.literal("Current Level: " + NUMBER_FORMAT.format(chefLevel)),
+                                this.backgroundX + 22, this.backgroundY + 38, yellowColor, false);
+
+                String nextLevelLabel = isMax ? "Next Level: MAX"
+                                : "Next Level: " + NUMBER_FORMAT.format(nextLevel);
+                context.drawText(this.textRenderer, Text.literal(nextLevelLabel),
+                                this.backgroundX + 22, this.backgroundY + 48, grayColor, false);
+
+                int xpBarX = this.backgroundX + 96;
+                int xpBarY = this.backgroundY + 8;
+
+                int levelTextWidth = this.textRenderer.getWidth("Lv " + this.skillState.getLevel());
+                context.drawText(this.textRenderer,
+                                Text.literal("Lv " + NUMBER_FORMAT.format(this.skillState.getLevel())),
+                                xpBarX - levelTextWidth - 6, xpBarY + (XP_BAR_HEIGHT / 2) - (this.textRenderer.fontHeight / 2),
+                                highlightColor, false);
+
+                context.fill(xpBarX, xpBarY, xpBarX + XP_BAR_WIDTH, xpBarY + XP_BAR_HEIGHT, 0xFF3A3A3A);
+
                 long required = this.skillState.getExperienceRequiredForNextLevel();
-                int unspent = this.skillState.getUnspentSkillPoints();
-
-                context.drawText(this.textRenderer,
-                                Text.translatable("screen.gardenkingmod.skills.level", level),
-                                textX, textY, 0xFFFFFF, false);
-                textY += lineHeight;
-
-                context.drawText(this.textRenderer,
-                                Text.translatable("screen.gardenkingmod.skills.total_xp", NUMBER_FORMAT.format(totalExperience)),
-                                textX, textY, 0xD0D0D0, false);
-                textY += lineHeight;
-
-                String progressValue = NUMBER_FORMAT.format(progress);
-                String requiredValue = NUMBER_FORMAT.format(required);
-                context.drawText(this.textRenderer,
-                                Text.translatable("screen.gardenkingmod.skills.progress", progressValue, requiredValue),
-                                textX, textY, 0xD0D0D0, false);
-                textY += lineHeight;
-
-                context.drawText(this.textRenderer,
-                                Text.translatable("screen.gardenkingmod.skills.unspent_points", unspent),
-                                textX, textY, 0xFFD784, false);
-
-                int barWidth = this.infoPanelWidth - (INFO_PANEL_PADDING * 2);
-                int barHeight = 8;
-                int barX = this.infoPanelLeft + INFO_PANEL_PADDING;
-                int barY = panelBottom - INFO_PANEL_PADDING - barHeight;
-                context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF3A3A3A);
+                long progress = this.skillState.getExperienceTowardsNextLevel();
+                String progressLabel;
                 if (required > 0L) {
                         float ratio = Math.min(1.0F, Math.max(0.0F, (float) progress / (float) required));
-                        int fillWidth = Math.round((barWidth - 2) * ratio);
+                        int fillWidth = Math.round((XP_BAR_WIDTH - 2) * ratio);
                         if (fillWidth > 0) {
-                                context.fill(barX + 1, barY + 1, barX + 1 + fillWidth, barY + barHeight - 1, 0xFF66C24A);
+                                context.fill(xpBarX + 1, xpBarY + 1, xpBarX + 1 + fillWidth, xpBarY + XP_BAR_HEIGHT - 1,
+                                                0xFF66C24A);
                         }
+                        progressLabel = NUMBER_FORMAT.format(progress) + " / " + NUMBER_FORMAT.format(required);
+                } else {
+                        context.fill(xpBarX + 1, xpBarY + 1, xpBarX + XP_BAR_WIDTH - 1, xpBarY + XP_BAR_HEIGHT - 1,
+                                        0xFF66C24A);
+                        progressLabel = "Max Level";
+                }
+
+                int progressLabelWidth = this.textRenderer.getWidth(progressLabel);
+                context.drawText(this.textRenderer, Text.literal(progressLabel),
+                                xpBarX + (XP_BAR_WIDTH / 2) - (progressLabelWidth / 2),
+                                xpBarY + XP_BAR_HEIGHT + 3, grayColor, false);
+
+                context.drawText(this.textRenderer,
+                                Text.literal("Skill Points: " + NUMBER_FORMAT.format(this.skillState.getUnspentSkillPoints())),
+                                this.backgroundX + 198, this.backgroundY + 4, yellowColor, false);
+
+                context.drawText(this.textRenderer, Text.literal("Description"), descriptionBoxX + 4,
+                                descriptionBoxY + 8, highlightColor, false);
+
+                String description = SkillProgressManager.getSkillDefinitions()
+                                .getOrDefault(SkillProgressManager.CHEF_SKILL,
+                                                new SkillProgressManager.SkillDefinition(SkillProgressManager.CHEF_SKILL,
+                                                                "Chef Master", ""))
+                                .description();
+                if (description.isBlank()) {
+                        description = "No description available.";
+                }
+
+                int descriptionTextX = descriptionBoxX + 4;
+                int descriptionTextY = descriptionBoxY + 22;
+                int wrapWidth = descriptionBoxWidth - 8;
+                for (OrderedText line : this.textRenderer.wrapLines(Text.literal(description), wrapWidth)) {
+                        context.drawText(this.textRenderer, line, descriptionTextX, descriptionTextY, grayColor, false);
+                        descriptionTextY += this.textRenderer.fontHeight + 2;
                 }
         }
 
-        public void setHoveredSkill(@Nullable SkillProgressManager.SkillDefinition definition, int mouseX, int mouseY) {
-                this.hoveredDefinition = definition;
-                this.hoveredMouseX = mouseX;
-                this.hoveredMouseY = mouseY;
+        private void updateUpgradeButtonState() {
+                if (this.upgradeButton == null) {
+                        return;
+                }
+
+                boolean canUpgrade = this.skillState.getUnspentSkillPoints() > 0
+                                && this.skillState.getChefMasteryLevel() < SkillProgressManager.getMaxDefinedLevel();
+                this.upgradeButton.active = canUpgrade;
         }
 
         private void sendSpendRequest(Identifier skillId, int points) {
@@ -185,10 +203,6 @@ public class SkillScreen extends Screen {
                 ClientPlayNetworking.send(ModPackets.SKILL_SPEND_REQUEST, buf);
         }
 
-        int getUnspentPoints() {
-                return this.skillState.getUnspentSkillPoints();
-        }
-
         void allocatePoint(Identifier skillId) {
                 sendSpendRequest(skillId, 1);
         }
@@ -197,121 +211,6 @@ public class SkillScreen extends Screen {
         public void close() {
                 if (this.client != null) {
                         this.client.setScreen(null);
-                }
-        }
-
-        private static final class SkillTreeWidget extends ElementListWidget<SkillEntry> {
-                private static final int ENTRY_HEIGHT = 56;
-
-                private final SkillScreen parent;
-
-                private SkillTreeWidget(SkillScreen parent, MinecraftClient client, int width, int height, int top,
-                                int bottom) {
-                        super(client, width, height, top, bottom, ENTRY_HEIGHT);
-                        this.parent = parent;
-                }
-
-                void rebuild(Map<Identifier, SkillProgressManager.SkillDefinition> definitions, SkillState state) {
-                        this.clearEntries();
-                        definitions.forEach((id, definition) -> {
-                                SkillEntry entry = new SkillEntry(this.parent, definition);
-                                entry.updateAllocation(state.getAllocation(id));
-                                entry.updateUnspent(this.parent.getUnspentPoints());
-                                this.addEntry(entry);
-                        });
-                }
-
-                void refreshAllocations(SkillState state, int unspent) {
-                        for (SkillEntry entry : this.children()) {
-                                entry.updateAllocation(state.getAllocation(entry.getSkillId()));
-                                entry.updateUnspent(unspent);
-                        }
-                }
-
-                @Override
-                public int getRowWidth() {
-                        return this.width - 12;
-                }
-
-                @Override
-                protected int getScrollbarPositionX() {
-                        return this.getRowLeft() + this.getRowWidth() + 6;
-                }
-        }
-
-        private static final class SkillEntry extends ElementListWidget.Entry<SkillEntry> {
-                private static final int BUTTON_WIDTH = 80;
-                private static final int BUTTON_HEIGHT = 20;
-
-                private final SkillScreen parent;
-                private final SkillProgressManager.SkillDefinition definition;
-                private final ButtonWidget allocateButton;
-                private int allocation;
-
-                private SkillEntry(SkillScreen parent, SkillProgressManager.SkillDefinition definition) {
-                        this.parent = parent;
-                        this.definition = definition;
-                        this.allocateButton = ButtonWidget.builder(
-                                        Text.translatable("screen.gardenkingmod.skills.allocate"),
-                                        button -> this.parent.allocatePoint(this.definition.id()))
-                                        .dimensions(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT).build();
-                }
-
-                Identifier getSkillId() {
-                        return this.definition.id();
-                }
-
-                void updateAllocation(int value) {
-                        this.allocation = Math.max(0, value);
-                }
-
-                void updateUnspent(int unspent) {
-                        this.allocateButton.active = unspent > 0;
-                }
-
-                @Override
-                public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight,
-                                int mouseX, int mouseY, boolean hovered, float delta) {
-                        int backgroundColor = hovered ? 0x4032A852 : 0x40222222;
-                        context.fill(x, y, x + entryWidth, y + entryHeight, backgroundColor);
-
-                        Text nameText = Text.literal(this.definition.displayName()).formatted(Formatting.WHITE);
-                        context.drawText(this.parent.textRenderer, nameText, x + 8, y + 8, 0xFFFFFF, false);
-
-                        Text allocationText = Text.translatable("screen.gardenkingmod.skills.points_spent", this.allocation)
-                                        .formatted(Formatting.YELLOW);
-                        context.drawText(this.parent.textRenderer, allocationText, x + 8,
-                                        y + 8 + this.parent.textRenderer.fontHeight + 2, 0xFFD784, false);
-
-                        int descriptionMaxWidth = entryWidth - BUTTON_WIDTH - 20;
-                        Text description = Text.literal(this.definition.description()).formatted(Formatting.GRAY);
-                        List<OrderedText> descriptionLines = this.parent.textRenderer.wrapLines(description,
-                                        Math.max(32, descriptionMaxWidth));
-                        int descriptionBaseY = y + 8 + (this.parent.textRenderer.fontHeight + 2) * 2;
-                        for (int i = 0; i < Math.min(2, descriptionLines.size()); i++) {
-                                context.drawText(this.parent.textRenderer, descriptionLines.get(i), x + 8,
-                                                descriptionBaseY + (i * (this.parent.textRenderer.fontHeight + 1)),
-                                                0xC0C0C0, false);
-                        }
-
-                        int buttonX = x + entryWidth - BUTTON_WIDTH - 8;
-                        int buttonY = y + (entryHeight / 2) - (BUTTON_HEIGHT / 2);
-                        this.allocateButton.setPosition(buttonX, buttonY);
-                        this.allocateButton.render(context, mouseX, mouseY, delta);
-
-                        if (hovered || this.allocateButton.isHovered()) {
-                                this.parent.setHoveredSkill(this.definition, mouseX, mouseY);
-                        }
-                }
-
-                @Override
-                public List<? extends Element> children() {
-                        return List.of(this.allocateButton);
-                }
-
-                @Override
-                public List<? extends Selectable> selectableChildren() {
-                        return List.of(this.allocateButton);
                 }
         }
 }
