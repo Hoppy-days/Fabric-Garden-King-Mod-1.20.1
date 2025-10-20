@@ -331,7 +331,7 @@
   "item.gardenkingmod.enchanted_wheat": "Enchanted Wheat",
   "item.gardenkingmod.enchanted_yam": "Enchanted Yam",
   "item.gardenkingmod.enchanted_zucchini": "Enchanted Zucchini",
-  "screen.gardenkingmod.skills.title": "Garden Skills",
+  "screen.gardenkingmod.skills.title": "Skills",
   "screen.gardenkingmod.skills.level": "Level: %s",
   "screen.gardenkingmod.skills.total_xp": "Total XP: %s",
   "screen.gardenkingmod.skills.progress": "Progress: %s / %s",
