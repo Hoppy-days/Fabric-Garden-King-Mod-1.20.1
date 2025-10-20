@@ -14,8 +14,8 @@ public class SkillScreen extends Screen {
         private static final Identifier BACKGROUND_TEXTURE = new Identifier("gardenkingmod",
                         "textures/gui/skill_screen_gui.png");
 
-        private static final int BACKGROUND_WIDTH = 512;
-        private static final int BACKGROUND_HEIGHT = 512;
+        private static final int BACKGROUND_WIDTH = 428;
+        private static final int BACKGROUND_HEIGHT = 246;
 
         private static final int TEXTURE_WIDTH = 512;
         private static final int TEXTURE_HEIGHT = 512;
