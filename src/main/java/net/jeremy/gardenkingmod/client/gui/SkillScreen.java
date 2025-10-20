@@ -1,5 +1,7 @@
 package net.jeremy.gardenkingmod.client.gui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -42,8 +44,15 @@ public class SkillScreen extends Screen {
 
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
                 context.drawTexture(BACKGROUND_TEXTURE, this.backgroundX, this.backgroundY, 0, 0, BACKGROUND_WIDTH,
                                 BACKGROUND_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+
+                RenderSystem.disableBlend();
+
                 super.render(context, mouseX, mouseY, delta);
         }
 
