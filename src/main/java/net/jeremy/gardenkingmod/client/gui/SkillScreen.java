@@ -32,6 +32,8 @@ public class SkillScreen extends Screen {
         private static final int XP_BAR_FILL_V = XP_BAR_HEIGHT;
         private static final int XP_BAR_X_OFFSET_FROM_TITLE = 30;
         private static final int XP_BAR_Y_OFFSET = 2;
+        private static final int XP_LEVEL_TEXT_X_OFFSET = 2;
+        private static final int XP_LEVEL_TEXT_COLOR = 0x55FF55;
 
         private static final int BACKGROUND_WIDTH = 428;
         private static final int BACKGROUND_HEIGHT = 246;
@@ -87,6 +89,7 @@ public class SkillScreen extends Screen {
         private void drawXpBar(DrawContext context) {
                 SkillState skillState = SkillState.getInstance();
                 float progress = MathHelper.clamp(skillState.getProgressPercentage(), 0.0f, 1.0f);
+                int level = skillState.getLevel();
 
                 int titleWidth = this.textRenderer.getWidth(this.title);
                 int barX = this.backgroundX + TITLE_X + titleWidth + XP_BAR_X_OFFSET_FROM_TITLE;
@@ -99,6 +102,13 @@ public class SkillScreen extends Screen {
                 if (filledWidth > 0) {
                         context.drawTexture(XP_BAR_TEXTURE, barX, barY, 0, XP_BAR_FILL_V, filledWidth, XP_BAR_HEIGHT,
                                         XP_BAR_TEXTURE_WIDTH, XP_BAR_TEXTURE_HEIGHT);
+                }
+
+                if (this.textRenderer != null) {
+                        String levelText = Integer.toString(Math.max(0, level));
+                        int textX = barX + XP_BAR_WIDTH + XP_LEVEL_TEXT_X_OFFSET;
+                        int textY = barY + Math.max(0, (XP_BAR_HEIGHT - this.textRenderer.fontHeight) / 2);
+                        context.drawText(this.textRenderer, levelText, textX, textY, XP_LEVEL_TEXT_COLOR, false);
                 }
         }
 
