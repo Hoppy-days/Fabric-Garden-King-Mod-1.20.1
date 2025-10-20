@@ -16,6 +16,12 @@ public class SkillScreen extends Screen {
         private static final Identifier BACKGROUND_TEXTURE = new Identifier("gardenkingmod",
                         "textures/gui/skill_screen_gui.png");
 
+        private static final Text TITLE_TEXT = Text.literal("Skills");
+        private static final int TITLE_COLOR = 0xFFFFFFFF;
+        private static final int TITLE_X = 16;
+        private static final int TITLE_Y = 16;
+        private static final float TITLE_SCALE = 1.5F;
+
         private static final int BACKGROUND_WIDTH = 428;
         private static final int BACKGROUND_HEIGHT = 246;
 
@@ -53,7 +59,21 @@ public class SkillScreen extends Screen {
 
                 RenderSystem.disableBlend();
 
+                drawTitle(context);
                 super.render(context, mouseX, mouseY, delta);
+        }
+
+        private void drawTitle(DrawContext context) {
+                if (this.textRenderer == null) {
+                        return;
+                }
+
+                var matrices = context.getMatrices();
+                matrices.push();
+                matrices.translate(this.backgroundX + TITLE_X, this.backgroundY + TITLE_Y, 0.0F);
+                matrices.scale(TITLE_SCALE, TITLE_SCALE, 1.0F);
+                context.drawTextWithShadow(this.textRenderer, TITLE_TEXT, 0, 0, TITLE_COLOR);
+                matrices.pop();
         }
 
         @Override
