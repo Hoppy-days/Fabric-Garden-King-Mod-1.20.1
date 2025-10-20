@@ -222,6 +222,10 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
         @Override
         protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
                 if (activeTab == Tab.BUY) {
                         int originX = getBuyBackgroundX();
                         int originY = getBuyBackgroundY();
@@ -235,6 +239,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                         context.drawTexture(SELL_TEXTURE, x, y, SELL_BACKGROUND_U, SELL_BACKGROUND_V, backgroundWidth, backgroundHeight,
                                         SELL_TEXTURE_WIDTH, SELL_TEXTURE_HEIGHT);
                 }
+
+                RenderSystem.disableBlend();
         }
 
         @Override
