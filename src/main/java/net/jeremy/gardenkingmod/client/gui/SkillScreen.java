@@ -20,8 +20,8 @@ public class SkillScreen extends Screen {
         private static final int TITLE_Y = 16;
         private static final float TITLE_SCALE = 1.5F;
 
-        private static final int BACKGROUND_WIDTH = 512;
-        private static final int BACKGROUND_HEIGHT = 512;
+        private static final int BACKGROUND_WIDTH = 428;
+        private static final int BACKGROUND_HEIGHT = 246;
 
         private static final int TEXTURE_WIDTH = 512;
         private static final int TEXTURE_HEIGHT = 512;
