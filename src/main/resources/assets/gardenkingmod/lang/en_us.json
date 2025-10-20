@@ -336,6 +336,7 @@
   "screen.gardenkingmod.skills.total_xp": "Total XP: %s",
   "screen.gardenkingmod.skills.progress": "Progress: %s / %s",
   "screen.gardenkingmod.skills.unspent_points": "Unspent Points: %s",
+  "screen.gardenkingmod.skills.unspent_points_label": "Unspent Points",
   "screen.gardenkingmod.skills.allocate": "Allocate",
   "screen.gardenkingmod.skills.points_spent": "Points Spent: %s",
   "key.gardenkingmod.open_skills": "Open Skill Screen",
