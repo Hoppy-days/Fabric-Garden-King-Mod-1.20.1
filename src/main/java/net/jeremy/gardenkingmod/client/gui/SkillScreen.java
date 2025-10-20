@@ -18,9 +18,9 @@ public class SkillScreen extends Screen {
 
         private static final Text TITLE_TEXT = Text.literal("Skills");
         private static final int TITLE_COLOR = 0xFFFFFFFF;
-        private static final int TITLE_X = 16;
-        private static final int TITLE_Y = 16;
-        private static final float TITLE_SCALE = 1.5F;
+        private static final int TITLE_X = 10;
+        private static final int TITLE_Y = 6;
+        private static final float TITLE_SCALE = 1.0F;
 
         private static final int BACKGROUND_WIDTH = 428;
         private static final int BACKGROUND_HEIGHT = 246;
