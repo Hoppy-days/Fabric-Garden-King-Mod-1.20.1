@@ -33,6 +33,7 @@ public class SkillScreen extends Screen {
         private static final int XP_BAR_X_OFFSET_FROM_TITLE = 30;
         private static final int XP_BAR_Y_OFFSET = 2;
         private static final int XP_LEVEL_TEXT_X_OFFSET = 2;
+        private static final int XP_LEVEL_TEXT_COLOR = 0x55FF55;
 
         private static final int BACKGROUND_WIDTH = 428;
         private static final int BACKGROUND_HEIGHT = 246;
@@ -107,7 +108,7 @@ public class SkillScreen extends Screen {
                         String levelText = Integer.toString(Math.max(0, level));
                         int textX = barX + XP_BAR_WIDTH + XP_LEVEL_TEXT_X_OFFSET;
                         int textY = barY + Math.max(0, (XP_BAR_HEIGHT - this.textRenderer.fontHeight) / 2);
-                        context.drawText(this.textRenderer, levelText, textX, textY, TITLE_COLOR, false);
+                        context.drawText(this.textRenderer, levelText, textX, textY, XP_LEVEL_TEXT_COLOR, false);
                 }
         }
 
