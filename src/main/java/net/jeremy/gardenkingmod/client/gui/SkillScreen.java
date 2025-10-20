@@ -31,19 +31,19 @@ public class SkillScreen extends Screen {
         private static final int XP_BAR_BACKGROUND_V = 0;
         private static final int XP_BAR_FILL_V = XP_BAR_HEIGHT;
 
-        private static final int HEADER_BOX_WIDTH = 158;
-        private static final int HEADER_BOX_HEIGHT = 42;
-        private static final int HEADER_BOX_TEXTURE_U = 60;
-        private static final int HEADER_BOX_TEXTURE_V = 19;
-        private static final int HEADER_BOX_MARGIN_RIGHT = 12;
-        private static final int HEADER_BOX_MARGIN_TOP = 12;
+        private static final int HEADER_AREA_WIDTH = 158;
+        private static final int HEADER_AREA_HEIGHT = 42;
+        private static final int HEADER_AREA_OFFSET_X = 60;
+        private static final int HEADER_AREA_OFFSET_Y = 19;
         private static final int HEADER_CONTENT_PADDING_X = 8;
         private static final int HEADER_CONTENT_PADDING_Y = 4;
         private static final int HEADER_LINE_SPACING = 1;
         private static final int HEADER_LABEL_VALUE_GAP = 4;
         private static final int HEADER_PROGRESS_BAR_INLINE_GAP = 6;
         private static final int HEADER_PROGRESS_BAR_VERTICAL_GAP = 2;
-        private static final int HEADER_UNSPENT_VERTICAL_GAP = 6;
+
+        private static final int UNSPENT_POINTS_X_OFFSET_FROM_TITLE = 12;
+        private static final int UNSPENT_POINTS_Y_OFFSET = 0;
 
         private static final int LEVEL_LABEL_COLOR = 0x404040;
         private static final int LEVEL_VALUE_COLOR = 0x55FF55;
@@ -100,29 +100,26 @@ public class SkillScreen extends Screen {
                         return;
                 }
 
-                context.drawText(this.textRenderer, this.title, this.backgroundX + TITLE_X, this.backgroundY + TITLE_Y,
-                                TITLE_COLOR, false);
-                drawHeader(context);
+                int titleX = this.backgroundX + TITLE_X;
+                int titleY = this.backgroundY + TITLE_Y;
+                context.drawText(this.textRenderer, this.title, titleX, titleY, TITLE_COLOR, false);
+
+                SkillState skillState = SkillState.getInstance();
+                drawUnspentPoints(context, skillState, titleX, titleY);
+                drawHeader(context, skillState);
         }
 
-        private void drawHeader(DrawContext context) {
+        private void drawHeader(DrawContext context, SkillState skillState) {
                 if (this.textRenderer == null) {
                         return;
                 }
-
-                SkillState skillState = SkillState.getInstance();
                 float progress = MathHelper.clamp(skillState.getProgressPercentage(), 0.0f, 1.0f);
                 int level = Math.max(0, skillState.getLevel());
                 long totalExperience = Math.max(0L, skillState.getTotalExperience());
                 long progressTowards = Math.max(0L, skillState.getExperienceTowardsNextLevel());
                 long progressRequired = Math.max(0L, skillState.getExperienceRequiredForNextLevel());
-                int unspentPoints = Math.max(0, skillState.getUnspentSkillPoints());
-
-                int headerX = this.backgroundX + BACKGROUND_WIDTH - HEADER_BOX_WIDTH - HEADER_BOX_MARGIN_RIGHT;
-                int headerY = this.backgroundY + HEADER_BOX_MARGIN_TOP;
-
-                context.drawTexture(BACKGROUND_TEXTURE, headerX, headerY, HEADER_BOX_TEXTURE_U, HEADER_BOX_TEXTURE_V,
-                                HEADER_BOX_WIDTH, HEADER_BOX_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+                int headerX = this.backgroundX + HEADER_AREA_OFFSET_X;
+                int headerY = this.backgroundY + HEADER_AREA_OFFSET_Y;
 
                 int contentX = headerX + HEADER_CONTENT_PADDING_X;
                 int contentY = headerY + HEADER_CONTENT_PADDING_Y;
@@ -147,7 +144,7 @@ public class SkillScreen extends Screen {
                 int progressLineWidth = drawLabelAndValue(context, progressLabel, progressValue, contentX, progressY,
                                 PROGRESS_LABEL_COLOR, PROGRESS_VALUE_COLOR);
 
-                int availableContentWidth = HEADER_BOX_WIDTH - (2 * HEADER_CONTENT_PADDING_X);
+                int availableContentWidth = HEADER_AREA_WIDTH - (2 * HEADER_CONTENT_PADDING_X);
                 int xpBarX;
                 int xpBarY;
                 if (progressLineWidth + HEADER_PROGRESS_BAR_INLINE_GAP + XP_BAR_WIDTH <= availableContentWidth) {
@@ -158,6 +155,10 @@ public class SkillScreen extends Screen {
                         xpBarY = progressY + lineHeight + HEADER_PROGRESS_BAR_VERTICAL_GAP;
                 }
 
+                int minXpBarY = contentY;
+                int maxXpBarY = headerY + HEADER_AREA_HEIGHT - HEADER_CONTENT_PADDING_Y - XP_BAR_HEIGHT;
+                xpBarY = MathHelper.clamp(xpBarY, minXpBarY, Math.max(minXpBarY, maxXpBarY));
+
                 context.drawTexture(XP_BAR_TEXTURE, xpBarX, xpBarY, 0, XP_BAR_BACKGROUND_V, XP_BAR_WIDTH,
                                 XP_BAR_HEIGHT, XP_BAR_TEXTURE_WIDTH, XP_BAR_TEXTURE_HEIGHT);
 
@@ -167,11 +168,6 @@ public class SkillScreen extends Screen {
                                         XP_BAR_HEIGHT, XP_BAR_TEXTURE_WIDTH, XP_BAR_TEXTURE_HEIGHT);
                 }
 
-                Text unspentLabelText = Text.translatable("screen.gardenkingmod.skills.unspent_points_label");
-                Text unspentValueText = Text.literal(Integer.toString(unspentPoints));
-                int unspentY = headerY + HEADER_BOX_HEIGHT + HEADER_UNSPENT_VERTICAL_GAP;
-                drawLabelAndValue(context, unspentLabelText, unspentValueText, headerX, unspentY,
-                                UNSPENT_POINTS_LABEL_COLOR, UNSPENT_POINTS_VALUE_COLOR);
         }
 
         private int drawLabelAndValue(DrawContext context, Text label, Text value, int x, int y, int labelColor,
@@ -181,6 +177,21 @@ public class SkillScreen extends Screen {
                 int valueX = x + labelWidth + HEADER_LABEL_VALUE_GAP;
                 context.drawText(this.textRenderer, value, valueX, y, valueColor, false);
                 return labelWidth + HEADER_LABEL_VALUE_GAP + this.textRenderer.getWidth(value);
+        }
+
+        private void drawUnspentPoints(DrawContext context, SkillState skillState, int titleX, int titleY) {
+                if (this.textRenderer == null) {
+                        return;
+                }
+
+                int titleWidth = this.textRenderer.getWidth(this.title);
+                int unspentLabelX = titleX + titleWidth + UNSPENT_POINTS_X_OFFSET_FROM_TITLE;
+                int unspentLabelY = titleY + UNSPENT_POINTS_Y_OFFSET;
+
+                Text unspentLabelText = Text.translatable("screen.gardenkingmod.skills.unspent_points_label");
+                Text unspentValueText = Text.literal(Integer.toString(Math.max(0, skillState.getUnspentSkillPoints())));
+                drawLabelAndValue(context, unspentLabelText, unspentValueText, unspentLabelX, unspentLabelY,
+                                UNSPENT_POINTS_LABEL_COLOR, UNSPENT_POINTS_VALUE_COLOR);
         }
 
         @Override
