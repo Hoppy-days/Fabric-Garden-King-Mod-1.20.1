@@ -32,8 +32,14 @@ public class SkillScreen extends Screen {
         private static final int XP_BAR_FILL_V = XP_BAR_HEIGHT;
         private static final int XP_BAR_X_OFFSET_FROM_TITLE = 30;
         private static final int XP_BAR_Y_OFFSET = 2;
-        private static final int XP_LEVEL_TEXT_X_OFFSET = 2;
         private static final int XP_LEVEL_TEXT_COLOR = 0x55FF55;
+        private static final int XP_LEVEL_TEXT_X_OFFSET = 0;
+        private static final int XP_LEVEL_TEXT_Y_OFFSET = 0;
+        private static final int UNSPENT_POINTS_LABEL_X_OFFSET = 10;
+        private static final int UNSPENT_POINTS_LABEL_Y_OFFSET = 0;
+        private static final int UNSPENT_POINTS_VALUE_GAP = 4;
+        private static final int UNSPENT_POINTS_LABEL_COLOR = 0x404040;
+        private static final int UNSPENT_POINTS_VALUE_COLOR = 0x55FF55;
 
         private static final int BACKGROUND_WIDTH = 428;
         private static final int BACKGROUND_HEIGHT = 246;
@@ -90,6 +96,7 @@ public class SkillScreen extends Screen {
                 SkillState skillState = SkillState.getInstance();
                 float progress = MathHelper.clamp(skillState.getProgressPercentage(), 0.0f, 1.0f);
                 int level = skillState.getLevel();
+                int unspentPoints = Math.max(0, skillState.getUnspentSkillPoints());
 
                 int titleWidth = this.textRenderer.getWidth(this.title);
                 int barX = this.backgroundX + TITLE_X + titleWidth + XP_BAR_X_OFFSET_FROM_TITLE;
@@ -106,9 +113,25 @@ public class SkillScreen extends Screen {
 
                 if (this.textRenderer != null) {
                         String levelText = Integer.toString(Math.max(0, level));
-                        int textX = barX + XP_BAR_WIDTH + XP_LEVEL_TEXT_X_OFFSET;
-                        int textY = barY + Math.max(0, (XP_BAR_HEIGHT - this.textRenderer.fontHeight) / 2);
-                        context.drawText(this.textRenderer, levelText, textX, textY, XP_LEVEL_TEXT_COLOR, false);
+                        int levelTextWidth = this.textRenderer.getWidth(levelText);
+                        int levelTextX = barX + Math.max(0, (XP_BAR_WIDTH - levelTextWidth) / 2) + XP_LEVEL_TEXT_X_OFFSET;
+                        int levelTextY = barY + Math.max(0, (XP_BAR_HEIGHT - this.textRenderer.fontHeight) / 2)
+                                        + XP_LEVEL_TEXT_Y_OFFSET;
+                        context.drawText(this.textRenderer, levelText, levelTextX, levelTextY, XP_LEVEL_TEXT_COLOR, false);
+
+                        Text unspentLabelText = Text
+                                        .translatable("screen.gardenkingmod.skills.unspent_points_label");
+                        int unspentLabelX = barX + XP_BAR_WIDTH + UNSPENT_POINTS_LABEL_X_OFFSET;
+                        int unspentLabelY = this.backgroundY + TITLE_Y + UNSPENT_POINTS_LABEL_Y_OFFSET;
+                        context.drawText(this.textRenderer, unspentLabelText, unspentLabelX, unspentLabelY,
+                                        UNSPENT_POINTS_LABEL_COLOR, false);
+
+                        String unspentValue = Integer.toString(unspentPoints);
+                        int unspentValueX = unspentLabelX + this.textRenderer.getWidth(unspentLabelText)
+                                        + UNSPENT_POINTS_VALUE_GAP;
+                        int unspentValueY = this.backgroundY + TITLE_Y + UNSPENT_POINTS_LABEL_Y_OFFSET;
+                        context.drawText(this.textRenderer, unspentValue, unspentValueX, unspentValueY,
+                                        UNSPENT_POINTS_VALUE_COLOR, false);
                 }
         }
 
