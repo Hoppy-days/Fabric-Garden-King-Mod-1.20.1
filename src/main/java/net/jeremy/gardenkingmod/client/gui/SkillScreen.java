@@ -71,7 +71,6 @@ public class SkillScreen extends Screen {
         private static final int FIRST_SKILL_BAR_WIDTH = 208;
         private static final int FIRST_SKILL_LEVEL_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
         private static final int FIRST_SKILL_LEVEL_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 27;
-        private static final int FIRST_SKILL_MAX_LEVEL = 5;
 
         private static final int BACKGROUND_WIDTH = 428;
         private static final int BACKGROUND_HEIGHT = 246;
@@ -193,7 +192,7 @@ public class SkillScreen extends Screen {
                 }
 
                 int chefLevel = Math.max(0, skillState.getChefMasteryLevel());
-                int maxChefLevel = Math.max(1, FIRST_SKILL_MAX_LEVEL);
+                int maxChefLevel = Math.max(1, SkillProgressManager.getMaxDefinedLevel());
                 float chefProgress = MathHelper.clamp((float) chefLevel / (float) maxChefLevel, 0.0F, 1.0F);
 
                 Text chefTitleText = getChefMasteryTitleText();
@@ -211,7 +210,7 @@ public class SkillScreen extends Screen {
                         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 }
 
-                String chefLevelValue = MathHelper.clamp(chefLevel, 0, maxChefLevel) + "/" + maxChefLevel;
+                String chefLevelValue = chefLevel + "/" + maxChefLevel;
                 Text chefLevelText = Text.literal(chefLevelValue);
                 int levelX = chefSkillLevelStyle.computeX(this.backgroundX);
                 int levelY = chefSkillLevelStyle.computeY(this.backgroundY);
