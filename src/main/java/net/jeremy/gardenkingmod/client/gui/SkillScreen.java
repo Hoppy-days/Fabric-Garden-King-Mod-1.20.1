@@ -31,7 +31,7 @@ public class SkillScreen extends Screen {
         private static final int XP_BAR_BACKGROUND_V = 0;
         private static final int XP_BAR_FILL_V = XP_BAR_HEIGHT;
 
-        private static final int HEADER_AREA_WIDTH = 158;
+        private static final int HEADER_AREA_WIDTH = 258;
         private static final int HEADER_AREA_HEIGHT = 42;
         private static final int HEADER_AREA_OFFSET_X = 60;
         private static final int HEADER_AREA_OFFSET_Y = 19;
@@ -42,7 +42,7 @@ public class SkillScreen extends Screen {
         private static final int HEADER_PROGRESS_BAR_INLINE_GAP = 6;
         private static final int HEADER_PROGRESS_BAR_VERTICAL_GAP = 2;
 
-        private static final int UNSPENT_POINTS_X_OFFSET_FROM_TITLE = 12;
+        private static final int UNSPENT_POINTS_X_OFFSET_FROM_TITLE = 100;
         private static final int UNSPENT_POINTS_Y_OFFSET = 0;
 
         private static final int LEVEL_LABEL_COLOR = 0x404040;
