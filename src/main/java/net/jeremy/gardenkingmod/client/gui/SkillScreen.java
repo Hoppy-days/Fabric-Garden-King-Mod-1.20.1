@@ -47,7 +47,7 @@ public class SkillScreen extends Screen {
         private static final int HEADER_LINE_SPACING = 1;
         private static final int HEADER_LABEL_VALUE_GAP = 4;
         private static final int HEADER_PROGRESS_BAR_VERTICAL_GAP = 2;
-        private static final int HEADER_PROGRESS_BAR_Y_OFFSET = 5;
+        private static final int HEADER_PROGRESS_BAR_Y_OFFSET = 2;
 
         private static final int UNSPENT_POINTS_X_OFFSET_FROM_TITLE = 100;
         private static final int UNSPENT_POINTS_Y_OFFSET = 0;
