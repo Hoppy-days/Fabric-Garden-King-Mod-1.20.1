@@ -3,6 +3,7 @@ package net.jeremy.gardenkingmod.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.jeremy.gardenkingmod.client.skill.SkillState;
+import net.jeremy.gardenkingmod.skill.SkillProgressManager;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -61,6 +62,17 @@ public class SkillScreen extends Screen {
         private static final int UNSPENT_POINTS_LABEL_COLOR = 0x404040;
         private static final int UNSPENT_POINTS_VALUE_COLOR = 0x55FF55;
 
+        private static final int FIRST_SKILL_AREA_OFFSET_X = 9;
+        private static final int FIRST_SKILL_AREA_OFFSET_Y = 62;
+        private static final int FIRST_SKILL_TITLE_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
+        private static final int FIRST_SKILL_TITLE_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 4;
+        private static final int FIRST_SKILL_BAR_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
+        private static final int FIRST_SKILL_BAR_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 20;
+        private static final int FIRST_SKILL_BAR_WIDTH = 208;
+        private static final int FIRST_SKILL_LEVEL_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
+        private static final int FIRST_SKILL_LEVEL_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 27;
+        private static final int FIRST_SKILL_MAX_LEVEL = 5;
+
         private static final int BACKGROUND_WIDTH = 428;
         private static final int BACKGROUND_HEIGHT = 246;
 
@@ -69,6 +81,13 @@ public class SkillScreen extends Screen {
 
         private int backgroundX;
         private int backgroundY;
+
+        private final TextElementStyle chefSkillTitleStyle = new TextElementStyle(
+                        FIRST_SKILL_TITLE_BASE_X, FIRST_SKILL_TITLE_BASE_Y, 0xFFFF55);
+        private final BarElementStyle chefSkillBarStyle = new BarElementStyle(
+                        FIRST_SKILL_BAR_BASE_X, FIRST_SKILL_BAR_BASE_Y, FIRST_SKILL_BAR_WIDTH);
+        private final TextElementStyle chefSkillLevelStyle = new TextElementStyle(
+                        FIRST_SKILL_LEVEL_BASE_X, FIRST_SKILL_LEVEL_BASE_Y, 0xFFFFFF);
 
         public SkillScreen() {
                 super(Text.translatable("screen.gardenkingmod.skills.title"));
@@ -114,6 +133,7 @@ public class SkillScreen extends Screen {
                 SkillState skillState = SkillState.getInstance();
                 drawUnspentPoints(context, skillState, titleX, titleY);
                 drawHeader(context, skillState);
+                drawChefMasteryOverview(context, skillState);
         }
 
         private void drawHeader(DrawContext context, SkillState skillState) {
@@ -165,6 +185,37 @@ public class SkillScreen extends Screen {
 
                 drawXpBar(context, xpBarX, xpBarY, xpBarWidth, progress);
 
+        }
+
+        private void drawChefMasteryOverview(DrawContext context, SkillState skillState) {
+                if (this.textRenderer == null) {
+                        return;
+                }
+
+                int chefLevel = Math.max(0, skillState.getChefMasteryLevel());
+                int maxChefLevel = Math.max(1, FIRST_SKILL_MAX_LEVEL);
+                float chefProgress = MathHelper.clamp((float) chefLevel / (float) maxChefLevel, 0.0F, 1.0F);
+
+                Text chefTitleText = getChefMasteryTitleText();
+                int titleX = chefSkillTitleStyle.computeX(this.backgroundX);
+                int titleY = chefSkillTitleStyle.computeY(this.backgroundY);
+                context.drawText(this.textRenderer, chefTitleText, titleX, titleY, chefSkillTitleStyle.getColor(), false);
+
+                int barX = chefSkillBarStyle.computeX(this.backgroundX);
+                int barY = chefSkillBarStyle.computeY(this.backgroundY);
+                int barWidth = chefSkillBarStyle.getWidth();
+                if (barWidth > 0) {
+                        RenderSystem.setShaderColor(chefSkillBarStyle.getRed(), chefSkillBarStyle.getGreen(),
+                                        chefSkillBarStyle.getBlue(), chefSkillBarStyle.getAlpha());
+                        drawXpBar(context, barX, barY, barWidth, chefProgress);
+                        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                }
+
+                String chefLevelValue = MathHelper.clamp(chefLevel, 0, maxChefLevel) + "/" + maxChefLevel;
+                Text chefLevelText = Text.literal(chefLevelValue);
+                int levelX = chefSkillLevelStyle.computeX(this.backgroundX);
+                int levelY = chefSkillLevelStyle.computeY(this.backgroundY);
+                context.drawText(this.textRenderer, chefLevelText, levelX, levelY, chefSkillLevelStyle.getColor(), false);
         }
 
         private void drawXpBar(DrawContext context, int x, int y, int width, float progress) {
@@ -269,10 +320,150 @@ public class SkillScreen extends Screen {
                                 UNSPENT_POINTS_LABEL_COLOR, UNSPENT_POINTS_VALUE_COLOR);
         }
 
+        private Text getChefMasteryTitleText() {
+                SkillProgressManager.SkillDefinition definition = SkillProgressManager.getSkillDefinitions()
+                                .get(SkillProgressManager.CHEF_SKILL);
+                if (definition != null) {
+                        String displayName = definition.displayName();
+                        if (displayName != null && !displayName.isBlank()) {
+                                return Text.literal(displayName);
+                        }
+                }
+                return Text.literal("Chef Mastery");
+        }
+
+        public void setChefSkillTitleOffset(int offsetX, int offsetY) {
+                chefSkillTitleStyle.setOffset(offsetX, offsetY);
+        }
+
+        public void setChefSkillTitleColor(int color) {
+                chefSkillTitleStyle.setColor(color);
+        }
+
+        public void setChefSkillBarOffset(int offsetX, int offsetY) {
+                chefSkillBarStyle.setOffset(offsetX, offsetY);
+        }
+
+        public void setChefSkillBarColor(float red, float green, float blue, float alpha) {
+                chefSkillBarStyle.setColor(red, green, blue, alpha);
+        }
+
+        public void setChefSkillBarColor(int rgb) {
+                chefSkillBarStyle.setColor(rgb);
+        }
+
+        public void setChefSkillLevelOffset(int offsetX, int offsetY) {
+                chefSkillLevelStyle.setOffset(offsetX, offsetY);
+        }
+
+        public void setChefSkillLevelColor(int color) {
+                chefSkillLevelStyle.setColor(color);
+        }
+
         @Override
         public void close() {
                 if (this.client != null) {
                         this.client.setScreen(null);
+                }
+        }
+
+        private static final class TextElementStyle {
+                private final int baseX;
+                private final int baseY;
+                private int offsetX;
+                private int offsetY;
+                private int color;
+
+                private TextElementStyle(int baseX, int baseY, int defaultColor) {
+                        this.baseX = baseX;
+                        this.baseY = baseY;
+                        this.color = defaultColor;
+                }
+
+                private int computeX(int originX) {
+                        return originX + this.baseX + this.offsetX;
+                }
+
+                private int computeY(int originY) {
+                        return originY + this.baseY + this.offsetY;
+                }
+
+                private int getColor() {
+                        return this.color;
+                }
+
+                private void setOffset(int offsetX, int offsetY) {
+                        this.offsetX = offsetX;
+                        this.offsetY = offsetY;
+                }
+
+                private void setColor(int color) {
+                        this.color = color;
+                }
+        }
+
+        private static final class BarElementStyle {
+                private final int baseX;
+                private final int baseY;
+                private final int width;
+                private int offsetX;
+                private int offsetY;
+                private float red = 1.0F;
+                private float green = 1.0F;
+                private float blue = 1.0F;
+                private float alpha = 1.0F;
+
+                private BarElementStyle(int baseX, int baseY, int width) {
+                        this.baseX = baseX;
+                        this.baseY = baseY;
+                        this.width = width;
+                }
+
+                private int computeX(int originX) {
+                        return originX + this.baseX + this.offsetX;
+                }
+
+                private int computeY(int originY) {
+                        return originY + this.baseY + this.offsetY;
+                }
+
+                private int getWidth() {
+                        return this.width;
+                }
+
+                private float getRed() {
+                        return this.red;
+                }
+
+                private float getGreen() {
+                        return this.green;
+                }
+
+                private float getBlue() {
+                        return this.blue;
+                }
+
+                private float getAlpha() {
+                        return this.alpha;
+                }
+
+                private void setOffset(int offsetX, int offsetY) {
+                        this.offsetX = offsetX;
+                        this.offsetY = offsetY;
+                }
+
+                private void setColor(float red, float green, float blue, float alpha) {
+                        this.red = MathHelper.clamp(red, 0.0F, 1.0F);
+                        this.green = MathHelper.clamp(green, 0.0F, 1.0F);
+                        this.blue = MathHelper.clamp(blue, 0.0F, 1.0F);
+                        this.alpha = MathHelper.clamp(alpha, 0.0F, 1.0F);
+                }
+
+                private void setColor(int rgb) {
+                        float red = ((rgb >> 16) & 0xFF) / 255.0F;
+                        float green = ((rgb >> 8) & 0xFF) / 255.0F;
+                        float blue = (rgb & 0xFF) / 255.0F;
+                        setColor(red, green, blue, 1.0F);
                 }
         }
 }
