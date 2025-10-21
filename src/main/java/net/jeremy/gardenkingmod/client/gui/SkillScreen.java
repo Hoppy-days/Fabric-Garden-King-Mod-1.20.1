@@ -39,7 +39,7 @@ public class SkillScreen extends Screen {
 
         private static final int HEADER_AREA_WIDTH = 258;
         private static final int HEADER_AREA_HEIGHT = 42;
-        private static final int HEADER_AREA_OFFSET_X = 60;
+        private static final int HEADER_AREA_OFFSET_X = 16;
         private static final int HEADER_AREA_OFFSET_Y = 19;
         private static final int HEADER_CONTENT_PADDING_LEFT = 0;
         private static final int HEADER_CONTENT_PADDING_RIGHT = 8;
