@@ -4,8 +4,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.jeremy.gardenkingmod.client.skill.SkillState;
 import net.jeremy.gardenkingmod.skill.SkillProgressManager;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -71,6 +73,7 @@ public class SkillScreen extends Screen {
         private static final int FIRST_SKILL_BAR_WIDTH = 204;
         private static final int FIRST_SKILL_LEVEL_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
         private static final int FIRST_SKILL_LEVEL_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 27;
+        private static final int FIRST_SKILL_LEVEL_LABEL_VALUE_GAP = 4;
 
         private static final int BACKGROUND_WIDTH = 428;
         private static final int BACKGROUND_HEIGHT = 246;
@@ -85,7 +88,9 @@ public class SkillScreen extends Screen {
                         FIRST_SKILL_TITLE_BASE_X, FIRST_SKILL_TITLE_BASE_Y, 0xFFFF55);
         private final BarElementStyle chefSkillBarStyle = new BarElementStyle(
                         FIRST_SKILL_BAR_BASE_X, FIRST_SKILL_BAR_BASE_Y, FIRST_SKILL_BAR_WIDTH);
-        private final TextElementStyle chefSkillLevelStyle = new TextElementStyle(
+        private final TextElementStyle chefSkillLevelLabelStyle = new TextElementStyle(
+                        FIRST_SKILL_LEVEL_BASE_X, FIRST_SKILL_LEVEL_BASE_Y, 0xFFFFAA);
+        private final TextElementStyle chefSkillLevelValueStyle = new TextElementStyle(
                         FIRST_SKILL_LEVEL_BASE_X, FIRST_SKILL_LEVEL_BASE_Y, 0xFFFFFF);
 
         public SkillScreen() {
@@ -196,9 +201,7 @@ public class SkillScreen extends Screen {
                 float chefProgress = MathHelper.clamp((float) chefLevel / (float) maxChefLevel, 0.0F, 1.0F);
 
                 Text chefTitleText = getChefMasteryTitleText();
-                int titleX = chefSkillTitleStyle.computeX(this.backgroundX);
-                int titleY = chefSkillTitleStyle.computeY(this.backgroundY);
-                context.drawText(this.textRenderer, chefTitleText, titleX, titleY, chefSkillTitleStyle.getColor(), false);
+                chefSkillTitleStyle.draw(context, this.textRenderer, chefTitleText, this.backgroundX, this.backgroundY);
 
                 int barX = chefSkillBarStyle.computeX(this.backgroundX);
                 int barY = chefSkillBarStyle.computeY(this.backgroundY);
@@ -210,11 +213,18 @@ public class SkillScreen extends Screen {
                         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 }
 
+                Text chefLevelLabelText = Text.translatable(
+                                "screen.gardenkingmod.skills.chef.current_level_label");
+                chefSkillLevelLabelStyle.draw(context, this.textRenderer, chefLevelLabelText, this.backgroundX,
+                                this.backgroundY);
+
                 String chefLevelValue = chefLevel + "/" + maxChefLevel;
                 Text chefLevelText = Text.literal(chefLevelValue);
-                int levelX = chefSkillLevelStyle.computeX(this.backgroundX);
-                int levelY = chefSkillLevelStyle.computeY(this.backgroundY);
-                context.drawText(this.textRenderer, chefLevelText, levelX, levelY, chefSkillLevelStyle.getColor(), false);
+                int valueX = chefSkillLevelValueStyle.computeX(this.backgroundX)
+                                + chefSkillLevelLabelStyle.getScaledTextWidth(this.textRenderer, chefLevelLabelText)
+                                + FIRST_SKILL_LEVEL_LABEL_VALUE_GAP;
+                int valueY = chefSkillLevelValueStyle.computeY(this.backgroundY);
+                chefSkillLevelValueStyle.drawAt(context, this.textRenderer, chefLevelText, valueX, valueY);
         }
 
         private void drawXpBar(DrawContext context, int x, int y, int width, float progress) {
@@ -352,11 +362,28 @@ public class SkillScreen extends Screen {
         }
 
         public void setChefSkillLevelOffset(int offsetX, int offsetY) {
-                chefSkillLevelStyle.setOffset(offsetX, offsetY);
+                chefSkillLevelLabelStyle.setOffset(offsetX, offsetY);
+                chefSkillLevelValueStyle.setOffset(offsetX, offsetY);
         }
 
         public void setChefSkillLevelColor(int color) {
-                chefSkillLevelStyle.setColor(color);
+                chefSkillLevelValueStyle.setColor(color);
+        }
+
+        public void setChefSkillLevelLabelColor(int color) {
+                chefSkillLevelLabelStyle.setColor(color);
+        }
+
+        public void setChefSkillTitleScale(float scale) {
+                chefSkillTitleStyle.setScale(scale);
+        }
+
+        public void setChefSkillLevelLabelScale(float scale) {
+                chefSkillLevelLabelStyle.setScale(scale);
+        }
+
+        public void setChefSkillLevelValueScale(float scale) {
+                chefSkillLevelValueStyle.setScale(scale);
         }
 
         @Override
@@ -372,6 +399,7 @@ public class SkillScreen extends Screen {
                 private int offsetX;
                 private int offsetY;
                 private int color;
+                private float scale = 1.0F;
 
                 private TextElementStyle(int baseX, int baseY, int defaultColor) {
                         this.baseX = baseX;
@@ -387,10 +415,6 @@ public class SkillScreen extends Screen {
                         return originY + this.baseY + this.offsetY;
                 }
 
-                private int getColor() {
-                        return this.color;
-                }
-
                 private void setOffset(int offsetX, int offsetY) {
                         this.offsetX = offsetX;
                         this.offsetY = offsetY;
@@ -398,6 +422,33 @@ public class SkillScreen extends Screen {
 
                 private void setColor(int color) {
                         this.color = color;
+                }
+
+                private void setScale(float scale) {
+                        this.scale = MathHelper.clamp(scale, 0.0F, 8.0F);
+                }
+
+                private int getScaledTextWidth(TextRenderer renderer, Text text) {
+                        return MathHelper.ceil(renderer.getWidth(text) * this.scale);
+                }
+
+                private void draw(DrawContext context, TextRenderer renderer, Text text, int originX, int originY) {
+                        int drawX = computeX(originX);
+                        int drawY = computeY(originY);
+                        drawAt(context, renderer, text, drawX, drawY);
+                }
+
+                private void drawAt(DrawContext context, TextRenderer renderer, Text text, int drawX, int drawY) {
+                        float appliedScale = this.scale;
+                        MatrixStack matrices = context.getMatrices();
+                        matrices.push();
+                        if (appliedScale != 1.0F) {
+                                matrices.scale(appliedScale, appliedScale, 1.0F);
+                                drawX = MathHelper.floor(drawX / appliedScale);
+                                drawY = MathHelper.floor(drawY / appliedScale);
+                        }
+                        context.drawText(renderer, text, drawX, drawY, this.color, false);
+                        matrices.pop();
                 }
         }
 

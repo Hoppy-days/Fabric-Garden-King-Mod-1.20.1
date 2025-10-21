@@ -340,6 +340,7 @@
   "screen.gardenkingmod.skills.header.level_label": "Level:",
   "screen.gardenkingmod.skills.header.total_xp_label": "Total XP:",
   "screen.gardenkingmod.skills.header.progress_label": "Progress:",
+  "screen.gardenkingmod.skills.chef.current_level_label": "Current Level:",
   "screen.gardenkingmod.skills.allocate": "Allocate",
   "screen.gardenkingmod.skills.points_spent": "Points Spent: %s",
   "key.gardenkingmod.open_skills": "Open Skill Screen",
