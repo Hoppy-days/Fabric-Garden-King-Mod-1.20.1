@@ -68,7 +68,7 @@ public class SkillScreen extends Screen {
         private static final int FIRST_SKILL_TITLE_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 4;
         private static final int FIRST_SKILL_BAR_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
         private static final int FIRST_SKILL_BAR_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 20;
-        private static final int FIRST_SKILL_BAR_WIDTH = 208;
+        private static final int FIRST_SKILL_BAR_WIDTH = 204;
         private static final int FIRST_SKILL_LEVEL_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
         private static final int FIRST_SKILL_LEVEL_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 27;
 
