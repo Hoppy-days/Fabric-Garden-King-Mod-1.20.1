@@ -41,7 +41,8 @@ public class SkillScreen extends Screen {
         private static final int HEADER_AREA_HEIGHT = 42;
         private static final int HEADER_AREA_OFFSET_X = 60;
         private static final int HEADER_AREA_OFFSET_Y = 19;
-        private static final int HEADER_CONTENT_PADDING_X = 8;
+        private static final int HEADER_CONTENT_PADDING_LEFT = 0;
+        private static final int HEADER_CONTENT_PADDING_RIGHT = 8;
         private static final int HEADER_CONTENT_PADDING_Y = 4;
         private static final int HEADER_LINE_SPACING = 1;
         private static final int HEADER_LABEL_VALUE_GAP = 4;
@@ -126,7 +127,7 @@ public class SkillScreen extends Screen {
                 int headerX = this.backgroundX + HEADER_AREA_OFFSET_X;
                 int headerY = this.backgroundY + HEADER_AREA_OFFSET_Y;
 
-                int contentX = headerX + HEADER_CONTENT_PADDING_X;
+                int contentX = headerX + HEADER_CONTENT_PADDING_LEFT;
                 int contentY = headerY + HEADER_CONTENT_PADDING_Y;
                 int lineHeight = this.textRenderer.fontHeight;
 
@@ -149,9 +150,10 @@ public class SkillScreen extends Screen {
                 drawLabelAndValue(context, progressLabel, progressValue, contentX, progressY,
                                 PROGRESS_LABEL_COLOR, PROGRESS_VALUE_COLOR);
 
-                int availableContentWidth = HEADER_AREA_WIDTH - (2 * HEADER_CONTENT_PADDING_X);
+                int availableContentWidth = HEADER_AREA_WIDTH - HEADER_CONTENT_PADDING_LEFT
+                                - HEADER_CONTENT_PADDING_RIGHT;
                 int xpBarWidth = Math.min(XP_BAR_DISPLAY_WIDTH, availableContentWidth);
-                int xpBarX = contentX + (availableContentWidth - xpBarWidth) / 2;
+                int xpBarX = contentX;
                 int xpBarY = progressY + lineHeight + HEADER_PROGRESS_BAR_VERTICAL_GAP;
 
                 int minXpBarY = contentY;
