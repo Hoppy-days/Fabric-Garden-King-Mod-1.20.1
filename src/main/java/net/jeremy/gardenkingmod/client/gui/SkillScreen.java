@@ -43,7 +43,7 @@ public class SkillScreen extends Screen {
                         - XP_BAR_LEFT_CAP_WIDTH - XP_BAR_RIGHT_CAP_WIDTH;
 
         private static final int HEADER_AREA_WIDTH = 258;
-        private static final int HEADER_AREA_HEIGHT = 44;
+        private static final int HEADER_AREA_HEIGHT = 46;
         private static final int HEADER_AREA_OFFSET_X = 16;
         private static final int HEADER_AREA_OFFSET_Y = 19;
         private static final int HEADER_CONTENT_PADDING_LEFT = 0;
@@ -67,14 +67,14 @@ public class SkillScreen extends Screen {
         private static final int UNSPENT_POINTS_VALUE_COLOR = 0xFFFF55;
 
         private static final int FIRST_SKILL_AREA_OFFSET_X = 9;
-        private static final int FIRST_SKILL_AREA_OFFSET_Y = 62;
+        private static final int FIRST_SKILL_AREA_OFFSET_Y = 64;
         private static final int FIRST_SKILL_TITLE_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
         private static final int FIRST_SKILL_TITLE_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 4;
         private static final int FIRST_SKILL_BAR_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
-        private static final int FIRST_SKILL_BAR_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 18;
+        private static final int FIRST_SKILL_BAR_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 20;
         private static final int FIRST_SKILL_BAR_WIDTH = 204;
         private static final int FIRST_SKILL_LEVEL_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
-        private static final int FIRST_SKILL_LEVEL_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 28;
+        private static final int FIRST_SKILL_LEVEL_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 30;
         private static final int FIRST_SKILL_LEVEL_LABEL_VALUE_GAP = 4;
 
         private static final int BACKGROUND_WIDTH = 428;
