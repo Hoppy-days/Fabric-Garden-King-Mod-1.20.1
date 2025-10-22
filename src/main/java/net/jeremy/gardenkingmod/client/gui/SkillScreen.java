@@ -50,9 +50,9 @@ public class SkillScreen extends Screen {
         private static final int HEADER_LINE_SPACING = 1;
         private static final int HEADER_LABEL_VALUE_GAP = 4;
         private static final int HEADER_PROGRESS_BAR_VERTICAL_GAP = 2;
-        private static final int HEADER_PROGRESS_BAR_Y_OFFSET = 2;
+        private static final int HEADER_PROGRESS_BAR_Y_OFFSET = 1;
 
-        private static final int UNSPENT_POINTS_X_OFFSET_FROM_TITLE = 100;
+        private static final int UNSPENT_POINTS_X_OFFSET_FROM_TITLE = 140;
         private static final int UNSPENT_POINTS_Y_OFFSET = 0;
 
         private static final int LEVEL_LABEL_COLOR = 0x404040;
@@ -62,17 +62,17 @@ public class SkillScreen extends Screen {
         private static final int PROGRESS_LABEL_COLOR = 0x404040;
         private static final int PROGRESS_VALUE_COLOR = 0x55FFFF;
         private static final int UNSPENT_POINTS_LABEL_COLOR = 0x404040;
-        private static final int UNSPENT_POINTS_VALUE_COLOR = 0x55FF55;
+        private static final int UNSPENT_POINTS_VALUE_COLOR = 0xFFFF55;
 
         private static final int FIRST_SKILL_AREA_OFFSET_X = 9;
         private static final int FIRST_SKILL_AREA_OFFSET_Y = 62;
         private static final int FIRST_SKILL_TITLE_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
         private static final int FIRST_SKILL_TITLE_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 4;
         private static final int FIRST_SKILL_BAR_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
-        private static final int FIRST_SKILL_BAR_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 20;
+        private static final int FIRST_SKILL_BAR_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 18;
         private static final int FIRST_SKILL_BAR_WIDTH = 204;
         private static final int FIRST_SKILL_LEVEL_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
-        private static final int FIRST_SKILL_LEVEL_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 27;
+        private static final int FIRST_SKILL_LEVEL_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 28;
         private static final int FIRST_SKILL_LEVEL_LABEL_VALUE_GAP = 4;
 
         private static final int BACKGROUND_WIDTH = 428;
@@ -85,7 +85,7 @@ public class SkillScreen extends Screen {
         private int backgroundY;
 
         private final TextElementStyle chefSkillTitleStyle = new TextElementStyle(
-                        FIRST_SKILL_TITLE_BASE_X, FIRST_SKILL_TITLE_BASE_Y, 0xFFFF55);
+                        FIRST_SKILL_TITLE_BASE_X, FIRST_SKILL_TITLE_BASE_Y, 0xFFFFFF);
         private final BarElementStyle chefSkillBarStyle = new BarElementStyle(
                         FIRST_SKILL_BAR_BASE_X, FIRST_SKILL_BAR_BASE_Y, FIRST_SKILL_BAR_WIDTH);
         private final TextElementStyle chefSkillLevelLabelStyle = new TextElementStyle(

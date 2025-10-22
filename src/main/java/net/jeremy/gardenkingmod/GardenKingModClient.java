@@ -77,6 +77,13 @@ public class GardenKingModClient implements ClientModInitializer {
             while (openSkillScreenKey.wasPressed()) {
                 if (client != null && client.player != null && client.currentScreen == null) {
                     client.setScreen(new SkillScreen());
+
+                    SkillScreen screen = new SkillScreen();
+                    screen.setChefSkillTitleScale(1.1F);       // title text
+                    screen.setChefSkillLevelLabelScale(0.7F);  // “Level:” label
+                    screen.setChefSkillLevelValueScale(0.7F);  // numeric value
+                    client.setScreen(screen);
+
                 }
             }
         });
