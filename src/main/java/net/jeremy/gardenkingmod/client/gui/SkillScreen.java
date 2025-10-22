@@ -2,12 +2,24 @@ package net.jeremy.gardenkingmod.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.jeremy.gardenkingmod.client.skill.SkillState;
+import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.skill.SkillProgressManager;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -66,16 +78,50 @@ public class SkillScreen extends Screen {
         private static final int UNSPENT_POINTS_LABEL_COLOR = 0x404040;
         private static final int UNSPENT_POINTS_VALUE_COLOR = 0xFFFF55;
 
-        private static final int FIRST_SKILL_AREA_OFFSET_X = 9;
-        private static final int FIRST_SKILL_AREA_OFFSET_Y = 64;
-        private static final int FIRST_SKILL_TITLE_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
-        private static final int FIRST_SKILL_TITLE_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 4;
-        private static final int FIRST_SKILL_BAR_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
-        private static final int FIRST_SKILL_BAR_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 20;
-        private static final int FIRST_SKILL_BAR_WIDTH = 204;
-        private static final int FIRST_SKILL_LEVEL_BASE_X = FIRST_SKILL_AREA_OFFSET_X + 42;
-        private static final int FIRST_SKILL_LEVEL_BASE_Y = FIRST_SKILL_AREA_OFFSET_Y + 30;
-        private static final int FIRST_SKILL_LEVEL_LABEL_VALUE_GAP = 4;
+        private static final int SKILL_LIST_OFFSET_X = 10;
+        private static final int SKILL_LIST_OFFSET_Y = 65;
+        private static final int SKILL_LIST_WIDTH = 256;
+        private static final int SKILL_LIST_HEIGHT = 171;
+        private static final int SKILL_SECTION_WIDTH = 256;
+        private static final int SKILL_SECTION_HEIGHT = 44;
+        private static final int SKILL_SECTION_TEXTURE_U = 0;
+        private static final int SKILL_SECTION_TEXTURE_V = 248;
+        private static final int SKILL_SECTION_HOVER_V = 290;
+        private static final int SKILL_SECTION_TEXTURE_WIDTH = 251;
+        private static final int SKILL_SECTION_TEXTURE_HEIGHT = 44;
+        private static final int SKILL_SECTION_SPACING = 44;
+
+        private static final int SKILL_TITLE_BASE_X = SKILL_LIST_OFFSET_X + 42;
+        private static final int SKILL_TITLE_BASE_Y = SKILL_LIST_OFFSET_Y + 4;
+        private static final int SKILL_BAR_BASE_X = SKILL_LIST_OFFSET_X + 42;
+        private static final int SKILL_BAR_BASE_Y = SKILL_LIST_OFFSET_Y + 20;
+        private static final int SKILL_BAR_WIDTH = 204;
+        private static final int SKILL_LEVEL_BASE_X = SKILL_LIST_OFFSET_X + 42;
+        private static final int SKILL_LEVEL_BASE_Y = SKILL_LIST_OFFSET_Y + 30;
+        private static final int SKILL_LEVEL_LABEL_VALUE_GAP = 4;
+
+        private static final int DESCRIPTION_AREA_OFFSET_X = 290;
+        private static final int DESCRIPTION_AREA_OFFSET_Y = 19;
+        private static final int DESCRIPTION_AREA_WIDTH = 127;
+        private static final int DESCRIPTION_AREA_HEIGHT = 170;
+
+        private static final int UPGRADE_BUTTON_OFFSET_X = 321;
+        private static final int UPGRADE_BUTTON_OFFSET_Y = 213;
+        private static final int UPGRADE_BUTTON_WIDTH = 70;
+        private static final int UPGRADE_BUTTON_HEIGHT = 18;
+        private static final int UPGRADE_BUTTON_TEXTURE_U = 430;
+        private static final int UPGRADE_BUTTON_TEXTURE_V = 0;
+        private static final int UPGRADE_BUTTON_HOVER_V = 18;
+
+        private static final int SCROLLBAR_OFFSET_X = 262;
+        private static final int SCROLLBAR_OFFSET_Y = 18;
+        private static final int SCROLLBAR_WIDTH = 6;
+        private static final int SCROLLBAR_HEIGHT = 219;
+        private static final int SCROLLBAR_KNOB_TEXTURE_U = 261;
+        private static final int SCROLLBAR_KNOB_TEXTURE_V = 247;
+        private static final int SCROLLBAR_KNOB_WIDTH = 6;
+        private static final int SCROLLBAR_KNOB_HEIGHT = 27;
+        private static final int SCROLL_WHEEL_STEP = 10;
 
         private static final int BACKGROUND_WIDTH = 428;
         private static final int BACKGROUND_HEIGHT = 246;
@@ -87,13 +133,19 @@ public class SkillScreen extends Screen {
         private int backgroundY;
 
         private final TextElementStyle chefSkillTitleStyle = new TextElementStyle(
-                        FIRST_SKILL_TITLE_BASE_X, FIRST_SKILL_TITLE_BASE_Y, 0xFFFFFF);
+                        SKILL_TITLE_BASE_X, SKILL_TITLE_BASE_Y, 0xFFFFFF);
         private final BarElementStyle chefSkillBarStyle = new BarElementStyle(
-                        FIRST_SKILL_BAR_BASE_X, FIRST_SKILL_BAR_BASE_Y, FIRST_SKILL_BAR_WIDTH);
+                        SKILL_BAR_BASE_X, SKILL_BAR_BASE_Y, SKILL_BAR_WIDTH);
         private final TextElementStyle chefSkillLevelLabelStyle = new TextElementStyle(
-                        FIRST_SKILL_LEVEL_BASE_X, FIRST_SKILL_LEVEL_BASE_Y, 0xFFFFAA);
+                        SKILL_LEVEL_BASE_X, SKILL_LEVEL_BASE_Y, 0xFFFFAA);
         private final TextElementStyle chefSkillLevelValueStyle = new TextElementStyle(
-                        FIRST_SKILL_LEVEL_BASE_X, FIRST_SKILL_LEVEL_BASE_Y, 0xFFFFFF);
+                        SKILL_LEVEL_BASE_X, SKILL_LEVEL_BASE_Y, 0xFFFFFF);
+
+        private final List<SkillEntry> skillEntries = new ArrayList<>();
+        private Identifier selectedSkillId;
+        private double scrollOffset;
+        private boolean scrolling;
+        private List<OrderedText> descriptionLines = Collections.emptyList();
 
         public SkillScreen() {
                 super(Text.translatable("screen.gardenkingmod.skills.title"));
@@ -123,23 +175,28 @@ public class SkillScreen extends Screen {
 
                 RenderSystem.disableBlend();
 
-                drawTitle(context);
+                drawContents(context, mouseX, mouseY);
                 super.render(context, mouseX, mouseY, delta);
         }
 
-        private void drawTitle(DrawContext context) {
+        private void drawContents(DrawContext context, int mouseX, int mouseY) {
                 if (this.textRenderer == null) {
                         return;
                 }
+
+                SkillState skillState = SkillState.getInstance();
+                updateSkillEntries(skillState);
 
                 int titleX = this.backgroundX + TITLE_X;
                 int titleY = this.backgroundY + TITLE_Y;
                 context.drawText(this.textRenderer, this.title, titleX, titleY, TITLE_COLOR, false);
 
-                SkillState skillState = SkillState.getInstance();
                 drawUnspentPoints(context, skillState, titleX, titleY);
                 drawHeader(context, skillState);
-                drawChefMasteryOverview(context, skillState);
+                drawSkillSections(context, skillState, mouseX, mouseY);
+                drawDescription(context);
+                drawUpgradeButton(context, skillState, mouseX, mouseY);
+                drawScrollbar(context);
         }
 
         private void drawHeader(DrawContext context, SkillState skillState) {
@@ -191,42 +248,6 @@ public class SkillScreen extends Screen {
 
                 drawXpBar(context, XP_BAR_TEXTURE, xpBarX, xpBarY, xpBarWidth, progress);
 
-        }
-
-        private void drawChefMasteryOverview(DrawContext context, SkillState skillState) {
-                if (this.textRenderer == null) {
-                        return;
-                }
-
-                int chefLevel = Math.max(0, skillState.getChefMasteryLevel());
-                int maxChefLevel = Math.max(1, SkillProgressManager.getMaxDefinedLevel());
-                float chefProgress = MathHelper.clamp((float) chefLevel / (float) maxChefLevel, 0.0F, 1.0F);
-
-                Text chefTitleText = getChefMasteryTitleText();
-                chefSkillTitleStyle.draw(context, this.textRenderer, chefTitleText, this.backgroundX, this.backgroundY);
-
-                int barX = chefSkillBarStyle.computeX(this.backgroundX);
-                int barY = chefSkillBarStyle.computeY(this.backgroundY);
-                int barWidth = chefSkillBarStyle.getWidth();
-                if (barWidth > 0) {
-                        RenderSystem.setShaderColor(chefSkillBarStyle.getRed(), chefSkillBarStyle.getGreen(),
-                                        chefSkillBarStyle.getBlue(), chefSkillBarStyle.getAlpha());
-                        drawXpBar(context, SUB_SKILL_XP_BAR_TEXTURE, barX, barY, barWidth, chefProgress);
-                        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-                }
-
-                Text chefLevelLabelText = Text.translatable(
-                                "screen.gardenkingmod.skills.chef.current_level_label");
-                chefSkillLevelLabelStyle.draw(context, this.textRenderer, chefLevelLabelText, this.backgroundX,
-                                this.backgroundY);
-
-                String chefLevelValue = chefLevel + "/" + maxChefLevel;
-                Text chefLevelText = Text.literal(chefLevelValue);
-                int valueX = chefSkillLevelValueStyle.computeX(this.backgroundX)
-                                + chefSkillLevelLabelStyle.getScaledTextWidth(this.textRenderer, chefLevelLabelText)
-                                + FIRST_SKILL_LEVEL_LABEL_VALUE_GAP;
-                int valueY = chefSkillLevelValueStyle.computeY(this.backgroundY);
-                chefSkillLevelValueStyle.drawAt(context, this.textRenderer, chefLevelText, valueX, valueY);
         }
 
         private void drawXpBar(DrawContext context, Identifier texture, int x, int y, int width, float progress) {
@@ -339,16 +360,376 @@ public class SkillScreen extends Screen {
                                 UNSPENT_POINTS_LABEL_COLOR, UNSPENT_POINTS_VALUE_COLOR);
         }
 
-        private Text getChefMasteryTitleText() {
-                SkillProgressManager.SkillDefinition definition = SkillProgressManager.getSkillDefinitions()
-                                .get(SkillProgressManager.CHEF_SKILL);
-                if (definition != null) {
-                        String displayName = definition.displayName();
-                        if (displayName != null && !displayName.isBlank()) {
-                                return Text.literal(displayName);
+        private void drawSkillSections(DrawContext context, SkillState skillState, int mouseX, int mouseY) {
+                if (this.textRenderer == null) {
+                        return;
+                }
+
+                int listX = this.backgroundX + SKILL_LIST_OFFSET_X;
+                int listY = this.backgroundY + SKILL_LIST_OFFSET_Y;
+                int listBottom = listY + SKILL_LIST_HEIGHT;
+
+                for (int index = 0; index < this.skillEntries.size(); index++) {
+                        SkillEntry entry = this.skillEntries.get(index);
+                        int entryTop = listY + getEntryOffset(index);
+                        int entryBottom = entryTop + SKILL_SECTION_HEIGHT;
+
+                        if (entryBottom < listY || entryTop > listBottom) {
+                                continue;
+                        }
+
+                        boolean hovered = mouseX >= listX && mouseX <= listX + SKILL_SECTION_WIDTH && mouseY >= entryTop
+                                        && mouseY <= entryBottom;
+
+                        int textureV = hovered || entry.id.equals(this.selectedSkillId) ? SKILL_SECTION_HOVER_V
+                                        : SKILL_SECTION_TEXTURE_V;
+                        context.drawTexture(BACKGROUND_TEXTURE, listX, entryTop, SKILL_SECTION_TEXTURE_U, textureV,
+                                        SKILL_SECTION_TEXTURE_WIDTH, SKILL_SECTION_TEXTURE_HEIGHT, TEXTURE_WIDTH,
+                                        TEXTURE_HEIGHT);
+
+                        drawSkillEntryContents(context, entry, index);
+                }
+
+        }
+
+        private void drawSkillEntryContents(DrawContext context, SkillEntry entry, int index) {
+                if (this.textRenderer == null) {
+                        return;
+                }
+
+                int originY = this.backgroundY + getEntryOffset(index);
+
+                chefSkillTitleStyle.draw(context, this.textRenderer, entry.displayName, this.backgroundX, originY);
+
+                int barX = chefSkillBarStyle.computeX(this.backgroundX);
+                int barY = chefSkillBarStyle.computeY(originY);
+                int barWidth = chefSkillBarStyle.getWidth();
+                if (barWidth > 0) {
+                        RenderSystem.setShaderColor(chefSkillBarStyle.getRed(), chefSkillBarStyle.getGreen(),
+                                        chefSkillBarStyle.getBlue(), chefSkillBarStyle.getAlpha());
+                        drawXpBar(context, SUB_SKILL_XP_BAR_TEXTURE, barX, barY, barWidth, entry.progress);
+                        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                }
+
+                chefSkillLevelLabelStyle.draw(context, this.textRenderer, entry.levelLabel, this.backgroundX, originY);
+
+                int valueX = chefSkillLevelValueStyle.computeX(this.backgroundX)
+                                + chefSkillLevelLabelStyle.getScaledTextWidth(this.textRenderer, entry.levelLabel)
+                                + SKILL_LEVEL_LABEL_VALUE_GAP;
+                int valueY = chefSkillLevelValueStyle.computeY(originY);
+                chefSkillLevelValueStyle.drawAt(context, this.textRenderer, entry.levelValue, valueX, valueY);
+        }
+
+        private void drawDescription(DrawContext context) {
+                if (this.textRenderer == null) {
+                        return;
+                }
+
+                int descriptionX = this.backgroundX + DESCRIPTION_AREA_OFFSET_X;
+                int descriptionY = this.backgroundY + DESCRIPTION_AREA_OFFSET_Y;
+
+                int lineY = descriptionY;
+                for (OrderedText line : this.descriptionLines) {
+                        context.drawText(this.textRenderer, line, descriptionX, lineY, 0x404040, false);
+                        lineY += this.textRenderer.fontHeight + 1;
+                        if (lineY > descriptionY + DESCRIPTION_AREA_HEIGHT) {
+                                break;
                         }
                 }
-                return Text.literal("Chef Mastery");
+        }
+
+        private void drawUpgradeButton(DrawContext context, SkillState skillState, int mouseX, int mouseY) {
+                if (this.textRenderer == null) {
+                        return;
+                }
+
+                boolean buttonActive = this.selectedSkillId != null && skillState.getUnspentSkillPoints() > 0;
+                boolean hovered = buttonActive && isUpgradeButtonHovered(mouseX, mouseY, skillState);
+
+                int buttonX = this.backgroundX + UPGRADE_BUTTON_OFFSET_X;
+                int buttonY = this.backgroundY + UPGRADE_BUTTON_OFFSET_Y;
+
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, buttonActive ? 1.0F : 0.5F);
+                context.drawTexture(BACKGROUND_TEXTURE, buttonX, buttonY, UPGRADE_BUTTON_TEXTURE_U,
+                                hovered ? UPGRADE_BUTTON_HOVER_V : UPGRADE_BUTTON_TEXTURE_V, UPGRADE_BUTTON_WIDTH,
+                                UPGRADE_BUTTON_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+                Text buttonText = Text.translatable("screen.gardenkingmod.skills.upgrade_button");
+                int textWidth = this.textRenderer.getWidth(buttonText);
+                int textX = buttonX + (UPGRADE_BUTTON_WIDTH - textWidth) / 2;
+                int textY = buttonY + (UPGRADE_BUTTON_HEIGHT - this.textRenderer.fontHeight) / 2;
+                context.drawText(this.textRenderer, buttonText, textX, textY, buttonActive ? 0xFFFFFF : 0xA0A0A0, false);
+        }
+
+        private void drawScrollbar(DrawContext context) {
+                if (getMaxScroll() <= 0) {
+                        return;
+                }
+
+                int scrollbarX = this.backgroundX + SCROLLBAR_OFFSET_X;
+                int scrollbarY = this.backgroundY + SCROLLBAR_OFFSET_Y;
+                int travel = SCROLLBAR_HEIGHT - SCROLLBAR_KNOB_HEIGHT;
+                double scrollPercent = MathHelper.clamp(getScrollPercent(), 0.0D, 1.0D);
+                int knobY = scrollbarY + MathHelper.floor(scrollPercent * travel);
+
+                context.drawTexture(BACKGROUND_TEXTURE, scrollbarX, knobY, SCROLLBAR_KNOB_TEXTURE_U,
+                                SCROLLBAR_KNOB_TEXTURE_V, SCROLLBAR_KNOB_WIDTH, SCROLLBAR_KNOB_HEIGHT, TEXTURE_WIDTH,
+                                TEXTURE_HEIGHT);
+        }
+
+        private boolean isUpgradeButtonHovered(int mouseX, int mouseY, SkillState skillState) {
+                int buttonX = this.backgroundX + UPGRADE_BUTTON_OFFSET_X;
+                int buttonY = this.backgroundY + UPGRADE_BUTTON_OFFSET_Y;
+                return mouseX >= buttonX && mouseX <= buttonX + UPGRADE_BUTTON_WIDTH && mouseY >= buttonY
+                                && mouseY <= buttonY + UPGRADE_BUTTON_HEIGHT;
+        }
+
+        private void updateSkillEntries(SkillState skillState) {
+                Map<Identifier, SkillProgressManager.SkillDefinition> definitions = SkillProgressManager
+                                .getSkillDefinitions();
+
+                Identifier previousSelection = this.selectedSkillId;
+                this.skillEntries.clear();
+                int maxLevel = Math.max(1, SkillProgressManager.getMaxDefinedLevel());
+
+                SkillEntry matchedSelection = null;
+
+                for (SkillProgressManager.SkillDefinition definition : definitions.values()) {
+                        Identifier id = definition.id();
+                        int level = Math.max(0, skillState.getAllocation(id));
+                        float progress = MathHelper.clamp((float) level / (float) maxLevel, 0.0F, 1.0F);
+                        String displayNameText = definition.displayName();
+                        if (displayNameText == null || displayNameText.isBlank()) {
+                                displayNameText = "Unknown Skill";
+                        }
+                        Text displayName = Text.literal(displayNameText);
+                        Text levelLabel = Text.translatable("screen.gardenkingmod.skills.chef.current_level_label");
+                        Text levelValue = Text.literal(level + "/" + maxLevel);
+                        String descriptionText = definition.description();
+                        if (descriptionText == null || descriptionText.isBlank()) {
+                                descriptionText = "Sample description text.";
+                        }
+                        Text description = Text.literal(descriptionText);
+                        SkillEntry entry = new SkillEntry(id, displayName, levelLabel, levelValue, progress, description);
+                        this.skillEntries.add(entry);
+                        if (matchedSelection == null && id.equals(previousSelection)) {
+                                matchedSelection = entry;
+                        }
+                }
+
+                SkillEntry selected = matchedSelection;
+                if (selected == null && !this.skillEntries.isEmpty()) {
+                        selected = this.skillEntries.get(0);
+                }
+
+                if (selected != null) {
+                        this.selectedSkillId = selected.id;
+                        updateDescriptionLines(selected.description);
+                } else {
+                        this.descriptionLines = wrapDescriptionText(
+                                        Text.translatable("screen.gardenkingmod.skills.description_placeholder"));
+                }
+
+                clampScrollOffset();
+        }
+
+        private SkillEntry getSelectedEntry() {
+                if (this.selectedSkillId == null) {
+                        return null;
+                }
+                for (SkillEntry entry : this.skillEntries) {
+                        if (entry.id.equals(this.selectedSkillId)) {
+                                return entry;
+                        }
+                }
+                return null;
+        }
+
+        private int getEntryOffset(int index) {
+                double rawOffset = index * (double) SKILL_SECTION_SPACING - this.scrollOffset;
+                return MathHelper.floor(rawOffset);
+        }
+
+        private void updateDescriptionLines(Text description) {
+                this.descriptionLines = wrapDescriptionText(description);
+        }
+
+        private List<OrderedText> wrapDescriptionText(Text description) {
+                if (this.textRenderer == null) {
+                        return Collections.emptyList();
+                }
+                return this.textRenderer.wrapLines(description, DESCRIPTION_AREA_WIDTH);
+        }
+
+        private void clampScrollOffset() {
+                double maxScroll = getMaxScroll();
+                if (maxScroll <= 0) {
+                        this.scrollOffset = 0.0D;
+                        return;
+                }
+                this.scrollOffset = MathHelper.clamp(this.scrollOffset, 0.0D, maxScroll);
+        }
+
+        private double getMaxScroll() {
+                int contentHeight = Math.max(0, this.skillEntries.size() * SKILL_SECTION_HEIGHT);
+                int extra = Math.max(0, contentHeight - SKILL_LIST_HEIGHT);
+                return extra;
+        }
+
+        private double getScrollPercent() {
+                double maxScroll = getMaxScroll();
+                if (maxScroll <= 0) {
+                        return 0.0D;
+                }
+                return MathHelper.clamp(this.scrollOffset / maxScroll, 0.0D, 1.0D);
+        }
+
+        private void setScrollPercent(double percent) {
+                double maxScroll = getMaxScroll();
+                if (maxScroll <= 0) {
+                        this.scrollOffset = 0.0D;
+                        return;
+                }
+                this.scrollOffset = MathHelper.clamp(percent, 0.0D, 1.0D) * maxScroll;
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                if (button == 0) {
+                        if (handleSkillListClick(mouseX, mouseY)) {
+                                return true;
+                        }
+
+                        if (handleUpgradeButtonClick(mouseX, mouseY)) {
+                                return true;
+                        }
+
+                        if (handleScrollbarClick(mouseX, mouseY)) {
+                                return true;
+                        }
+                }
+
+                return super.mouseClicked(mouseX, mouseY, button);
+        }
+
+        @Override
+        public boolean mouseReleased(double mouseX, double mouseY, int button) {
+                if (button == 0) {
+                        this.scrolling = false;
+                }
+                return super.mouseReleased(mouseX, mouseY, button);
+        }
+
+        @Override
+        public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+                if (this.scrolling && button == 0) {
+                        updateScrollFromMouse(mouseY);
+                        return true;
+                }
+                return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        }
+
+        @Override
+        public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+                if (getMaxScroll() > 0) {
+                        this.scrollOffset = MathHelper.clamp(this.scrollOffset - amount * SCROLL_WHEEL_STEP, 0.0D,
+                                        getMaxScroll());
+                        return true;
+                }
+                return super.mouseScrolled(mouseX, mouseY, amount);
+        }
+
+        private boolean handleSkillListClick(double mouseX, double mouseY) {
+                int listX = this.backgroundX + SKILL_LIST_OFFSET_X;
+                int listY = this.backgroundY + SKILL_LIST_OFFSET_Y;
+                if (mouseX < listX || mouseX > listX + SKILL_SECTION_WIDTH || mouseY < listY
+                                || mouseY > listY + SKILL_LIST_HEIGHT) {
+                        return false;
+                }
+
+                for (int index = 0; index < this.skillEntries.size(); index++) {
+                        int entryTop = listY + getEntryOffset(index);
+                        int entryBottom = entryTop + SKILL_SECTION_HEIGHT;
+                        if (mouseY >= entryTop && mouseY <= entryBottom) {
+                                SkillEntry entry = this.skillEntries.get(index);
+                                if (!entry.id.equals(this.selectedSkillId)) {
+                                        this.selectedSkillId = entry.id;
+                                        updateDescriptionLines(entry.description);
+                                }
+                                playClickSound();
+                                return true;
+                        }
+                }
+
+                return false;
+        }
+
+        private boolean handleUpgradeButtonClick(double mouseX, double mouseY) {
+                SkillEntry selected = getSelectedEntry();
+                if (selected == null) {
+                        return false;
+                }
+
+                SkillState skillState = SkillState.getInstance();
+                if (skillState.getUnspentSkillPoints() <= 0) {
+                        return false;
+                }
+
+                if (!isUpgradeButtonHovered((int) mouseX, (int) mouseY, skillState)) {
+                        return false;
+                }
+
+                sendUpgradeRequest(selected.id);
+                playClickSound();
+                return true;
+        }
+
+        private boolean handleScrollbarClick(double mouseX, double mouseY) {
+                if (getMaxScroll() <= 0) {
+                        return false;
+                }
+
+                int scrollbarX = this.backgroundX + SCROLLBAR_OFFSET_X;
+                int scrollbarY = this.backgroundY + SCROLLBAR_OFFSET_Y;
+                if (mouseX < scrollbarX || mouseX > scrollbarX + SCROLLBAR_WIDTH || mouseY < scrollbarY
+                                || mouseY > scrollbarY + SCROLLBAR_HEIGHT) {
+                        return false;
+                }
+
+                this.scrolling = true;
+                updateScrollFromMouse(mouseY);
+                return true;
+        }
+
+        private void updateScrollFromMouse(double mouseY) {
+                int scrollbarY = this.backgroundY + SCROLLBAR_OFFSET_Y;
+                int travel = SCROLLBAR_HEIGHT - SCROLLBAR_KNOB_HEIGHT;
+                if (travel <= 0) {
+                        return;
+                }
+
+                double knobCenter = mouseY - scrollbarY - SCROLLBAR_KNOB_HEIGHT / 2.0D;
+                knobCenter = MathHelper.clamp(knobCenter, 0.0D, travel);
+                double percent = knobCenter / travel;
+                setScrollPercent(percent);
+        }
+
+        private void sendUpgradeRequest(Identifier skillId) {
+                if (this.client == null) {
+                        return;
+                }
+
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeIdentifier(skillId);
+                buf.writeVarInt(1);
+                ClientPlayNetworking.send(ModPackets.SKILL_SPEND_REQUEST, buf);
+        }
+
+        private void playClickSound() {
+                if (this.client != null) {
+                        this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                }
         }
 
         public void setChefSkillTitleOffset(int offsetX, int offsetY) {
@@ -400,6 +781,25 @@ public class SkillScreen extends Screen {
         public void close() {
                 if (this.client != null) {
                         this.client.setScreen(null);
+                }
+        }
+
+        private static final class SkillEntry {
+                private final Identifier id;
+                private final Text displayName;
+                private final Text levelLabel;
+                private final Text levelValue;
+                private final float progress;
+                private final Text description;
+
+                private SkillEntry(Identifier id, Text displayName, Text levelLabel, Text levelValue, float progress,
+                                Text description) {
+                        this.id = id;
+                        this.displayName = displayName;
+                        this.levelLabel = levelLabel;
+                        this.levelValue = levelValue;
+                        this.progress = progress;
+                        this.description = description;
                 }
         }
 
