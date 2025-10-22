@@ -87,17 +87,17 @@ public class SkillScreen extends Screen {
         private static final int SKILL_SECTION_TEXTURE_U = 0;
         private static final int SKILL_SECTION_TEXTURE_V = 248;
         private static final int SKILL_SECTION_HOVER_V = 290;
-        private static final int SKILL_SECTION_TEXTURE_WIDTH = 251;
+        private static final int SKILL_SECTION_TEXTURE_WIDTH = 250;
         private static final int SKILL_SECTION_TEXTURE_HEIGHT = 44;
         private static final int SKILL_SECTION_SPACING = 44;
 
         private static final int SKILL_TITLE_BASE_X = SKILL_LIST_OFFSET_X + 42;
-        private static final int SKILL_TITLE_BASE_Y = SKILL_LIST_OFFSET_Y + 4;
-        private static final int SKILL_BAR_BASE_X = SKILL_LIST_OFFSET_X + 42;
-        private static final int SKILL_BAR_BASE_Y = SKILL_LIST_OFFSET_Y + 20;
+        private static final int SKILL_TITLE_BASE_Y = SKILL_LIST_OFFSET_Y + 8;
+        private static final int SKILL_BAR_BASE_X = SKILL_LIST_OFFSET_X + 40;
+        private static final int SKILL_BAR_BASE_Y = SKILL_LIST_OFFSET_Y + 22;
         private static final int SKILL_BAR_WIDTH = 204;
         private static final int SKILL_LEVEL_BASE_X = SKILL_LIST_OFFSET_X + 42;
-        private static final int SKILL_LEVEL_BASE_Y = SKILL_LIST_OFFSET_Y + 30;
+        private static final int SKILL_LEVEL_BASE_Y = SKILL_LIST_OFFSET_Y + 32;
         private static final int SKILL_LEVEL_LABEL_VALUE_GAP = 4;
 
         private static final int DESCRIPTION_AREA_OFFSET_X = 290;
