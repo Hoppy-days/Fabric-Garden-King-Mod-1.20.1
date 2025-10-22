@@ -22,6 +22,8 @@ public class SkillScreen extends Screen {
                         "textures/gui/skill_screen_gui.png");
         private static final Identifier XP_BAR_TEXTURE = new Identifier("gardenkingmod",
                         "textures/gui/skill_xp_bar.png");
+        private static final Identifier SUB_SKILL_XP_BAR_TEXTURE = new Identifier("gardenkingmod",
+                        "textures/gui/sub_skill_xp_bar.png");
 
         private static final int TITLE_COLOR = 0x404040;
         private static final int TITLE_X = 8;
@@ -187,7 +189,7 @@ public class SkillScreen extends Screen {
                                 + Math.max(0, HEADER_PROGRESS_BAR_Y_OFFSET);
                 xpBarY = MathHelper.clamp(xpBarY, minXpBarY, Math.max(minXpBarY, maxXpBarY));
 
-                drawXpBar(context, xpBarX, xpBarY, xpBarWidth, progress);
+                drawXpBar(context, XP_BAR_TEXTURE, xpBarX, xpBarY, xpBarWidth, progress);
 
         }
 
@@ -209,7 +211,7 @@ public class SkillScreen extends Screen {
                 if (barWidth > 0) {
                         RenderSystem.setShaderColor(chefSkillBarStyle.getRed(), chefSkillBarStyle.getGreen(),
                                         chefSkillBarStyle.getBlue(), chefSkillBarStyle.getAlpha());
-                        drawXpBar(context, barX, barY, barWidth, chefProgress);
+                        drawXpBar(context, SUB_SKILL_XP_BAR_TEXTURE, barX, barY, barWidth, chefProgress);
                         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 }
 
@@ -227,20 +229,25 @@ public class SkillScreen extends Screen {
                 chefSkillLevelValueStyle.drawAt(context, this.textRenderer, chefLevelText, valueX, valueY);
         }
 
-        private void drawXpBar(DrawContext context, int x, int y, int width, float progress) {
+        private void drawXpBar(DrawContext context, Identifier texture, int x, int y, int width, float progress) {
                 if (width <= 0) {
                         return;
                 }
 
-                drawXpBarStrip(context, x, y, width, XP_BAR_BACKGROUND_V);
+                drawXpBarStrip(context, texture, x, y, width, XP_BAR_BACKGROUND_V);
 
                 int filledWidth = MathHelper.clamp(MathHelper.ceil(progress * width), 0, width);
                 if (filledWidth > 0) {
-                        drawXpBarStrip(context, x, y, filledWidth, XP_BAR_FILL_V);
+                        drawXpBarStrip(context, texture, x, y, filledWidth, XP_BAR_FILL_V);
                 }
         }
 
-        private void drawXpBarStrip(DrawContext context, int x, int y, int totalWidth, int textureV) {
+        private void drawXpBar(DrawContext context, int x, int y, int width, float progress) {
+                drawXpBar(context, XP_BAR_TEXTURE, x, y, width, progress);
+        }
+
+        private void drawXpBarStrip(DrawContext context, Identifier texture, int x, int y, int totalWidth,
+                        int textureV) {
                 if (totalWidth <= 0) {
                         return;
                 }
@@ -250,7 +257,7 @@ public class SkillScreen extends Screen {
 
                 int leftWidth = Math.min(XP_BAR_LEFT_CAP_WIDTH, remaining);
                 if (leftWidth > 0) {
-                        drawXpBarTexture(context, drawX, y, 0, textureV, leftWidth);
+                        drawXpBarTexture(context, texture, drawX, y, 0, textureV, leftWidth);
                         drawX += leftWidth;
                         remaining -= leftWidth;
                 }
@@ -267,21 +274,24 @@ public class SkillScreen extends Screen {
                 int middleTarget = remaining - rightWidth;
                 if (middleTarget > 0) {
                         if (XP_BAR_REPEATABLE_WIDTH > 0) {
-                                drawTiledXpBarTexture(context, drawX, y, XP_BAR_LEFT_CAP_WIDTH, textureV, middleTarget);
+                                drawTiledXpBarTexture(context, texture, drawX, y, XP_BAR_LEFT_CAP_WIDTH, textureV,
+                                                middleTarget);
                         } else {
-                                drawXpBarTexture(context, drawX, y, XP_BAR_LEFT_CAP_WIDTH, textureV, middleTarget);
+                                drawXpBarTexture(context, texture, drawX, y, XP_BAR_LEFT_CAP_WIDTH, textureV,
+                                                middleTarget);
                         }
                         drawX += middleTarget;
                         remaining -= middleTarget;
                 }
 
                 if (remaining > 0 && rightWidth > 0) {
-                        drawXpBarTexture(context, drawX, y,
+                        drawXpBarTexture(context, texture, drawX, y,
                                         XP_BAR_TEXTURE_REGION_WIDTH - XP_BAR_RIGHT_CAP_WIDTH, textureV, remaining);
                 }
         }
 
-        private void drawTiledXpBarTexture(DrawContext context, int x, int y, int u, int v, int targetWidth) {
+        private void drawTiledXpBarTexture(DrawContext context, Identifier texture, int x, int y, int u, int v,
+                        int targetWidth) {
                 if (targetWidth <= 0) {
                         return;
                 }
@@ -290,18 +300,18 @@ public class SkillScreen extends Screen {
                 int remaining = targetWidth;
                 while (remaining > 0) {
                         int drawWidth = Math.min(XP_BAR_REPEATABLE_WIDTH, remaining);
-                        drawXpBarTexture(context, drawX, y, u, v, drawWidth);
+                        drawXpBarTexture(context, texture, drawX, y, u, v, drawWidth);
                         drawX += drawWidth;
                         remaining -= drawWidth;
                 }
         }
 
-        private void drawXpBarTexture(DrawContext context, int x, int y, int u, int v, int width) {
+        private void drawXpBarTexture(DrawContext context, Identifier texture, int x, int y, int u, int v, int width) {
                 if (width <= 0) {
                         return;
                 }
 
-                context.drawTexture(XP_BAR_TEXTURE, x, y, u, v, width, XP_BAR_HEIGHT, XP_BAR_TEXTURE_ATLAS_WIDTH,
+                context.drawTexture(texture, x, y, u, v, width, XP_BAR_HEIGHT, XP_BAR_TEXTURE_ATLAS_WIDTH,
                                 XP_BAR_TEXTURE_ATLAS_HEIGHT);
         }
 
