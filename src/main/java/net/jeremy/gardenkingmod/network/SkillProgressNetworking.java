@@ -32,6 +32,8 @@ public final class SkillProgressNetworking {
                 Map<Identifier, Integer> allocations = new LinkedHashMap<>();
                 allocations.put(SkillProgressManager.CHEF_SKILL,
                                 Math.max(0, skillHolder.gardenkingmod$getChefMasteryLevel()));
+                allocations.put(SkillProgressManager.ENCHANTER_SKILL,
+                                Math.max(0, skillHolder.gardenkingmod$getEnchanterLevel()));
 
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeVarLong(totalExperience);

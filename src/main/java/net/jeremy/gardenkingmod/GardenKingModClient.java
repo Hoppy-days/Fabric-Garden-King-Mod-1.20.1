@@ -193,6 +193,9 @@ public class GardenKingModClient implements ClientModInitializer {
                                         skillHolder.gardenkingmod$setUnspentSkillPoints(unspentPoints);
                                         int chefMastery = allocations.getOrDefault(SkillProgressManager.CHEF_SKILL, 0);
                                         skillHolder.gardenkingmod$setChefMasteryLevel(chefMastery);
+                                        int enchanterLevel = allocations
+                                                        .getOrDefault(SkillProgressManager.ENCHANTER_SKILL, 0);
+                                        skillHolder.gardenkingmod$setEnchanterLevel(enchanterLevel);
                                 }
                         });
                 });

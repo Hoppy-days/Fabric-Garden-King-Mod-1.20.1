@@ -95,4 +95,8 @@ public final class SkillState {
     public synchronized int getChefMasteryLevel() {
         return getAllocation(SkillProgressManager.CHEF_SKILL);
     }
+
+    public synchronized int getEnchanterLevel() {
+        return getAllocation(SkillProgressManager.ENCHANTER_SKILL);
+    }
 }

@@ -23,5 +23,6 @@ public abstract class ServerPlayerEntityMixin {
                 newSkillHolder.gardenkingmod$setSkillLevel(oldSkillHolder.gardenkingmod$getSkillLevel());
                 newSkillHolder.gardenkingmod$setUnspentSkillPoints(oldSkillHolder.gardenkingmod$getUnspentSkillPoints());
                 newSkillHolder.gardenkingmod$setChefMasteryLevel(oldSkillHolder.gardenkingmod$getChefMasteryLevel());
+                newSkillHolder.gardenkingmod$setEnchanterLevel(oldSkillHolder.gardenkingmod$getEnchanterLevel());
         }
 }

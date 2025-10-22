@@ -11,6 +11,7 @@ public interface SkillProgressHolder {
         String SKILL_LEVEL_KEY = "GardenKingSkillLevel";
         String SKILL_POINTS_KEY = "GardenKingSkillPoints";
         String CHEF_MASTERY_KEY = "GardenKingChefMastery";
+        String ENCHANTER_KEY = "GardenKingEnchanter";
 
         long gardenkingmod$getSkillExperience();
 
@@ -27,6 +28,10 @@ public interface SkillProgressHolder {
         int gardenkingmod$getChefMasteryLevel();
 
         void gardenkingmod$setChefMasteryLevel(int level);
+
+        int gardenkingmod$getEnchanterLevel();
+
+        void gardenkingmod$setEnchanterLevel(int level);
 
         default int gardenkingmod$addSkillExperience(long experience) {
                 if (experience <= 0) {
