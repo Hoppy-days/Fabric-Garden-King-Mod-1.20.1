@@ -17,7 +17,10 @@ import net.jeremy.gardenkingmod.crop.EnchantedCropDefinition;
 import net.jeremy.gardenkingmod.crop.EnchantedCropDefinitions;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager.BonusDropEntry;
 import net.jeremy.gardenkingmod.skill.HarvestXpService;
+import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
+import net.jeremy.gardenkingmod.skill.SkillProgressManager;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -38,6 +41,7 @@ import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.loot.context.LootContextParameters;
 
 /**
  * Applies Garden King's crop drop multipliers to loot tables at runtime.
@@ -390,14 +394,16 @@ public final class CropDropModifier {
 
                 @Override
                 protected ItemStack process(ItemStack stack, LootContext context) {
-                        if (stack.isEmpty() || enchantedChance <= 0.0f) {
+                        float effectiveChance = computeEffectiveChance(context);
+
+                        if (stack.isEmpty() || effectiveChance <= 0.0f) {
                                 if (!expectsRottenFunction) {
                                         HarvestXpService.handleLootContext(context, blockId, tierId, stack);
                                 }
                                 return stack;
                         }
 
-                        if (context.getRandom().nextFloat() >= enchantedChance) {
+                        if (context.getRandom().nextFloat() >= effectiveChance) {
                                 if (!expectsRottenFunction) {
                                         HarvestXpService.handleLootContext(context, blockId, tierId, stack);
                                 }
@@ -434,6 +440,23 @@ public final class CropDropModifier {
 
                         HarvestXpService.handleLootContext(context, blockId, tierId, enchantedStack);
                         return enchantedStack;
+                }
+
+                private float computeEffectiveChance(LootContext context) {
+                        float chance = MathHelper.clamp(this.enchantedChance, 0.0f, 1.0f);
+                        Entity entity = context.get(LootContextParameters.THIS_ENTITY);
+                        if (!(entity instanceof SkillProgressHolder skillHolder)) {
+                                return chance;
+                        }
+
+                        int skillLevel = MathHelper.clamp(skillHolder.gardenkingmod$getEnchanterLevel(), 0,
+                                        SkillProgressManager.getMaxDefinedLevel());
+                        if (skillLevel <= 0) {
+                                return chance;
+                        }
+
+                        float bonus = MathHelper.clamp(skillLevel * 0.01f, 0.0f, 1.0f);
+                        return MathHelper.clamp(chance + bonus, 0.0f, 1.0f);
                 }
         }
 

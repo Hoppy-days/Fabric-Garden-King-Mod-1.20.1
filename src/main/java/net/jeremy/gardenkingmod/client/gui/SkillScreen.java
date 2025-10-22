@@ -89,7 +89,7 @@ public class SkillScreen extends Screen {
         private static final int SKILL_SECTION_HOVER_V = 290;
         private static final int SKILL_SECTION_TEXTURE_WIDTH = 251;
         private static final int SKILL_SECTION_TEXTURE_HEIGHT = 44;
-        private static final int SKILL_SECTION_SPACING = 44;
+        private static final int SKILL_SECTION_SPACING = SKILL_SECTION_HEIGHT + 1;
 
         private static final int SKILL_TITLE_BASE_X = SKILL_LIST_OFFSET_X + 42;
         private static final int SKILL_TITLE_BASE_Y = SKILL_LIST_OFFSET_Y + 4;
@@ -572,7 +572,10 @@ public class SkillScreen extends Screen {
         }
 
         private double getMaxScroll() {
-                int contentHeight = Math.max(0, this.skillEntries.size() * SKILL_SECTION_HEIGHT);
+                int contentHeight = Math.max(0,
+                                this.skillEntries.isEmpty() ? 0
+                                                : (this.skillEntries.size() - 1) * SKILL_SECTION_SPACING
+                                                                + SKILL_SECTION_HEIGHT);
                 int extra = Math.max(0, contentHeight - SKILL_LIST_HEIGHT);
                 return extra;
         }

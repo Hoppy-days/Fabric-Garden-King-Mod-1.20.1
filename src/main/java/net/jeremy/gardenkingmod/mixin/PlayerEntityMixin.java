@@ -31,6 +31,9 @@ public abstract class PlayerEntityMixin implements GardenCurrencyHolder, SkillPr
         @Unique
         private int gardenkingmod$chefMasteryLevel;
 
+        @Unique
+        private int gardenkingmod$enchanterLevel;
+
         @Override
         public int gardenkingmod$getLifetimeCurrency() {
                 return this.gardenkingmod$lifetimeCurrency;
@@ -91,6 +94,16 @@ public abstract class PlayerEntityMixin implements GardenCurrencyHolder, SkillPr
                 this.gardenkingmod$chefMasteryLevel = Math.max(0, level);
         }
 
+        @Override
+        public int gardenkingmod$getEnchanterLevel() {
+                return this.gardenkingmod$enchanterLevel;
+        }
+
+        @Override
+        public void gardenkingmod$setEnchanterLevel(int level) {
+                this.gardenkingmod$enchanterLevel = Math.max(0, level);
+        }
+
         @Inject(method = "readCustomDataFromNbt", at = @At("RETURN"))
         private void gardenkingmod$readLifetimeCurrency(NbtCompound nbt, CallbackInfo ci) {
                 if (nbt.contains(LIFETIME_CURRENCY_KEY, NbtElement.NUMBER_TYPE)) {
@@ -115,6 +128,10 @@ public abstract class PlayerEntityMixin implements GardenCurrencyHolder, SkillPr
 
                 if (nbt.contains(CHEF_MASTERY_KEY, NbtElement.NUMBER_TYPE)) {
                         gardenkingmod$setChefMasteryLevel(nbt.getInt(CHEF_MASTERY_KEY));
+                }
+
+                if (nbt.contains(ENCHANTER_KEY, NbtElement.NUMBER_TYPE)) {
+                        gardenkingmod$setEnchanterLevel(nbt.getInt(ENCHANTER_KEY));
                 }
         }
 
@@ -154,6 +171,12 @@ public abstract class PlayerEntityMixin implements GardenCurrencyHolder, SkillPr
                         nbt.putInt(CHEF_MASTERY_KEY, gardenkingmod$getChefMasteryLevel());
                 } else {
                         nbt.remove(CHEF_MASTERY_KEY);
+                }
+
+                if (gardenkingmod$getEnchanterLevel() > 0) {
+                        nbt.putInt(ENCHANTER_KEY, gardenkingmod$getEnchanterLevel());
+                } else {
+                        nbt.remove(ENCHANTER_KEY);
                 }
         }
 }

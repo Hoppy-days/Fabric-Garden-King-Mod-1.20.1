@@ -58,14 +58,9 @@ public final class ModServerNetworking {
                             return;
                         }
 
-                        if (SkillProgressManager.CHEF_SKILL.equals(skillId)) {
-                            int updatedLevel = MathHelper.clamp(
-                                    skillHolder.gardenkingmod$getChefMasteryLevel() + pointsToSpend, 0, Integer.MAX_VALUE);
-                            skillHolder.gardenkingmod$setChefMasteryLevel(updatedLevel);
-                        } else {
-                            int refunded = MathHelper.clamp(pointsToSpend, 0, Integer.MAX_VALUE);
-                            skillHolder.gardenkingmod$setUnspentSkillPoints(MathHelper.clamp(
-                                    skillHolder.gardenkingmod$getUnspentSkillPoints() + refunded, 0, Integer.MAX_VALUE));
+                        boolean applied = applySkillUpgrade(skillHolder, skillId, pointsToSpend);
+                        if (!applied) {
+                            refundSkillPoints(skillHolder, pointsToSpend);
                         }
 
                         SkillProgressNetworking.sync(serverPlayer);
@@ -75,5 +70,43 @@ public final class ModServerNetworking {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
             SkillProgressNetworking.sync(handler.player);
         });
+    }
+
+    private static boolean applySkillUpgrade(SkillProgressHolder skillHolder, Identifier skillId, int pointsToSpend) {
+        int maxLevel = Math.max(0, SkillProgressManager.getMaxDefinedLevel());
+        if (SkillProgressManager.CHEF_SKILL.equals(skillId)) {
+            return applyBoundedAllocation(pointsToSpend, maxLevel, skillHolder.gardenkingmod$getChefMasteryLevel(),
+                    skillHolder::gardenkingmod$setChefMasteryLevel, skillHolder);
+        }
+        if (SkillProgressManager.ENCHANTER_SKILL.equals(skillId)) {
+            return applyBoundedAllocation(pointsToSpend, maxLevel, skillHolder.gardenkingmod$getEnchanterLevel(),
+                    skillHolder::gardenkingmod$setEnchanterLevel, skillHolder);
+        }
+        return false;
+    }
+
+    private static boolean applyBoundedAllocation(int pointsToSpend, int maxLevel, int currentLevel,
+            java.util.function.IntConsumer setter, SkillProgressHolder skillHolder) {
+        int clampedCurrent = MathHelper.clamp(currentLevel, 0, maxLevel);
+        int targetLevel = MathHelper.clamp(clampedCurrent + pointsToSpend, 0, maxLevel);
+        int applied = targetLevel - clampedCurrent;
+        if (applied <= 0) {
+            return false;
+        }
+        setter.accept(targetLevel);
+        int refund = pointsToSpend - applied;
+        if (refund > 0) {
+            refundSkillPoints(skillHolder, refund);
+        }
+        return true;
+    }
+
+    private static void refundSkillPoints(SkillProgressHolder skillHolder, int amount) {
+        int refund = MathHelper.clamp(amount, 0, Integer.MAX_VALUE);
+        if (refund <= 0) {
+            return;
+        }
+        int updated = MathHelper.clamp(skillHolder.gardenkingmod$getUnspentSkillPoints() + refund, 0, Integer.MAX_VALUE);
+        skillHolder.gardenkingmod$setUnspentSkillPoints(updated);
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier;
  */
 public final class SkillProgressManager {
         public static final Identifier CHEF_SKILL = new Identifier("gardenkingmod", "chef");
+        public static final Identifier ENCHANTER_SKILL = new Identifier("gardenkingmod", "enchanter");
 
         private static final Map<Identifier, SkillDefinition> SKILL_DEFINITIONS = new LinkedHashMap<>();
         private static final List<Long> LEVEL_THRESHOLDS = List.of(
@@ -32,6 +33,8 @@ public final class SkillProgressManager {
 
         static {
                 registerSkill(new SkillDefinition(CHEF_SKILL, "Chef Mastery", "Improve your cooking prowess."));
+                registerSkill(new SkillDefinition(ENCHANTER_SKILL, "Enchanter",
+                                "Each level increases enchanted crop chances by 1%."));
         }
 
         private SkillProgressManager() {
