@@ -85,7 +85,7 @@ public class SkillScreen extends Screen {
         private static final int SKILL_SECTION_WIDTH = 256;
         private static final int SKILL_SECTION_HEIGHT = 44;
         private static final int SKILL_SECTION_TEXTURE_U = 0;
-        private static final int SKILL_SECTION_TEXTURE_V = 26;
+        private static final int SKILL_SECTION_TEXTURE_V = 246;
         private static final int SKILL_SECTION_HOVER_V = 290;
         private static final int SKILL_SECTION_TEXTURE_WIDTH = 250;
         private static final int SKILL_SECTION_TEXTURE_HEIGHT = 44;
