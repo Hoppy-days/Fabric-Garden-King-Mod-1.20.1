@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,lit=false": { "model": "gardenkingmod:block/garden_oven" },
+    "facing=east,lit=false": { "model": "gardenkingmod:block/garden_oven", "y": 90 },
+    "facing=south,lit=false": { "model": "gardenkingmod:block/garden_oven", "y": 180 },
+    "facing=west,lit=false": { "model": "gardenkingmod:block/garden_oven", "y": 270 },
+    "facing=north,lit=true": { "model": "gardenkingmod:block/garden_oven_on" },
+    "facing=east,lit=true": { "model": "gardenkingmod:block/garden_oven_on", "y": 90 },
+    "facing=south,lit=true": { "model": "gardenkingmod:block/garden_oven_on", "y": 180 },
+    "facing=west,lit=true": { "model": "gardenkingmod:block/garden_oven_on", "y": 270 }
+  }
+}
