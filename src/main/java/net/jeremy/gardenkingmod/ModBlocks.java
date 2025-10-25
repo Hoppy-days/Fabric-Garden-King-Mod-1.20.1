@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.jeremy.gardenkingmod.block.BankBlock;
+import net.jeremy.gardenkingmod.block.GardenOvenBlock;
 import net.jeremy.gardenkingmod.block.GearShopBlock;
 import net.jeremy.gardenkingmod.block.GearShopBlockPart;
 import net.jeremy.gardenkingmod.block.MarketBlock;
@@ -55,6 +56,10 @@ public final class ModBlocks {
         public static final Block RUBY_BLOCK = registerBlock("ruby_block",
                         new Block(FabricBlockSettings.copyOf(Blocks.DIAMOND_BLOCK)));
 
+        public static final Block GARDEN_OVEN_BLOCK = registerBlock("garden_oven",
+                        new GardenOvenBlock(FabricBlockSettings.copyOf(Blocks.BRICKS).strength(3.5f)
+                                        .luminance(state -> state.get(GardenOvenBlock.LIT) ? 13 : 0)));
+
         public static final Block MARKET_BLOCK_PART = registerBlockWithoutItem("market_block_part",
                         new MarketBlockPart(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).dropsNothing().nonOpaque()));
 
@@ -92,6 +97,7 @@ public final class ModBlocks {
                         entries.add(GOLD_SPRINKLER_BLOCK);
                         entries.add(DIAMOND_SPRINKLER_BLOCK);
                         entries.add(EMERALD_SPRINKLER_BLOCK);
+                        entries.add(GARDEN_OVEN_BLOCK);
                 });
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(entries -> entries.add(RUBY_BLOCK));
         }

@@ -43,6 +43,7 @@ import net.jeremy.gardenkingmod.item.FortuneProvidingItem;
 import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.screen.BankScreen;
 import net.jeremy.gardenkingmod.screen.BankScreenHandler;
+import net.jeremy.gardenkingmod.screen.GardenOvenScreen;
 import net.jeremy.gardenkingmod.screen.GearShopScreen;
 import net.jeremy.gardenkingmod.screen.MarketScreen;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreen;
@@ -92,6 +93,7 @@ public class GardenKingModClient implements ClientModInitializer {
         HandledScreens.register(ModScreenHandlers.MARKET_SCREEN_HANDLER, MarketScreen::new);
         HandledScreens.register(ModScreenHandlers.SCARECROW_SCREEN_HANDLER, ScarecrowScreen::new);
         HandledScreens.register(ModScreenHandlers.BANK_SCREEN_HANDLER, BankScreen::new);
+        HandledScreens.register(ModScreenHandlers.GARDEN_OVEN_SCREEN_HANDLER, GardenOvenScreen::new);
         EntityModelLayerRegistry.registerModelLayer(BankBlockModel.LAYER_LOCATION, BankBlockModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(MarketBlockModel.LAYER_LOCATION, MarketBlockModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(GearShopModel.LAYER_LOCATION,

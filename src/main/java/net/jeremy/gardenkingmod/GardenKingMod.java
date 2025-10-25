@@ -14,9 +14,11 @@ import net.jeremy.gardenkingmod.item.WalletItem;
 import net.jeremy.gardenkingmod.network.ModServerNetworking;
 import net.jeremy.gardenkingmod.registry.ModEntities;
 import net.jeremy.gardenkingmod.registry.ModSoundEvents;
+import net.jeremy.gardenkingmod.recipe.ModRecipes;
 import net.jeremy.gardenkingmod.shop.GardenMarketOfferManager;
 import net.jeremy.gardenkingmod.shop.GearShopOfferManager;
 import net.jeremy.gardenkingmod.skill.HarvestXpConfig;
+import net.jeremy.gardenkingmod.util.GardenOvenBalanceConfig;
 
 import net.minecraft.resource.ResourceType;
 
@@ -30,10 +32,12 @@ public class GardenKingMod implements ModInitializer {
         @Override
         public void onInitialize() {
                 FertilizerBalanceConfig.reload();
+                GardenOvenBalanceConfig.reload();
                 HarvestXpConfig.reload();
                 ModItems.registerModItems();
                 ModBlocks.registerModBlocks();
                 ModBlockEntities.registerBlockEntities();
+                ModRecipes.register();
                 ModEntities.register();
                 ModSoundEvents.register();
                 ModScreenHandlers.registerScreenHandlers();
