@@ -1,0 +1,38 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:salts"
+    },
+    {
+      "tag": "croptopia:beef_mutton"
+    },
+    {
+      "item": "croptopia:pepper"
+    },
+    {
+      "item": "minecraft:potato"
+    },
+    {
+      "item": "croptopia:frying_pan"
+    },
+    {
+      "tag": "c:tomatoes"
+    },
+    {
+      "tag": "c:corn"
+    },
+    {
+      "tag": "c:garlic"
+    },
+    {
+      "tag": "c:onions"
+    }
+  ],
+  "result": {
+    "item": "croptopia:shepherds_pie",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

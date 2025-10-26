@@ -1,0 +1,23 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:doughs"
+    },
+    {
+      "tag": "c:lettuce"
+    },
+    {
+      "item": "minecraft:egg"
+    },
+    {
+      "tag": "croptopia:meat_replacements"
+    }
+  ],
+  "result": {
+    "item": "croptopia:egg_roll",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

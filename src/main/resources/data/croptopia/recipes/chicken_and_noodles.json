@@ -1,0 +1,26 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:noodles"
+    },
+    {
+      "tag": "c:chile_peppers"
+    },
+    {
+      "tag": "c:olive_oils"
+    },
+    {
+      "tag": "croptopia:chicken_replacements"
+    },
+    {
+      "item": "croptopia:cooking_pot"
+    }
+  ],
+  "result": {
+    "item": "croptopia:chicken_and_noodles",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

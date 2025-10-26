@@ -1,0 +1,23 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:flour"
+    },
+    {
+      "item": "minecraft:nether_wart"
+    },
+    {
+      "item": "minecraft:crimson_fungus"
+    },
+    {
+      "item": "minecraft:warped_fungus"
+    }
+  ],
+  "result": {
+    "item": "croptopia:nether_wart_stew",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

@@ -1,0 +1,29 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:broccoli"
+    },
+    {
+      "item": "minecraft:carrot"
+    },
+    {
+      "item": "minecraft:beef"
+    },
+    {
+      "tag": "c:olive_oils"
+    },
+    {
+      "tag": "c:soy_sauces"
+    },
+    {
+      "tag": "c:garlic"
+    }
+  ],
+  "result": {
+    "item": "croptopia:beef_stir_fry",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

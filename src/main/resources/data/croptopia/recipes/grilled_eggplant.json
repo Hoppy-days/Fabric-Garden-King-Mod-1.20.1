@@ -1,0 +1,29 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:paprika"
+    },
+    {
+      "tag": "c:salts"
+    },
+    {
+      "item": "croptopia:pepper"
+    },
+    {
+      "tag": "c:olive_oils"
+    },
+    {
+      "tag": "c:eggplants"
+    },
+    {
+      "tag": "c:garlic"
+    }
+  ],
+  "result": {
+    "item": "croptopia:grilled_eggplant",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

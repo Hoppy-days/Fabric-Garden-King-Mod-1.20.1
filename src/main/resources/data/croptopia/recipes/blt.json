@@ -1,0 +1,23 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "item": "minecraft:bread"
+    },
+    {
+      "item": "croptopia:cooked_bacon"
+    },
+    {
+      "tag": "c:lettuce"
+    },
+    {
+      "tag": "c:tomatoes"
+    }
+  ],
+  "result": {
+    "item": "croptopia:blt",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}
