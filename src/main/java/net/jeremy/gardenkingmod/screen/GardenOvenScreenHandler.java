@@ -142,14 +142,18 @@ public class GardenOvenScreenHandler extends ScreenHandler {
                 this.inventory.onClose(player);
         }
 
-        public int getCookProgress() {
+        public int getCookProgressScaled(int size) {
                 int cookTime = this.propertyDelegate.get(0);
                 int cookTimeTotal = this.propertyDelegate.get(1);
                 if (cookTimeTotal <= 0 || cookTime <= 0) {
                         return 0;
                 }
 
-                return cookTime * 24 / cookTimeTotal;
+                int scaled = cookTime * size / cookTimeTotal;
+                if (scaled <= 0) {
+                        return 1;
+                }
+                return Math.min(scaled, size);
         }
 
         public boolean isCooking() {
