@@ -53,7 +53,7 @@ public class GardenOvenBlock extends BlockWithEntity {
 
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction facing = ctx.getHorizontalPlayerFacing().getOpposite();
+        Direction facing = ctx.getHorizontalPlayerFacing();
         return this.getDefaultState().with(FACING, facing).with(LIT, Boolean.FALSE);
     }
 
