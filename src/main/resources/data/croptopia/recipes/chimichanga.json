@@ -1,0 +1,20 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "item": "croptopia:burrito"
+    },
+    {
+      "tag": "c:flour"
+    },
+    {
+      "item": "croptopia:cooking_pot"
+    }
+  ],
+  "result": {
+    "item": "croptopia:chimichanga",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

@@ -1,0 +1,32 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:onions"
+    },
+    {
+      "tag": "c:rutabagas"
+    },
+    {
+      "item": "croptopia:pepper"
+    },
+    {
+      "tag": "c:flour"
+    },
+    {
+      "item": "minecraft:beef"
+    },
+    {
+      "item": "minecraft:potato"
+    },
+    {
+      "item": "croptopia:frying_pan"
+    }
+  ],
+  "result": {
+    "item": "croptopia:cornish_pasty",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

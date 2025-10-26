@@ -1,0 +1,26 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:salts"
+    },
+    {
+      "item": "croptopia:pepper"
+    },
+    {
+      "tag": "c:butters"
+    },
+    {
+      "tag": "c:greenbeans"
+    },
+    {
+      "tag": "c:gingers"
+    }
+  ],
+  "result": {
+    "item": "croptopia:buttered_green_beans",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

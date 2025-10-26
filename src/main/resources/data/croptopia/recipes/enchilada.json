@@ -1,0 +1,23 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "croptopia:meat_replacements"
+    },
+    {
+      "tag": "c:tomatoes"
+    },
+    {
+      "tag": "c:cheeses"
+    },
+    {
+      "tag": "c:tortillas"
+    }
+  ],
+  "result": {
+    "item": "croptopia:enchilada",
+    "count": 2
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

@@ -1,0 +1,26 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:doughs"
+    },
+    {
+      "tag": "c:cheeses"
+    },
+    {
+      "tag": "c:tomatoes"
+    },
+    {
+      "tag": "c:cheeses"
+    },
+    {
+      "item": "croptopia:frying_pan"
+    }
+  ],
+  "result": {
+    "item": "croptopia:cheese_pizza",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

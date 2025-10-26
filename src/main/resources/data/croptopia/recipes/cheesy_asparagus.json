@@ -1,0 +1,23 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:asparagus"
+    },
+    {
+      "tag": "c:cheeses"
+    },
+    {
+      "tag": "c:olive_oils"
+    },
+    {
+      "item": "croptopia:pepper"
+    }
+  ],
+  "result": {
+    "item": "croptopia:cheesy_asparagus",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

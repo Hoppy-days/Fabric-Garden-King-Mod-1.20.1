@@ -1,0 +1,26 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "item": "minecraft:potato"
+    },
+    {
+      "tag": "c:flour"
+    },
+    {
+      "tag": "c:greenonions"
+    },
+    {
+      "item": "croptopia:bacon"
+    },
+    {
+      "tag": "c:water_bottles"
+    }
+  ],
+  "result": {
+    "item": "croptopia:potato_soup",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}
