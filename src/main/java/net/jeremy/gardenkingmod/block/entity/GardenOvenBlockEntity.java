@@ -259,6 +259,11 @@ public class GardenOvenBlockEntity extends BlockEntity implements NamedScreenHan
 
         public void dropContents(World world, BlockPos pos) {
                 ItemScatterer.spawn(world, pos, this.inventory);
+                if (!world.isClient && world instanceof ServerWorld serverWorld) {
+                        releaseStoredExperience(serverWorld, Vec3d.ofCenter(pos));
+                } else {
+                        this.storedExperience = 0.0F;
+                }
                 resetInventoryState();
                 updateLitState(false);
                 this.markDirty();
@@ -269,14 +274,21 @@ public class GardenOvenBlockEntity extends BlockEntity implements NamedScreenHan
                         return;
                 }
 
-                ServerWorld serverWorld = (ServerWorld) this.world;
+                if (this.world instanceof ServerWorld serverWorld) {
+                        releaseStoredExperience(serverWorld, Vec3d.ofCenter(this.pos));
+                } else {
+                        this.storedExperience = 0.0F;
+                }
+        }
+
+        private void releaseStoredExperience(ServerWorld serverWorld, Vec3d pos) {
                 int experience = MathHelper.floor(this.storedExperience);
                 float remainder = this.storedExperience - experience;
                 if (remainder > 0.0F && serverWorld.random.nextFloat() < remainder) {
                         experience++;
                 }
                 if (experience > 0) {
-                        ExperienceOrbEntity.spawn(serverWorld, Vec3d.ofCenter(this.pos), experience);
+                        ExperienceOrbEntity.spawn(serverWorld, pos, experience);
                 }
                 this.storedExperience = 0.0F;
         }
