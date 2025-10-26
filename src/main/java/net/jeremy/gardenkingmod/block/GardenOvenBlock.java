@@ -24,7 +24,7 @@ public class GardenOvenBlock extends AbstractFurnaceBlock {
 
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        Direction facing = ctx.getHorizontalPlayerFacing().getOpposite();
+        Direction facing = ctx.getHorizontalPlayerFacing();
         if (ctx.getPlayer() == null) {
             Direction side = ctx.getSide();
             if (side.getAxis().isHorizontal()) {
@@ -44,7 +44,7 @@ public class GardenOvenBlock extends AbstractFurnaceBlock {
 
         Direction facing = state.get(FACING);
         if (placer instanceof PlayerEntity player) {
-            facing = player.getHorizontalFacing().getOpposite();
+            facing = player.getHorizontalFacing();
         }
 
         BlockState updatedState = state.with(FACING, facing);
