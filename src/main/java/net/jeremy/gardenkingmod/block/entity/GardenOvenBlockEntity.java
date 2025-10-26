@@ -259,7 +259,9 @@ public class GardenOvenBlockEntity extends BlockEntity implements NamedScreenHan
 
         public void dropContents(World world, BlockPos pos) {
                 ItemScatterer.spawn(world, pos, this.inventory);
-                this.inventory.clear();
+                resetInventoryState();
+                updateLitState(false);
+                this.markDirty();
         }
 
         public void onOutputTaken(ServerPlayerEntity player) {
@@ -396,7 +398,15 @@ public class GardenOvenBlockEntity extends BlockEntity implements NamedScreenHan
 
         @Override
         public void clear() {
-                this.inventory.clear();
+                resetInventoryState();
+                this.markDirty();
+        }
+
+        private void resetInventoryState() {
+                this.inventory = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
+                this.cookTime = 0;
+                this.cookTimeTotal = GardenOvenBalanceConfig.get().cookTime();
+                this.storedExperience = 0.0F;
         }
 
         @Override
