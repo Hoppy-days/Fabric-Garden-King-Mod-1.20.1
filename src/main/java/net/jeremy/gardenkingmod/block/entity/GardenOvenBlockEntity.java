@@ -219,6 +219,44 @@ public class GardenOvenBlockEntity extends BlockEntity implements NamedScreenHan
                 }
         }
 
+        private void tryStartCooking() {
+                if (this.world == null || this.world.isClient) {
+                        return;
+                }
+
+                SimpleInventory input = createInputInventory();
+                GardenOvenRecipe recipe = getMatchingRecipe(this.world, input);
+                if (recipe == null || !canAcceptRecipe(this.world, recipe)) {
+                        return;
+                }
+
+                int recipeTime = recipe.getCookingTime();
+                if (recipeTime <= 0) {
+                        recipeTime = GardenOvenBalanceConfig.get().cookTime();
+                }
+
+                this.cookTimeTotal = recipeTime;
+                if (this.cookTime <= 0) {
+                        this.cookTime = 1;
+                }
+
+                updateLitState(true);
+                this.markDirty();
+        }
+
+        private void updateLitState(boolean lit) {
+                if (this.world == null || this.world.isClient) {
+                        return;
+                }
+
+                BlockState state = this.world.getBlockState(this.pos);
+                if (!state.contains(GardenOvenBlock.LIT) || state.get(GardenOvenBlock.LIT) == lit) {
+                        return;
+                }
+
+                this.world.setBlockState(this.pos, state.with(GardenOvenBlock.LIT, lit), Block.NOTIFY_LISTENERS);
+        }
+
         public void dropContents(World world, BlockPos pos) {
                 ItemScatterer.spawn(world, pos, this.inventory);
                 this.inventory.clear();
@@ -330,10 +368,19 @@ public class GardenOvenBlockEntity extends BlockEntity implements NamedScreenHan
                 if (stack.getCount() > this.getMaxCountPerStack()) {
                         stack.setCount(this.getMaxCountPerStack());
                 }
-                if (slot < INPUT_SLOT_COUNT && !same) {
+                boolean inputSlot = slot < INPUT_SLOT_COUNT;
+                if (inputSlot && !same) {
+                        boolean wasCooking = this.cookTime > 0;
                         this.cookTime = 0;
+                        this.cookTimeTotal = GardenOvenBalanceConfig.get().cookTime();
+                        if (wasCooking) {
+                                updateLitState(false);
+                        }
                 }
                 this.markDirty();
+                if (inputSlot) {
+                        tryStartCooking();
+                }
         }
 
         @Override
