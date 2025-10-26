@@ -23,10 +23,31 @@ public class GardenOvenBlock extends AbstractFurnaceBlock {
         public BlockState getPlacementState(ItemPlacementContext ctx) {
                 Direction facing = ctx.getHorizontalPlayerFacing().getOpposite();
                 if (ctx.getPlayer() == null) {
-                        facing = ctx.getHorizontalFacing().getOpposite();
+                        Direction side = ctx.getSide();
+                        if (side.getAxis().isHorizontal()) {
+                                facing = side;
+                        }
                 }
 
                 return this.getDefaultState().with(FACING, facing).with(LIT, Boolean.FALSE);
+        }
+
+        @Override
+        public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
+                super.onPlaced(world, pos, state, placer, itemStack);
+                if (world.isClient) {
+                        return;
+                }
+
+                Direction facing = state.get(FACING);
+                if (placer instanceof PlayerEntity player) {
+                        facing = player.getHorizontalFacing().getOpposite();
+                }
+
+                BlockState updatedState = state.with(FACING, facing);
+                if (!updatedState.equals(state)) {
+                        world.setBlockState(pos, updatedState, Block.NOTIFY_ALL);
+                }
         }
 
 	@Override
