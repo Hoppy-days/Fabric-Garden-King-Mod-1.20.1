@@ -15,6 +15,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -90,6 +91,7 @@ public class GardenOvenBlock extends BlockWithEntity {
 
                 return ActionResult.CONSUME;
         }
+    }
 
         @Override
         public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
@@ -114,4 +116,15 @@ public class GardenOvenBlock extends BlockWithEntity {
                 }
                 return checkType(type, ModBlockEntities.GARDEN_OVEN_BLOCK_ENTITY, GardenOvenBlockEntity::tick);
         }
+
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof GardenOvenBlockEntity oven) {
+            player.openHandledScreen((NamedScreenHandlerFactory) oven);
+        }
+    }
+
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new GardenOvenBlockEntity(pos, state);
+    }
 }
