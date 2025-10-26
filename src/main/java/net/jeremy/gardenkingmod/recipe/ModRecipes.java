@@ -1,8 +1,6 @@
 package net.jeremy.gardenkingmod.recipe;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
-import net.jeremy.gardenkingmod.util.GardenOvenBalanceConfig;
-import net.minecraft.recipe.CookingRecipeSerializer;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
@@ -21,7 +19,7 @@ public final class ModRecipes {
 
         public static final RecipeSerializer<GardenOvenRecipe> GARDEN_OVEN_RECIPE_SERIALIZER = Registry.register(
                         Registries.RECIPE_SERIALIZER, new Identifier(GardenKingMod.MOD_ID, "garden_oven"),
-                        new CookingRecipeSerializer<>(GardenOvenRecipe::new, GardenOvenBalanceConfig.get().cookTime()));
+                        new GardenOvenRecipe.Serializer());
 
         private ModRecipes() {
         }
