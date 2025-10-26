@@ -38,7 +38,7 @@ public class GardenOvenScreen extends HandledScreen<GardenOvenScreenHandler> {
                 int fireProgress = this.handler.getCookProgressScaled(14);
                 if (fireProgress > 0) {
                         int offset = 14 - fireProgress;
-                        context.drawTexture(TEXTURE, x + 129, y + 59 + offset, 176, offset, 14, fireProgress);
+                        context.drawTexture(TEXTURE, x + 125, y + 59 + offset, 176, offset, 14, fireProgress);
                 }
         }
 
