@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 
 public final class GardenKingModGameTest implements FabricGameTest {
         @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
-        public void sellingCroptopiaTomatoAwardsCoins(GameTestHelper helper) {
+        public void sellingCroptopiaTomatoAwardsDollars(GameTestHelper helper) {
                 helper.setBlock(BlockPos.ORIGIN, ModBlocks.MARKET_BLOCK.getDefaultState());
 
                 helper.runAtTickTime(1, () -> {
@@ -41,18 +41,18 @@ public final class GardenKingModGameTest implements FabricGameTest {
                                 return;
                         }
 
-                        int coinCount = 0;
+                        int dollarCount = 0;
                         int tomatoCount = 0;
                         for (ItemStack inventoryStack : player.getInventory().main) {
-                                if (inventoryStack.isOf(ModItems.GARDEN_COIN)) {
-                                        coinCount += inventoryStack.getCount();
+                                if (inventoryStack.isOf(ModItems.DOLLAR)) {
+                                        dollarCount += inventoryStack.getCount();
                                 } else if (inventoryStack.isOf(tomatoOptional.get())) {
                                         tomatoCount += inventoryStack.getCount();
                                 }
                         }
 
-                        if (coinCount <= 0) {
-                                helper.fail("Player did not receive any garden coins after selling tomatoes");
+                        if (dollarCount <= 0) {
+                                helper.fail("Player did not receive any dollars after selling tomatoes");
                                 return;
                         }
 

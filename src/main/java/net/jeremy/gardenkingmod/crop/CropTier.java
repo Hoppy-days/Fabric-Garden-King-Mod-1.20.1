@@ -8,5 +8,5 @@ import net.minecraft.util.Identifier;
  * harvests, and the probability of producing no harvest at all.
  */
 public record CropTier(Identifier id, float growthMultiplier, float dropMultiplier, float rottenChance,
-	float noDropChance) {
+        float noDropChance, float enchantedChance) {
 }

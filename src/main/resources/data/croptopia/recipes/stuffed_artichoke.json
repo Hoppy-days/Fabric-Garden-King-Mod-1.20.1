@@ -1,0 +1,35 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "item": "minecraft:bread"
+    },
+    {
+      "tag": "c:cheeses"
+    },
+    {
+      "tag": "c:olive_oils"
+    },
+    {
+      "tag": "c:artichokes"
+    },
+    {
+      "item": "croptopia:pepper"
+    },
+    {
+      "tag": "c:lemons"
+    },
+    {
+      "tag": "c:salts"
+    },
+    {
+      "item": "croptopia:frying_pan"
+    }
+  ],
+  "result": {
+    "item": "croptopia:stuffed_artichoke",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

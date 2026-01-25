@@ -1,0 +1,35 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:flour"
+    },
+    {
+      "tag": "c:onions"
+    },
+    {
+      "tag": "c:mustard"
+    },
+    {
+      "item": "croptopia:frying_pan"
+    },
+    {
+      "item": "croptopia:pepper"
+    },
+    {
+      "item": "minecraft:egg"
+    },
+    {
+      "item": "minecraft:beef"
+    },
+    {
+      "item": "minecraft:brown_mushroom"
+    }
+  ],
+  "result": {
+    "item": "croptopia:beef_wellington",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

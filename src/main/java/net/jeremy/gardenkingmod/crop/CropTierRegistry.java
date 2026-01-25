@@ -67,12 +67,12 @@ public final class CropTierRegistry {
                         return;
                 }
 
-		tiers = Map.ofEntries(
-				Map.entry(TIER_1_ID, new CropTier(TIER_1_ID, 1.0f, 1.0f, 0.5f, 0.0f)),
-				Map.entry(TIER_2_ID, new CropTier(TIER_2_ID, 0.9f, 1.15f, 0.05f, 0.05f)),
-				Map.entry(TIER_3_ID, new CropTier(TIER_3_ID, 0.8f, 1.3f, 0.1f, 0.1f)),
-				Map.entry(TIER_4_ID, new CropTier(TIER_4_ID, 0.7f, 1.5f, 0.15f, 0.15f)),
-				Map.entry(TIER_5_ID, new CropTier(TIER_5_ID, 0.6f, 1.75f, 0.2f, 0.2f)));
+                tiers = Map.ofEntries(
+                                Map.entry(TIER_1_ID, new CropTier(TIER_1_ID, 1.0f, 1.0f, 0.25f, 0.25f, 0.01f)),
+                                Map.entry(TIER_2_ID, new CropTier(TIER_2_ID, 0.8f, 1.15f, 0.20f, 0.20f, 0.02f)),
+                                Map.entry(TIER_3_ID, new CropTier(TIER_3_ID, 0.6f, 1.3f, 0.15f, 0.15f, 0.03f)),
+                                Map.entry(TIER_4_ID, new CropTier(TIER_4_ID, 0.4f, 1.5f, 0.10f, 0.10f, 0.04f)),
+                                Map.entry(TIER_5_ID, new CropTier(TIER_5_ID, 0.2f, 1.75f, 0.05f, 0.05f, 0.05f)));
 
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA)
                                 .registerReloadListener(new BlockTierLookupReloader());

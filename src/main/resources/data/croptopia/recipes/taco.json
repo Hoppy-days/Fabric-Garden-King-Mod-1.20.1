@@ -1,0 +1,26 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:tortillas"
+    },
+    {
+      "tag": "c:cheeses"
+    },
+    {
+      "tag": "c:lettuce"
+    },
+    {
+      "item": "croptopia:salsa"
+    },
+    {
+      "tag": "croptopia:meat_replacements"
+    }
+  ],
+  "result": {
+    "item": "croptopia:taco",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

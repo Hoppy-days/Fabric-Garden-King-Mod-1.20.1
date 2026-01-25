@@ -1,0 +1,29 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "croptopia:meat_replacements"
+    },
+    {
+      "tag": "c:bellpeppers"
+    },
+    {
+      "tag": "c:onions"
+    },
+    {
+      "tag": "c:tomatoes"
+    },
+    {
+      "tag": "c:cheeses"
+    },
+    {
+      "item": "croptopia:frying_pan"
+    }
+  ],
+  "result": {
+    "item": "croptopia:fajitas",
+    "count": 2
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

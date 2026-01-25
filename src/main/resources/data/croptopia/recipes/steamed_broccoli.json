@@ -1,0 +1,20 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:broccoli"
+    },
+    {
+      "tag": "c:water_bottles"
+    },
+    {
+      "tag": "c:broccoli"
+    }
+  ],
+  "result": {
+    "item": "croptopia:steamed_broccoli",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

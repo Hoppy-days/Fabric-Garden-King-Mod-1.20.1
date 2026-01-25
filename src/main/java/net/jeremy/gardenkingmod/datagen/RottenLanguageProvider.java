@@ -19,25 +19,31 @@ public final class RottenLanguageProvider extends FabricLanguageProvider {
         }
 
     @Override
-    public void generateTranslations(TranslationBuilder translationBuilder) {
+        public void generateTranslations(TranslationBuilder translationBuilder) {
                 translationBuilder.add("block.gardenkingmod.market_block", "Garden Market");
-                translationBuilder.add("item.gardenkingmod.garden_coin", "Garden Coin");
+                translationBuilder.add("block.gardenkingmod.gear_shop_block", "Gear Shop");
+                translationBuilder.add("item.gardenkingmod.dollar", "Dollar");
                 translationBuilder.add("container.gardenkingmod.market", "Garden Market");
+                translationBuilder.add("container.gardenkingmod.gear_shop", "Gear Shop");
+                translationBuilder.add("container.gardenkingmod.scarecrow", "Field Scarecrow");
                 translationBuilder.add("screen.gardenkingmod.market.sell", "Sell");
-                translationBuilder.add("screen.gardenkingmod.market.sale_result",
-                                "You sold %1$s crops and earned %2$s garden coins.");
-                translationBuilder.add("screen.gardenkingmod.market.sale_result_detailed",
-                                "You sold %1$s and earned %2$s garden coins.");
+                translationBuilder.add("screen.gardenkingmod.market.tab.sell", "Sell");
+                translationBuilder.add("screen.gardenkingmod.market.tab.buy", "Buy");
+                translationBuilder.add("screen.gardenkingmod.market.offers", "OFFERS");
+                translationBuilder.add("screen.gardenkingmod.market.cost_count", "%s required");
+                translationBuilder.add("screen.gardenkingmod.market.sale_result_sold", "You sold %1$s crops");
+                translationBuilder.add("screen.gardenkingmod.market.sale_result_sold_detailed", "You sold %1$s");
+                translationBuilder.add("screen.gardenkingmod.market.sale_result_earned", "Earned: %1$s dollars");
                 translationBuilder.add("screen.gardenkingmod.market.sale_result_item", "%1$s %2$s");
-                translationBuilder.add("screen.gardenkingmod.market.lifetime",
-                                "Lifetime earnings: %1$s garden coins.");
+                translationBuilder.add("screen.gardenkingmod.market.sale_result_lifetime", "Lifetime earnings: %1$s dollars");
                 translationBuilder.add("message.gardenkingmod.market.sold",
-                                "Sold %1$s Croptopia crops for %2$s coins.");
+                                "Sold %1$s Croptopia crops for %2$s dollars.");
                 translationBuilder.add("message.gardenkingmod.market.sold.lifetime",
-                                "Sold %1$s Croptopia crops for %2$s coins. Lifetime earnings: %3$s coins.");
+                                "Sold %1$s Croptopia crops for %2$s dollars. Lifetime earnings: %3$s dollars.");
                 translationBuilder.add("message.gardenkingmod.market.empty", "There are no crops to sell.");
                 translationBuilder.add("message.gardenkingmod.market.invalid", "Only Crops and Food can be sold here!");
-                translationBuilder.add("scoreboard.gardenkingmod.garden_currency", "Garden Coins");
+                translationBuilder.add("scoreboard.gardenkingmod.garden_currency", "Garden Dollars");
+                translationBuilder.add("scoreboard.gardenkingmod.garden_currency_bank", "Bank Dollars");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier", "Tier: %s");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier.tier_1", "Tier 1");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier.tier_2", "Tier 2");

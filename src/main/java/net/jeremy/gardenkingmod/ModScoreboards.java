@@ -13,13 +13,18 @@ import net.minecraft.text.Text;
 
 public final class ModScoreboards {
         public static final String CURRENCY_OBJECTIVE = "garden_currency";
+        public static final String BANK_CURRENCY_OBJECTIVE = "garden_currency_bank";
 
         private ModScoreboards() {
         }
 
         public static void registerScoreboards() {
-                ServerLifecycleEvents.SERVER_STARTED.register(server -> ensureObjective(server.getScoreboard()));
-                ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> syncPlayerScore(handler.player));
+                ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+                        Scoreboard scoreboard = server.getScoreboard();
+                        ensureLifetimeObjective(scoreboard);
+                        ensureBankObjective(scoreboard);
+                });
+                ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> syncPlayerBalances(handler.player));
         }
 
         public static int addCurrency(ServerPlayerEntity player, int amount) {
@@ -33,7 +38,7 @@ public final class ModScoreboards {
                 }
 
                 Scoreboard scoreboard = server.getScoreboard();
-                ScoreboardObjective objective = ensureObjective(scoreboard);
+                ScoreboardObjective objective = ensureLifetimeObjective(scoreboard);
                 ScoreboardPlayerScore score = scoreboard.getPlayerScore(player.getEntityName(), objective);
 
                 int updatedScore;
@@ -47,26 +52,73 @@ public final class ModScoreboards {
                 return updatedScore;
         }
 
-        private static void syncPlayerScore(ServerPlayerEntity player) {
+        public static void syncPlayerBalances(ServerPlayerEntity player) {
                 MinecraftServer server = player.getServer();
                 if (server == null) {
                         return;
                 }
 
                 Scoreboard scoreboard = server.getScoreboard();
-                ScoreboardObjective objective = ensureObjective(scoreboard);
-                ScoreboardPlayerScore score = scoreboard.getPlayerScore(player.getEntityName(), objective);
+                ScoreboardObjective lifetimeObjective = ensureLifetimeObjective(scoreboard);
+                ScoreboardObjective bankObjective = ensureBankObjective(scoreboard);
+                ScoreboardPlayerScore lifetimeScore = scoreboard.getPlayerScore(player.getEntityName(), lifetimeObjective);
+                ScoreboardPlayerScore bankScore = scoreboard.getPlayerScore(player.getEntityName(), bankObjective);
 
                 if (player instanceof GardenCurrencyHolder holder) {
-                        score.setScore(holder.gardenkingmod$getLifetimeCurrency());
+                        lifetimeScore.setScore(holder.gardenkingmod$getLifetimeCurrency());
+
+                        long bankBalance = holder.gardenkingmod$getBankBalance();
+                        int clamped = bankBalance > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) Math.max(0L, bankBalance);
+                        bankScore.setScore(clamped);
+                } else {
+                        lifetimeScore.setScore(0);
+                        bankScore.setScore(0);
                 }
         }
 
-        private static ScoreboardObjective ensureObjective(Scoreboard scoreboard) {
-                ScoreboardObjective objective = scoreboard.getObjective(CURRENCY_OBJECTIVE);
+        public static int getLifetimeCurrency(ServerPlayerEntity player) {
+                if (player instanceof GardenCurrencyHolder holder) {
+                        return holder.gardenkingmod$getLifetimeCurrency();
+                }
+
+                MinecraftServer server = player.getServer();
+                if (server == null) {
+                        return 0;
+                }
+
+                Scoreboard scoreboard = server.getScoreboard();
+                ScoreboardObjective objective = ensureLifetimeObjective(scoreboard);
+                return scoreboard.getPlayerScore(player.getEntityName(), objective).getScore();
+        }
+
+        public static long getBankBalance(ServerPlayerEntity player) {
+                if (player instanceof GardenCurrencyHolder holder) {
+                        return holder.gardenkingmod$getBankBalance();
+                }
+
+                MinecraftServer server = player.getServer();
+                if (server == null) {
+                        return 0L;
+                }
+
+                Scoreboard scoreboard = server.getScoreboard();
+                ScoreboardObjective objective = ensureBankObjective(scoreboard);
+                return scoreboard.getPlayerScore(player.getEntityName(), objective).getScore();
+        }
+
+        private static ScoreboardObjective ensureLifetimeObjective(Scoreboard scoreboard) {
+                return ensureObjective(scoreboard, CURRENCY_OBJECTIVE, "scoreboard.gardenkingmod.garden_currency");
+        }
+
+        private static ScoreboardObjective ensureBankObjective(Scoreboard scoreboard) {
+                return ensureObjective(scoreboard, BANK_CURRENCY_OBJECTIVE, "scoreboard.gardenkingmod.garden_currency_bank");
+        }
+
+        private static ScoreboardObjective ensureObjective(Scoreboard scoreboard, String name, String translationKey) {
+                ScoreboardObjective objective = scoreboard.getObjective(name);
                 if (objective == null) {
-                        objective = scoreboard.addObjective(CURRENCY_OBJECTIVE, ScoreboardCriterion.DUMMY, Text.translatable("scoreboard.gardenkingmod.garden_currency"), ScoreboardCriterion.RenderType.INTEGER);
-                        GardenKingMod.LOGGER.info("Created scoreboard objective {}", CURRENCY_OBJECTIVE);
+                        objective = scoreboard.addObjective(name, ScoreboardCriterion.DUMMY, Text.translatable(translationKey), ScoreboardCriterion.RenderType.INTEGER);
+                        GardenKingMod.LOGGER.info("Created scoreboard objective {}", name);
                 }
 
                 return objective;

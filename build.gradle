@@ -65,6 +65,8 @@ dependencies {
 
         modImplementation "curse.maven:epherolib-885449:4949797"
 
+        modImplementation "curse.maven:jei-238222:6600309"
+
 }
 
 processResources {

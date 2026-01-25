@@ -74,6 +74,21 @@
 - **Durability:** Optional—decrease durability when crow attempts to attack; break when zero.
 - **Upgrades:** Accepts talismans or food offerings in internal inventory to increase aura duration or radius.
 
+#### Implementation knobs
+- `ScarecrowAuraComponent` owns the core ward parameters, including `BASE_HORIZONTAL_RADIUS`, `BASE_VERTICAL_RADIUS`, `PULSE_INTERVAL_TICKS`, and `PULSE_DURATION_TICKS`, which define the base aura shape and pulse cadence.
+- `ScarecrowBlockEntity` wires the aura into gameplay: `tick` advances pulses, `MAX_DURABILITY` and `onCrowRepelled` handle durability drain, `getUpgradeRadiusBonus` / `getUpgradeVerticalBonus` / `getUpgradeLevel` apply inventory-based upgrades, and `isValidUpgrade` plus `getMaxCountPerStack` enforce allowed items and stack limits.
+- `CrowFleeWardingGoal` queries `ScarecrowAuraComponent.findNearestActiveAura` to decide when crows should flee.
+- `ScarecrowBlock` exposes the `POWERED` redstone property; `ScarecrowBlockEntity.isAuraActive` checks it so redstone power disables the aura.
+
+To adjust gameplay tuning:
+- **Base radii:** update `BASE_HORIZONTAL_RADIUS` / `BASE_VERTICAL_RADIUS` in `ScarecrowAuraComponent`.
+- **Pulse interval/duration:** change `PULSE_INTERVAL_TICKS` and `PULSE_DURATION_TICKS` in the same component, and ensure any cooldown math in `ScarecrowAuraComponent.tick` still behaves as expected.
+- **Durability drain & cap:** modify `MAX_DURABILITY` or the decrement logic in `ScarecrowBlockEntity.onCrowRepelled`.
+- **Upgrade items & limits:** tweak `ScarecrowBlockEntity.isValidUpgrade`, `getUpgradeRadiusBonus`, `getUpgradeVerticalBonus`, `getUpgradeLevel`, and `getMaxCountPerStack` to match the desired item tags, scaling, and stack caps.
+- **Redstone disabling:** the aura respects the `POWERED` flag set in `ScarecrowBlock`; adjust `ScarecrowBlockEntity.isAuraActive` or block state updates if you want different redstone behavior.
+
+> **Texture placement:** keep scarecrow block textures under `src/main/resources/assets/gardenkingmod/textures/block/`. No PNGs are auto-generated, so add the artwork manually.
+
 ### Option B: Protective Charm Entity
 - **Entity Type:** Stationary, invisible entity spawned by block placement or thrown item.
 - **Behavior:** Emits aura, can move slowly or hover; uses `LivingEntity` or `AreaEffectCloud` subclass for built-in radius handling.

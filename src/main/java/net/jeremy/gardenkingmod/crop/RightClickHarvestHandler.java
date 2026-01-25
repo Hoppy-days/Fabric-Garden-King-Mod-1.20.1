@@ -1,17 +1,29 @@
 package net.jeremy.gardenkingmod.crop;
 
+import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
+
+import net.jeremy.gardenkingmod.ModItems;
+import net.jeremy.gardenkingmod.crop.CropTier;
+import net.jeremy.gardenkingmod.crop.CropTierRegistry;
+import net.jeremy.gardenkingmod.skill.HarvestXpService;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CropBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.HoeItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
@@ -44,7 +56,7 @@ public final class RightClickHarvestHandler {
 
                 ServerWorld serverWorld = (ServerWorld) world;
                 BlockEntity blockEntity = world.getBlockEntity(pos);
-                Block.dropStacks(state, serverWorld, pos, blockEntity, player, toolForDrops);
+                dropStacksWithXp(state, serverWorld, pos, blockEntity, player, toolForDrops);
 
                 BlockState resetState = crop.withAge(0);
                 world.setBlockState(pos, resetState, Block.NOTIFY_ALL);
@@ -56,6 +68,38 @@ public final class RightClickHarvestHandler {
                 }
 
                 return ActionResult.SUCCESS;
+        }
+
+        private static void dropStacksWithXp(BlockState state, ServerWorld world, BlockPos pos,
+                        @Nullable BlockEntity blockEntity, PlayerEntity player, ItemStack toolForDrops) {
+                List<ItemStack> generatedLoot = Block.getDroppedStacks(state, world, pos, blockEntity, player, toolForDrops);
+                Identifier blockId = Registries.BLOCK.getId(state.getBlock());
+                Identifier tierId = CropTierRegistry.get(state).map(CropTier::id).orElse(null);
+
+                ItemStack enchantedCandidate = ItemStack.EMPTY;
+                ItemStack normalCandidate = ItemStack.EMPTY;
+
+                for (ItemStack stack : generatedLoot) {
+                        if (stack.isEmpty()) {
+                                continue;
+                        }
+
+                        Item item = stack.getItem();
+                        if (ModItems.isEnchantedItem(item)) {
+                                if (enchantedCandidate.isEmpty()) {
+                                        enchantedCandidate = stack.copy();
+                                }
+                        } else if (!ModItems.isRottenItem(item) && normalCandidate.isEmpty()) {
+                                normalCandidate = stack.copy();
+                        }
+                }
+
+                ItemStack xpStack = enchantedCandidate.isEmpty() ? normalCandidate : enchantedCandidate;
+                if (!xpStack.isEmpty()) {
+                        HarvestXpService.awardHarvestXp(player, blockId, tierId, xpStack);
+                }
+
+                Block.dropStacks(state, world, pos, blockEntity, player, toolForDrops);
         }
 
 }

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "gardenkingmod:item/garden_coin"
+    "layer0": "croptopia:item/lettuce"
   }
 }

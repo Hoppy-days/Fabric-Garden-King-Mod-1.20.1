@@ -1,0 +1,23 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:blackbeans"
+    },
+    {
+      "tag": "c:rice"
+    },
+    {
+      "tag": "c:tomatoes"
+    },
+    {
+      "tag": "c:tortillas"
+    }
+  ],
+  "result": {
+    "item": "croptopia:burrito",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}
