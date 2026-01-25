@@ -69,7 +69,15 @@ public final class ModServerNetworking {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
             SkillProgressNetworking.sync(handler.player);
+            applyPlayerGlow(handler.player);
         });
+    }
+
+    private static void applyPlayerGlow(ServerPlayerEntity player) {
+        if (player == null) {
+            return;
+        }
+        player.setGlowing(true);
     }
 
     private static boolean applySkillUpgrade(SkillProgressHolder skillHolder, Identifier skillId, int pointsToSpend) {
