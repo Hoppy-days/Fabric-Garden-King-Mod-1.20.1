@@ -2,6 +2,7 @@ package net.jeremy.gardenkingmod.network;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerPlayerEvents;
 import net.jeremy.gardenkingmod.screen.BankScreenHandler;
 import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
 import net.jeremy.gardenkingmod.skill.SkillProgressManager;
@@ -69,7 +70,19 @@ public final class ModServerNetworking {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
             SkillProgressNetworking.sync(handler.player);
+            applyPlayerGlow(handler.player);
         });
+
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
+            applyPlayerGlow(newPlayer);
+        });
+    }
+
+    private static void applyPlayerGlow(ServerPlayerEntity player) {
+        if (player == null) {
+            return;
+        }
+        player.setGlowing(true);
     }
 
     private static boolean applySkillUpgrade(SkillProgressHolder skillHolder, Identifier skillId, int pointsToSpend) {
