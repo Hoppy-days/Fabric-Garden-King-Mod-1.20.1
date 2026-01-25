@@ -25,7 +25,7 @@ repositories {
         // See https://docs.gradle.org/current/userguide/declaring_repositories.html
         // for more information about repositories.
         maven { url "https://cursemaven.com" }
-        maven { url "https://maven.croptopia.com" }
+        maven { url "https://api.modrinth.com/maven" }
 }
 
 fabricApi {
@@ -63,9 +63,8 @@ dependencies {
                 exclude module: "fabric-convention-tags-v1"
         }
 
-        modImplementation "com.epherical.croptopia:croptopia-fabric-1.20.1:${project.croptopia_version}"
-
-        modImplementation "com.epherical.croptopia:epherolib:${project.epherolib_version}"
+        modImplementation "maven.modrinth:croptopia:${project.croptopia_version}"
+        modImplementation "maven.modrinth:epherolib:${project.epherolib_version}"
 
         modImplementation "curse.maven:jei-238222:6600309"
 
