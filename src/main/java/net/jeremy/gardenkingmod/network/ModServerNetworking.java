@@ -70,7 +70,7 @@ public final class ModServerNetworking {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
             SkillProgressNetworking.sync(handler.player);
-            applyPlayerGlow(handler.player);
+            handler.player.setGlowing(true);
         });
 
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
