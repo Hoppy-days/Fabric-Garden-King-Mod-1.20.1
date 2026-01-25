@@ -2,10 +2,11 @@ package net.jeremy.gardenkingmod.network;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.jeremy.gardenkingmod.screen.BankScreenHandler;
 import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
 import net.jeremy.gardenkingmod.skill.SkillProgressManager;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -65,19 +66,12 @@ public final class ModServerNetworking {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
             SkillProgressNetworking.sync(handler.player);
             // Glow on join; respawn glow is handled in ServerPlayerEntityMixin.copyFrom.
-            handler.player.setGlowing(true);
+            applyPlayerGlow(handler.player);
         });
 
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             applyPlayerGlow(newPlayer);
         });
-    }
-
-    private static void applyPlayerGlow(ServerPlayerEntity player) {
-        if (player == null) {
-            return;
-        }
-        player.setGlowing(true);
     }
 
     private static void applyPlayerGlow(ServerPlayerEntity player) {
