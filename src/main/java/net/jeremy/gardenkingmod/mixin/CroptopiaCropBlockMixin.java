@@ -17,7 +17,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Pseudo
 @Mixin(targets = { "com.epherical.croptopia.blocks.CropBlock",
-                "com.epherical.croptopia.blocks.CroptopiaCropBlock" }, remap = false)
+                "com.epherical.croptopia.blocks.CroptopiaCropBlock",
+                "com.epherical.croptopia.block.CropBlock",
+                "com.epherical.croptopia.block.CroptopiaCropBlock" }, remap = false)
 public abstract class CroptopiaCropBlockMixin {
 
         @Inject(method = "onUse(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;",
