@@ -63,7 +63,7 @@ dependencies {
                 exclude module: "fabric-convention-tags-v1"
         }
 
-        modImplementation "maven.modrinth:croptopia:${project.croptopia_version}"
+        modImplementation "curse.maven:croptopia-415438:4970185"
         modImplementation "maven.modrinth:epherolib:${project.epherolib_version}"
 
         modImplementation "curse.maven:jei-238222:6600309"
