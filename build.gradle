@@ -19,13 +19,21 @@ sourceSets {
 }
 
 repositories {
-        // Add repositories to retrieve artifacts from in here.
-        // You should only use this when depending on other mods because
-        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-        // for more information about repositories.
-        maven { url "https://cursemaven.com" }
-        maven { url "https://maven.croptopia.com" }
+// CurseForge Maven (Croptopia, EpheroLib, JEI, etc.)
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+
+
+// Modrinth Maven
+    maven { url "https://api.modrinth.com/maven" }
+
+
+// Normal libraries
+    mavenCentral()
 }
 
 fabricApi {
@@ -53,18 +61,28 @@ loom {
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+// To change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-        // Fabric API. This is technically optional, but you probably want it anyway.
-        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-        modImplementation "curse.maven:croptopia-415438:4997461"
+// Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}") {
+        exclude module: "fabric-convention-tags-v1"
+    }
 
-        modImplementation "curse.maven:epherolib-885449:4949797"
 
+// Croptopia (1.20.1 Fabric 3.0.3, via CurseMaven)
+    modImplementation "curse.maven:croptopia-415438:4970185"
+
+
+// EpheroLib (1.20.1 Fabric 1.2.0, via CurseMaven)
+    modImplementation "curse.maven:epherolib-885449:4949797"
+
+
+// JEI for Fabric 1.20.1 (from CurseMaven, snippet from the JEI file page)
+    modImplementation "curse.maven:jei-238222:6600309"
 }
 
 processResources {

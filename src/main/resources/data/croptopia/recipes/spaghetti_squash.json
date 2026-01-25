@@ -1,0 +1,23 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:squashes"
+    },
+    {
+      "tag": "c:chile_peppers"
+    },
+    {
+      "tag": "c:olive_oils"
+    },
+    {
+      "item": "croptopia:frying_pan"
+    }
+  ],
+  "result": {
+    "item": "croptopia:spaghetti_squash",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

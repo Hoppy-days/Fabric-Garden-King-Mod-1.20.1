@@ -1,0 +1,57 @@
+{
+  "_comment": "Default Garden Market offers. Adjust as needed for balancing.",
+  "offers": [
+    {
+      "offer": "minecraft:wheat_seeds*16",
+      "price": [
+        "gardenkingmod:dollar*4",
+        "gardenkingmod:dollar*4"
+        ]
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:dollar*4"
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:dollar*4"
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:dollar*4"
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:dollar*4"
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:dollar*4"
+    },{
+      "offer": "minecraft:wheat_seeds*16",
+      "price": "gardenkingmod:dollar*4"
+    },{
+      "offer": "minecraft:carrot*16",
+      "price": "gardenkingmod:dollar*6"
+    },{
+      "offer": "minecraft:potato*16",
+      "price": "gardenkingmod:dollar*6"
+    },{
+      "offer": "minecraft:melon_seeds*8",
+      "price": "gardenkingmod:dollar*10"
+    },{
+      "offer": "minecraft:pumpkin_seeds*8",
+      "price": "gardenkingmod:dollar*10"
+    },{
+      "offer": "minecraft:bee_nest",
+      "price": [
+        "gardenkingmod:dollar*64",
+        "minecraft:honeycomb*8"
+      ]
+    },{
+      "offer": "gardenkingmod:rotten_tomato*8",
+      "price": "gardenkingmod:dollar*1"
+    },{
+      "offer": "gardenkingmod:rotten_potato*8",
+      "price": "gardenkingmod:dollar*1"
+    },{
+      "offer": "gardenkingmod:rotten_wheat*8",
+      "price": "gardenkingmod:dollar*1"
+    }
+  ]
+}

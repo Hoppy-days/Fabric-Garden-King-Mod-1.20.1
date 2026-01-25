@@ -1,0 +1,26 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:blackbeans"
+    },
+    {
+      "tag": "c:blackbeans"
+    },
+    {
+      "tag": "c:tomatoes"
+    },
+    {
+      "tag": "c:lettuce"
+    },
+    {
+      "tag": "c:tortillas"
+    }
+  ],
+  "result": {
+    "item": "croptopia:tostada",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

@@ -1,0 +1,32 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:basil"
+    },
+    {
+      "item": "minecraft:egg"
+    },
+    {
+      "tag": "c:olive_oils"
+    },
+    {
+      "tag": "c:eggplants"
+    },
+    {
+      "item": "croptopia:pepper"
+    },
+    {
+      "tag": "c:cheeses"
+    },
+    {
+      "item": "minecraft:bread"
+    }
+  ],
+  "result": {
+    "item": "croptopia:eggplant_parmesan",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}

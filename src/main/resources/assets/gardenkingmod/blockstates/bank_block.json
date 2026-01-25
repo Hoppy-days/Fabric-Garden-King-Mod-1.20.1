@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,half=lower": { "model": "minecraft:block/air" },
+    "facing=south,half=lower": { "model": "minecraft:block/air" },
+    "facing=west,half=lower": { "model": "minecraft:block/air" },
+    "facing=east,half=lower": { "model": "minecraft:block/air" },
+    "facing=north,half=upper": { "model": "minecraft:block/air" },
+    "facing=south,half=upper": { "model": "minecraft:block/air" },
+    "facing=west,half=upper": { "model": "minecraft:block/air" },
+    "facing=east,half=upper": { "model": "minecraft:block/air" }
+  }
+}

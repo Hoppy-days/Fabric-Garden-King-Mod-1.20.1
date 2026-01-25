@@ -2,7 +2,7 @@
 
 ## Bonus harvest drops
 
-Garden King now loads bonus crop drop definitions from JSON files under `data/gardenkingmod/bonus_harvest_drops/`. Each file maps a crop block or direct loot table identifier to one or more bonus entries with an `item`, `chance`, and integer `count` range. The new [`wheat_diamonds.json`](src/main/resources/data/gardenkingmod/bonus_harvest_drops/wheat_diamonds.json) file, for example, grants wheat a 5% chance to drop 1–3 diamonds when harvested.
+Garden King now loads bonus crop drop definitions from JSON files under `data/gardenkingmod/bonus_harvest_drops/`. Each file maps a crop block or direct loot table identifier to one or more bonus entries with an `item`, `chance`, and integer `count` range. All of the project's data-driven loaders strip any field named `_comment`, so you can document bonus drops, gear shop offers, or rotten crop definitions with entries such as `"_comment": "This is a general comment about the file."` anywhere in the JSON tree. The new [`wheat_diamonds.json`](src/main/resources/data/gardenkingmod/bonus_harvest_drops/wheat_diamonds.json) file, for example, grants wheat a 5% chance to drop 1–3 diamonds when harvested.
 
 ### Creating event packs
 
@@ -17,6 +17,73 @@ The repository ships an [example event configuration](src/main/resources/data/ga
 ### Asset reminders
 
 If an event introduces new items, remember to include their textures in `assets/gardenkingmod/textures/item/`. Place the matching `.png` files in that directory so Fabric can load them correctly.
+
+## Crow spawning
+
+Crow spawning is configured with two JSON files so that designers can keep biome targeting separate from spawn behaviour:
+
+* [`data/gardenkingmod/tags/worldgen/biome/spawns_crows.json`](src/main/resources/data/gardenkingmod/tags/worldgen/biome/spawns_crows.json) lists the biome IDs that should spawn crows.
+* [`config/gardenkingmod/crow.json`](config/gardenkingmod/crow.json) stores the spawn weight and minimum/maximum group sizes used by Fabric's mob spawning rules.
+
+### Adjusting biomes
+
+1. Open `data/gardenkingmod/tags/worldgen/biome/spawns_crows.json`.
+2. Add or remove biome IDs under the `values` array to control which biomes spawn crows. Use fully qualified identifiers such as `minecraft:plains`.
+3. Save the file and reload the game or server with `/reload`, or restart the instance, to apply the new biome list.
+
+### Tuning spawn rates
+
+1. Open `config/gardenkingmod/crow.json`.
+2. Change `spawnWeight` to increase or decrease how frequently crows spawn relative to other mobs in the same biome.
+3. Adjust `minSpawnGroupSize` and `maxSpawnGroupSize` to define how many crows appear together. Ensure the minimum does not exceed the maximum.
+4. Save the file and use `/reload` or restart the game/server to refresh the spawn parameters.
+
+### Crow assets
+
+Crow models, textures, and other assets follow the same conventions as the rest of the project. Keep any `.png` textures for the crow entity under `assets/gardenkingmod/textures/entity/` so that they are picked up automatically at runtime.
+
+## Gear shop trades
+
+The gear shop's inventory is now data-driven. All default trades live in
+[`data/gardenkingmod/gear_shop_offers.json`](src/main/resources/data/gardenkingmod/gear_shop_offers.json), which groups
+offers by UI tab through a `pages` array. Use `_comment` fields at the root, page, or offer level to label long files without affecting parsing:
+
+```json
+{
+  "_comment": "Starter inventory for the travelling gardener.",
+  "pages": [
+    {
+      "_comment": "Page 1: equipment",
+      "offers": [
+        {
+          "_comment": "Keep the elytra trade near the top for visibility.",
+          "offer": "minecraft:elytra",
+          "price": "gardenkingmod:ruby*32"
+        }
+      ]
+    }
+  ]
+}
+```
+
+* Each object inside `pages` represents one tab from top to bottom. The example file defines four pages to match the four tab
+  buttons in the UI; you can leave an `offers` array empty if you want a blank tab, but extra pages beyond the fourth are ignored.
+* `offer` is the item the shop will sell. You can provide it as a plain string (`"namespace:item"`) or as an object with
+  explicit fields such as `{ "item": "croptopia:cheese", "count": 2 }`.
+* `price` accepts either a single string/object or an array if you want multiple inputs. To specify stack sizes inline, append
+  `*<count>` to the identifier (for example, `"gardenkingmod:ruby*32"`).
+
+The stock configuration distributes the ruby-for-elytra upgrades across all four tabs while keeping the cheese trade on the
+first tab.
+
+### Adding more trades
+
+1. Open [`gear_shop_offers.json`](src/main/resources/data/gardenkingmod/gear_shop_offers.json).
+2. Decide which tab should display the trade and add a new JSON object to that page's `offers` array using the format above.
+   If you need to repurpose a tab, edit one of the existing four page entries—the UI ignores any pages defined beyond them.
+3. Save the file and reload your data packs (or restart the game/server) so Fabric's resource loader picks up the change.
+4. If the trade produces a brand-new item, place its `.png` texture inside `assets/gardenkingmod/textures/item/` so Fabric can
+   find it at runtime.
 
 ## Fortune levels and loot drops
 

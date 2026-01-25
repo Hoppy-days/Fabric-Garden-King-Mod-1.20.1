@@ -1,0 +1,26 @@
+{
+  "type": "gardenkingmod:garden_oven",
+  "ingredients": [
+    {
+      "tag": "c:cashews"
+    },
+    {
+      "item": "minecraft:cooked_chicken"
+    },
+    {
+      "tag": "c:soy_sauces"
+    },
+    {
+      "tag": "c:cabbage"
+    },
+    {
+      "item": "minecraft:carrot"
+    }
+  ],
+  "result": {
+    "item": "croptopia:cashew_chicken",
+    "count": 1
+  },
+  "group": "garden_oven",
+  "cookingtime": 200
+}
