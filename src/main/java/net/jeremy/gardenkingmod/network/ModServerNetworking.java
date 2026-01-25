@@ -85,6 +85,13 @@ public final class ModServerNetworking {
         player.setGlowing(true);
     }
 
+    private static void applyPlayerGlow(ServerPlayerEntity player) {
+        if (player == null) {
+            return;
+        }
+        player.setGlowing(true);
+    }
+
     private static boolean applySkillUpgrade(SkillProgressHolder skillHolder, Identifier skillId, int pointsToSpend) {
         int maxLevel = Math.max(0, SkillProgressManager.getMaxDefinedLevel());
         if (SkillProgressManager.CHEF_SKILL.equals(skillId)) {
