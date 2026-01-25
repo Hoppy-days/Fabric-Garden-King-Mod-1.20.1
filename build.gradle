@@ -59,7 +59,9 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
         // Fabric API. This is technically optional, but you probably want it anyway.
-        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+        modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}") {
+                exclude module: "fabric-convention-tags-v1"
+        }
 
         modImplementation "com.epherical.croptopia:croptopia-fabric-1.20.1:${project.croptopia_version}"
 
