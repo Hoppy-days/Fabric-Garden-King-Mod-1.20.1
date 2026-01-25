@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.jeremy.gardenkingmod.screen.BankScreenHandler;
 import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
 import net.jeremy.gardenkingmod.skill.SkillProgressManager;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -33,28 +32,23 @@ public final class ModServerNetworking {
                     int pointsToSpend = buf.readVarInt();
 
                     server.execute(() -> {
-                        if (!(player instanceof ServerPlayerEntity)) {
+                        if (!(player instanceof SkillProgressHolder)) {
                             return;
                         }
-                        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-
-                        if (!(serverPlayer instanceof SkillProgressHolder)) {
-                            return;
-                        }
-                        SkillProgressHolder skillHolder = (SkillProgressHolder) serverPlayer;
+                        SkillProgressHolder skillHolder = (SkillProgressHolder) player;
 
                         if (pointsToSpend <= 0) {
-                            SkillProgressNetworking.sync(serverPlayer);
+                            SkillProgressNetworking.sync(player);
                             return;
                         }
 
                         if (!SkillProgressManager.getSkillDefinitions().containsKey(skillId)) {
-                            SkillProgressNetworking.sync(serverPlayer);
+                            SkillProgressNetworking.sync(player);
                             return;
                         }
 
                         if (!skillHolder.gardenkingmod$spendSkillPoints(pointsToSpend)) {
-                            SkillProgressNetworking.sync(serverPlayer);
+                            SkillProgressNetworking.sync(player);
                             return;
                         }
 
@@ -63,12 +57,13 @@ public final class ModServerNetworking {
                             refundSkillPoints(skillHolder, pointsToSpend);
                         }
 
-                        SkillProgressNetworking.sync(serverPlayer);
+                        SkillProgressNetworking.sync(player);
                     });
                 });
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
             SkillProgressNetworking.sync(handler.player);
+            handler.player.setGlowing(true);
         });
     }
 
