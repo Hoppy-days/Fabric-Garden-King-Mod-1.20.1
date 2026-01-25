@@ -69,6 +69,7 @@ public final class ModServerNetworking {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
             SkillProgressNetworking.sync(handler.player);
+            handler.player.setGlowing(true);
         });
     }
 
