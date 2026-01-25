@@ -64,6 +64,7 @@ public final class ModServerNetworking {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
             SkillProgressNetworking.sync(handler.player);
+            // Glow on join; respawn glow is handled in ServerPlayerEntityMixin.copyFrom.
             handler.player.setGlowing(true);
         });
 
