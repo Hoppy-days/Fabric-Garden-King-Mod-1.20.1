@@ -1,9 +1,10 @@
 {
-  "_comment": "This is a general comment about the file.",
+  "_comment": "Item that will have a bonus drop",
   "minecraft:wheat": [
     {
+      "_comment": "Bonus item(s) that will drop when chance roll hits",
       "item": "gardenkingmod:ruby",
-      "chance": 0.15,
+      "chance": 0.01,
       "count": { "min": 1, "max": 1 }
     }
   ]
