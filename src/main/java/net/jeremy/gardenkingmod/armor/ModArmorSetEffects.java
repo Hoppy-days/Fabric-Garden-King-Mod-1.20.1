@@ -34,32 +34,32 @@ public final class ModArmorSetEffects {
 
         static {
                 EFFECTS_BY_MATERIAL.put(AmethystArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.NIGHT_VISION),
-                                effect(StatusEffects.LUCK)));
+                                effect(StatusEffects.NIGHT_VISION, 220, 0, true, false, true),
+                                effect(StatusEffects.LUCK, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(BlueSapphireArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.SPEED),
-                                effect(StatusEffects.JUMP_BOOST),
-                                effect(StatusEffects.DOLPHINS_GRACE)));
+                                effect(StatusEffects.SPEED, 220, 0, true, false, true),
+                                effect(StatusEffects.JUMP_BOOST, 220, 0, true, false, true),
+                                effect(StatusEffects.DOLPHINS_GRACE, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(EmeraldArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.LUCK),
-                                effect(StatusEffects.HERO_OF_THE_VILLAGE),
-                                effect(StatusEffects.REGENERATION)));
+                                effect(StatusEffects.LUCK, 220, 0, true, false, true),
+                                effect(StatusEffects.HERO_OF_THE_VILLAGE, 220, 0, true, false, true),
+                                effect(StatusEffects.REGENERATION, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(ObsidianArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.RESISTANCE),
-                                effect(StatusEffects.SLOWNESS),
-                                effect(StatusEffects.ABSORPTION)));
+                                effect(StatusEffects.RESISTANCE, 220, 0, true, false, true),
+                                effect(StatusEffects.SLOWNESS, 220, 0, true, false, true),
+                                effect(StatusEffects.ABSORPTION, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(PearlArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.SLOW_FALLING),
-                                effect(StatusEffects.SPEED),
-                                effect(StatusEffects.RESISTANCE)));
+                                effect(StatusEffects.SLOW_FALLING, 220, 0, true, false, true),
+                                effect(StatusEffects.SPEED, 220, 0, true, false, true),
+                                effect(StatusEffects.RESISTANCE, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(RubyArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.STRENGTH),
-                                effect(StatusEffects.REGENERATION),
-                                effect(StatusEffects.FIRE_RESISTANCE)));
+                                effect(StatusEffects.STRENGTH, 220, 0, true, false, true),
+                                effect(StatusEffects.REGENERATION, 220, 0, true, false, true),
+                                effect(StatusEffects.FIRE_RESISTANCE, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(TopazArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.HASTE),
-                                effect(StatusEffects.LUCK),
-                                effect(StatusEffects.ABSORPTION)));
+                                effect(StatusEffects.HASTE, 220, 0, true, false, true),
+                                effect(StatusEffects.LUCK, 220, 0, true, false, true),
+                                effect(StatusEffects.ABSORPTION, 220, 0, true, false, true)));
         }
 
         private ModArmorSetEffects() {
@@ -105,8 +105,9 @@ public final class ModArmorSetEffects {
                 return armorItem.getMaterial() == material;
         }
 
-        private static StatusEffectInstance effect(StatusEffect statusEffect) {
-                return new StatusEffectInstance(statusEffect, 220, 0, true, false, true);
+        private static StatusEffectInstance effect(StatusEffect statusEffect, int duration, int amplifier,
+                        boolean ambient, boolean showParticles, boolean showIcon) {
+                return new StatusEffectInstance(statusEffect, duration, amplifier, ambient, showParticles, showIcon);
         }
 
         private record StatusEffectBonus(List<StatusEffectInstance> templates) {
