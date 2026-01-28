@@ -1,10 +1,17 @@
 package net.jeremy.gardenkingmod.armor;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.jeremy.gardenkingmod.item.AmethystArmorMaterial;
+import net.jeremy.gardenkingmod.item.BlueSapphireArmorMaterial;
+import net.jeremy.gardenkingmod.item.EmeraldArmorMaterial;
+import net.jeremy.gardenkingmod.item.ObsidianArmorMaterial;
+import net.jeremy.gardenkingmod.item.PearlArmorMaterial;
 import net.jeremy.gardenkingmod.item.RubyArmorMaterial;
+import net.jeremy.gardenkingmod.item.TopazArmorMaterial;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -26,11 +33,33 @@ public final class ModArmorSetEffects {
         private static final Map<ArmorMaterial, StatusEffectBonus> EFFECTS_BY_MATERIAL = new LinkedHashMap<>();
 
         static {
-                // Update the template below to adjust duration, amplifier, or visual settings for the
-                // ruby armor bonus. Add new entries to this block for additional armor materials as
-                // you introduce them.
-                EFFECTS_BY_MATERIAL.put(RubyArmorMaterial.INSTANCE,
-                                new StatusEffectBonus(new StatusEffectInstance(StatusEffects.SPEED, 220, 0, true, false, true)));
+                EFFECTS_BY_MATERIAL.put(AmethystArmorMaterial.INSTANCE, new StatusEffectBonus(
+                                effect(StatusEffects.NIGHT_VISION, 220, 0, true, false, true),
+                                effect(StatusEffects.LUCK, 220, 0, true, false, true)));
+                EFFECTS_BY_MATERIAL.put(BlueSapphireArmorMaterial.INSTANCE, new StatusEffectBonus(
+                                effect(StatusEffects.SPEED, 220, 0, true, false, true),
+                                effect(StatusEffects.JUMP_BOOST, 220, 0, true, false, true),
+                                effect(StatusEffects.DOLPHINS_GRACE, 220, 0, true, false, true)));
+                EFFECTS_BY_MATERIAL.put(EmeraldArmorMaterial.INSTANCE, new StatusEffectBonus(
+                                effect(StatusEffects.LUCK, 220, 0, true, false, true),
+                                effect(StatusEffects.HERO_OF_THE_VILLAGE, 220, 0, true, false, true),
+                                effect(StatusEffects.REGENERATION, 220, 0, true, false, true)));
+                EFFECTS_BY_MATERIAL.put(ObsidianArmorMaterial.INSTANCE, new StatusEffectBonus(
+                                effect(StatusEffects.RESISTANCE, 220, 0, true, false, true),
+                                effect(StatusEffects.SLOWNESS, 220, 0, true, false, true),
+                                effect(StatusEffects.ABSORPTION, 220, 0, true, false, true)));
+                EFFECTS_BY_MATERIAL.put(PearlArmorMaterial.INSTANCE, new StatusEffectBonus(
+                                effect(StatusEffects.SLOW_FALLING, 220, 0, true, false, true),
+                                effect(StatusEffects.SPEED, 220, 0, true, false, true),
+                                effect(StatusEffects.RESISTANCE, 220, 0, true, false, true)));
+                EFFECTS_BY_MATERIAL.put(RubyArmorMaterial.INSTANCE, new StatusEffectBonus(
+                                effect(StatusEffects.STRENGTH, 220, 0, true, false, true),
+                                effect(StatusEffects.REGENERATION, 220, 0, true, false, true),
+                                effect(StatusEffects.FIRE_RESISTANCE, 220, 0, true, false, true)));
+                EFFECTS_BY_MATERIAL.put(TopazArmorMaterial.INSTANCE, new StatusEffectBonus(
+                                effect(StatusEffects.HASTE, 220, 0, true, false, true),
+                                effect(StatusEffects.LUCK, 220, 0, true, false, true),
+                                effect(StatusEffects.ABSORPTION, 220, 0, true, false, true)));
         }
 
         private ModArmorSetEffects() {
@@ -76,16 +105,27 @@ public final class ModArmorSetEffects {
                 return armorItem.getMaterial() == material;
         }
 
-        private record StatusEffectBonus(StatusEffectInstance template) {
+        private static StatusEffectInstance effect(StatusEffect statusEffect, int duration, int amplifier,
+                        boolean ambient, boolean showParticles, boolean showIcon) {
+                return new StatusEffectInstance(statusEffect, duration, amplifier, ambient, showParticles, showIcon);
+        }
+
+        private record StatusEffectBonus(List<StatusEffectInstance> templates) {
+                private StatusEffectBonus(StatusEffectInstance... templates) {
+                        this(List.of(templates));
+                }
+
                 void apply(ServerPlayerEntity player) {
-                        StatusEffect effect = template.getEffectType();
-                        StatusEffectInstance current = player.getStatusEffect(effect);
-                        if (shouldRefresh(current)) {
-                                player.addStatusEffect(new StatusEffectInstance(template));
+                        for (StatusEffectInstance template : templates) {
+                                StatusEffect effect = template.getEffectType();
+                                StatusEffectInstance current = player.getStatusEffect(effect);
+                                if (shouldRefresh(template, current)) {
+                                        player.addStatusEffect(new StatusEffectInstance(template));
+                                }
                         }
                 }
 
-                private boolean shouldRefresh(StatusEffectInstance current) {
+                private boolean shouldRefresh(StatusEffectInstance template, StatusEffectInstance current) {
                         if (current == null) {
                                 return true;
                         }
