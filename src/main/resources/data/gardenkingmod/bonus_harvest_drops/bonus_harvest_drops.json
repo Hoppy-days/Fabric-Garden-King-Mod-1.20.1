@@ -2,7 +2,6 @@
   "_comment": "This is a general comment about the file.",
   "minecraft:wheat": [
     {
-      "_comment": "Ruby drops make wheat harvests feel special during events.",
       "item": "gardenkingmod:ruby",
       "chance": 0.15,
       "count": { "min": 1, "max": 1 }
