@@ -180,7 +180,8 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         if (rootObject.has("settings") && rootObject.get("settings").isJsonObject()) {
             applySettings(rootObject.getAsJsonObject("settings"));
         }
-        if (rootObject.has("min_offers") || rootObject.has("max_offers") || rootObject.has("refresh_minutes")) {
+        if (rootObject.has("min_offers") || rootObject.has("max_offers") || rootObject.has("refresh_minutes")
+                || rootObject.has("show_all_offers")) {
             applySettings(rootObject);
         }
     }
