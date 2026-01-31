@@ -35,8 +35,14 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
     private static final Identifier RELOAD_ID = new Identifier(GardenKingMod.MOD_ID, "garden_market_offers");
     private static final Identifier OFFERS_FILE = new Identifier(GardenKingMod.MOD_ID, "garden_market_offers.json");
     private static final GardenMarketOfferManager INSTANCE = new GardenMarketOfferManager();
+    private static final int DEFAULT_MIN_OFFERS = 5;
+    private static final int DEFAULT_MAX_OFFERS = 8;
+    private static final int DEFAULT_REFRESH_MINUTES = 30;
 
     private volatile List<GearShopOffer> offers = List.of();
+    private volatile int minOffers = DEFAULT_MIN_OFFERS;
+    private volatile int maxOffers = DEFAULT_MAX_OFFERS;
+    private volatile int refreshMinutes = DEFAULT_REFRESH_MINUTES;
 
     private GardenMarketOfferManager() {
     }
@@ -45,8 +51,44 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         return INSTANCE;
     }
 
-    public List<GearShopOffer> getOffers() {
+    public List<GearShopOffer> getMasterOffers() {
         return offers;
+    }
+
+    public List<GearShopOffer> getOffersByIndices(List<Integer> indices) {
+        if (indices == null || indices.isEmpty()) {
+            return List.of();
+        }
+
+        List<GearShopOffer> master = offers;
+        if (master.isEmpty()) {
+            return List.of();
+        }
+
+        List<GearShopOffer> resolved = new ArrayList<>(indices.size());
+        for (Integer index : indices) {
+            if (index == null) {
+                continue;
+            }
+            int offerIndex = index;
+            if (offerIndex >= 0 && offerIndex < master.size()) {
+                resolved.add(master.get(offerIndex));
+            }
+        }
+        return List.copyOf(resolved);
+    }
+
+    public int getMinOffers() {
+        return minOffers;
+    }
+
+    public int getMaxOffers() {
+        return maxOffers;
+    }
+
+    public long getRefreshIntervalTicks() {
+        int minutes = Math.max(1, refreshMinutes);
+        return minutes * 60L * 20L;
     }
 
     @Override
@@ -60,6 +102,10 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
     }
 
     private List<GearShopOffer> loadOffers(ResourceManager manager) {
+        minOffers = DEFAULT_MIN_OFFERS;
+        maxOffers = DEFAULT_MAX_OFFERS;
+        refreshMinutes = DEFAULT_REFRESH_MINUTES;
+
         Optional<Resource> resourceOptional = manager.getResource(OFFERS_FILE);
         if (resourceOptional.isEmpty()) {
             GardenKingMod.LOGGER.warn("No garden market offer file found at {}", OFFERS_FILE);
@@ -73,6 +119,7 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
             JsonElement sanitized = JsonCommentHelper.sanitize(root);
             if (sanitized.isJsonObject()) {
                 JsonObject rootObject = sanitized.getAsJsonObject();
+                parseSettings(rootObject);
                 if (rootObject.has("offers")) {
                     loadedOffers = parseOffersArray(rootObject.get("offers"), "root offers");
                 } else {
@@ -120,6 +167,24 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         }
 
         return parsedOffers;
+    }
+
+    private void parseSettings(JsonObject rootObject) {
+        if (rootObject.has("settings") && rootObject.get("settings").isJsonObject()) {
+            applySettings(rootObject.getAsJsonObject("settings"));
+        }
+        if (rootObject.has("min_offers") || rootObject.has("max_offers") || rootObject.has("refresh_minutes")) {
+            applySettings(rootObject);
+        }
+    }
+
+    private void applySettings(JsonObject object) {
+        minOffers = JsonHelper.getInt(object, "min_offers", minOffers);
+        maxOffers = JsonHelper.getInt(object, "max_offers", maxOffers);
+        refreshMinutes = JsonHelper.getInt(object, "refresh_minutes", refreshMinutes);
+        if (maxOffers < minOffers) {
+            maxOffers = minOffers;
+        }
     }
 
     private GearShopOffer parseOfferObject(JsonObject object, String context) {
