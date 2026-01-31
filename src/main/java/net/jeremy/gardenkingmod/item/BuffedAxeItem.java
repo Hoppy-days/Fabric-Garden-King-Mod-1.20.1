@@ -33,8 +33,4 @@ public class BuffedAxeItem extends AxeItem {
                 return stack;
         }
 
-        @Override
-        public int getMaxDamage() {
-                return ToolBuffHelper.getDurabilityOverride(this).orElse(super.getMaxDamage());
-        }
 }

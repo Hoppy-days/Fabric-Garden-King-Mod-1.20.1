@@ -33,8 +33,4 @@ public class BuffedPickaxeItem extends PickaxeItem {
                 return stack;
         }
 
-        @Override
-        public int getMaxDamage() {
-                return ToolBuffHelper.getDurabilityOverride(this).orElse(super.getMaxDamage());
-        }
 }
