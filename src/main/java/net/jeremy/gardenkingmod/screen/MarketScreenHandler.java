@@ -158,7 +158,7 @@ public class MarketScreenHandler extends ScreenHandler {
                         return new ArrayList<>(state.getActiveOffers(serverWorld));
                 }
 
-                if (offerIndices != null && !offerIndices.isEmpty()) {
+                if (offerIndices != null) {
                         return new ArrayList<>(GardenMarketOfferManager.getInstance().getOffersByIndices(offerIndices));
                 }
 
