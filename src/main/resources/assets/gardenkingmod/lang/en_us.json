@@ -115,7 +115,7 @@
   "screen.gardenkingmod.gear_shop.offers": "OFFERS",
   "screen.gardenkingmod.gear_shop.buy_button": "BUY",
   "screen.gardenkingmod.gear_shop.cost_label": "COST:",
-  "screen.gardenkingmod.gear_shop.price": "$%s",
+  "screen.gardenkingmod.gear_shop.price": "\\$%s",
   "screen.gardenkingmod.gear_shop.cost_count": "%s required",
   "tooltip.gardenkingmod.crop_tier": "Tier: %s",
   "tooltip.gardenkingmod.built_in_fortune": "Built-in %s %s",
