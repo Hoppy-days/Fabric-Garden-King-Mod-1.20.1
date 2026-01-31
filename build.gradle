@@ -87,8 +87,13 @@ processResources {
 	inputs.property "version", project.version
 	inputs.property "dependent", "croptopia"
 
-	filesMatching("fabric.mod.json") {
-		expand "version": inputs.properties.version
+	def expandProperties = [
+		version: inputs.properties.version,
+		dependent: inputs.properties.dependent
+	]
+
+	filesMatching(["fabric.mod.json", "data/**/*.json"]) {
+		expand expandProperties
 	}
 }
 
