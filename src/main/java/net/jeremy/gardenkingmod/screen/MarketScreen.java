@@ -71,9 +71,9 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_HEADER_COLOR = 0x404040;
         private static final int BUY_OFFERS_LABEL_X = 6;
         private static final int BUY_OFFERS_LABEL_Y = 22;
-        private static final int BUY_REFRESH_TIMER_ANCHOR_X = 211;
-        private static final int BUY_REFRESH_LABEL_Y = 112;
-        private static final int BUY_REFRESH_TIME_Y = 123;
+        private static final int BUY_REFRESH_TIMER_ANCHOR_X = 231;
+        private static final int BUY_REFRESH_LABEL_Y = 102;
+        private static final int BUY_REFRESH_TIME_Y = 113;
         private static final int BUY_REFRESH_LABEL_COLOR = 0x404040;
         private static final int BUY_REFRESH_TIME_COLOR = 0x404040;
 
