@@ -15,6 +15,7 @@ public enum BlueSapphireArmorMaterial implements ArmorMaterial {
         INSTANCE;
 
         private static final int DURABILITY_MULTIPLIER = 34;
+        //this is multiplied by base durability below for max durability number
         private static final int ENCHANTABILITY = 21;
         private static final float TOUGHNESS = 2.5F;
         private static final float KNOCKBACK_RESISTANCE = 0.05F;
@@ -28,6 +29,7 @@ public enum BlueSapphireArmorMaterial implements ArmorMaterial {
                 BASE_DURABILITY.put(ArmorItem.Type.LEGGINGS, 16);
                 BASE_DURABILITY.put(ArmorItem.Type.BOOTS, 11);
 
+                //this is the +armor value
                 PROTECTION_VALUES.put(ArmorItem.Type.HELMET, 3);
                 PROTECTION_VALUES.put(ArmorItem.Type.CHESTPLATE, 8);
                 PROTECTION_VALUES.put(ArmorItem.Type.LEGGINGS, 6);

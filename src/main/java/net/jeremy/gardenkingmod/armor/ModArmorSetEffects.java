@@ -37,28 +37,28 @@ public final class ModArmorSetEffects {
                                 effect(StatusEffects.NIGHT_VISION, 220, 0, true, false, true),
                                 effect(StatusEffects.LUCK, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(BlueSapphireArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.SPEED, 220, 0, true, false, true),
-                                effect(StatusEffects.JUMP_BOOST, 220, 0, true, false, true),
+                                effect(StatusEffects.SPEED, 220, 1, true, false, true),
+                                effect(StatusEffects.JUMP_BOOST, 220, 1, true, false, true),
                                 effect(StatusEffects.DOLPHINS_GRACE, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(EmeraldArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.LUCK, 220, 0, true, false, true),
+                                effect(StatusEffects.LUCK, 220, 1, true, false, true),
                                 effect(StatusEffects.HERO_OF_THE_VILLAGE, 220, 0, true, false, true),
                                 effect(StatusEffects.REGENERATION, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(ObsidianArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.RESISTANCE, 220, 0, true, false, true),
+                                effect(StatusEffects.RESISTANCE, 220, 1, true, false, true),
                                 effect(StatusEffects.SLOWNESS, 220, 0, true, false, true),
-                                effect(StatusEffects.ABSORPTION, 220, 0, true, false, true)));
+                                effect(StatusEffects.ABSORPTION, 220, 4, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(PearlArmorMaterial.INSTANCE, new StatusEffectBonus(
                                 effect(StatusEffects.SLOW_FALLING, 220, 0, true, false, true),
                                 effect(StatusEffects.SPEED, 220, 0, true, false, true),
                                 effect(StatusEffects.RESISTANCE, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(RubyArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.STRENGTH, 220, 0, true, false, true),
-                                effect(StatusEffects.REGENERATION, 220, 0, true, false, true),
+                                effect(StatusEffects.STRENGTH, 220, 1, true, false, true),
+                                effect(StatusEffects.REGENERATION, 220, 1, true, false, true),
                                 effect(StatusEffects.FIRE_RESISTANCE, 220, 0, true, false, true)));
                 EFFECTS_BY_MATERIAL.put(TopazArmorMaterial.INSTANCE, new StatusEffectBonus(
-                                effect(StatusEffects.HASTE, 220, 0, true, false, true),
-                                effect(StatusEffects.LUCK, 220, 0, true, false, true),
+                                effect(StatusEffects.HASTE, 220, 2, true, false, true),
+                                effect(StatusEffects.LUCK, 220, 1, true, false, true),
                                 effect(StatusEffects.ABSORPTION, 220, 0, true, false, true)));
         }
 

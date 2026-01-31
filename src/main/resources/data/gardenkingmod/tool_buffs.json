@@ -8,7 +8,7 @@
     "attribute_modifiers": [
       {
         "attribute": "minecraft:generic.attack_damage",
-        "amount": 1.0,
+        "amount": 5.0,
         "operation": "add",
         "slot": "mainhand",
         "name": "Emerald sword bonus"
