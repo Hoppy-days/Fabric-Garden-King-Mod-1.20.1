@@ -90,10 +90,6 @@ processResources {
 	filesMatching("fabric.mod.json") {
 		expand "version": inputs.properties.version
 	}
-
-	filesMatching("**/*.json") {
-		expand "dependent": inputs.properties.dependent
-	}
 }
 
 tasks.withType(JavaCompile).configureEach {
