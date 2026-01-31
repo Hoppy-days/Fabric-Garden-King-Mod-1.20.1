@@ -309,7 +309,7 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
             return ItemStack.EMPTY;
         }
 
-        Optional<Item> itemOptional = Registries.ITEM.getOrEmpty(id);
+        Optional<Item> itemOptional = resolveItem(id);
         if (itemOptional.isEmpty()) {
             GardenKingMod.LOGGER.warn("Garden market {} entry references unknown item '{}'", fieldName, id);
             return ItemStack.EMPTY;
@@ -327,5 +327,23 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
     private static String describeStack(ItemStack stack) {
         Identifier id = Registries.ITEM.getId(stack.getItem());
         return stack.getCount() + "x " + (id != null ? id.toString() : stack.getName().getString());
+    }
+
+    private Optional<Item> resolveItem(Identifier id) {
+        Optional<Item> itemOptional = Registries.ITEM.getOrEmpty(id);
+        if (itemOptional.isPresent()) {
+            return itemOptional;
+        }
+
+        String path = id.getPath();
+        if (path.endsWith("_crop")) {
+            Identifier fallbackId = new Identifier(id.getNamespace(), path.substring(0, path.length() - "_crop".length()));
+            itemOptional = Registries.ITEM.getOrEmpty(fallbackId);
+            if (itemOptional.isPresent()) {
+                return itemOptional;
+            }
+        }
+
+        return Optional.empty();
     }
 }
