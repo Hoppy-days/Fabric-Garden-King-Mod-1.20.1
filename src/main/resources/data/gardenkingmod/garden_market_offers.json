@@ -1,8 +1,8 @@
 {
   "_comment": "Garden King Market offers (auto-generated).",
   "settings": {
-    "min_offers": 5,
-    "max_offers": 8,
+    "min_offers": 50,
+    "max_offers": 105,
     "refresh_minutes": 30
   },
   "offers": [
