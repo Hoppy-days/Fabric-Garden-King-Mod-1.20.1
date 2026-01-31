@@ -5,25 +5,25 @@
       "_comment": "Page 1: Weapons",
       "offers": [
         {
-          "offer": "gardenkingmod:ruby_sword",
+          "offer": "gardenkingmod:amethyst_sword",
+          "price": "gardenkingmod:dollar*128"
+        },{
+          "offer": "gardenkingmod:pearl_sword",
+          "price": "gardenkingmod:dollar*1000"
+        },{
+          "offer": "gardenkingmod:topaz_sword",
           "price": "gardenkingmod:dollar*128"
         },{
           "offer": "gardenkingmod:blue_sapphire_sword",
           "price": "gardenkingmod:dollar*128"
         },{
-          "offer": "gardenkingmod:topaz_sword",
-          "price": "gardenkingmod:dollar*128"
-        },{
-          "offer": "gardenkingmod:pearl_sword",
-          "price": "gardenkingmod:dollar*128"
-        },{
-          "offer": "gardenkingmod:amethyst_sword",
+          "offer": "gardenkingmod:emerald_sword",
           "price": "gardenkingmod:dollar*1200"
         },{
           "offer": "gardenkingmod:obsidian_sword",
           "price": "gardenkingmod:dollar*128"
         },{
-          "offer": "gardenkingmod:emerald_sword",
+          "offer": "gardenkingmod:ruby_sword",
           "price": "gardenkingmod:dollar*128"
         }
       ]

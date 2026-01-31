@@ -3,13 +3,18 @@
     "_comment": "Emerald tool placeholders.",
     "item": "gardenkingmod:emerald_sword",
     "enchantments": [
-      { "id": "minecraft:looting", "level": 5 },
-      { "id": "minecraft:unbreaking", "level": 3 }
+      { "id": "minecraft:looting", "level": 5 }
     ],
     "attribute_modifiers": [
       {
         "attribute": "minecraft:generic.attack_damage",
-        "amount": 5.0,
+        "amount": 4.0,
+        "operation": "add",
+        "slot": "mainhand",
+        "name": "Emerald sword bonus"
+      },{
+        "attribute": "minecraft:generic.attack_speed",
+        "amount": 8.0,
         "operation": "add",
         "slot": "mainhand",
         "name": "Emerald sword bonus"
@@ -185,7 +190,7 @@
     "_comment": "Pearl tool placeholders.",
     "item": "gardenkingmod:pearl_sword",
     "enchantments": [
-      { "id": "minecraft:sharpness", "level": 4 }
+      { "id": "minecraft:sharpness", "level": 5 }
     ]
   },
   {
