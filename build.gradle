@@ -10,10 +10,14 @@ base {
         archivesName = project.archives_base_name
 }
 
+def includeGeneratedResources = project.findProperty("includeGeneratedResources")?.toString()?.toBoolean() ?: false
+
 sourceSets {
         main {
                 resources {
-                        srcDir "src/main/generated"
+                        if (includeGeneratedResources) {
+                                srcDir "src/main/generated"
+                        }
                 }
         }
 }
