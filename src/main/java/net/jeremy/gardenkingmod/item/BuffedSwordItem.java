@@ -33,8 +33,4 @@ public class BuffedSwordItem extends SwordItem {
                 return stack;
         }
 
-        @Override
-        public int getMaxDamage() {
-                return ToolBuffHelper.getDurabilityOverride(this).orElse(super.getMaxDamage());
-        }
 }

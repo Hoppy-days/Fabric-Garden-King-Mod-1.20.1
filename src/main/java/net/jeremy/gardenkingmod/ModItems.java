@@ -37,6 +37,7 @@ import net.jeremy.gardenkingmod.item.RubyArmorMaterial;
 import net.jeremy.gardenkingmod.item.RubyToolMaterial;
 import net.jeremy.gardenkingmod.item.TopazArmorMaterial;
 import net.jeremy.gardenkingmod.item.TopazToolMaterial;
+import net.jeremy.gardenkingmod.item.ToolBuffDefinitions;
 import net.jeremy.gardenkingmod.item.WalletItem;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
@@ -62,75 +63,97 @@ public final class ModItems {
         public static final Item SCARECROW_HAT = registerItem("scarecrow_hat",
                         new Item(new FabricItemSettings()));
         public static final Item RUBY_SWORD = registerItem("ruby_sword",
-                        new BuffedSwordItem(RubyToolMaterial.INSTANCE, 4, -2.2F, new FabricItemSettings()));
+                        new BuffedSwordItem(RubyToolMaterial.INSTANCE, 4, -2.2F, toolSettings("ruby_sword")));
         public static final Item BLUE_SAPPHIRE_SWORD = registerItem("blue_sapphire_sword",
-                        new BuffedSwordItem(BlueSapphireToolMaterial.INSTANCE, 3, -2.0F, new FabricItemSettings()));
+                        new BuffedSwordItem(BlueSapphireToolMaterial.INSTANCE, 3, -2.0F,
+                                        toolSettings("blue_sapphire_sword")));
         public static final Item TOPAZ_SWORD = registerItem("topaz_sword",
-                        new BuffedSwordItem(TopazToolMaterial.INSTANCE, 3, -2.0F, new FabricItemSettings()));
+                        new BuffedSwordItem(TopazToolMaterial.INSTANCE, 3, -2.0F, toolSettings("topaz_sword")));
         public static final Item PEARL_SWORD = registerItem("pearl_sword",
-                        new BuffedSwordItem(PearlToolMaterial.INSTANCE, 5, -2.2F, new FabricItemSettings()));
+                        new BuffedSwordItem(PearlToolMaterial.INSTANCE, 5, -2.2F, toolSettings("pearl_sword")));
         public static final Item AMETHYST_SWORD = registerItem("amethyst_sword",
-                        new BuffedSwordItem(AmethystToolMaterial.INSTANCE, 4, -2.1F, new FabricItemSettings()));
+                        new BuffedSwordItem(AmethystToolMaterial.INSTANCE, 4, -2.1F,
+                                        toolSettings("amethyst_sword")));
         public static final Item RUBY_PICKAXE = registerItem("ruby_pickaxe",
-                        new BuffedPickaxeItem(RubyToolMaterial.INSTANCE, 2, -2.8F, new FabricItemSettings()));
+                        new BuffedPickaxeItem(RubyToolMaterial.INSTANCE, 2, -2.8F, toolSettings("ruby_pickaxe")));
         public static final Item BLUE_SAPPHIRE_PICKAXE = registerItem("blue_sapphire_pickaxe",
-                        new BuffedPickaxeItem(BlueSapphireToolMaterial.INSTANCE, 1, -2.8F, new FabricItemSettings()));
+                        new BuffedPickaxeItem(BlueSapphireToolMaterial.INSTANCE, 1, -2.8F,
+                                        toolSettings("blue_sapphire_pickaxe")));
         public static final Item TOPAZ_PICKAXE = registerItem("topaz_pickaxe",
-                        new BuffedPickaxeItem(TopazToolMaterial.INSTANCE, 2, -2.8F, new FabricItemSettings()));
+                        new BuffedPickaxeItem(TopazToolMaterial.INSTANCE, 2, -2.8F, toolSettings("topaz_pickaxe")));
         public static final Item PEARL_PICKAXE = registerItem("pearl_pickaxe",
-                        new BuffedPickaxeItem(PearlToolMaterial.INSTANCE, 3, -2.8F, new FabricItemSettings()));
+                        new BuffedPickaxeItem(PearlToolMaterial.INSTANCE, 3, -2.8F, toolSettings("pearl_pickaxe")));
         public static final Item AMETHYST_PICKAXE = registerItem("amethyst_pickaxe",
-                        new BuffedPickaxeItem(AmethystToolMaterial.INSTANCE, 2, -2.8F, new FabricItemSettings()));
+                        new BuffedPickaxeItem(AmethystToolMaterial.INSTANCE, 2, -2.8F,
+                                        toolSettings("amethyst_pickaxe")));
         public static final Item RUBY_AXE = registerItem("ruby_axe",
-                        new BuffedAxeItem(RubyToolMaterial.INSTANCE, 6.0F, -3.0F, new FabricItemSettings()));
+                        new BuffedAxeItem(RubyToolMaterial.INSTANCE, 6.0F, -3.0F, toolSettings("ruby_axe")));
         public static final Item BLUE_SAPPHIRE_AXE = registerItem("blue_sapphire_axe",
-                        new BuffedAxeItem(BlueSapphireToolMaterial.INSTANCE, 5.5F, -3.0F, new FabricItemSettings()));
+                        new BuffedAxeItem(BlueSapphireToolMaterial.INSTANCE, 5.5F, -3.0F,
+                                        toolSettings("blue_sapphire_axe")));
         public static final Item TOPAZ_AXE = registerItem("topaz_axe",
-                        new BuffedAxeItem(TopazToolMaterial.INSTANCE, 6.0F, -3.0F, new FabricItemSettings()));
+                        new BuffedAxeItem(TopazToolMaterial.INSTANCE, 6.0F, -3.0F, toolSettings("topaz_axe")));
         public static final Item PEARL_AXE = registerItem("pearl_axe",
-                        new BuffedAxeItem(PearlToolMaterial.INSTANCE, 6.5F, -3.0F, new FabricItemSettings()));
+                        new BuffedAxeItem(PearlToolMaterial.INSTANCE, 6.5F, -3.0F, toolSettings("pearl_axe")));
         public static final Item AMETHYST_AXE = registerItem("amethyst_axe",
-                        new BuffedAxeItem(AmethystToolMaterial.INSTANCE, 6.5F, -3.0F, new FabricItemSettings()));
+                        new BuffedAxeItem(AmethystToolMaterial.INSTANCE, 6.5F, -3.0F,
+                                        toolSettings("amethyst_axe")));
         public static final Item RUBY_SHOVEL = registerItem("ruby_shovel",
-                        new BuffedShovelItem(RubyToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
+                        new BuffedShovelItem(RubyToolMaterial.INSTANCE, 2.5F, -3.0F, toolSettings("ruby_shovel")));
         public static final Item BLUE_SAPPHIRE_SHOVEL = registerItem("blue_sapphire_shovel",
-                        new BuffedShovelItem(BlueSapphireToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
+                        new BuffedShovelItem(BlueSapphireToolMaterial.INSTANCE, 2.5F, -3.0F,
+                                        toolSettings("blue_sapphire_shovel")));
         public static final Item TOPAZ_SHOVEL = registerItem("topaz_shovel",
-                        new BuffedShovelItem(TopazToolMaterial.INSTANCE, 2.5F, -3.0F, new FabricItemSettings()));
+                        new BuffedShovelItem(TopazToolMaterial.INSTANCE, 2.5F, -3.0F,
+                                        toolSettings("topaz_shovel")));
         public static final Item PEARL_SHOVEL = registerItem("pearl_shovel",
-                        new BuffedShovelItem(PearlToolMaterial.INSTANCE, 3.0F, -3.0F, new FabricItemSettings()));
+                        new BuffedShovelItem(PearlToolMaterial.INSTANCE, 3.0F, -3.0F,
+                                        toolSettings("pearl_shovel")));
         public static final Item AMETHYST_SHOVEL = registerItem("amethyst_shovel",
-                        new BuffedShovelItem(AmethystToolMaterial.INSTANCE, 3.0F, -3.0F, new FabricItemSettings()));
+                        new BuffedShovelItem(AmethystToolMaterial.INSTANCE, 3.0F, -3.0F,
+                                        toolSettings("amethyst_shovel")));
         public static final Item RUBY_HOE = registerItem("ruby_hoe",
-                        new BuffedHoeItem(RubyToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings()));
+                        new BuffedHoeItem(RubyToolMaterial.INSTANCE, -2, 0.0F, toolSettings("ruby_hoe")));
         public static final Item BLUE_SAPPHIRE_HOE = registerItem("blue_sapphire_hoe",
-                        new BuffedHoeItem(BlueSapphireToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings()));
+                        new BuffedHoeItem(BlueSapphireToolMaterial.INSTANCE, -2, 0.0F,
+                                        toolSettings("blue_sapphire_hoe")));
         public static final Item TOPAZ_HOE = registerItem("topaz_hoe",
-                        new BuffedHoeItem(TopazToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings()));
+                        new BuffedHoeItem(TopazToolMaterial.INSTANCE, -2, 0.0F, toolSettings("topaz_hoe")));
         public static final Item PEARL_HOE = registerItem("pearl_hoe",
-                        new BuffedHoeItem(PearlToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings()));
+                        new BuffedHoeItem(PearlToolMaterial.INSTANCE, -2, 0.0F, toolSettings("pearl_hoe")));
         public static final Item AMETHYST_HOE = registerItem("amethyst_hoe",
-                        new BuffedHoeItem(AmethystToolMaterial.INSTANCE, -2, 0.0F, new FabricItemSettings()));
+                        new BuffedHoeItem(AmethystToolMaterial.INSTANCE, -2, 0.0F,
+                                        toolSettings("amethyst_hoe")));
         public static final Item OBSIDIAN_SWORD = registerItem("obsidian_sword",
-                        new BuffedSwordItem(ObsidianToolMaterial.INSTANCE, 5, -2.4F, new FabricItemSettings()));
+                        new BuffedSwordItem(ObsidianToolMaterial.INSTANCE, 5, -2.4F,
+                                        toolSettings("obsidian_sword")));
         public static final Item OBSIDIAN_PICKAXE = registerItem("obsidian_pickaxe",
-                        new BuffedPickaxeItem(ObsidianToolMaterial.INSTANCE, 3, -2.8F, new FabricItemSettings()));
+                        new BuffedPickaxeItem(ObsidianToolMaterial.INSTANCE, 3, -2.8F,
+                                        toolSettings("obsidian_pickaxe")));
         public static final Item OBSIDIAN_AXE = registerItem("obsidian_axe",
-                        new BuffedAxeItem(ObsidianToolMaterial.INSTANCE, 7.0F, -3.1F, new FabricItemSettings()));
+                        new BuffedAxeItem(ObsidianToolMaterial.INSTANCE, 7.0F, -3.1F,
+                                        toolSettings("obsidian_axe")));
         public static final Item OBSIDIAN_SHOVEL = registerItem("obsidian_shovel",
-                        new BuffedShovelItem(ObsidianToolMaterial.INSTANCE, 3.5F, -3.0F, new FabricItemSettings()));
+                        new BuffedShovelItem(ObsidianToolMaterial.INSTANCE, 3.5F, -3.0F,
+                                        toolSettings("obsidian_shovel")));
         public static final Item OBSIDIAN_HOE = registerItem("obsidian_hoe",
-                        new BuffedHoeItem(ObsidianToolMaterial.INSTANCE, -4, 0.0F, new FabricItemSettings()));
+                        new BuffedHoeItem(ObsidianToolMaterial.INSTANCE, -4, 0.0F,
+                                        toolSettings("obsidian_hoe")));
         public static final Item EMERALD_SWORD = registerItem("emerald_sword",
-                        new BuffedSwordItem(EmeraldToolMaterial.INSTANCE, 3, -2.2F, new FabricItemSettings()));
+                        new BuffedSwordItem(EmeraldToolMaterial.INSTANCE, 3, -2.2F,
+                                        toolSettings("emerald_sword")));
         public static final Item EMERALD_PICKAXE = registerItem("emerald_pickaxe",
-                        new BuffedPickaxeItem(EmeraldToolMaterial.INSTANCE, 1, -2.8F, new FabricItemSettings()));
+                        new BuffedPickaxeItem(EmeraldToolMaterial.INSTANCE, 1, -2.8F,
+                                        toolSettings("emerald_pickaxe")));
         public static final Item EMERALD_AXE = registerItem("emerald_axe",
-                        new BuffedAxeItem(EmeraldToolMaterial.INSTANCE, 5.0F, -3.0F, new FabricItemSettings()));
+                        new BuffedAxeItem(EmeraldToolMaterial.INSTANCE, 5.0F, -3.0F,
+                                        toolSettings("emerald_axe")));
         public static final Item EMERALD_SHOVEL = registerItem("emerald_shovel",
-                        new BuffedShovelItem(EmeraldToolMaterial.INSTANCE, 2.0F, -3.0F, new FabricItemSettings()));
+                        new BuffedShovelItem(EmeraldToolMaterial.INSTANCE, 2.0F, -3.0F,
+                                        toolSettings("emerald_shovel")));
         public static final Item EMERALD_HOE = registerItem("emerald_hoe",
-                        new BuffedHoeItem(EmeraldToolMaterial.INSTANCE, -3, 0.0F, new FabricItemSettings()));
+                        new BuffedHoeItem(EmeraldToolMaterial.INSTANCE, -3, 0.0F,
+                                        toolSettings("emerald_hoe")));
         public static final Item RUBY_HELMET = registerItem("ruby_helmet",
                         new ArmorItem(RubyArmorMaterial.INSTANCE, ArmorItem.Type.HELMET, new FabricItemSettings()));
         public static final Item BLUE_SAPPHIRE_HELMET = registerItem("blue_sapphire_helmet",
@@ -207,6 +230,15 @@ public final class ModItems {
 
         private static Item registerItem(String name, Item item) {
                 return Registry.register(Registries.ITEM, new Identifier(GardenKingMod.MOD_ID, name), item);
+        }
+
+        private static FabricItemSettings toolSettings(String itemName) {
+                FabricItemSettings settings = new FabricItemSettings();
+                Identifier id = new Identifier(GardenKingMod.MOD_ID, itemName);
+                ToolBuffDefinitions.findByItemId(id)
+                                .ifPresent(definition -> definition.durabilityOverride()
+                                                .ifPresent(settings::maxDamage));
+                return settings;
         }
 
         public static synchronized boolean initializeRottenItems() {
