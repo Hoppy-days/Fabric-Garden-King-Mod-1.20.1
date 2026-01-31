@@ -38,11 +38,13 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
     private static final int DEFAULT_MIN_OFFERS = 5;
     private static final int DEFAULT_MAX_OFFERS = 8;
     private static final int DEFAULT_REFRESH_MINUTES = 30;
+    private static final boolean DEFAULT_SHOW_ALL_OFFERS = false;
 
     private volatile List<GearShopOffer> offers = List.of();
     private volatile int minOffers = DEFAULT_MIN_OFFERS;
     private volatile int maxOffers = DEFAULT_MAX_OFFERS;
     private volatile int refreshMinutes = DEFAULT_REFRESH_MINUTES;
+    private volatile boolean showAllOffers = DEFAULT_SHOW_ALL_OFFERS;
 
     private GardenMarketOfferManager() {
     }
@@ -91,6 +93,10 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         return minutes * 60L * 20L;
     }
 
+    public boolean shouldShowAllOffers() {
+        return showAllOffers;
+    }
+
     @Override
     public Identifier getFabricId() {
         return RELOAD_ID;
@@ -105,6 +111,7 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         minOffers = DEFAULT_MIN_OFFERS;
         maxOffers = DEFAULT_MAX_OFFERS;
         refreshMinutes = DEFAULT_REFRESH_MINUTES;
+        showAllOffers = DEFAULT_SHOW_ALL_OFFERS;
 
         Optional<Resource> resourceOptional = manager.getResource(OFFERS_FILE);
         if (resourceOptional.isEmpty()) {
@@ -182,6 +189,7 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         minOffers = JsonHelper.getInt(object, "min_offers", minOffers);
         maxOffers = JsonHelper.getInt(object, "max_offers", maxOffers);
         refreshMinutes = JsonHelper.getInt(object, "refresh_minutes", refreshMinutes);
+        showAllOffers = JsonHelper.getBoolean(object, "show_all_offers", showAllOffers);
         if (maxOffers < minOffers) {
             maxOffers = minOffers;
         }

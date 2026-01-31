@@ -3,7 +3,8 @@
   "settings": {
     "min_offers": 50,
     "max_offers": 105,
-    "refresh_minutes": 30
+    "refresh_minutes": 30,
+    "show_all_offers": true
   },
   "offers": [
     {
