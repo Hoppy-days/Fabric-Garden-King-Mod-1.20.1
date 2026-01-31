@@ -85,9 +85,14 @@ dependencies {
 
 processResources {
 	inputs.property "version", project.version
+	inputs.property "dependent", "croptopia"
 
 	filesMatching("fabric.mod.json") {
 		expand "version": inputs.properties.version
+	}
+
+	filesMatching("**/*.json") {
+		expand "dependent": inputs.properties.dependent
 	}
 }
 
