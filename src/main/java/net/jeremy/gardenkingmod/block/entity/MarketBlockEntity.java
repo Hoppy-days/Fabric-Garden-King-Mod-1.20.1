@@ -18,6 +18,7 @@ import net.jeremy.gardenkingmod.crop.CropTier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.item.WalletItem;
 import net.jeremy.gardenkingmod.screen.MarketScreenHandler;
+import net.jeremy.gardenkingmod.shop.GardenMarketOfferState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -34,6 +35,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -81,6 +83,21 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
         @Override
         public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
                 buf.writeBlockPos(getPos());
+                ServerWorld serverWorld = player.getServerWorld();
+                if (serverWorld != null) {
+                        GardenMarketOfferState state = GardenMarketOfferState.get(serverWorld);
+                        var offerIndices = state.getActiveOfferIndices(serverWorld);
+                        buf.writeVarInt(offerIndices.size());
+                        for (Integer index : offerIndices) {
+                                if (index != null) {
+                                        buf.writeVarInt(index);
+                                }
+                        }
+                        buf.writeLong(state.getNextRefreshTime(serverWorld));
+                } else {
+                        buf.writeVarInt(0);
+                        buf.writeLong(0L);
+                }
         }
 
         @Override

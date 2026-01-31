@@ -1,5 +1,11 @@
 {
   "_comment": "Default Garden Market offers. Adjust as needed for balancing.",
+  "settings": {
+    "_comment": "Market selects a random subset of offers between min_offers and max_offers for each refresh.",
+    "min_offers": 5,
+    "max_offers": 8,
+    "refresh_minutes": 30
+  },
   "offers": [
     {
       "offer": "minecraft:wheat_seeds*16",

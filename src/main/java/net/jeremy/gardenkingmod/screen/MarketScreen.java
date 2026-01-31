@@ -12,7 +12,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.client.gui.toast.SaleResultToast;
 import net.jeremy.gardenkingmod.shop.GearShopOffer;
-import net.jeremy.gardenkingmod.shop.GardenMarketOfferManager;
 import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -1154,7 +1153,10 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         }
 
         private List<GearShopOffer> getBuyOffers() {
-                return GardenMarketOfferManager.getInstance().getOffers();
+                if (handler == null) {
+                        return List.of();
+                }
+                return handler.getBuyOffers();
         }
 
         private void playClickSound() {

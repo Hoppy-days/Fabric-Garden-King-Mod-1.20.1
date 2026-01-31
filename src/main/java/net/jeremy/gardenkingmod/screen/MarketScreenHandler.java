@@ -13,6 +13,7 @@ import net.jeremy.gardenkingmod.block.entity.MarketBlockEntity;
 import net.jeremy.gardenkingmod.item.WalletItem;
 import net.jeremy.gardenkingmod.screen.inventory.GearShopCostInventory;
 import net.jeremy.gardenkingmod.shop.GardenMarketOfferManager;
+import net.jeremy.gardenkingmod.shop.GardenMarketOfferState;
 import net.jeremy.gardenkingmod.shop.GearShopOffer;
 import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,6 +29,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
 public class MarketScreenHandler extends ScreenHandler {
@@ -68,8 +70,9 @@ public class MarketScreenHandler extends ScreenHandler {
         private Slot resultSlot;
         private boolean marketSlotsEnabled;
         private boolean buySlotsEnabled;
-        private final List<GearShopOffer> buyOffers;
+        private List<GearShopOffer> buyOffers;
         private int selectedOfferIndex;
+        private long offerRefreshTime;
         private final int marketInventoryEnd;
         private final int costSlotStartIndex;
         private final int costSlotEndIndex;
@@ -78,10 +81,16 @@ public class MarketScreenHandler extends ScreenHandler {
         private final int hotbarStartIndex;
 
         public MarketScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
-                this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()));
+                this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()), readOfferIndices(buf),
+                                buf.readLong());
         }
 
         public MarketScreenHandler(int syncId, PlayerInventory playerInventory, MarketBlockEntity blockEntity) {
+                this(syncId, playerInventory, blockEntity, List.of(), 0L);
+        }
+
+        private MarketScreenHandler(int syncId, PlayerInventory playerInventory, MarketBlockEntity blockEntity,
+                        List<Integer> offerIndices, long refreshTime) {
                 super(ModScreenHandlers.MARKET_SCREEN_HANDLER, syncId);
                 this.blockEntity = blockEntity;
                 this.playerInventory = playerInventory;
@@ -95,7 +104,13 @@ public class MarketScreenHandler extends ScreenHandler {
                 this.resultInventory.addListener(this::onInventoryChanged);
                 this.costInventory.onOpen(playerInventory.player);
                 this.resultInventory.onOpen(playerInventory.player);
-                this.buyOffers = new ArrayList<>(GardenMarketOfferManager.getInstance().getOffers());
+                this.buyOffers = resolveBuyOffers(blockEntity, offerIndices);
+                this.offerRefreshTime = refreshTime;
+                if (this.offerRefreshTime == 0L && blockEntity != null
+                                && blockEntity.getWorld() instanceof ServerWorld serverWorld) {
+                        GardenMarketOfferState state = GardenMarketOfferState.get(serverWorld);
+                        this.offerRefreshTime = state.getNextRefreshTime(serverWorld);
+                }
                 this.selectedOfferIndex = -1;
 
                 checkSize(this.inventory, MarketBlockEntity.INVENTORY_SIZE);
@@ -118,6 +133,36 @@ public class MarketScreenHandler extends ScreenHandler {
 
                 setMarketSlotsEnabled(true);
                 setBuySlotsEnabled(false);
+        }
+
+        public List<GearShopOffer> getBuyOffers() {
+                return this.buyOffers;
+        }
+
+        public long getOfferRefreshTime() {
+                return offerRefreshTime;
+        }
+
+        private static List<Integer> readOfferIndices(PacketByteBuf buf) {
+                int offerCount = buf.readVarInt();
+                List<Integer> indices = new ArrayList<>(offerCount);
+                for (int i = 0; i < offerCount; i++) {
+                        indices.add(buf.readVarInt());
+                }
+                return indices;
+        }
+
+        private List<GearShopOffer> resolveBuyOffers(MarketBlockEntity blockEntity, List<Integer> offerIndices) {
+                if (blockEntity != null && blockEntity.getWorld() instanceof ServerWorld serverWorld) {
+                        GardenMarketOfferState state = GardenMarketOfferState.get(serverWorld);
+                        return new ArrayList<>(state.getActiveOffers(serverWorld));
+                }
+
+                if (offerIndices != null && !offerIndices.isEmpty()) {
+                        return new ArrayList<>(GardenMarketOfferManager.getInstance().getOffersByIndices(offerIndices));
+                }
+
+                return new ArrayList<>(GardenMarketOfferManager.getInstance().getMasterOffers());
         }
         private void onInventoryChanged(Inventory inventory) {
                 onContentChanged(inventory);
