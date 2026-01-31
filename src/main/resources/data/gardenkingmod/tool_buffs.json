@@ -3,7 +3,8 @@
     "_comment": "Emerald tool placeholders.",
     "item": "gardenkingmod:emerald_sword",
     "enchantments": [
-      { "id": "minecraft:looting", "level": 5 }
+      { "id": "minecraft:looting", "level": 5 },
+      { "id": "minecraft:unbreaking", "level": 3 }
     ],
     "attribute_modifiers": [
       {
@@ -18,12 +19,13 @@
   {
     "item": "gardenkingmod:emerald_pickaxe",
     "enchantments": [
-      { "id": "minecraft:fortune", "level": 3 }
+      { "id": "minecraft:fortune", "level": 5 },
+      { "id": "minecraft:unbreaking", "level": 3 }
     ],
     "attribute_modifiers": [
       {
         "attribute": "minecraft:generic.attack_speed",
-        "amount": 0.1,
+        "amount": 1.0,
         "operation": "add",
         "slot": "mainhand",
         "name": "Emerald pickaxe speed"
@@ -33,7 +35,8 @@
   {
     "item": "gardenkingmod:emerald_axe",
     "enchantments": [
-      { "id": "minecraft:efficiency", "level": 3 }
+      { "id": "minecraft:efficiency", "level": 3 },
+      { "id": "minecraft:unbreaking", "level": 3 }
     ],
     "attribute_modifiers": [
       {
@@ -61,7 +64,7 @@
     "_comment": "Ruby tool placeholders.",
     "item": "gardenkingmod:ruby_sword",
     "enchantments": [
-      { "id": "minecraft:sharpness", "level": 4 }
+      { "id": "minecraft:sharpness", "level": 10 }
     ]
   },
   {
