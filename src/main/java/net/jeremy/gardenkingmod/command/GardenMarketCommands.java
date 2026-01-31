@@ -36,8 +36,10 @@ public final class GardenMarketCommands {
             nextRefreshTime = Math.max(nextRefreshTime, state.forceRefresh(world));
             refreshed++;
         }
+        final int refreshedCount = refreshed;
+        final long nextRefreshTick = nextRefreshTime;
         source.sendFeedback(() -> Text.literal("Refreshed garden market offers and reset the timer in "
-                + refreshed + " world(s). Next refresh tick: " + nextRefreshTime + "."), false);
+                + refreshedCount + " world(s). Next refresh tick: " + nextRefreshTick + "."), false);
         return refreshed;
     }
 }
