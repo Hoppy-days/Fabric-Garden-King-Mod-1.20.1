@@ -76,6 +76,11 @@ public final class GardenMarketOfferState extends PersistentState {
         }
     }
 
+    public long forceRefresh(ServerWorld world) {
+        refreshOffers(world);
+        return nextRefreshTime;
+    }
+
     private boolean needsRefresh(ServerWorld world) {
         return offerIndices.isEmpty() || nextRefreshTime <= 0L || world.getTime() >= nextRefreshTime;
     }
