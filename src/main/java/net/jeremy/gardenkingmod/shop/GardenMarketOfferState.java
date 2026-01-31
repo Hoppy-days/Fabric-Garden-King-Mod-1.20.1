@@ -92,12 +92,17 @@ public final class GardenMarketOfferState extends PersistentState {
 
         if (!master.isEmpty()) {
             int available = master.size();
-            int minOffers = MathHelper.clamp(manager.getMinOffers(), 0, available);
-            int maxOffers = MathHelper.clamp(manager.getMaxOffers(), minOffers, available);
-            int count = minOffers;
-            if (maxOffers > minOffers) {
-                Random javaRandom = new Random(world.getRandom().nextLong());
-                count = minOffers + javaRandom.nextInt(maxOffers - minOffers + 1);
+            int count;
+            if (manager.shouldShowAllOffers()) {
+                count = available;
+            } else {
+                int minOffers = MathHelper.clamp(manager.getMinOffers(), 0, available);
+                int maxOffers = MathHelper.clamp(manager.getMaxOffers(), minOffers, available);
+                count = minOffers;
+                if (maxOffers > minOffers) {
+                    Random javaRandom = new Random(world.getRandom().nextLong());
+                    count = minOffers + javaRandom.nextInt(maxOffers - minOffers + 1);
+                }
             }
 
             if (count > 0) {
