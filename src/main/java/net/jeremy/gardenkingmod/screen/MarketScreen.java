@@ -71,6 +71,11 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_HEADER_COLOR = 0x404040;
         private static final int BUY_OFFERS_LABEL_X = 6;
         private static final int BUY_OFFERS_LABEL_Y = 22;
+        private static final int BUY_REFRESH_TIMER_ANCHOR_X = 211;
+        private static final int BUY_REFRESH_LABEL_Y = 112;
+        private static final int BUY_REFRESH_TIME_Y = 123;
+        private static final int BUY_REFRESH_LABEL_COLOR = 0x404040;
+        private static final int BUY_REFRESH_TIME_COLOR = 0x404040;
 
         private static final int BUY_OFFER_LIST_X = 5;
         private static final int BUY_OFFER_LIST_Y = 32;
@@ -186,6 +191,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private float lastRenderDelta;
         private float resultSlotAnimationStartTicks = Float.NaN;
         private ItemStack lastAnimatedResultSlotStack = ItemStack.EMPTY;
+        private int refreshTimerOffsetX;
+        private int refreshTimerOffsetY;
 
         public MarketScreen(MarketScreenHandler handler, PlayerInventory inventory, Text title) {
                 super(handler, inventory, title);
@@ -198,6 +205,8 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
                 this.lastLifetimeTotal = -1;
                 this.saleResultLine = Text.empty();
                 this.lifetimeResultLine = Text.empty();
+                this.refreshTimerOffsetX = 0;
+                this.refreshTimerOffsetY = 0;
         }
 
         @Override
@@ -569,6 +578,40 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private void drawBuyLabels(DrawContext context) {
                 context.drawText(textRenderer, Text.translatable("screen.gardenkingmod.market.offers"),
                                 BUY_OFFERS_LABEL_X, BUY_OFFERS_LABEL_Y, BUY_HEADER_COLOR, false);
+                drawBuyRefreshTimer(context);
+        }
+
+        private void drawBuyRefreshTimer(DrawContext context) {
+                if (handler == null || client == null || client.world == null) {
+                        return;
+                }
+
+                long refreshTime = handler.getOfferRefreshTime();
+                if (refreshTime <= 0L) {
+                        return;
+                }
+
+                long currentTime = client.world.getTime();
+                long ticksRemaining = Math.max(0L, refreshTime - currentTime);
+                int totalSeconds = MathHelper.floor(ticksRemaining / 20.0);
+                int minutes = totalSeconds / 60;
+                int seconds = totalSeconds % 60;
+                String timerText = String.format(Locale.ROOT, "%d:%02d", minutes, seconds);
+
+                Text labelText = Text.translatable("screen.gardenkingmod.market.refresh_time");
+                int anchorX = BUY_REFRESH_TIMER_ANCHOR_X + refreshTimerOffsetX;
+                int labelX = anchorX - textRenderer.getWidth(labelText) / 2;
+                int labelY = BUY_REFRESH_LABEL_Y + refreshTimerOffsetY;
+                context.drawText(textRenderer, labelText, labelX, labelY, BUY_REFRESH_LABEL_COLOR, false);
+
+                int timeX = anchorX - textRenderer.getWidth(timerText) / 2;
+                int timeY = BUY_REFRESH_TIME_Y + refreshTimerOffsetY;
+                context.drawText(textRenderer, timerText, timeX, timeY, BUY_REFRESH_TIME_COLOR, false);
+        }
+
+        public void setRefreshTimerOffset(int offsetX, int offsetY) {
+                this.refreshTimerOffsetX = offsetX;
+                this.refreshTimerOffsetY = offsetY;
         }
 
         private void drawBuyOfferList(DrawContext context, int originX, int originY, int mouseX, int mouseY) {
