@@ -71,7 +71,10 @@ public final class GardenMarketOfferState extends PersistentState {
     }
 
     private void ensureOffers(ServerWorld world) {
-        if (needsRefresh(world)) {
+        GardenMarketOfferManager manager = GardenMarketOfferManager.getInstance();
+        List<GearShopOffer> master = manager.getMasterOffers();
+        boolean showAllMismatch = manager.shouldShowAllOffers() && offerIndices.size() < master.size();
+        if (needsRefresh(world) || showAllMismatch) {
             refreshOffers(world);
         }
     }
