@@ -6,25 +6,25 @@
       "offers": [
         {
           "offer": "gardenkingmod:amethyst_sword",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*1000"
         },{
           "offer": "gardenkingmod:pearl_sword",
           "price": "gardenkingmod:dollar*1000"
         },{
           "offer": "gardenkingmod:topaz_sword",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*1000"
         },{
           "offer": "gardenkingmod:blue_sapphire_sword",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*1000"
         },{
           "offer": "gardenkingmod:emerald_sword",
-          "price": "gardenkingmod:dollar*1200"
+          "price": "gardenkingmod:dollar*2000"
         },{
           "offer": "gardenkingmod:obsidian_sword",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*2000"
         },{
           "offer": "gardenkingmod:ruby_sword",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         }
       ]
     },
@@ -33,88 +33,88 @@
       "offers": [
         {
           "offer": "gardenkingmod:ruby_axe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:ruby_hoe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:ruby_pickaxe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:ruby_shovel",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:blue_sapphire_axe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:blue_sapphire_hoe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:blue_sapphire_pickaxe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:blue_sapphire_shovel",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:topaz_axe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:topaz_hoe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:topaz_pickaxe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:topaz_shovel",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:pearl_axe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:pearl_hoe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:pearl_pickaxe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:pearl_shovel",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:amethyst_axe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:amethyst_hoe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:amethyst_pickaxe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:amethyst_shovel",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:obsidian_axe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:obsidian_hoe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:obsidian_pickaxe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:obsidian_shovel",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:emerald_axe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:emerald_hoe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:emerald_pickaxe",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:emerald_shovel",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         }
       ]
     },
@@ -123,88 +123,88 @@
       "offers": [
         {
           "offer": "gardenkingmod:ruby_helmet",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:ruby_chestplate",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:ruby_leggings",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:ruby_boots",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:blue_sapphire_helmet",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:blue_sapphire_chestplate",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:blue_sapphire_leggings",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:blue_sapphire_boots",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:topaz_helmet",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:topaz_chestplate",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:topaz_leggings",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:topaz_boots",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:pearl_helmet",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:pearl_chestplate",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:pearl_leggings",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:pearl_boots",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:amethyst_helmet",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:amethyst_chestplate",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:amethyst_leggings",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:amethyst_boots",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:obsidian_helmet",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:obsidian_chestplate",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:obsidian_leggings",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:obsidian_boots",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:emerald_helmet",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:emerald_chestplate",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:emerald_leggings",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         },{
           "offer": "gardenkingmod:emerald_boots",
-          "price": "gardenkingmod:dollar*128"
+          "price": "gardenkingmod:dollar*3000"
         }
       ]
     },
@@ -213,10 +213,10 @@
       "offers": [
         {
           "offer": "gardenkingmod:iron_sprinkler",
-          "price": "gardenkingmod:dollar*1500"
+          "price": "gardenkingmod:dollar*10000"
         },{
           "offer": "gardenkingmod:gold_sprinkler",
-          "price": "gardenkingmod:dollar*3000"
+          "price": "gardenkingmod:dollar*10000"
         }
       ]
     }
