@@ -1,10 +1,13 @@
 package net.jeremy.gardenkingmod.shop;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +19,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.fabricmc.loader.api.FabricLoader;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.util.JsonCommentHelper;
@@ -29,12 +33,18 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 /**
- * Loads gear shop offers from {@code data/gardenkingmod/gear_shop_offers.json} so they can be
+ * Loads gear shop offers from {@code config/gardenkingmod/gear_shop_offers.json} so they can be
  * configured with simple {@code offer}/ {@code price} lines instead of hard-coded Java.
+ * The default file is copied from {@code data/gardenkingmod/gear_shop_offers.json} the first
+ * time it is needed.
  */
 public final class GearShopOfferManager implements SimpleSynchronousResourceReloadListener {
     private static final Identifier RELOAD_ID = new Identifier(GardenKingMod.MOD_ID, "gear_shop_offers");
     private static final Identifier OFFERS_FILE = new Identifier(GardenKingMod.MOD_ID, "gear_shop_offers.json");
+    private static final String DEFAULT_RESOURCE_PATH = "data/" + GardenKingMod.MOD_ID + "/gear_shop_offers.json";
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir()
+            .resolve(GardenKingMod.MOD_ID)
+            .resolve("gear_shop_offers.json");
     private static final GearShopOfferManager INSTANCE = new GearShopOfferManager();
 
     private static final int MAX_SUPPORTED_PAGES = 4;
@@ -88,6 +98,50 @@ public final class GearShopOfferManager implements SimpleSynchronousResourceRelo
     }
 
     private List<List<GearShopOffer>> loadOfferPages(ResourceManager manager) {
+        ensureConfigExists(manager);
+
+        if (Files.exists(CONFIG_PATH)) {
+            List<List<GearShopOffer>> configPages = loadOfferPagesFromConfig();
+            if (!configPages.isEmpty()) {
+                return configPages;
+            }
+        }
+
+        return loadOfferPagesFromDataPack(manager);
+    }
+
+    private List<List<GearShopOffer>> loadOfferPagesFromConfig() {
+        List<List<GearShopOffer>> loadedPages = new ArrayList<>();
+        try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH, StandardCharsets.UTF_8)) {
+            JsonElement root = JsonParser.parseReader(reader);
+            JsonElement sanitized = JsonCommentHelper.sanitize(root);
+            if (sanitized.isJsonObject()) {
+                JsonObject rootObject = sanitized.getAsJsonObject();
+                if (rootObject.has("pages")) {
+                    parsePagesArray(rootObject.get("pages"), loadedPages);
+                } else if (rootObject.has("offers")) {
+                    List<GearShopOffer> page = parseOffersArray(rootObject.get("offers"), "root offers");
+                    loadedPages.add(List.copyOf(page));
+                } else {
+                    GearShopOffer single = parseOfferObject(rootObject, "root object");
+                    if (single != null) {
+                        loadedPages.add(List.of(single));
+                    }
+                }
+            } else if (sanitized.isJsonArray()) {
+                List<GearShopOffer> page = parseOffersArray(sanitized, "root array");
+                loadedPages.add(List.copyOf(page));
+            } else {
+                GardenKingMod.LOGGER.warn("gear_shop_offers.json must contain an array of offers");
+            }
+        } catch (IOException | JsonParseException exception) {
+            GardenKingMod.LOGGER.error("Failed to load gear shop offers from {}", CONFIG_PATH, exception);
+        }
+
+        return finalizePages(loadedPages);
+    }
+
+    private List<List<GearShopOffer>> loadOfferPagesFromDataPack(ResourceManager manager) {
         Optional<Resource> resourceOptional = manager.getResource(OFFERS_FILE);
         if (resourceOptional.isEmpty()) {
             GardenKingMod.LOGGER.warn("No gear shop offer file found at {}", OFFERS_FILE);
@@ -119,9 +173,13 @@ public final class GearShopOfferManager implements SimpleSynchronousResourceRelo
                 GardenKingMod.LOGGER.warn("gear_shop_offers.json must contain an array of offers");
             }
         } catch (IOException | JsonParseException exception) {
-            GardenKingMod.LOGGER.error("Failed to load gear shop offers", exception);
+            GardenKingMod.LOGGER.error("Failed to load gear shop offers from {}", OFFERS_FILE, exception);
         }
 
+        return finalizePages(loadedPages);
+    }
+
+    private List<List<GearShopOffer>> finalizePages(List<List<GearShopOffer>> loadedPages) {
         if (loadedPages.size() > MAX_SUPPORTED_PAGES) {
             GardenKingMod.LOGGER.warn(
                     "Gear shop defines {} pages but the UI only exposes the first {} tabs", loadedPages.size(),
@@ -138,6 +196,46 @@ public final class GearShopOfferManager implements SimpleSynchronousResourceRelo
             immutablePages.add(List.copyOf(page));
         }
         return List.copyOf(immutablePages);
+    }
+
+    private void ensureConfigExists(ResourceManager manager) {
+        try {
+            Files.createDirectories(CONFIG_PATH.getParent());
+        } catch (IOException exception) {
+            GardenKingMod.LOGGER.warn("Failed to create gear shop config directory", exception);
+            return;
+        }
+
+        if (Files.exists(CONFIG_PATH)) {
+            return;
+        }
+
+        try (InputStream source = openDefaultOffersStream(manager)) {
+            if (source == null) {
+                GardenKingMod.LOGGER.warn("Unable to locate default gear shop offers file");
+                return;
+            }
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(source, StandardCharsets.UTF_8));
+                 BufferedWriter writer = Files.newBufferedWriter(CONFIG_PATH, StandardCharsets.UTF_8)) {
+                char[] buffer = new char[4096];
+                int read;
+                while ((read = reader.read(buffer)) >= 0) {
+                    writer.write(buffer, 0, read);
+                }
+            }
+        } catch (IOException exception) {
+            GardenKingMod.LOGGER.warn("Failed to create gear shop config at {}", CONFIG_PATH, exception);
+        }
+    }
+
+    private InputStream openDefaultOffersStream(ResourceManager manager) throws IOException {
+        Optional<Resource> resourceOptional = manager.getResource(OFFERS_FILE);
+        if (resourceOptional.isPresent()) {
+            return resourceOptional.get().getInputStream();
+        }
+
+        return GearShopOfferManager.class.getClassLoader().getResourceAsStream(DEFAULT_RESOURCE_PATH);
     }
 
     private void parsePagesArray(JsonElement element, List<List<GearShopOffer>> destination) {

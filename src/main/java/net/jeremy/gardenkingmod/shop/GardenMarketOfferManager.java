@@ -1,10 +1,13 @@
 package net.jeremy.gardenkingmod.shop;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +19,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.fabricmc.loader.api.FabricLoader;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
 import net.jeremy.gardenkingmod.util.JsonCommentHelper;
@@ -29,11 +33,17 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 /**
- * Loads the Garden Market's buy offers from {@code data/gardenkingmod/garden_market_offers.json}.
+ * Loads the Garden Market's buy offers from {@code config/gardenkingmod/garden_market_offers.json}.
+ * The default file is copied from {@code data/gardenkingmod/garden_market_offers.json} the first
+ * time it is needed.
  */
 public final class GardenMarketOfferManager implements SimpleSynchronousResourceReloadListener {
     private static final Identifier RELOAD_ID = new Identifier(GardenKingMod.MOD_ID, "garden_market_offers");
     private static final Identifier OFFERS_FILE = new Identifier(GardenKingMod.MOD_ID, "garden_market_offers.json");
+    private static final String DEFAULT_RESOURCE_PATH = "data/" + GardenKingMod.MOD_ID + "/garden_market_offers.json";
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir()
+            .resolve(GardenKingMod.MOD_ID)
+            .resolve("garden_market_offers.json");
     private static final GardenMarketOfferManager INSTANCE = new GardenMarketOfferManager();
     private static final int DEFAULT_MIN_OFFERS = 5;
     private static final int DEFAULT_MAX_OFFERS = 8;
@@ -113,6 +123,48 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         refreshMinutes = DEFAULT_REFRESH_MINUTES;
         showAllOffers = DEFAULT_SHOW_ALL_OFFERS;
 
+        ensureConfigExists(manager);
+
+        if (Files.exists(CONFIG_PATH)) {
+            List<GearShopOffer> configOffers = loadOffersFromConfig();
+            if (!configOffers.isEmpty()) {
+                return configOffers;
+            }
+        }
+
+        return loadOffersFromDataPack(manager);
+    }
+
+    private List<GearShopOffer> loadOffersFromConfig() {
+        List<GearShopOffer> loadedOffers = new ArrayList<>();
+        try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH, StandardCharsets.UTF_8)) {
+            JsonElement root = JsonParser.parseReader(reader);
+            JsonElement sanitized = JsonCommentHelper.sanitize(root);
+            if (sanitized.isJsonObject()) {
+                JsonObject rootObject = sanitized.getAsJsonObject();
+                parseSettings(rootObject);
+                if (rootObject.has("offers")) {
+                    loadedOffers = parseOffersArray(rootObject.get("offers"), "root offers");
+                } else {
+                    GearShopOffer single = parseOfferObject(rootObject, "root object");
+                    if (single != null) {
+                        loadedOffers = List.of(single);
+                    }
+                }
+            } else if (sanitized.isJsonArray()) {
+                loadedOffers = parseOffersArray(sanitized.getAsJsonArray(), "root array");
+            } else {
+                GardenKingMod.LOGGER.warn("garden_market_offers.json must define an array or object of offers");
+            }
+        } catch (IOException | JsonParseException exception) {
+            GardenKingMod.LOGGER.error("Failed to load garden market offers from {}", CONFIG_PATH, exception);
+        }
+
+        return loadedOffers.isEmpty() ? List.of() : List.copyOf(loadedOffers);
+    }
+
+    private List<GearShopOffer> loadOffersFromDataPack(ResourceManager manager) {
+
         Optional<Resource> resourceOptional = manager.getResource(OFFERS_FILE);
         if (resourceOptional.isEmpty()) {
             GardenKingMod.LOGGER.warn("No garden market offer file found at {}", OFFERS_FILE);
@@ -141,7 +193,7 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
                 GardenKingMod.LOGGER.warn("garden_market_offers.json must define an array or object of offers");
             }
         } catch (IOException | JsonParseException exception) {
-            GardenKingMod.LOGGER.error("Failed to load garden market offers", exception);
+            GardenKingMod.LOGGER.error("Failed to load garden market offers from {}", OFFERS_FILE, exception);
         }
 
         if (loadedOffers.isEmpty()) {
@@ -149,6 +201,46 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         }
 
         return List.copyOf(loadedOffers);
+    }
+
+    private void ensureConfigExists(ResourceManager manager) {
+        try {
+            Files.createDirectories(CONFIG_PATH.getParent());
+        } catch (IOException exception) {
+            GardenKingMod.LOGGER.warn("Failed to create garden market config directory", exception);
+            return;
+        }
+
+        if (Files.exists(CONFIG_PATH)) {
+            return;
+        }
+
+        try (InputStream source = openDefaultOffersStream(manager)) {
+            if (source == null) {
+                GardenKingMod.LOGGER.warn("Unable to locate default garden market offers file");
+                return;
+            }
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(source, StandardCharsets.UTF_8));
+                 BufferedWriter writer = Files.newBufferedWriter(CONFIG_PATH, StandardCharsets.UTF_8)) {
+                char[] buffer = new char[4096];
+                int read;
+                while ((read = reader.read(buffer)) >= 0) {
+                    writer.write(buffer, 0, read);
+                }
+            }
+        } catch (IOException exception) {
+            GardenKingMod.LOGGER.warn("Failed to create garden market config at {}", CONFIG_PATH, exception);
+        }
+    }
+
+    private InputStream openDefaultOffersStream(ResourceManager manager) throws IOException {
+        Optional<Resource> resourceOptional = manager.getResource(OFFERS_FILE);
+        if (resourceOptional.isPresent()) {
+            return resourceOptional.get().getInputStream();
+        }
+
+        return GardenMarketOfferManager.class.getClassLoader().getResourceAsStream(DEFAULT_RESOURCE_PATH);
     }
 
     private List<GearShopOffer> parseOffersArray(JsonElement element, String context) {
