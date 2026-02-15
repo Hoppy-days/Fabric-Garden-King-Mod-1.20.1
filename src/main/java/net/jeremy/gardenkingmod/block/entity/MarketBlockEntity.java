@@ -19,6 +19,8 @@ import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.item.WalletItem;
 import net.jeremy.gardenkingmod.screen.MarketScreenHandler;
 import net.jeremy.gardenkingmod.shop.GardenMarketOfferState;
+import net.jeremy.gardenkingmod.shop.GearShopOffer;
+import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -86,11 +88,15 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 ServerWorld serverWorld = player.getServerWorld();
                 if (serverWorld != null) {
                         GardenMarketOfferState state = GardenMarketOfferState.get(serverWorld);
-                        var offerIndices = state.getActiveOfferIndices(serverWorld);
-                        buf.writeVarInt(offerIndices.size());
-                        for (Integer index : offerIndices) {
-                                if (index != null) {
-                                        buf.writeVarInt(index);
+                        var activeOffers = state.getActiveOffers(serverWorld);
+                        buf.writeVarInt(activeOffers.size());
+                        for (GearShopOffer offer : activeOffers) {
+                                buf.writeItemStack(offer.copyResultStack());
+                                var costs = offer.copyCostStacks();
+                                buf.writeVarInt(costs.size());
+                                for (ItemStack cost : costs) {
+                                        buf.writeItemStack(cost);
+                                        buf.writeVarInt(GearShopStackHelper.getRequestedCount(cost));
                                 }
                         }
                         buf.writeLong(state.getNextRefreshTime(serverWorld));

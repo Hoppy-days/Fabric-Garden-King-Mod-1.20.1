@@ -81,7 +81,7 @@ public class MarketScreenHandler extends ScreenHandler {
         private final int hotbarStartIndex;
 
         public MarketScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
-                this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()), readOfferIndices(buf),
+                this(syncId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()), readOffers(buf),
                                 buf.readLong());
         }
 
@@ -90,7 +90,7 @@ public class MarketScreenHandler extends ScreenHandler {
         }
 
         private MarketScreenHandler(int syncId, PlayerInventory playerInventory, MarketBlockEntity blockEntity,
-                        List<Integer> offerIndices, long refreshTime) {
+                        List<GearShopOffer> offersFromPacket, long refreshTime) {
                 super(ModScreenHandlers.MARKET_SCREEN_HANDLER, syncId);
                 this.blockEntity = blockEntity;
                 this.playerInventory = playerInventory;
@@ -104,7 +104,7 @@ public class MarketScreenHandler extends ScreenHandler {
                 this.resultInventory.addListener(this::onInventoryChanged);
                 this.costInventory.onOpen(playerInventory.player);
                 this.resultInventory.onOpen(playerInventory.player);
-                this.buyOffers = resolveBuyOffers(blockEntity, offerIndices);
+                this.buyOffers = resolveBuyOffers(blockEntity, offersFromPacket);
                 this.offerRefreshTime = refreshTime;
                 if (this.offerRefreshTime == 0L && blockEntity != null
                                 && blockEntity.getWorld() instanceof ServerWorld serverWorld) {
@@ -143,23 +143,36 @@ public class MarketScreenHandler extends ScreenHandler {
                 return offerRefreshTime;
         }
 
-        private static List<Integer> readOfferIndices(PacketByteBuf buf) {
+        private static List<GearShopOffer> readOffers(PacketByteBuf buf) {
                 int offerCount = buf.readVarInt();
-                List<Integer> indices = new ArrayList<>(offerCount);
-                for (int i = 0; i < offerCount; i++) {
-                        indices.add(buf.readVarInt());
+                List<GearShopOffer> offers = new ArrayList<>(offerCount);
+                for (int offerIndex = 0; offerIndex < offerCount; offerIndex++) {
+                        ItemStack result = buf.readItemStack();
+                        int costCount = buf.readVarInt();
+                        List<ItemStack> costs = new ArrayList<>(costCount);
+                        for (int costIndex = 0; costIndex < costCount; costIndex++) {
+                                ItemStack costStack = buf.readItemStack();
+                                int requestedCount = buf.readVarInt();
+                                if (!costStack.isEmpty()) {
+                                        GearShopStackHelper.applyRequestedCount(costStack, requestedCount);
+                                        costs.add(costStack);
+                                }
+                        }
+                        if (!result.isEmpty()) {
+                                offers.add(GearShopOffer.of(result, costs));
+                        }
                 }
-                return indices;
+                return List.copyOf(offers);
         }
 
-        private List<GearShopOffer> resolveBuyOffers(MarketBlockEntity blockEntity, List<Integer> offerIndices) {
+        private List<GearShopOffer> resolveBuyOffers(MarketBlockEntity blockEntity, List<GearShopOffer> offersFromPacket) {
                 if (blockEntity != null && blockEntity.getWorld() instanceof ServerWorld serverWorld) {
                         GardenMarketOfferState state = GardenMarketOfferState.get(serverWorld);
                         return new ArrayList<>(state.getActiveOffers(serverWorld));
                 }
 
-                if (offerIndices != null) {
-                        return new ArrayList<>(GardenMarketOfferManager.getInstance().getOffersByIndices(offerIndices));
+                if (offersFromPacket != null && !offersFromPacket.isEmpty()) {
+                        return new ArrayList<>(offersFromPacket);
                 }
 
                 return new ArrayList<>(GardenMarketOfferManager.getInstance().getMasterOffers());
