@@ -9,8 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -134,16 +137,25 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         refreshMinutes = DEFAULT_REFRESH_MINUTES;
         showAllOffers = DEFAULT_SHOW_ALL_OFFERS;
 
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            List<GearShopOffer> devDataPackOffers = loadOffersFromDataPack(manager);
+            if (!devDataPackOffers.isEmpty()) {
+                return devDataPackOffers;
+            }
+        }
+
         ensureConfigExists(manager);
+
+        List<GearShopOffer> dataPackOffers = loadOffersFromDataPack(manager);
 
         if (Files.exists(CONFIG_PATH)) {
             List<GearShopOffer> configOffers = loadOffersFromConfig();
             if (!configOffers.isEmpty()) {
-                return configOffers;
+                return mergeOffers(configOffers, dataPackOffers);
             }
         }
 
-        return loadOffersFromDataPack(manager);
+        return dataPackOffers;
     }
 
     private List<GearShopOffer> loadOffersFromConfig() {
@@ -413,8 +425,39 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
             return;
         }
 
+        normalizeEnchantmentLevelTags(parsedNbt);
+
         NbtCompound existingNbt = stack.getOrCreateNbt();
         existingNbt.copyFrom(parsedNbt);
+    }
+
+
+    private void normalizeEnchantmentLevelTags(NbtElement element) {
+        if (element instanceof NbtCompound compound) {
+            for (String key : compound.getKeys()) {
+                NbtElement child = compound.get(key);
+                if (child == null) {
+                    continue;
+                }
+
+                if (("StoredEnchantments".equals(key) || "Enchantments".equals(key)) && child instanceof NbtList list) {
+                    for (int index = 0; index < list.size(); index++) {
+                        NbtElement entry = list.get(index);
+                        if (entry instanceof NbtCompound enchantment && enchantment.contains("lvl", NbtElement.NUMBER_TYPE)) {
+                            enchantment.putShort("lvl", enchantment.getShort("lvl"));
+                        }
+                        normalizeEnchantmentLevelTags(entry);
+                    }
+                    continue;
+                }
+
+                normalizeEnchantmentLevelTags(child);
+            }
+        } else if (element instanceof NbtList list) {
+            for (int index = 0; index < list.size(); index++) {
+                normalizeEnchantmentLevelTags(list.get(index));
+            }
+        }
     }
 
     private NbtCompound parseNbtCompound(JsonElement element, String fieldName, String itemId) {
@@ -527,6 +570,50 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
             stack.setCount(Math.min(count, stack.getMaxCount()));
         }
         return stack;
+    }
+
+
+    private List<GearShopOffer> mergeOffers(List<GearShopOffer> primary, List<GearShopOffer> secondary) {
+        if (primary.isEmpty()) {
+            return secondary.isEmpty() ? List.of() : List.copyOf(secondary);
+        }
+        if (secondary.isEmpty()) {
+            return List.copyOf(primary);
+        }
+
+        List<GearShopOffer> merged = new ArrayList<>(primary.size() + secondary.size());
+        Set<String> seenSignatures = new LinkedHashSet<>();
+
+        for (GearShopOffer offer : primary) {
+            String signature = buildOfferSignature(offer);
+            if (seenSignatures.add(signature)) {
+                merged.add(offer);
+            }
+        }
+
+        for (GearShopOffer offer : secondary) {
+            String signature = buildOfferSignature(offer);
+            if (seenSignatures.add(signature)) {
+                merged.add(offer);
+            }
+        }
+
+        return List.copyOf(merged);
+    }
+
+    private String buildOfferSignature(GearShopOffer offer) {
+        StringJoiner joiner = new StringJoiner("||");
+        joiner.add(buildStackSignature(offer.copyResultStack()));
+        for (ItemStack cost : offer.copyCostStacks()) {
+            joiner.add(buildStackSignature(cost));
+        }
+        return joiner.toString();
+    }
+
+    private String buildStackSignature(ItemStack stack) {
+        Identifier id = Registries.ITEM.getId(stack.getItem());
+        String nbt = stack.hasNbt() ? stack.getNbt().toString() : "";
+        return (id != null ? id.toString() : "unknown") + "#" + stack.getCount() + "#" + nbt;
     }
 
     private static String describeStack(ItemStack stack) {
