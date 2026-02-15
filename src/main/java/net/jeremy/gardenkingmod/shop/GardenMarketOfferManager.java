@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.google.gson.JsonArray;
@@ -49,6 +50,11 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
     private static final int DEFAULT_MAX_OFFERS = 8;
     private static final int DEFAULT_REFRESH_MINUTES = 30;
     private static final boolean DEFAULT_SHOW_ALL_OFFERS = false;
+    private static final Map<Identifier, Identifier> LEGACY_ITEM_ALIASES = Map.of(
+            new Identifier("minecraft", "beetroots"), new Identifier("minecraft", "beetroot_seeds"),
+            new Identifier("minecraft", "carrots"), new Identifier("minecraft", "carrot"),
+            new Identifier("minecraft", "potatoes"), new Identifier("minecraft", "potato"),
+            new Identifier("croptopia", "vanilla_seed"), new Identifier("croptopia", "vanilla_seeds"));
 
     private volatile List<GearShopOffer> offers = List.of();
     private volatile int minOffers = DEFAULT_MIN_OFFERS;
@@ -425,6 +431,14 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         Optional<Item> itemOptional = Registries.ITEM.getOrEmpty(id);
         if (itemOptional.isPresent()) {
             return itemOptional;
+        }
+
+        Identifier aliasId = LEGACY_ITEM_ALIASES.get(id);
+        if (aliasId != null) {
+            itemOptional = Registries.ITEM.getOrEmpty(aliasId);
+            if (itemOptional.isPresent()) {
+                return itemOptional;
+            }
         }
 
         String path = id.getPath();
