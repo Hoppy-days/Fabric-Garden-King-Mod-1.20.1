@@ -134,6 +134,13 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         refreshMinutes = DEFAULT_REFRESH_MINUTES;
         showAllOffers = DEFAULT_SHOW_ALL_OFFERS;
 
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            List<GearShopOffer> devDataPackOffers = loadOffersFromDataPack(manager);
+            if (!devDataPackOffers.isEmpty()) {
+                return devDataPackOffers;
+            }
+        }
+
         ensureConfigExists(manager);
 
         if (Files.exists(CONFIG_PATH)) {
