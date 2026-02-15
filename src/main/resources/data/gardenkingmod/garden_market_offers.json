@@ -198,17 +198,17 @@
       "tier": 1
     },
     {
-      "offer": "minecraft:beetroots*1",
+      "offer": "minecraft:beetroot_seeds*1",
       "price": "gardenkingmod:dollar*1",
       "tier": 1
     },
     {
-      "offer": "minecraft:carrots*1",
+      "offer": "minecraft:carrot*1",
       "price": "gardenkingmod:dollar*1",
       "tier": 1
     },
     {
-      "offer": "minecraft:potatoes*1",
+      "offer": "minecraft:potato*1",
       "price": "gardenkingmod:dollar*1",
       "tier": 1
     },
@@ -268,7 +268,7 @@
       "tier": 3
     },
     {
-      "offer": "croptopia:vanilla_seed*1",
+      "offer": "croptopia:vanilla_seeds*1",
       "price": "gardenkingmod:dollar*1",
       "tier": 3
     },
