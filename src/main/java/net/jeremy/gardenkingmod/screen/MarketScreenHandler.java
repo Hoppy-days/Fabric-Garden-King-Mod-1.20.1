@@ -86,7 +86,7 @@ public class MarketScreenHandler extends ScreenHandler {
         }
 
         public MarketScreenHandler(int syncId, PlayerInventory playerInventory, MarketBlockEntity blockEntity) {
-                this(syncId, playerInventory, blockEntity, List.of(), 0L);
+                this(syncId, playerInventory, blockEntity, null, 0L);
         }
 
         private MarketScreenHandler(int syncId, PlayerInventory playerInventory, MarketBlockEntity blockEntity,
@@ -171,7 +171,7 @@ public class MarketScreenHandler extends ScreenHandler {
                         return new ArrayList<>(state.getActiveOffers(serverWorld));
                 }
 
-                if (offersFromPacket != null && !offersFromPacket.isEmpty()) {
+                if (offersFromPacket != null) {
                         return new ArrayList<>(offersFromPacket);
                 }
 
