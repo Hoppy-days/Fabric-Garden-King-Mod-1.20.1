@@ -8,6 +8,11 @@
   },
   "offers": [
     {
+      "offer": "minecraft:experience_bottle*1",
+      "price": "gardenkingmod:dollar*1",
+      "tier": 1
+    },
+    {
       "offer": "croptopia:artichoke_seed*1",
       "price": "gardenkingmod:dollar*1",
       "tier": 1
