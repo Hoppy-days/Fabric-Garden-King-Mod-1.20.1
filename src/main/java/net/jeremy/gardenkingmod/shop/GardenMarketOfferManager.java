@@ -420,8 +420,39 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
             return;
         }
 
+        normalizeEnchantmentLevelTags(parsedNbt);
+
         NbtCompound existingNbt = stack.getOrCreateNbt();
         existingNbt.copyFrom(parsedNbt);
+    }
+
+
+    private void normalizeEnchantmentLevelTags(NbtElement element) {
+        if (element instanceof NbtCompound compound) {
+            for (String key : compound.getKeys()) {
+                NbtElement child = compound.get(key);
+                if (child == null) {
+                    continue;
+                }
+
+                if (("StoredEnchantments".equals(key) || "Enchantments".equals(key)) && child instanceof NbtList list) {
+                    for (int index = 0; index < list.size(); index++) {
+                        NbtElement entry = list.get(index);
+                        if (entry instanceof NbtCompound enchantment && enchantment.contains("lvl", NbtElement.NUMBER_TYPE)) {
+                            enchantment.putShort("lvl", enchantment.getShort("lvl"));
+                        }
+                        normalizeEnchantmentLevelTags(entry);
+                    }
+                    continue;
+                }
+
+                normalizeEnchantmentLevelTags(child);
+            }
+        } else if (element instanceof NbtList list) {
+            for (int index = 0; index < list.size(); index++) {
+                normalizeEnchantmentLevelTags(list.get(index));
+            }
+        }
     }
 
     private NbtCompound parseNbtCompound(JsonElement element, String fieldName, String itemId) {
