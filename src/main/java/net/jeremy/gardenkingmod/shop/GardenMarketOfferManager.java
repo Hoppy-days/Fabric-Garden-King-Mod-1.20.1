@@ -410,7 +410,8 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
             return;
         }
 
-        stack.setNbt(parsedNbt);
+        NbtCompound existingNbt = stack.getOrCreateNbt();
+        existingNbt.copyFrom(parsedNbt);
     }
 
     private NbtCompound parseNbtCompound(JsonElement element, String fieldName, String itemId) {
