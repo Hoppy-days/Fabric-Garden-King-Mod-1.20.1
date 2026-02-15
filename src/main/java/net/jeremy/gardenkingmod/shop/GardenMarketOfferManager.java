@@ -14,7 +14,9 @@ import java.util.Optional;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
@@ -26,6 +28,12 @@ import net.jeremy.gardenkingmod.util.JsonCommentHelper;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.AbstractNbtNumber;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -348,7 +356,13 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
             }
             String itemId = JsonHelper.getString(object, "item");
             int count = JsonHelper.getInt(object, "count", 1);
-            return createStack(itemId, count, fieldName, preserveFullCount);
+            ItemStack stack = createStack(itemId, count, fieldName, preserveFullCount);
+            if (stack.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+
+            applyStackNbt(object, stack, fieldName, itemId);
+            return stack;
         }
 
         GardenKingMod.LOGGER.warn("Garden market {} entry must be a string or object: {}", fieldName, element);
@@ -383,6 +397,102 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
         }
 
         return createStack(itemPart, count, fieldName, preserveFullCount);
+    }
+
+    private void applyStackNbt(JsonObject object, ItemStack stack, String fieldName, String itemId) {
+        if (!object.has("nbt")) {
+            return;
+        }
+
+        JsonElement nbtElement = object.get("nbt");
+        NbtCompound parsedNbt = parseNbtCompound(nbtElement, fieldName, itemId);
+        if (parsedNbt == null) {
+            return;
+        }
+
+        NbtCompound existingNbt = stack.getOrCreateNbt();
+        existingNbt.copyFrom(parsedNbt);
+    }
+
+    private NbtCompound parseNbtCompound(JsonElement element, String fieldName, String itemId) {
+        if (element == null || element.isJsonNull()) {
+            GardenKingMod.LOGGER.warn("Garden market {} entry for '{}' has a null 'nbt' value", fieldName, itemId);
+            return null;
+        }
+
+        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+            String nbtString = element.getAsString().trim();
+            if (nbtString.isEmpty()) {
+                GardenKingMod.LOGGER.warn("Garden market {} entry for '{}' has an empty 'nbt' value", fieldName, itemId);
+                return null;
+            }
+
+            try {
+                return StringNbtReader.parse(nbtString);
+            } catch (Exception exception) {
+                GardenKingMod.LOGGER.warn("Garden market {} entry for '{}' has invalid SNBT '{}': {}", fieldName, itemId,
+                        nbtString, exception.getMessage());
+                return null;
+            }
+        }
+
+        if (!element.isJsonObject()) {
+            GardenKingMod.LOGGER.warn("Garden market {} entry for '{}' must define 'nbt' as an object or SNBT string",
+                    fieldName, itemId);
+            return null;
+        }
+
+        NbtElement converted = convertJsonToNbt(element);
+        if (!(converted instanceof NbtCompound compound)) {
+            GardenKingMod.LOGGER.warn("Garden market {} entry for '{}' must define 'nbt' as a compound", fieldName,
+                    itemId);
+            return null;
+        }
+
+        return compound;
+    }
+
+    private NbtElement convertJsonToNbt(JsonElement element) {
+        if (element == null || element instanceof JsonNull || element.isJsonNull()) {
+            return NbtString.of("null");
+        }
+
+        if (element.isJsonObject()) {
+            NbtCompound compound = new NbtCompound();
+            JsonObject object = element.getAsJsonObject();
+            for (String key : object.keySet()) {
+                compound.put(key, convertJsonToNbt(object.get(key)));
+            }
+            return compound;
+        }
+
+        if (element.isJsonArray()) {
+            NbtList list = new NbtList();
+            for (JsonElement child : element.getAsJsonArray()) {
+                list.add(convertJsonToNbt(child));
+            }
+            return list;
+        }
+
+        JsonPrimitive primitive = element.getAsJsonPrimitive();
+        if (primitive.isBoolean()) {
+            return AbstractNbtNumber.of(primitive.getAsBoolean() ? (byte) 1 : (byte) 0);
+        }
+
+        if (primitive.isNumber()) {
+            Number number = primitive.getAsNumber();
+            double doubleValue = number.doubleValue();
+            long longValue = number.longValue();
+            if (Double.isFinite(doubleValue) && doubleValue == longValue) {
+                if (longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE) {
+                    return AbstractNbtNumber.of((int) longValue);
+                }
+                return AbstractNbtNumber.of(longValue);
+            }
+            return AbstractNbtNumber.of(doubleValue);
+        }
+
+        return NbtString.of(primitive.getAsString());
     }
 
     private ItemStack createStack(String itemId, int count, String fieldName) {
