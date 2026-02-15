@@ -28,10 +28,13 @@ import net.jeremy.gardenkingmod.util.JsonCommentHelper;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.AbstractNbtNumber;
+import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtDouble;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtLong;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.registry.Registries;
@@ -476,7 +479,7 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
 
         JsonPrimitive primitive = element.getAsJsonPrimitive();
         if (primitive.isBoolean()) {
-            return AbstractNbtNumber.of(primitive.getAsBoolean() ? (byte) 1 : (byte) 0);
+            return NbtByte.of(primitive.getAsBoolean());
         }
 
         if (primitive.isNumber()) {
@@ -485,11 +488,11 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
             long longValue = number.longValue();
             if (Double.isFinite(doubleValue) && doubleValue == longValue) {
                 if (longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE) {
-                    return AbstractNbtNumber.of((int) longValue);
+                    return NbtInt.of((int) longValue);
                 }
-                return AbstractNbtNumber.of(longValue);
+                return NbtLong.of(longValue);
             }
-            return AbstractNbtNumber.of(doubleValue);
+            return NbtDouble.of(doubleValue);
         }
 
         return NbtString.of(primitive.getAsString());
