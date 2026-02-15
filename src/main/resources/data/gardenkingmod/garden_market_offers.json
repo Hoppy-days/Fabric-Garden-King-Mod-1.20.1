@@ -6,22 +6,6 @@
     "refresh_minutes": 30,
     "show_all_offers": true
   },
-  "_nbt_example": {
-    "offer": {
-      "item": "minecraft:enchanted_book",
-      "count": 1,
-      "nbt": {
-        "StoredEnchantments": [
-          {
-            "id": "minecraft:sharpness",
-            "lvl": 7
-          }
-        ]
-      }
-    },
-    "price": "gardenkingmod:dollar*64",
-    "tier": 7
-  },
   "offers": [
     {
       "offer": "minecraft:experience_bottle*1",
