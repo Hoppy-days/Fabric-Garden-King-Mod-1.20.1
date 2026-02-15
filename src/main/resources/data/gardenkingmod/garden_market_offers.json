@@ -1,5 +1,11 @@
 {
   "_comment": "Garden King Market offers (auto-generated).",
+  "settings": {
+    "min_offers": 5,
+    "max_offers": 105,
+    "refresh_minutes": 30,
+    "show_all_offers": true
+  },
   "_nbt_example": {
     "offer": {
       "item": "minecraft:enchanted_book",
@@ -15,12 +21,6 @@
     },
     "price": "gardenkingmod:dollar*64",
     "tier": 7
-  },
-  "settings": {
-    "min_offers": 5,
-    "max_offers": 105,
-    "refresh_minutes": 30,
-    "show_all_offers": true
   },
   "offers": [
     {
