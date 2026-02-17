@@ -209,6 +209,18 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 return changed;
         }
 
+        private static void insertOrDrop(ServerPlayerEntity player, ItemStack stack) {
+                if (stack.isEmpty()) {
+                        return;
+                }
+
+                ItemStack stackToInsert = stack.copy();
+                boolean inserted = player.getInventory().insertStack(stackToInsert);
+                if (!inserted || !stackToInsert.isEmpty()) {
+                        player.dropItem(stackToInsert, false);
+                }
+        }
+
         @Override
         public void markDirty() {
                 super.markDirty();
