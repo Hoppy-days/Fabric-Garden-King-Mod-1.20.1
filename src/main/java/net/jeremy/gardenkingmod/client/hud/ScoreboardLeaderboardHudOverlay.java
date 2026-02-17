@@ -9,9 +9,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.jeremy.gardenkingmod.ModScoreboards;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.scoreboard.ReadableScoreboardScore;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.text.Text;
 
 public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback {
@@ -84,7 +84,7 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
                 .thenComparing(LeaderboardEntry::name, Comparator.reverseOrder());
 
         PriorityQueue<LeaderboardEntry> topEntries = new PriorityQueue<>(MAX_VISIBLE_ENTRIES, byLowestScoreThenReverseName);
-        for (ReadableScoreboardScore scoreEntry : scoreboard.getAllPlayerScores(objective)) {
+        for (ScoreboardPlayerScore scoreEntry : scoreboard.getAllPlayerScores(objective)) {
             int score = scoreEntry.getScore();
             if (score <= 0) {
                 continue;
