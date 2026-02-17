@@ -41,7 +41,7 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
         }
 
         int currentTick = client.player.age;
-        if (currentTick - lastRefreshTick >= REFRESH_INTERVAL_TICKS || currentTick < lastRefreshTick) {
+        if (shouldRefresh(currentTick)) {
             refreshTopEntries(client.world.getScoreboard());
             lastRefreshTick = currentTick;
         }
@@ -61,6 +61,15 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
             context.drawText(client.textRenderer, line, x, lineY, 0xE0E0E0, false);
             lineY += 10;
         }
+    }
+
+    private boolean shouldRefresh(int currentTick) {
+        if (lastRefreshTick == Integer.MIN_VALUE) {
+            return true;
+        }
+
+        long ticksSinceLastRefresh = (long) currentTick - lastRefreshTick;
+        return ticksSinceLastRefresh >= REFRESH_INTERVAL_TICKS || currentTick < lastRefreshTick;
     }
 
     private void refreshTopEntries(Scoreboard scoreboard) {
