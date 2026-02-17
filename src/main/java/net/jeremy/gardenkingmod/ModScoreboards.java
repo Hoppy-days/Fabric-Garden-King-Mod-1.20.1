@@ -12,6 +12,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 public final class ModScoreboards {
+        private static final int PLAYER_LIST_DISPLAY_SLOT = 0;
         public static final String CURRENCY_OBJECTIVE = "garden_currency";
         public static final String BANK_CURRENCY_OBJECTIVE = "garden_currency_bank";
 
