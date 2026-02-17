@@ -10,7 +10,7 @@
                 "CropBlockMixin",
                 "CroptopiaCropBlockMixin",
                 "EnchantmentHelperMixin",
-                "EnchantmentMixin",
+                "DamageEnchantmentMixin",
                 "BoneMealItemMixin",
                 "ComposterBlockMixin",
                 "FarmlandBlockMixin",
