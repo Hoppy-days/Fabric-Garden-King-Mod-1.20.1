@@ -37,7 +37,8 @@ public class MarketScreenHandler extends ScreenHandler {
         public static final int BUTTON_SELECT_SELL_TAB = 1;
         public static final int BUTTON_SELECT_BUY_TAB = 2;
         public static final int BUTTON_BUY = 3;
-        private static final int BUTTON_SELECT_BUY_OFFER_BASE = 1000;
+        /** Keep custom button ids in packet-safe range for dedicated servers. */
+        private static final int BUTTON_SELECT_BUY_OFFER_BASE = 10;
 
         private static final int SLOT_SIZE = 18;
         private static final int COST_SLOT_COUNT = 2;
@@ -460,41 +461,39 @@ public class MarketScreenHandler extends ScreenHandler {
                         return true;
                 }
 
-                if (this.blockEntity != null) {
-                        if (id == BUTTON_SELL && player instanceof ServerPlayerEntity serverPlayer) {
-                                if (this.blockEntity.sell(serverPlayer)) {
+                if (id == BUTTON_SELL && player instanceof ServerPlayerEntity serverPlayer) {
+                        if (this.blockEntity != null && this.blockEntity.sell(serverPlayer)) {
+                                sendContentUpdates();
+                        }
+                        return true;
+                }
+
+                if (id == BUTTON_SELECT_SELL_TAB) {
+                        if (player instanceof ServerPlayerEntity serverPlayer) {
+                                if (clearSelection(serverPlayer)) {
                                         sendContentUpdates();
                                 }
-                                return true;
                         }
+                        setMarketSlotsEnabled(true);
+                        setBuySlotsEnabled(false);
+                        return true;
+                }
 
-                        if (id == BUTTON_SELECT_SELL_TAB) {
-                                if (player instanceof ServerPlayerEntity serverPlayer) {
-                                        if (clearSelection(serverPlayer)) {
-                                                sendContentUpdates();
-                                        }
-                                }
-                                setMarketSlotsEnabled(true);
-                                setBuySlotsEnabled(false);
-                                return true;
+                if (id == BUTTON_SELECT_BUY_TAB) {
+                        boolean returnedItems = this.blockEntity != null && this.blockEntity.returnItemsToPlayer(player);
+                        setMarketSlotsEnabled(false);
+                        setBuySlotsEnabled(true);
+                        if (returnedItems) {
+                                sendContentUpdates();
                         }
+                        return true;
+                }
 
-                        if (id == BUTTON_SELECT_BUY_TAB) {
-                                boolean returnedItems = this.blockEntity.returnItemsToPlayer(player);
-                                setMarketSlotsEnabled(false);
-                                setBuySlotsEnabled(true);
-                                if (returnedItems) {
-                                        sendContentUpdates();
-                                }
-                                return true;
+                if (id == BUTTON_BUY && player instanceof ServerPlayerEntity serverPlayer) {
+                        if (processPurchase(serverPlayer, this.selectedOfferIndex, false)) {
+                                sendContentUpdates();
                         }
-
-                        if (id == BUTTON_BUY && player instanceof ServerPlayerEntity serverPlayer) {
-                                if (processPurchase(serverPlayer, this.selectedOfferIndex, false)) {
-                                        sendContentUpdates();
-                                }
-                                return true;
-                        }
+                        return true;
                 }
 
                 return super.onButtonClick(player, id);
