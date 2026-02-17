@@ -85,9 +85,9 @@ public class MarketBlockModel extends EntityModel<Entity> {
                 .uv(0, 60).cuboid(-23.2F, -10.0F, -19.5F, 1.0F, 2.0F, 9.5F, new Dilation(0.0F))
                 .uv(0, 70).cuboid(-23.2F, -12.0F, -14.0F, 1.0F, 2.0F, 4.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
 
-        ModelPartData traycenter_r1 = bb_main.addChild("traycenter_r1", ModelPartBuilder.create().uv(129, 54).cuboid(-4.1F, -2.0F, -2.0F, 15.0F, 2.0F, 16.0F, new Dilation(0.0F))
-                .uv(129, 54).cuboid(26.9F, -2.0F, -2.0F, 15.0F, 2.0F, 16.0F, new Dilation(0.0F))
-                .uv(129, 54).cuboid(11.9F, -2.0F, -2.0F, 15.0F, 2.0F, 16.0F, new Dilation(0.0F)), ModelTransform.of(-19.0F, -3.8F, -20.0F, 0.3491F, 0.0F, 0.0F));
+        ModelPartData traycenter_r1 = bb_main.addChild("traycenter_r1", ModelPartBuilder.create().uv(128, 75).cuboid(-4.1F, -2.0F, -2.0F, 15.0F, 2.0F, 16.0F, new Dilation(0.0F))
+                .uv(128, 114).cuboid(26.9F, -2.0F, -2.0F, 15.0F, 2.0F, 16.0F, new Dilation(0.0F))
+                .uv(129, 94).cuboid(11.9F, -2.0F, -2.0F, 15.0F, 2.0F, 16.0F, new Dilation(0.0F)), ModelTransform.of(-19.0F, -3.8F, -20.0F, 0.3491F, 0.0F, 0.0F));
 
         ModelPartData cube_r5 = bb_main.addChild("cube_r5", ModelPartBuilder.create().uv(0, 78).cuboid(-1.9F, -2.0F, -2.0F, 1.8F, 2.0F, 16.0F, new Dilation(0.0F))
                 .uv(29, 77).cuboid(13.1F, -2.0F, -2.0F, 1.8F, 2.0F, 16.0F, new Dilation(0.0F))
