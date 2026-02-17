@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.jeremy.gardenkingmod.currency.GardenCurrencyHolder;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardCriterion;
+import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.server.MinecraftServer;
@@ -107,7 +108,12 @@ public final class ModScoreboards {
         }
 
         private static ScoreboardObjective ensureLifetimeObjective(Scoreboard scoreboard) {
-                return ensureObjective(scoreboard, CURRENCY_OBJECTIVE, "scoreboard.gardenkingmod.garden_currency");
+                ScoreboardObjective objective = ensureObjective(scoreboard, CURRENCY_OBJECTIVE,
+                                "scoreboard.gardenkingmod.garden_currency");
+                if (scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.LIST) == null) {
+                        scoreboard.setObjectiveSlot(ScoreboardDisplaySlot.LIST, objective);
+                }
+                return objective;
         }
 
         private static ScoreboardObjective ensureBankObjective(Scoreboard scoreboard) {

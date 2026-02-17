@@ -46,15 +46,16 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
             lastRefreshTick = currentTick;
         }
 
-        if (cachedTopEntries.isEmpty()) {
-            return;
-        }
-
         int x = 8;
         int y = 8;
         context.drawText(client.textRenderer, Text.literal("Garden Dollars Leaderboard"), x, y, 0xFFFFFF, true);
 
         int lineY = y + 12;
+        if (cachedTopEntries.isEmpty()) {
+            context.drawText(client.textRenderer, Text.literal("No leaderboard data yet"), x, lineY, 0xE0E0E0, false);
+            return;
+        }
+
         for (int i = 0; i < cachedTopEntries.size(); i++) {
             LeaderboardEntry entry = cachedTopEntries.get(i);
             Text line = Text.literal((i + 1) + ". " + entry.name() + " - " + entry.score());
@@ -86,10 +87,6 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
         PriorityQueue<LeaderboardEntry> topEntries = new PriorityQueue<>(MAX_VISIBLE_ENTRIES, byLowestScoreThenReverseName);
         for (ScoreboardPlayerScore scoreEntry : scoreboard.getAllPlayerScores(objective)) {
             int score = scoreEntry.getScore();
-            if (score <= 0) {
-                continue;
-            }
-
             LeaderboardEntry candidate = new LeaderboardEntry(scoreEntry.getPlayerName(), score);
             if (topEntries.size() < MAX_VISIBLE_ENTRIES) {
                 topEntries.offer(candidate);
