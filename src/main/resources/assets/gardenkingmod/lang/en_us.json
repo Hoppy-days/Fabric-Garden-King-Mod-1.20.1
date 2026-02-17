@@ -349,6 +349,8 @@
   "screen.gardenkingmod.skills.allocate": "Allocate",
   "screen.gardenkingmod.skills.points_spent": "Points Spent: %s",
   "key.gardenkingmod.open_skills": "Open Skill Screen",
+  "key.gardenkingmod.toggle_leaderboard": "Toggle Leaderboard",
+  "message.gardenkingmod.leaderboard.toggled": "Leaderboard: %s",
   "category.gardenkingmod": "Garden King"
 
 }
