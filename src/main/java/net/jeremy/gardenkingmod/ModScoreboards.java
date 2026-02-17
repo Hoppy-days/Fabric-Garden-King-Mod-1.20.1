@@ -110,8 +110,8 @@ public final class ModScoreboards {
         private static ScoreboardObjective ensureLifetimeObjective(Scoreboard scoreboard) {
                 ScoreboardObjective objective = ensureObjective(scoreboard, CURRENCY_OBJECTIVE,
                                 "scoreboard.gardenkingmod.garden_currency");
-                if (scoreboard.getObjectiveForSlot(PLAYER_LIST_DISPLAY_SLOT) == null) {
-                        scoreboard.setObjectiveSlot(PLAYER_LIST_DISPLAY_SLOT, objective);
+                if (scoreboard.getObjectiveForSlot(Scoreboard.DISPLAY_SLOT_LIST) == null) {
+                        scoreboard.setObjectiveSlot(Scoreboard.DISPLAY_SLOT_LIST, objective);
                 }
                 return objective;
         }
