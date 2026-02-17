@@ -349,6 +349,12 @@
   "screen.gardenkingmod.skills.allocate": "Allocate",
   "screen.gardenkingmod.skills.points_spent": "Points Spent: %s",
   "key.gardenkingmod.open_skills": "Open Skill Screen",
-  "category.gardenkingmod": "Garden King"
+  "key.gardenkingmod.toggle_leaderboard": "Toggle Garden Leaderboard",
+  "category.gardenkingmod": "Garden King",
+  "message.gardenkingmod.leaderboard.shown": "Garden leaderboard shown",
+  "message.gardenkingmod.leaderboard.hidden": "Garden leaderboard hidden",
+  "hud.gardenkingmod.leaderboard_title": "Garden King Leaderboard",
+  "hud.gardenkingmod.leaderboard_entry": "#%1$s %2$s: %3$s",
+  "hud.gardenkingmod.leaderboard_empty": "No leaderboard entries yet"
 
 }

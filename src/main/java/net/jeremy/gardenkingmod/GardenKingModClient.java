@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.jeremy.gardenkingmod.client.gui.SkillScreen;
+import net.jeremy.gardenkingmod.client.hud.GardenLeaderboardHudOverlay;
 import net.jeremy.gardenkingmod.client.hud.SkillHudOverlay;
 import net.jeremy.gardenkingmod.client.model.BankBlockModel;
 import net.jeremy.gardenkingmod.client.model.CrowEntityModel;
@@ -74,6 +75,12 @@ public class GardenKingModClient implements ClientModInitializer {
                 GLFW.GLFW_KEY_K,
                 "category.gardenkingmod"));
 
+        KeyBinding toggleLeaderboardKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.gardenkingmod.toggle_leaderboard",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_L,
+                "category.gardenkingmod"));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openSkillScreenKey.wasPressed()) {
                 if (client != null && client.player != null && client.currentScreen == null) {
@@ -85,6 +92,16 @@ public class GardenKingModClient implements ClientModInitializer {
                     screen.setChefSkillLevelValueScale(0.7F);  // numeric value
                     client.setScreen(screen);
 
+                }
+            }
+
+            while (toggleLeaderboardKey.wasPressed()) {
+                if (client != null && client.player != null) {
+                    GardenLeaderboardHudOverlay.INSTANCE.toggleVisible();
+                    Text stateText = GardenLeaderboardHudOverlay.INSTANCE.isVisible()
+                            ? Text.translatable("message.gardenkingmod.leaderboard.shown")
+                            : Text.translatable("message.gardenkingmod.leaderboard.hidden");
+                    client.player.sendMessage(stateText, true);
                 }
             }
         });
@@ -120,6 +137,7 @@ public class GardenKingModClient implements ClientModInitializer {
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.EMERALD_SPRINKLER_BLOCK, sprinklerItemRenderer);
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.SCARECROW_BLOCK, RenderLayer.getCutout());
         HudRenderCallback.EVENT.register(SkillHudOverlay.INSTANCE);
+        HudRenderCallback.EVENT.register(GardenLeaderboardHudOverlay.INSTANCE);
 
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.MARKET_SALE_RESULT_PACKET,
                 (client, handler, buf, responseSender) -> {
