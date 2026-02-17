@@ -209,6 +209,18 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 return changed;
         }
 
+        private static void insertOrDrop(ServerPlayerEntity player, ItemStack stack) {
+                if (stack.isEmpty()) {
+                        return;
+                }
+
+                ItemStack stackToInsert = stack.copy();
+                boolean inserted = player.getInventory().insertStack(stackToInsert);
+                if (!inserted || !stackToInsert.isEmpty()) {
+                        player.dropItem(stackToInsert, false);
+                }
+        }
+
         @Override
         public void markDirty() {
                 super.markDirty();
@@ -293,13 +305,6 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                                 continue;
                         }
 
-                        int remainder = details.remainder();
-                        if (remainder > 0) {
-                                ItemStack remainderStack = stack.copy();
-                                remainderStack.setCount(remainder);
-                                insertOrDrop(player, remainderStack);
-                        }
-
                         items.set(slot, ItemStack.EMPTY);
                         changed = true;
                 }
@@ -374,27 +379,22 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                         return Optional.empty();
                 }
 
-                int dollarsPerStack = getDollarsPerStack(tier.get());
-                if (dollarsPerStack <= 0) {
+                int dollarsPerItem = getDollarsPerItem(tier.get());
+                if (dollarsPerItem <= 0) {
                         return Optional.empty();
                 }
 
-                int maxStackSize = stack.getMaxCount();
-                if (maxStackSize <= 0) {
+                int itemsSold = stack.getCount();
+                if (itemsSold <= 0) {
                         return Optional.empty();
                 }
 
-                int fullStacks = stack.getCount() / maxStackSize;
-                int itemsSold = fullStacks * maxStackSize;
-                int remainder = stack.getCount() - itemsSold;
-
-                int payoutPerStack = Math.max(0, Math.round(dollarsPerStack * payoutMultiplier));
-                int totalDollars = fullStacks * payoutPerStack;
+                int payoutPerItem = Math.max(0, Math.round(dollarsPerItem * payoutMultiplier));
+                int totalDollars = itemsSold * payoutPerItem;
 
                 CropTier resolvedTier = tier.get();
 
-                return Optional.of(new SaleDetails(item, resolvedTier, maxStackSize, fullStacks, remainder, payoutPerStack,
-                                totalDollars, itemsSold));
+                return Optional.of(new SaleDetails(item, resolvedTier, payoutPerItem, totalDollars, itemsSold));
         }
 
         private static Optional<CropTier> resolveTier(EnchantedCropDefinition definition) {
@@ -411,7 +411,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 return Registries.ITEM.getOrEmpty(definition.cropId()).flatMap(CropTierRegistry::get);
         }
 
-        private static int getDollarsPerStack(CropTier tier) {
+        private static int getDollarsPerItem(CropTier tier) {
                 String path = tier.id().getPath();
                 return switch (path) {
                 case "crop_tiers/tier_1" -> 1;
@@ -443,19 +443,8 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 ServerPlayNetworking.send(player, ModPackets.MARKET_SALE_RESULT_PACKET, buf);
         }
 
-        private static void insertOrDrop(PlayerEntity player, ItemStack stack) {
-                if (stack.isEmpty()) {
-                        return;
-                }
-
-                boolean fullyInserted = player.getInventory().insertStack(stack);
-                if (!fullyInserted && !stack.isEmpty()) {
-                        player.dropItem(stack, false);
-                }
-        }
-
         private static long getExperienceForSale(SaleDetails details) {
-                if (details == null || details.itemsSold() <= 0 || details.fullStacks() <= 0) {
+                if (details == null || details.itemsSold() <= 0) {
                         return 0L;
                 }
 
@@ -469,14 +458,14 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                         return 0L;
                 }
 
-                int baseValue = getDollarsPerStack(tier);
+                int baseValue = getDollarsPerItem(tier);
                 if (baseValue <= 0) {
                         return 0L;
                 }
 
                 long experience;
                 try {
-                        experience = Math.multiplyExact(baseValue, (long) details.fullStacks());
+                        experience = Math.multiplyExact(baseValue, (long) details.itemsSold());
                 } catch (ArithmeticException overflow) {
                         experience = Long.MAX_VALUE;
                 }
@@ -504,7 +493,6 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 }
         }
 
-        private record SaleDetails(Item item, CropTier tier, int maxStackSize, int fullStacks, int remainder,
-                        int payoutPerStack, int totalDollars, int itemsSold) {
+        private record SaleDetails(Item item, CropTier tier, int payoutPerItem, int totalDollars, int itemsSold) {
         }
 }
