@@ -42,8 +42,10 @@ public final class RottenLanguageProvider extends FabricLanguageProvider {
                                 "Sold %1$s Croptopia crops for %2$s dollars. Lifetime earnings: %3$s dollars.");
                 translationBuilder.add("message.gardenkingmod.market.empty", "There are no crops to sell.");
                 translationBuilder.add("message.gardenkingmod.market.invalid", "Only Crops and Food can be sold here!");
+                translationBuilder.add("message.gardenkingmod.leaderboard.toggled", "Leaderboard: %s");
                 translationBuilder.add("scoreboard.gardenkingmod.garden_currency", "Garden Dollars");
                 translationBuilder.add("scoreboard.gardenkingmod.garden_currency_bank", "Bank Dollars");
+                translationBuilder.add("key.gardenkingmod.toggle_leaderboard", "Toggle Leaderboard");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier", "Tier: %s");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier.tier_1", "Tier 1");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier.tier_2", "Tier 2");
