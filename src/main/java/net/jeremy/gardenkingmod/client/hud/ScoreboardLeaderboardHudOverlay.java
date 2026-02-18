@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.jeremy.gardenkingmod.ModScoreboards;
 import net.minecraft.client.MinecraftClient;
@@ -74,8 +76,12 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
         }
 
         if (DRAW_BACKGROUND_TEXTURE) {
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             context.drawTexture(BACKGROUND_TEXTURE, BACKGROUND_X, BACKGROUND_Y, BACKGROUND_U, BACKGROUND_V,
                     BACKGROUND_WIDTH, BACKGROUND_HEIGHT, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
+            RenderSystem.disableBlend();
         }
 
         int lineY = ENTRIES_START_Y;
