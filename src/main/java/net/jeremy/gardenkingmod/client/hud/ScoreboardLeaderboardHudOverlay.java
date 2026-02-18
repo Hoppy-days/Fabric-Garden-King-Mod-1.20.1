@@ -27,23 +27,21 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
     private static final int BACKGROUND_Y = 4;
     private static final int BACKGROUND_U = 0;
     private static final int BACKGROUND_V = 0;
-    private static final int BACKGROUND_WIDTH = 140;
-    private static final int BACKGROUND_HEIGHT = 96;
+    private static final int BACKGROUND_WIDTH = 144;
+    private static final int BACKGROUND_HEIGHT = 196;
     private static final int BACKGROUND_TEXTURE_WIDTH = 256;
     private static final int BACKGROUND_TEXTURE_HEIGHT = 256;
 
     // Position constants
-    private static final int TITLE_X = 8;
-    private static final int TITLE_Y = 8;
-    private static final int ENTRIES_X = 8;
-    private static final int ENTRIES_START_Y = 20;
+    private static final int ENTRIES_U = 10;
+    private static final int ENTRIES_V = 34;
+    private static final int ENTRIES_X = BACKGROUND_X + ENTRIES_U;
+    private static final int ENTRIES_START_Y = BACKGROUND_Y + ENTRIES_V;
     private static final int ENTRY_LINE_HEIGHT = 10;
 
     // Text style constants
-    private static final int TITLE_COLOR = 0xFFFFFF;
     private static final int ENTRY_COLOR = 0xE0E0E0;
     private static final int EMPTY_STATE_COLOR = 0xE0E0E0;
-    private static final boolean TITLE_SHADOW = true;
     private static final boolean ENTRY_SHADOW = false;
     private static final boolean EMPTY_STATE_SHADOW = false;
 
@@ -79,9 +77,6 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
             context.drawTexture(BACKGROUND_TEXTURE, BACKGROUND_X, BACKGROUND_Y, BACKGROUND_U, BACKGROUND_V,
                     BACKGROUND_WIDTH, BACKGROUND_HEIGHT, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
         }
-
-        context.drawText(client.textRenderer, Text.literal("Garden Dollars Leaderboard"), TITLE_X, TITLE_Y, TITLE_COLOR,
-                TITLE_SHADOW);
 
         int lineY = ENTRIES_START_Y;
         if (cachedTopEntries.isEmpty()) {
