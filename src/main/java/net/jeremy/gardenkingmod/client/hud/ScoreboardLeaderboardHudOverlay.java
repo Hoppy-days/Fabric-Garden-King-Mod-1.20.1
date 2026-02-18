@@ -32,11 +32,15 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
     private static final int BACKGROUND_TEXTURE_WIDTH = 256;
     private static final int BACKGROUND_TEXTURE_HEIGHT = 256;
 
+    // Leaderboard text area constants
+    private static final int LEADERBOARD_BOX_U = 10;
+    private static final int LEADERBOARD_BOX_V = 34;
+    private static final int LEADERBOARD_BOX_WIDTH = 124;
+    private static final int LEADERBOARD_TOP_PADDING = 0;
+
     // Position constants
-    private static final int ENTRIES_U = 10;
-    private static final int ENTRIES_V = 34;
-    private static final int ENTRIES_X = BACKGROUND_X + ENTRIES_U;
-    private static final int ENTRIES_START_Y = BACKGROUND_Y + ENTRIES_V;
+    private static final int ENTRIES_START_X = BACKGROUND_X + LEADERBOARD_BOX_U;
+    private static final int ENTRIES_START_Y = BACKGROUND_Y + LEADERBOARD_BOX_V + LEADERBOARD_TOP_PADDING;
     private static final int ENTRY_LINE_HEIGHT = 10;
 
     // Text style constants
@@ -80,7 +84,9 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
 
         int lineY = ENTRIES_START_Y;
         if (cachedTopEntries.isEmpty()) {
-            context.drawText(client.textRenderer, Text.literal("No leaderboard data yet"), ENTRIES_X, lineY,
+            Text emptyStateText = Text.literal("No leaderboard data yet");
+            int emptyStateX = getCenteredX(client, emptyStateText);
+            context.drawText(client.textRenderer, emptyStateText, emptyStateX, lineY,
                     EMPTY_STATE_COLOR, EMPTY_STATE_SHADOW);
             return;
         }
@@ -88,9 +94,15 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
         for (int i = 0; i < cachedTopEntries.size(); i++) {
             LeaderboardEntry entry = cachedTopEntries.get(i);
             Text line = Text.literal((i + 1) + ". " + entry.name() + " - " + entry.score());
-            context.drawText(client.textRenderer, line, ENTRIES_X, lineY, ENTRY_COLOR, ENTRY_SHADOW);
+            int lineX = getCenteredX(client, line);
+            context.drawText(client.textRenderer, line, lineX, lineY, ENTRY_COLOR, ENTRY_SHADOW);
             lineY += ENTRY_LINE_HEIGHT;
         }
+    }
+
+    private int getCenteredX(MinecraftClient client, Text text) {
+        int textWidth = client.textRenderer.getWidth(text);
+        return ENTRIES_START_X + Math.max(0, (LEADERBOARD_BOX_WIDTH - textWidth) / 2);
     }
 
     private boolean shouldRefresh(int currentTick) {
