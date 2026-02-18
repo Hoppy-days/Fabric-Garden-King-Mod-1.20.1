@@ -13,10 +13,39 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback {
     private static final int MAX_VISIBLE_ENTRIES = 8;
     private static final int REFRESH_INTERVAL_TICKS = 20;
+
+    // Toggle / texture constants
+    private static final boolean DRAW_BACKGROUND_TEXTURE = true;
+    private static final Identifier BACKGROUND_TEXTURE = new Identifier("gardenkingmod",
+            "textures/gui/hud/leaderboard.png");
+    private static final int BACKGROUND_X = 4;
+    private static final int BACKGROUND_Y = 4;
+    private static final int BACKGROUND_U = 0;
+    private static final int BACKGROUND_V = 0;
+    private static final int BACKGROUND_WIDTH = 140;
+    private static final int BACKGROUND_HEIGHT = 96;
+    private static final int BACKGROUND_TEXTURE_WIDTH = 256;
+    private static final int BACKGROUND_TEXTURE_HEIGHT = 256;
+
+    // Position constants
+    private static final int TITLE_X = 8;
+    private static final int TITLE_Y = 8;
+    private static final int ENTRIES_X = 8;
+    private static final int ENTRIES_START_Y = 20;
+    private static final int ENTRY_LINE_HEIGHT = 10;
+
+    // Text style constants
+    private static final int TITLE_COLOR = 0xFFFFFF;
+    private static final int ENTRY_COLOR = 0xE0E0E0;
+    private static final int EMPTY_STATE_COLOR = 0xE0E0E0;
+    private static final boolean TITLE_SHADOW = true;
+    private static final boolean ENTRY_SHADOW = false;
+    private static final boolean EMPTY_STATE_SHADOW = false;
 
     public static final ScoreboardLeaderboardHudOverlay INSTANCE = new ScoreboardLeaderboardHudOverlay();
 
@@ -46,21 +75,26 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
             lastRefreshTick = currentTick;
         }
 
-        int x = 8;
-        int y = 8;
-        context.drawText(client.textRenderer, Text.literal("Garden Dollars Leaderboard"), x, y, 0xFFFFFF, true);
+        if (DRAW_BACKGROUND_TEXTURE) {
+            context.drawTexture(BACKGROUND_TEXTURE, BACKGROUND_X, BACKGROUND_Y, BACKGROUND_U, BACKGROUND_V,
+                    BACKGROUND_WIDTH, BACKGROUND_HEIGHT, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
+        }
 
-        int lineY = y + 12;
+        context.drawText(client.textRenderer, Text.literal("Garden Dollars Leaderboard"), TITLE_X, TITLE_Y, TITLE_COLOR,
+                TITLE_SHADOW);
+
+        int lineY = ENTRIES_START_Y;
         if (cachedTopEntries.isEmpty()) {
-            context.drawText(client.textRenderer, Text.literal("No leaderboard data yet"), x, lineY, 0xE0E0E0, false);
+            context.drawText(client.textRenderer, Text.literal("No leaderboard data yet"), ENTRIES_X, lineY,
+                    EMPTY_STATE_COLOR, EMPTY_STATE_SHADOW);
             return;
         }
 
         for (int i = 0; i < cachedTopEntries.size(); i++) {
             LeaderboardEntry entry = cachedTopEntries.get(i);
             Text line = Text.literal((i + 1) + ". " + entry.name() + " - " + entry.score());
-            context.drawText(client.textRenderer, line, x, lineY, 0xE0E0E0, false);
-            lineY += 10;
+            context.drawText(client.textRenderer, line, ENTRIES_X, lineY, ENTRY_COLOR, ENTRY_SHADOW);
+            lineY += ENTRY_LINE_HEIGHT;
         }
     }
 
