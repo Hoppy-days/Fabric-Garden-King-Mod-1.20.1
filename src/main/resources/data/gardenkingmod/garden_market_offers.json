@@ -1,5 +1,5 @@
 {
-  "_comment": "Garden King Market offers (auto-generated).",
+  "_comment": "Garden King Market offers (auto-generated). Economy formula: seed_price_by_tier={T1:2,T2:4,T3:7,T4:11,T5:16}; sapling_price_by_tier={T1:8,T2:14,T3:18,T4:28,T5:40}; values are additionally scaled by config/gardenkingmod/market_economy.json marketBuyDollarMultiplier.",
   "settings": {
     "min_offers": 5,
     "max_offers": 105,
@@ -14,457 +14,457 @@
     },
     {
       "offer": "croptopia:artichoke_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:asparagus_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:barley_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:basil_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:blackbean_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:broccoli_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:cabbage_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:cashew_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*8",
       "tier": 1
     },
     {
       "offer": "croptopia:cauliflower_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:celery_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:chile_pepper_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:corn_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:cucumber_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:eggplant_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:garlic_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:ginger_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:greenbean_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:greenonion_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:kale_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:leek_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:lettuce_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:mustard_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:oat_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:onion_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:radish_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:rhubarb_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:rice_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:rutabaga_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:soybean_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:spinach_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:squash_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:sweetpotato_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:tomatillo_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:tomato_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:turnip_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:yam_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "croptopia:zucchini_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "minecraft:beetroot_seeds*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "minecraft:carrot*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "minecraft:potato*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "minecraft:wheat_seeds*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*2",
       "tier": 1
     },
     {
       "offer": "minecraft:melon_seeds*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*4",
       "tier": 2
     },
     {
       "offer": "minecraft:pumpkin_seeds*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*4",
       "tier": 2
     },
     {
       "offer": "minecraft:cocoa_beans*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*7",
       "tier": 3
     },
     {
       "offer": "croptopia:coffee_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*7",
       "tier": 3
     },
     {
       "offer": "croptopia:hops_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*7",
       "tier": 3
     },
     {
       "offer": "croptopia:nutmeg_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*18",
       "tier": 3
     },
     {
       "offer": "croptopia:peanut_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*7",
       "tier": 3
     },
     {
       "offer": "croptopia:pepper_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*7",
       "tier": 3
     },
     {
       "offer": "croptopia:tea_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*7",
       "tier": 3
     },
     {
       "offer": "croptopia:turmeric_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*7",
       "tier": 3
     },
     {
       "offer": "croptopia:vanilla_seeds*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*7",
       "tier": 3
     },
     {
       "offer": "croptopia:apple_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:apricot_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:avocado_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:banana_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:bellpepper_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:blackberry_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:blueberry_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:cantaloupe_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:cherry_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:coconut_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:cranberry_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:currant_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:date_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:dragonfruit_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:elderberry_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:fig_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:grape_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:grapefruit_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:honeydew_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:kiwi_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:kumquat_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:lemon_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:lime_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:mango_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:nectarine_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:olive_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:orange_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:peach_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:pear_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:persimmon_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:pineapple_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:plum_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:raspberry_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:saguaro_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:starfruit_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*28",
       "tier": 4
     },
     {
       "offer": "croptopia:strawberry_seed*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*11",
       "tier": 4
     },
     {
       "offer": "croptopia:almond_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*40",
       "tier": 5
     },
     {
       "offer": "croptopia:pecan_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*40",
       "tier": 5
     },
     {
       "offer": "croptopia:walnut_sapling*1",
-      "price": "gardenkingmod:dollar*1",
+      "price": "gardenkingmod:dollar*40",
       "tier": 5
     },
     {

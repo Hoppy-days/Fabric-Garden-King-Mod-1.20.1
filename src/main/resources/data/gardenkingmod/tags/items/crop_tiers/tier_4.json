@@ -39,6 +39,23 @@
     "croptopia:saguaro",
     "croptopia:starfruit",
     "croptopia:strawberry",
-    "minecraft:apple"
+    "minecraft:apple",
+    "croptopia:beef_stir_fry",
+    "croptopia:chili_relleno",
+    "croptopia:cornish_pasty",
+    "croptopia:eggplant_parmesan",
+    "croptopia:fajitas",
+    "croptopia:fish_and_chips",
+    "croptopia:grilled_eggplant",
+    "croptopia:pineapple_pepperoni_pizza",
+    "croptopia:quesadilla",
+    "croptopia:roasted_asparagus",
+    "croptopia:roasted_radishes",
+    "croptopia:roasted_squash",
+    "croptopia:roasted_turnips",
+    "croptopia:stir_fry",
+    "croptopia:stuffed_poblanos",
+    "croptopia:supreme_pizza",
+    "croptopia:tamales"
   ]
 }

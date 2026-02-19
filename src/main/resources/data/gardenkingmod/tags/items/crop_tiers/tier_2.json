@@ -6,6 +6,15 @@
     "croptopia:barley",
     "croptopia:corn",
     "croptopia:oat",
-    "croptopia:rice"
+    "croptopia:rice",
+    "croptopia:chimichanga",
+    "croptopia:crema",
+    "croptopia:grilled_cheese",
+    "croptopia:hamburger",
+    "croptopia:peanut_butter_and_jam",
+    "croptopia:steamed_broccoli",
+    "croptopia:steamed_green_beans",
+    "croptopia:sushi",
+    "croptopia:toast_sandwich"
   ]
 }

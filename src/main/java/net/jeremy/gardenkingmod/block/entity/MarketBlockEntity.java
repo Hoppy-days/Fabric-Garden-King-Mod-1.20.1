@@ -21,6 +21,7 @@ import net.jeremy.gardenkingmod.screen.MarketScreenHandler;
 import net.jeremy.gardenkingmod.shop.GardenMarketOfferState;
 import net.jeremy.gardenkingmod.shop.GearShopOffer;
 import net.jeremy.gardenkingmod.shop.GearShopStackHelper;
+import net.jeremy.gardenkingmod.shop.MarketEconomyConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -375,11 +376,8 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                         }
                 }
 
-                if (tier.isEmpty()) {
-                        return Optional.empty();
-                }
-
-                int dollarsPerItem = getDollarsPerItem(tier.get());
+                CropTier resolvedTier = tier.orElse(null);
+                int dollarsPerItem = getDollarsPerItem(stack, resolvedTier);
                 if (dollarsPerItem <= 0) {
                         return Optional.empty();
                 }
@@ -391,8 +389,6 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
                 int payoutPerItem = Math.max(0, Math.round(dollarsPerItem * payoutMultiplier));
                 int totalDollars = itemsSold * payoutPerItem;
-
-                CropTier resolvedTier = tier.get();
 
                 return Optional.of(new SaleDetails(item, resolvedTier, payoutPerItem, totalDollars, itemsSold));
         }
@@ -411,16 +407,8 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 return Registries.ITEM.getOrEmpty(definition.cropId()).flatMap(CropTierRegistry::get);
         }
 
-        private static int getDollarsPerItem(CropTier tier) {
-                String path = tier.id().getPath();
-                return switch (path) {
-                case "crop_tiers/tier_1" -> 1;
-                case "crop_tiers/tier_2" -> 2;
-                case "crop_tiers/tier_3" -> 3;
-                case "crop_tiers/tier_4" -> 4;
-                case "crop_tiers/tier_5" -> 5;
-                default -> 0;
-                };
+        private static int getDollarsPerItem(ItemStack stack, CropTier tier) {
+                return MarketEconomyConfig.get().resolveSellValue(stack, tier);
         }
 
         private void sendSaleResult(ServerPlayerEntity player, boolean success, int totalItemsSold, int totalDollars,
@@ -458,7 +446,7 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                         return 0L;
                 }
 
-                int baseValue = getDollarsPerItem(tier);
+                int baseValue = getDollarsPerItem(new ItemStack(item), tier);
                 if (baseValue <= 0) {
                         return 0L;
                 }
