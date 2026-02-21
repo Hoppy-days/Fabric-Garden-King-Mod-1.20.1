@@ -38,7 +38,7 @@ public final class ScoreboardLeaderboardHudOverlay implements HudRenderCallback 
     private static final int LEADERBOARD_BOX_U = 10;
     private static final int LEADERBOARD_BOX_V = 34;
     private static final int LEADERBOARD_BOX_WIDTH = 124;
-    private static final int LEADERBOARD_TOP_PADDING = 0;
+    private static final int LEADERBOARD_TOP_PADDING = 8;
 
     // Position constants
     private static final int ENTRIES_START_X = BACKGROUND_X + LEADERBOARD_BOX_U;
