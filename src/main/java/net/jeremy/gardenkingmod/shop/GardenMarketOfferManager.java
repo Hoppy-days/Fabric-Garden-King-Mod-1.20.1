@@ -368,7 +368,7 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
 
             ItemStack adjusted = original.copy();
             int updatedCount = MarketEconomyConfig.get().applyBuyMultiplier(adjusted);
-            adjusted.setCount(Math.max(1, updatedCount));
+            GearShopStackHelper.applyRequestedCount(adjusted, Math.max(1, updatedCount));
             scaled.add(adjusted);
         }
 

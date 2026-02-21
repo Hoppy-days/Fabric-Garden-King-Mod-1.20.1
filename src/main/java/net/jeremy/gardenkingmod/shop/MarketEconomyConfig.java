@@ -148,7 +148,7 @@ public final class MarketEconomyConfig {
             return originalCost.getCount();
         }
 
-        int base = originalCost.getCount();
+        int base = GearShopStackHelper.getRequestedCount(originalCost);
         return Math.max(1, (int) Math.round(base * marketBuyDollarMultiplier));
     }
 
