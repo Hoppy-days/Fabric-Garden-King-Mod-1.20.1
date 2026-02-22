@@ -62,7 +62,7 @@ public final class MobDropModifier {
                                                                 .apply(SetCountLootFunction.builder(
                                                                                 UniformLootNumberProvider.create((float) drop.minCount(),
                                                                                                 (float) drop.maxCount()))))
-                                                .build());
+                                                );
                         }
 
                         if (applyMultiplier || !config.bonusDropsForMob(mobId).isEmpty()) {
