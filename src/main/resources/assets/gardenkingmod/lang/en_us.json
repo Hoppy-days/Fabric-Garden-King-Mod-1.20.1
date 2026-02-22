@@ -119,6 +119,7 @@
   "screen.gardenkingmod.gear_shop.price": "$%s",
   "screen.gardenkingmod.gear_shop.cost_count": "%s required",
   "tooltip.gardenkingmod.crop_tier": "Tier: %s",
+  "tooltip.gardenkingmod.crop_value_each": "Value: $%s each",
   "tooltip.gardenkingmod.built_in_fortune": "Built-in %s %s",
   "tooltip.gardenkingmod.crop_tier.tier_1": "Tier 1",
   "tooltip.gardenkingmod.crop_tier.tier_2": "Tier 2",

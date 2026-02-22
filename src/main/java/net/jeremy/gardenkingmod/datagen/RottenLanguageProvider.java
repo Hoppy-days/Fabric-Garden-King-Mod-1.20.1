@@ -47,6 +47,7 @@ public final class RottenLanguageProvider extends FabricLanguageProvider {
                 translationBuilder.add("scoreboard.gardenkingmod.garden_currency_bank", "Bank Dollars");
                 translationBuilder.add("key.gardenkingmod.toggle_leaderboard", "Toggle Leaderboard");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier", "Tier: %s");
+                translationBuilder.add("tooltip.gardenkingmod.crop_value_each", "Value: $%s each");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier.tier_1", "Tier 1");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier.tier_2", "Tier 2");
                 translationBuilder.add("tooltip.gardenkingmod.crop_tier.tier_3", "Tier 3");
