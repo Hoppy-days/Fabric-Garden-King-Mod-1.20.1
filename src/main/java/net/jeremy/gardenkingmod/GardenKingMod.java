@@ -37,7 +37,6 @@ public class GardenKingMod implements ModInitializer {
                 FertilizerBalanceConfig.reload();
                 GardenOvenBalanceConfig.reload();
                 HarvestXpConfig.reload();
-                MobDropConfig.reload();
                 ModItems.registerModItems();
                 ModBlocks.registerModBlocks();
                 ModBlockEntities.registerBlockEntities();
@@ -50,6 +49,7 @@ public class GardenKingMod implements ModInitializer {
                 ModServerNetworking.register();
                 GardenMarketCommands.register();
                 SkillDebugCommands.register();
+                MobDropConfig.reload();
 
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(BonusHarvestDropManager.getInstance());
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(GearShopOfferManager.getInstance());

@@ -15,6 +15,7 @@ import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import net.fabricmc.loader.api.FabricLoader;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
@@ -76,7 +77,7 @@ public final class MobDropConfig {
                         if (updated) {
                                 writeConfig(loaded);
                         }
-                } catch (IOException exception) {
+                } catch (IOException | JsonParseException exception) {
                         GardenKingMod.LOGGER.warn("Failed reading mob drop config; using defaults", exception);
                         defaults.rebuildRuntimeCaches();
                         instance = defaults;
