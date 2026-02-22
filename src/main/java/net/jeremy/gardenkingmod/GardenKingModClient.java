@@ -2,6 +2,7 @@ package net.jeremy.gardenkingmod;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -40,7 +41,9 @@ import net.jeremy.gardenkingmod.registry.ModEntities;
 import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.ModBlocks;
 import net.jeremy.gardenkingmod.ModScreenHandlers;
+import net.jeremy.gardenkingmod.crop.CropTier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
+import net.jeremy.gardenkingmod.crop.EnchantedCropDefinition;
 import net.jeremy.gardenkingmod.item.FortuneProvidingItem;
 import net.jeremy.gardenkingmod.network.ModPackets;
 import net.jeremy.gardenkingmod.screen.BankScreen;
@@ -56,6 +59,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -251,19 +255,34 @@ public class GardenKingModClient implements ClientModInitializer {
                         }
                 }
 
-                CropTierRegistry.get(stack.getItem()).ifPresent(tier -> {
-                        String path = tier.id().getPath();
+                Optional<EnchantedCropDefinition> enchantedDefinition = ModItems.getEnchantedDefinition(stack.getItem());
+                Optional<CropTier> tier = CropTierRegistry.get(stack.getItem());
+                if (tier.isEmpty() && enchantedDefinition.isPresent()) {
+                        Item targetItem = Registries.ITEM.get(enchantedDefinition.get().targetId());
+                        if (targetItem != Items.AIR) {
+                                tier = CropTierRegistry.get(targetItem);
+                        }
+                }
+
+                Optional<CropTier> resolvedTier = tier;
+                resolvedTier.ifPresent(value -> {
+                        String path = value.id().getPath();
                         String suffix = path.contains("/") ? path.substring(path.lastIndexOf('/') + 1) : path;
                         Text tierName = Text
-                                        .translatable("tooltip." + tier.id().getNamespace() + ".crop_tier." + suffix);
+                                        .translatable("tooltip." + value.id().getNamespace() + ".crop_tier." + suffix);
+                        Formatting pricingColor = enchantedDefinition.isPresent() ? Formatting.LIGHT_PURPLE : Formatting.GREEN;
                         lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_tier", tierName)
-                                        .formatted(Formatting.GREEN));
+                                        .formatted(pricingColor));
 
-                        int sellValue = ServerMarketPricingState.getInstance().resolveSellValue(tier);
+                        int sellValue = ServerMarketPricingState.getInstance().resolveSellValue(value);
+                        if (enchantedDefinition.isPresent()) {
+                                sellValue = Math.max(1,
+                                                Math.round(sellValue * enchantedDefinition.get().effectiveValueMultiplier()));
+                        }
                         if (sellValue > 0) {
                                 lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_value_each",
                                                 sellValue)
-                                                .formatted(Formatting.GREEN));
+                                                .formatted(pricingColor));
                         }
                 });
         });
