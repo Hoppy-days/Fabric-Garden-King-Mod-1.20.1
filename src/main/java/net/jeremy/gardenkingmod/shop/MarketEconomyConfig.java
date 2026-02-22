@@ -48,6 +48,13 @@ public final class MarketEconomyConfig {
             "crop_tiers/tier_4", 7,
             "crop_tiers/tier_5", 11));
 
+    private Map<String, Double> enchantedTierSellMultipliers = new LinkedHashMap<>(Map.of(
+            "crop_tiers/tier_1", 1.5D,
+            "crop_tiers/tier_2", 2.0D,
+            "crop_tiers/tier_3", 2.5D,
+            "crop_tiers/tier_4", 3.0D,
+            "crop_tiers/tier_5", 3.5D));
+
     private MarketEconomyConfig() {
     }
 
@@ -131,6 +138,29 @@ public final class MarketEconomyConfig {
             tierBaseSellValues = validated;
         }
 
+        if (enchantedTierSellMultipliers == null) {
+            enchantedTierSellMultipliers = new LinkedHashMap<>(defaults.enchantedTierSellMultipliers);
+            changed = true;
+        } else {
+            Map<String, Double> validated = new LinkedHashMap<>();
+            for (Map.Entry<String, Double> entry : defaults.enchantedTierSellMultipliers.entrySet()) {
+                Double configured = enchantedTierSellMultipliers.get(entry.getKey());
+                if (configured == null || !Double.isFinite(configured) || configured < 1.0D) {
+                    validated.put(entry.getKey(), entry.getValue());
+                    changed = true;
+                } else {
+                    validated.put(entry.getKey(), configured);
+                }
+            }
+            for (Map.Entry<String, Double> entry : enchantedTierSellMultipliers.entrySet()) {
+                if (!validated.containsKey(entry.getKey())) {
+                    double configured = entry.getValue() == null ? 1.0D : entry.getValue();
+                    validated.put(entry.getKey(), !Double.isFinite(configured) ? 1.0D : Math.max(1.0D, configured));
+                }
+            }
+            enchantedTierSellMultipliers = validated;
+        }
+
         return changed;
     }
 
@@ -169,35 +199,68 @@ public final class MarketEconomyConfig {
         return applySellMultiplier(tierValue);
     }
 
-    public Map<String, Integer> getEffectiveTierSellValues() {
-        Map<String, Integer> result = new LinkedHashMap<>();
-        for (Map.Entry<String, Integer> entry : tierBaseSellValues.entrySet()) {
-            int value = resolveSellValueForTierPath(entry.getKey());
-            if (value > 0) {
-                result.put(entry.getKey(), value);
-            }
+    public float resolveEnchantedSellMultiplier(CropTier tier, float fallbackMultiplier) {
+        if (tier == null || tier.id() == null) {
+            return sanitizeEnchantedMultiplier(fallbackMultiplier);
         }
-        return result;
+
+        Double configured = findDoubleValue(enchantedTierSellMultipliers, tier.id().getPath());
+        if (configured == null) {
+            return sanitizeEnchantedMultiplier(fallbackMultiplier);
+        }
+
+        return sanitizeEnchantedMultiplier(configured.floatValue());
     }
 
     private Integer findTierValue(String tierPath) {
-        if (tierPath == null || tierPath.isBlank()) {
+        return findIntegerValue(tierBaseSellValues, tierPath);
+    }
+
+    private static Integer findIntegerValue(Map<String, Integer> values, String key) {
+        if (values == null || key == null || key.isBlank()) {
             return null;
         }
 
-        Integer direct = tierBaseSellValues.get(tierPath);
+        Integer direct = values.get(key);
         if (direct != null) {
             return direct;
         }
 
-        String normalized = tierPath.toLowerCase(Locale.ROOT);
-        for (Map.Entry<String, Integer> entry : tierBaseSellValues.entrySet()) {
+        String normalized = key.toLowerCase(Locale.ROOT);
+        for (Map.Entry<String, Integer> entry : values.entrySet()) {
             if (Objects.equals(entry.getKey().toLowerCase(Locale.ROOT), normalized)) {
                 return entry.getValue();
             }
         }
 
         return null;
+    }
+
+    private static Double findDoubleValue(Map<String, Double> values, String key) {
+        if (values == null || key == null || key.isBlank()) {
+            return null;
+        }
+
+        Double direct = values.get(key);
+        if (direct != null) {
+            return direct;
+        }
+
+        String normalized = key.toLowerCase(Locale.ROOT);
+        for (Map.Entry<String, Double> entry : values.entrySet()) {
+            if (Objects.equals(entry.getKey().toLowerCase(Locale.ROOT), normalized)) {
+                return entry.getValue();
+            }
+        }
+
+        return null;
+    }
+
+    private static float sanitizeEnchantedMultiplier(float value) {
+        if (!Float.isFinite(value) || value < 1.0f) {
+            return 1.0f;
+        }
+        return value;
     }
 
     private int applySellMultiplier(int baseValue) {
