@@ -33,9 +33,9 @@ import net.minecraft.item.ItemStack;
 public final class MarketEconomyConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir()
+            .resolve(GardenKingMod.MOD_ID)
             .resolve("market_economy.json");
     private static final Path LEGACY_CONFIG_PATH = FabricLoader.getInstance().getConfigDir()
-            .resolve(GardenKingMod.MOD_ID)
             .resolve("market_economy.json");
 
     private static volatile MarketEconomyConfig instance = defaults();
@@ -94,6 +94,13 @@ public final class MarketEconomyConfig {
     }
 
     private static void writeConfigFile(MarketEconomyConfig config) {
+        try {
+            Files.createDirectories(CONFIG_PATH.getParent());
+        } catch (IOException exception) {
+            GardenKingMod.LOGGER.warn("Failed to create market economy config directory", exception);
+            return;
+        }
+
         try (BufferedWriter writer = Files.newBufferedWriter(CONFIG_PATH)) {
             GSON.toJson(config, writer);
         } catch (IOException exception) {
