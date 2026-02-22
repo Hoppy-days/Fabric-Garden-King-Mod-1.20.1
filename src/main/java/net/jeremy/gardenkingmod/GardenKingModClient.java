@@ -50,6 +50,7 @@ import net.jeremy.gardenkingmod.screen.MarketScreen;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreen;
 import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
 import net.jeremy.gardenkingmod.skill.SkillProgressManager;
+import net.jeremy.gardenkingmod.shop.MarketEconomyConfig;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
@@ -239,6 +240,13 @@ public class GardenKingModClient implements ClientModInitializer {
                                         .translatable("tooltip." + tier.id().getNamespace() + ".crop_tier." + suffix);
                         lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_tier", tierName)
                                         .formatted(Formatting.GREEN));
+
+                        int sellValue = MarketEconomyConfig.get().resolveSellValue(stack, tier);
+                        if (sellValue > 0) {
+                                lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_value_each",
+                                                sellValue)
+                                                .formatted(Formatting.GREEN));
+                        }
                 });
         });
     }
