@@ -368,12 +368,12 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
                 if (ModItems.isEnchantedItem(item)) {
                         Optional<EnchantedCropDefinition> enchantedDefinition = ModItems.getEnchantedDefinition(item);
-                        payoutMultiplier = enchantedDefinition
-                                        .map(EnchantedCropDefinition::effectiveValueMultiplier)
-                                        .orElse(EnchantedCropDefinition.DEFAULT_VALUE_MULTIPLIER);
                         if (enchantedDefinition.isPresent()) {
                                 tier = resolveTier(enchantedDefinition.get());
                         }
+
+                        payoutMultiplier = MarketEconomyConfig.get().resolveEnchantedSellMultiplier(
+                                        tier.orElse(null), EnchantedCropDefinition.DEFAULT_VALUE_MULTIPLIER);
                 }
 
                 CropTier resolvedTier = tier.orElse(null);
