@@ -7,14 +7,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.loader.api.FabricLoader;
 
 import net.jeremy.gardenkingmod.GardenKingMod;
 
@@ -38,7 +48,12 @@ import net.jeremy.gardenkingmod.util.JsonCommentHelper;
 public final class BonusHarvestDropManager extends JsonDataLoader implements IdentifiableResourceReloadListener {
         private static final Gson GSON = new GsonBuilder().setLenient().create();
         private static final String DIRECTORY = "bonus_harvest_drops";
+        private static final String DEFAULT_CONFIG_RESOURCE = "/data/gardenkingmod/bonus_harvest_drops/bonus_harvest_drops.json";
         private static final Identifier FABRIC_ID = new Identifier(GardenKingMod.MOD_ID, "bonus_harvest_drop_manager");
+        private static final Identifier CONFIG_FILE_ID = new Identifier(GardenKingMod.MOD_ID, "config/bonus_harvest_drops.json");
+        private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir()
+                        .resolve(GardenKingMod.MOD_ID)
+                        .resolve("bonus_harvest_drops.json");
         private static final BonusHarvestDropManager INSTANCE = new BonusHarvestDropManager();
 
         private final Map<Identifier, List<BonusDropEntry>> bonusDrops = new ConcurrentHashMap<>();
@@ -144,6 +159,11 @@ public final class BonusHarvestDropManager extends JsonDataLoader implements Ide
                         }
                 }
 
+                JsonObject configObject = loadRuntimeConfig();
+                if (configObject != null) {
+                        applyConfigOverrides(configObject, parsed);
+                }
+
                 bonusDrops.clear();
                 for (Map.Entry<Identifier, List<BonusDropEntry>> entry : parsed.entrySet()) {
                         bonusDrops.put(entry.getKey(), List.copyOf(entry.getValue()));
@@ -156,8 +176,77 @@ public final class BonusHarvestDropManager extends JsonDataLoader implements Ide
                 }
         }
 
+        private void applyConfigOverrides(JsonObject configObject, Map<Identifier, List<BonusDropEntry>> parsed) {
+                for (Map.Entry<String, JsonElement> definition : configObject.entrySet()) {
+                        Identifier targetId = parseIdentifier(definition.getKey(), CONFIG_FILE_ID);
+                        if (targetId == null) {
+                                continue;
+                        }
+
+                        Identifier lootTableId = resolveTarget(targetId);
+                        if (lootTableId == null) {
+                                continue;
+                        }
+
+                        JsonElement value = definition.getValue();
+                        if (!value.isJsonArray()) {
+                                GardenKingMod.LOGGER.warn("Ignoring config entries for {} because the value is not an array", targetId);
+                                continue;
+                        }
+
+                        List<BonusDropEntry> overrides = new ArrayList<>();
+                        parseEntries(CONFIG_FILE_ID, lootTableId, value.getAsJsonArray(), overrides);
+                        parsed.put(lootTableId, overrides);
+                }
+        }
+
+        private JsonObject loadRuntimeConfig() {
+                try {
+                        Files.createDirectories(CONFIG_PATH.getParent());
+                        if (Files.notExists(CONFIG_PATH)) {
+                                writeDefaultConfig();
+                        }
+
+                        try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH, StandardCharsets.UTF_8)) {
+                                JsonElement parsed = GSON.fromJson(reader, JsonElement.class);
+                                JsonElement sanitized = JsonCommentHelper.sanitize(parsed);
+                                if (sanitized == null || !sanitized.isJsonObject()) {
+                                        GardenKingMod.LOGGER.warn("Bonus harvest config at {} must be a JSON object", CONFIG_PATH);
+                                        return null;
+                                }
+
+                                return sanitized.getAsJsonObject();
+                        }
+                } catch (IOException | JsonParseException exception) {
+                        GardenKingMod.LOGGER.warn("Failed to load bonus harvest config from {}", CONFIG_PATH, exception);
+                        return null;
+                }
+        }
+
+        private void writeDefaultConfig() {
+                try (InputStream inputStream = BonusHarvestDropManager.class.getResourceAsStream(DEFAULT_CONFIG_RESOURCE)) {
+                        if (inputStream == null) {
+                                GardenKingMod.LOGGER.warn("Missing bundled bonus harvest config resource {}", DEFAULT_CONFIG_RESOURCE);
+                                return;
+                        }
+
+                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+                                        BufferedWriter writer = Files.newBufferedWriter(CONFIG_PATH, StandardCharsets.UTF_8)) {
+                                JsonElement parsed = GSON.fromJson(reader, JsonElement.class);
+                                GSON.toJson(parsed, writer);
+                                GardenKingMod.LOGGER.info("Created bonus harvest config at {}", CONFIG_PATH);
+                        }
+                } catch (IOException | JsonParseException exception) {
+                        GardenKingMod.LOGGER.warn("Failed to create bonus harvest config at {}", CONFIG_PATH, exception);
+                }
+        }
+
         private void parseEntries(Identifier fileId, Identifier lootTableId, JsonArray array, Map<Identifier, List<BonusDropEntry>> parsed) {
                 List<BonusDropEntry> entries = parsed.computeIfAbsent(lootTableId, id -> new ArrayList<>());
+                parseEntries(fileId, lootTableId, array, entries);
+        }
+
+        private void parseEntries(Identifier fileId, Identifier lootTableId, JsonArray array, List<BonusDropEntry> entries) {
 
                 for (int i = 0; i < array.size(); i++) {
                         JsonElement element = array.get(i);
