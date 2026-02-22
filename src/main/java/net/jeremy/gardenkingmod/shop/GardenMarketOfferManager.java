@@ -351,7 +351,28 @@ public final class GardenMarketOfferManager implements SimpleSynchronousResource
             return null;
         }
 
-        return GearShopOffer.of(result, costs);
+        List<ItemStack> scaledCosts = applyBuyPriceMultiplier(costs);
+        return GearShopOffer.of(result, scaledCosts);
+    }
+
+    private List<ItemStack> applyBuyPriceMultiplier(List<ItemStack> costs) {
+        if (costs.isEmpty()) {
+            return costs;
+        }
+
+        List<ItemStack> scaled = new ArrayList<>(costs.size());
+        for (ItemStack original : costs) {
+            if (original.isEmpty()) {
+                continue;
+            }
+
+            ItemStack adjusted = original.copy();
+            int updatedCount = MarketEconomyConfig.get().applyBuyMultiplier(adjusted);
+            GearShopStackHelper.applyRequestedCount(adjusted, Math.max(1, updatedCount));
+            scaled.add(adjusted);
+        }
+
+        return scaled;
     }
 
     private ItemStack parseStack(JsonElement element, String fieldName) {
