@@ -58,7 +58,7 @@ public final class CropDebugCommands {
         private static int inspectLookTarget(CommandContext<ServerCommandSource> context) {
                 ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
                 HitResult hit = player.raycast(8.0D, 0.0F, false);
-                if (!(hit instanceof BlockHitResult blockHit)) {
+                if (hit.getType() != HitResult.Type.BLOCK || !(hit instanceof BlockHitResult blockHit)) {
                         context.getSource().sendError(Text.literal("No block target in range. Use /gkcrop inspect block <pos>."));
                         return 0;
                 }
