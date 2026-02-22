@@ -52,6 +52,7 @@ import net.jeremy.gardenkingmod.screen.GardenOvenScreen;
 import net.jeremy.gardenkingmod.screen.GearShopScreen;
 import net.jeremy.gardenkingmod.screen.MarketScreen;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreen;
+import net.jeremy.gardenkingmod.shop.MarketEconomyConfig;
 import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
 import net.jeremy.gardenkingmod.skill.SkillProgressManager;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -59,7 +60,6 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -258,10 +258,7 @@ public class GardenKingModClient implements ClientModInitializer {
                 Optional<EnchantedCropDefinition> enchantedDefinition = ModItems.getEnchantedDefinition(stack.getItem());
                 Optional<CropTier> tier = CropTierRegistry.get(stack.getItem());
                 if (tier.isEmpty() && enchantedDefinition.isPresent()) {
-                        Item targetItem = Registries.ITEM.get(enchantedDefinition.get().targetId());
-                        if (targetItem != Items.AIR) {
-                                tier = CropTierRegistry.get(targetItem);
-                        }
+                        tier = resolveEnchantedTier(enchantedDefinition.get());
                 }
 
                 Optional<CropTier> resolvedTier = tier;
@@ -276,8 +273,9 @@ public class GardenKingModClient implements ClientModInitializer {
 
                         int sellValue = ServerMarketPricingState.getInstance().resolveSellValue(value);
                         if (enchantedDefinition.isPresent()) {
-                                sellValue = Math.max(1,
-                                                Math.round(sellValue * enchantedDefinition.get().effectiveValueMultiplier()));
+                                float payoutMultiplier = MarketEconomyConfig.get().resolveEnchantedSellMultiplier(
+                                                value, EnchantedCropDefinition.DEFAULT_VALUE_MULTIPLIER);
+                                sellValue = Math.max(1, Math.round(sellValue * payoutMultiplier));
                         }
                         if (sellValue > 0) {
                                 lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_value_each",
@@ -286,5 +284,19 @@ public class GardenKingModClient implements ClientModInitializer {
                         }
                 });
         });
+    }
+
+    private static Optional<CropTier> resolveEnchantedTier(EnchantedCropDefinition definition) {
+        if (definition == null) {
+            return Optional.empty();
+        }
+
+        Optional<CropTier> tier = Registries.BLOCK.getOrEmpty(definition.targetId())
+                .flatMap(CropTierRegistry::get);
+        if (tier.isPresent()) {
+            return tier;
+        }
+
+        return Registries.ITEM.getOrEmpty(definition.cropId()).flatMap(CropTierRegistry::get);
     }
 }
