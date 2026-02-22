@@ -10,6 +10,8 @@ import net.jeremy.gardenkingmod.command.SkillDebugCommands;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager;
 import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
+import net.jeremy.gardenkingmod.entity.MobDropConfig;
+import net.jeremy.gardenkingmod.entity.MobDropModifier;
 import net.jeremy.gardenkingmod.item.FertilizerBalanceConfig;
 import net.jeremy.gardenkingmod.item.WalletItem;
 import net.jeremy.gardenkingmod.network.ModServerNetworking;
@@ -47,6 +49,7 @@ public class GardenKingMod implements ModInitializer {
                 ModServerNetworking.register();
                 GardenMarketCommands.register();
                 SkillDebugCommands.register();
+                MobDropConfig.reload();
 
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(BonusHarvestDropManager.getInstance());
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(GearShopOfferManager.getInstance());
@@ -54,6 +57,7 @@ public class GardenKingMod implements ModInitializer {
 
                 CropTierRegistry.init();
                 CropDropModifier.register();
+                MobDropModifier.register();
 
                 ServerTickEvents.END_SERVER_TICK.register(server -> {
                         for (var player : server.getPlayerManager().getPlayerList()) {
