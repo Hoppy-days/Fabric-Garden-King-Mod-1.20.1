@@ -33,6 +33,8 @@ import net.minecraft.item.ItemStack;
 public final class MarketEconomyConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir()
+            .resolve("market_economy.json");
+    private static final Path LEGACY_CONFIG_PATH = FabricLoader.getInstance().getConfigDir()
             .resolve(GardenKingMod.MOD_ID)
             .resolve("market_economy.json");
 
@@ -65,11 +67,7 @@ public final class MarketEconomyConfig {
     public static void reload() {
         MarketEconomyConfig defaults = defaults();
 
-        try {
-            Files.createDirectories(CONFIG_PATH.getParent());
-        } catch (IOException exception) {
-            GardenKingMod.LOGGER.warn("Failed to create market economy config directory", exception);
-        }
+        migrateLegacyConfigIfNeeded();
 
         if (Files.notExists(CONFIG_PATH)) {
             writeConfigFile(defaults);
@@ -101,6 +99,25 @@ public final class MarketEconomyConfig {
         } catch (IOException exception) {
             GardenKingMod.LOGGER.warn("Failed to write market economy config", exception);
         }
+    }
+
+    private static void migrateLegacyConfigIfNeeded() {
+        if (Files.exists(CONFIG_PATH) || Files.notExists(LEGACY_CONFIG_PATH)) {
+            return;
+        }
+
+        try {
+            Files.createDirectories(CONFIG_PATH.getParent());
+            Files.copy(LEGACY_CONFIG_PATH, CONFIG_PATH);
+            GardenKingMod.LOGGER.info("Migrated market economy config from {} to {}",
+                    LEGACY_CONFIG_PATH, CONFIG_PATH);
+        } catch (IOException exception) {
+            GardenKingMod.LOGGER.warn("Failed to migrate legacy market economy config", exception);
+        }
+    }
+
+    public static Path configPath() {
+        return CONFIG_PATH;
     }
 
     private boolean validateAndApplyDefaults(MarketEconomyConfig defaults) {

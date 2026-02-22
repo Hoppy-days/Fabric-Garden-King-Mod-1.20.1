@@ -4,7 +4,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.jeremy.gardenkingmod.shop.GardenMarketOfferManager;
 import net.jeremy.gardenkingmod.shop.GardenMarketOfferState;
+import net.jeremy.gardenkingmod.shop.MarketEconomyConfig;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -23,8 +25,33 @@ public final class GardenMarketCommands {
             CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         dispatcher.register(CommandManager.literal("gkmarket")
                 .requires(source -> source.hasPermissionLevel(2))
+                .then(CommandManager.literal("reload_economy")
+                        .executes(GardenMarketCommands::reloadEconomyConfig))
                 .then(CommandManager.literal("refresh")
                         .executes(GardenMarketCommands::refreshMarket)));
+    }
+
+    private static int reloadEconomyConfig(CommandContext<ServerCommandSource> context) {
+        ServerCommandSource source = context.getSource();
+        MarketEconomyConfig.reload();
+        GardenMarketOfferManager.getInstance().reload(source.getServer().getResourceManager());
+
+        int refreshed = 0;
+        long nextRefreshTime = 0L;
+        for (ServerWorld world : source.getServer().getWorlds()) {
+            GardenMarketOfferState state = GardenMarketOfferState.get(world);
+            nextRefreshTime = Math.max(nextRefreshTime, state.forceRefresh(world));
+            refreshed++;
+        }
+
+        int refreshedCount = refreshed;
+        long nextRefreshTick = nextRefreshTime;
+        source.sendFeedback(
+                () -> Text.literal("Reloaded market economy config from " + MarketEconomyConfig.configPath()
+                        + " and rebuilt market offers in " + refreshedCount
+                        + " world(s). Next refresh tick: " + nextRefreshTick + "."),
+                false);
+        return refreshed;
     }
 
     private static int refreshMarket(CommandContext<ServerCommandSource> context) {
