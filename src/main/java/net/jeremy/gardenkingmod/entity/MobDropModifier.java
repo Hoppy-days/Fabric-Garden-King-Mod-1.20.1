@@ -22,6 +22,7 @@ import net.minecraft.loot.provider.number.LootNumberProviderTypes;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.loot.condition.LootCondition;
 import net.minecraft.loot.condition.RandomChanceLootCondition;
+import net.minecraft.loot.LootPool;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -56,13 +57,13 @@ public final class MobDropModifier {
                         }
 
                         for (ResolvedBonusDrop drop : config.bonusDropsForMob(mobId)) {
-                                fabricBuilder.pool(net.minecraft.loot.LootPool.builder()
+                                fabricBuilder.pool(LootPool.builder()
                                                 .with(ItemEntry.builder(drop.item())
                                                                 .conditionally(RandomChanceLootCondition.builder(drop.chance()))
                                                                 .apply(SetCountLootFunction.builder(
                                                                                 UniformLootNumberProvider.create((float) drop.minCount(),
                                                                                                 (float) drop.maxCount()))))
-                                                );
+                                                .build());
                         }
 
                         if (applyMultiplier || !config.bonusDropsForMob(mobId).isEmpty()) {

@@ -3,6 +3,7 @@ package net.jeremy.gardenkingmod.command;
 import java.util.Optional;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.context.CommandContext;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -55,7 +56,7 @@ public final class CropDebugCommands {
                                                                 .executes(CropDebugCommands::inspectHeldItem))));
         }
 
-        private static int inspectLookTarget(CommandContext<ServerCommandSource> context) {
+        private static int inspectLookTarget(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
                 ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
                 HitResult hit = player.raycast(8.0D, 0.0F, false);
                 if (hit.getType() != HitResult.Type.BLOCK || !(hit instanceof BlockHitResult blockHit)) {
@@ -93,7 +94,7 @@ public final class CropDebugCommands {
                 return 1;
         }
 
-        private static int inspectHeldItem(CommandContext<ServerCommandSource> context) {
+        private static int inspectHeldItem(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
                 ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
                 ItemStack stack = player.getMainHandStack();
                 if (stack.isEmpty()) {

@@ -182,6 +182,16 @@ public final class MarketEconomyConfig {
         return Math.max(1, (int) Math.round(base * marketBuyDollarMultiplier));
     }
 
+
+    public Map<String, Integer> getEffectiveTierSellValues() {
+        Map<String, Integer> effective = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : tierBaseSellValues.entrySet()) {
+            int baseValue = entry.getValue() == null ? 0 : Math.max(0, entry.getValue());
+            effective.put(entry.getKey(), applySellMultiplier(baseValue));
+        }
+        return effective;
+    }
+
     public int resolveSellValue(ItemStack stack, CropTier tier) {
         if (stack == null || stack.isEmpty() || tier == null) {
             return 0;
