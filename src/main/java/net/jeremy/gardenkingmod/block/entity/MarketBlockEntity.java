@@ -436,37 +436,19 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                         return 0L;
                 }
 
-                Item item = details.item();
-                if (ModItems.isRottenItem(item)) {
+                if (ModItems.isRottenItem(details.item())) {
                         return 0L;
                 }
 
-                CropTier tier = details.tier();
-                if (tier == null) {
+                if (details.tier() == null || details.payoutPerItem() <= 0) {
                         return 0L;
                 }
 
-                int baseValue = getDollarsPerItem(new ItemStack(item), tier);
-                if (baseValue <= 0) {
-                        return 0L;
-                }
-
-                long experience;
                 try {
-                        experience = Math.multiplyExact(baseValue, (long) details.itemsSold());
+                        return Math.multiplyExact(details.payoutPerItem(), (long) details.itemsSold());
                 } catch (ArithmeticException overflow) {
-                        experience = Long.MAX_VALUE;
+                        return Long.MAX_VALUE;
                 }
-
-                if (ModItems.isEnchantedItem(item)) {
-                        try {
-                                experience = Math.multiplyExact(experience, 2L);
-                        } catch (ArithmeticException overflow) {
-                                experience = Long.MAX_VALUE;
-                        }
-                }
-
-                return experience;
         }
 
         private static long accumulateExperience(long current, long additional) {
