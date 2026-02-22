@@ -101,3 +101,21 @@ The Fortune effect rolls for extra items whenever a block or crop is flagged as 
 The `1 + random(0, level)` formula above keeps scaling with whatever Fortune level a tool reports—there is no hard upper ceiling baked into vanilla's ore-style loot formula. A hoe (or any other tool) that provides Fortune 10 will therefore roll between one and eleven items each time. The only practical limit is whichever level you assign in code, though individual loot tables can choose to ignore Fortune or apply their own caps.
 
 Many crops and modded harvestables also respect Fortune. Carrots, potatoes, and glow berries all perform extra rolls that increase their stack size in the same way, while seeds from wheat gain additional chances to drop. Because the Ruby Hoe is hard-wired to provide Fortune level 5, harvesting fortune-aware plants with it can produce up to six items per block, making it ideal for squeezing every last crop or ore out of a field.
+
+## Crop tier debugging commands
+
+Use these operator-only commands to validate whether growth/drop scaling is targeting the block or item you expect:
+
+* `/gkcrop inspect block <x y z>`: prints the block ID, loot table ID, resolved crop tier, and whether the block is currently inside each `gardenkingmod:crop_tiers/tier_*` tag.
+* `/gkcrop inspect looking`: same report for the block you are currently looking at (up to 8 blocks away).
+* `/gkcrop inspect hand`: prints the held item ID, the resolved item tier, and (for block/aliased crop items) the linked crop block ID + tier.
+
+### Suggested verification workflow
+
+1. Stand near a target crop and run `/gkcrop inspect looking`.
+2. Confirm the block ID matches the datapack entry you placed inside `data/gardenkingmod/tags/blocks/crop_tiers/tier_*.json`.
+3. Hold the crop's seed or item and run `/gkcrop inspect hand`.
+4. Confirm the item/block tier shown by the command matches your expected drop scaling tier.
+5. Run `/reload` after editing tags, then run the command again to confirm the lookup updates.
+
+If you add custom crop UI/item art later, place the `.png` texture under `src/main/resources/assets/gardenkingmod/textures/item/`.

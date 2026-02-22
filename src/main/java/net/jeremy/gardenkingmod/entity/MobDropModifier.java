@@ -61,7 +61,8 @@ public final class MobDropModifier {
                                                                 .conditionally(RandomChanceLootCondition.builder(drop.chance()))
                                                                 .apply(SetCountLootFunction.builder(
                                                                                 UniformLootNumberProvider.create((float) drop.minCount(),
-                                                                                                (float) drop.maxCount())))));
+                                                                                                (float) drop.maxCount()))))
+                                                );
                         }
 
                         if (applyMultiplier || !config.bonusDropsForMob(mobId).isEmpty()) {

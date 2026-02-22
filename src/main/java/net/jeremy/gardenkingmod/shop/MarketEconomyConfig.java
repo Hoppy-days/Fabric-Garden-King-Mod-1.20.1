@@ -187,7 +187,11 @@ public final class MarketEconomyConfig {
             return 0;
         }
 
-        Integer tierValue = findTierValue(tier.id().getPath());
+        return resolveSellValueForTierPath(tier.id().getPath());
+    }
+
+    public int resolveSellValueForTierPath(String tierPath) {
+        Integer tierValue = findTierValue(tierPath);
         if (tierValue == null || tierValue <= 0) {
             return 0;
         }
