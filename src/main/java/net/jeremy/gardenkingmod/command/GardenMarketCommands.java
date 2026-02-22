@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.jeremy.gardenkingmod.shop.GardenMarketOfferState;
+import net.jeremy.gardenkingmod.shop.MarketEconomyConfig;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -23,8 +24,18 @@ public final class GardenMarketCommands {
             CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         dispatcher.register(CommandManager.literal("gkmarket")
                 .requires(source -> source.hasPermissionLevel(2))
+                .then(CommandManager.literal("reload_economy")
+                        .executes(GardenMarketCommands::reloadEconomyConfig))
                 .then(CommandManager.literal("refresh")
                         .executes(GardenMarketCommands::refreshMarket)));
+    }
+
+    private static int reloadEconomyConfig(CommandContext<ServerCommandSource> context) {
+        MarketEconomyConfig.reload();
+        context.getSource().sendFeedback(
+                () -> Text.literal("Reloaded market economy config from " + MarketEconomyConfig.configPath() + "."),
+                false);
+        return 1;
     }
 
     private static int refreshMarket(CommandContext<ServerCommandSource> context) {
