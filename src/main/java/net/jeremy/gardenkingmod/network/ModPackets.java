@@ -21,4 +21,7 @@ public final class ModPackets {
 
     public static final Identifier SKILL_SPEND_REQUEST =
             new Identifier(GardenKingMod.MOD_ID, "skill_spend_request");
+
+    public static final Identifier MARKET_SELL_VALUES_SYNC =
+            new Identifier(GardenKingMod.MOD_ID, "market_sell_values_sync");
 }

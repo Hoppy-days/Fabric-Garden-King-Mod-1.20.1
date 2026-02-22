@@ -1,10 +1,15 @@
 package net.jeremy.gardenkingmod.network;
 
+import java.util.Map;
+
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.jeremy.gardenkingmod.screen.BankScreenHandler;
 import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
 import net.jeremy.gardenkingmod.skill.SkillProgressManager;
+import net.jeremy.gardenkingmod.shop.MarketEconomyConfig;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -69,7 +74,21 @@ public final class ModServerNetworking {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
             SkillProgressNetworking.sync(handler.player);
+            syncMarketSellValues(handler.player);
         });
+    }
+
+    private static void syncMarketSellValues(ServerPlayerEntity player) {
+        Map<String, Integer> sellValues = MarketEconomyConfig.get().getEffectiveTierSellValues();
+
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeVarInt(sellValues.size());
+        sellValues.forEach((tierPath, value) -> {
+            buf.writeString(tierPath);
+            buf.writeVarInt(Math.max(0, value));
+        });
+
+        ServerPlayNetworking.send(player, ModPackets.MARKET_SELL_VALUES_SYNC, buf);
     }
 
     private static boolean applySkillUpgrade(SkillProgressHolder skillHolder, Identifier skillId, int pointsToSpend) {

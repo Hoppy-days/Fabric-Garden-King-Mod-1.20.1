@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.jeremy.gardenkingmod.client.gui.SkillScreen;
 import net.jeremy.gardenkingmod.client.hud.SkillHudOverlay;
 import net.jeremy.gardenkingmod.client.hud.ScoreboardLeaderboardHudOverlay;
+import net.jeremy.gardenkingmod.client.market.ServerMarketPricingState;
 import net.jeremy.gardenkingmod.client.model.BankBlockModel;
 import net.jeremy.gardenkingmod.client.model.CrowEntityModel;
 import net.jeremy.gardenkingmod.client.model.GearShopModel;
@@ -50,7 +51,6 @@ import net.jeremy.gardenkingmod.screen.MarketScreen;
 import net.jeremy.gardenkingmod.screen.ScarecrowScreen;
 import net.jeremy.gardenkingmod.skill.SkillProgressHolder;
 import net.jeremy.gardenkingmod.skill.SkillProgressManager;
-import net.jeremy.gardenkingmod.shop.MarketEconomyConfig;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
@@ -220,7 +220,25 @@ public class GardenKingModClient implements ClientModInitializer {
                         });
                 });
 
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> SkillState.getInstance().reset());
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.MARKET_SELL_VALUES_SYNC,
+                (client, handler, buf, responseSender) -> {
+                        int entries = buf.readVarInt();
+                        Map<String, Integer> sellValues = new LinkedHashMap<>();
+                        for (int index = 0; index < entries; index++) {
+                                String tierPath = buf.readString();
+                                int value = buf.readVarInt();
+                                if (!tierPath.isBlank() && value > 0) {
+                                        sellValues.put(tierPath, value);
+                                }
+                        }
+
+                        client.execute(() -> ServerMarketPricingState.getInstance().update(sellValues));
+                });
+
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+                SkillState.getInstance().reset();
+                ServerMarketPricingState.getInstance().reset();
+        });
 
         ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
                 if (stack.getItem() instanceof FortuneProvidingItem fortuneItem) {
@@ -241,7 +259,7 @@ public class GardenKingModClient implements ClientModInitializer {
                         lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_tier", tierName)
                                         .formatted(Formatting.GREEN));
 
-                        int sellValue = MarketEconomyConfig.get().resolveSellValue(stack, tier);
+                        int sellValue = ServerMarketPricingState.getInstance().resolveSellValue(tier);
                         if (sellValue > 0) {
                                 lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_value_each",
                                                 sellValue)

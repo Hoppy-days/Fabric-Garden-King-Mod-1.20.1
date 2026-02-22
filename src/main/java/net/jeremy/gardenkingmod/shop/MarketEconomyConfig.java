@@ -157,12 +157,27 @@ public final class MarketEconomyConfig {
             return 0;
         }
 
-        Integer tierValue = findTierValue(tier.id().getPath());
+        return resolveSellValueForTierPath(tier.id().getPath());
+    }
+
+    public int resolveSellValueForTierPath(String tierPath) {
+        Integer tierValue = findTierValue(tierPath);
         if (tierValue == null || tierValue <= 0) {
             return 0;
         }
 
         return applySellMultiplier(tierValue);
+    }
+
+    public Map<String, Integer> getEffectiveTierSellValues() {
+        Map<String, Integer> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : tierBaseSellValues.entrySet()) {
+            int value = resolveSellValueForTierPath(entry.getKey());
+            if (value > 0) {
+                result.put(entry.getKey(), value);
+            }
+        }
+        return result;
     }
 
     private Integer findTierValue(String tierPath) {
