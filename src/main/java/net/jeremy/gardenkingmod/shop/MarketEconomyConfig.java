@@ -12,6 +12,8 @@ import java.util.Objects;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.jeremy.gardenkingmod.GardenKingMod;
@@ -19,6 +21,7 @@ import net.jeremy.gardenkingmod.ModItems;
 import net.jeremy.gardenkingmod.crop.CropTier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.jeremy.gardenkingmod.util.JsonCommentHelper;
 
 /**
  * Market economy configuration with simple global multipliers.
@@ -76,7 +79,9 @@ public final class MarketEconomyConfig {
         }
 
         try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH)) {
-            MarketEconomyConfig loaded = GSON.fromJson(reader, MarketEconomyConfig.class);
+            JsonElement root = JsonParser.parseReader(reader);
+            JsonElement sanitized = JsonCommentHelper.sanitize(root);
+            MarketEconomyConfig loaded = GSON.fromJson(sanitized, MarketEconomyConfig.class);
             if (loaded == null) {
                 GardenKingMod.LOGGER.warn("Market economy config file was empty; using defaults");
                 instance = defaults;
