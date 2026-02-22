@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.jeremy.gardenkingmod.armor.ModArmorSetEffects;
 import net.jeremy.gardenkingmod.command.GardenMarketCommands;
 import net.jeremy.gardenkingmod.command.SkillDebugCommands;
+import net.jeremy.gardenkingmod.command.CropDebugCommands;
 import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager;
 import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
@@ -51,6 +52,7 @@ public class GardenKingMod implements ModInitializer {
                 ModServerNetworking.register();
                 GardenMarketCommands.register();
                 SkillDebugCommands.register();
+                CropDebugCommands.register();
                 MobDropConfig.reload();
 
                 ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(BonusHarvestDropManager.getInstance());

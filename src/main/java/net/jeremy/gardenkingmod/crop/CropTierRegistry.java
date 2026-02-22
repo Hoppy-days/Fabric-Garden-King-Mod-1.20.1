@@ -3,6 +3,7 @@ package net.jeremy.gardenkingmod.crop;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -55,6 +56,7 @@ public final class CropTierRegistry {
         private static volatile Map<Block, CropTier> blockTierLookup = Map.of();
         private static volatile ResourceManager lastResourceManager;
         private static final Object LOOKUP_LOCK = new Object();
+        private static final List<TagKey<Block>> TIER_BLOCK_TAGS = List.of(TIER_1, TIER_2, TIER_3, TIER_4, TIER_5);
         private static final Identifier BLOCK_LOOKUP_RELOAD_ID = new Identifier(GardenKingMod.MOD_ID,
                         "crop_tier_block_lookup");
         private static boolean initialized = false;
@@ -158,6 +160,34 @@ public final class CropTierRegistry {
 
         public static Optional<CropTier> get(Identifier id) {
                 return Optional.ofNullable(tiers.get(id));
+        }
+
+        public static List<TagKey<Block>> getTierBlockTags() {
+                return TIER_BLOCK_TAGS;
+        }
+
+        public static Optional<CropTier> getTierForTag(TagKey<Block> tag) {
+                if (tag == null) {
+                        return Optional.empty();
+                }
+
+                if (tag.equals(TIER_1)) {
+                        return get(TIER_1_ID);
+                }
+                if (tag.equals(TIER_2)) {
+                        return get(TIER_2_ID);
+                }
+                if (tag.equals(TIER_3)) {
+                        return get(TIER_3_ID);
+                }
+                if (tag.equals(TIER_4)) {
+                        return get(TIER_4_ID);
+                }
+                if (tag.equals(TIER_5)) {
+                        return get(TIER_5_ID);
+                }
+
+                return Optional.empty();
         }
 
         public static void ensureBlockLookup(ResourceManager manager) {
