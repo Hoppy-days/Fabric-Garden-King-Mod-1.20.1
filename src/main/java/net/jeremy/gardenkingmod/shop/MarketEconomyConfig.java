@@ -186,8 +186,15 @@ public final class MarketEconomyConfig {
     public Map<String, Integer> getEffectiveTierSellValues() {
         Map<String, Integer> effective = new LinkedHashMap<>();
         for (Map.Entry<String, Integer> entry : tierBaseSellValues.entrySet()) {
-            int baseValue = entry.getValue() == null ? 0 : Math.max(0, entry.getValue());
-            effective.put(entry.getKey(), applySellMultiplier(baseValue));
+            String normalizedTierPath = normalizeTierPathKey(entry.getKey());
+            if (normalizedTierPath == null || effective.containsKey(normalizedTierPath)) {
+                continue;
+            }
+
+            int resolved = resolveSellValueForTierPath(normalizedTierPath);
+            if (resolved > 0) {
+                effective.put(normalizedTierPath, resolved);
+            }
         }
         return effective;
     }
@@ -224,6 +231,19 @@ public final class MarketEconomyConfig {
 
     private Integer findTierValue(String tierPath) {
         return findIntegerValue(tierBaseSellValues, tierPath);
+    }
+
+    private static String normalizeTierPathKey(String tierPath) {
+        if (tierPath == null) {
+            return null;
+        }
+
+        String trimmed = tierPath.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+
+        return trimmed.toLowerCase(Locale.ROOT);
     }
 
     private static Integer findIntegerValue(Map<String, Integer> values, String key) {
