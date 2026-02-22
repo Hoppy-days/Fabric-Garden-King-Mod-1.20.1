@@ -199,6 +199,23 @@ public final class MarketEconomyConfig {
         return Math.max(1, (int) Math.round(base * marketBuyDollarMultiplier));
     }
 
+
+    public Map<String, Integer> getEffectiveTierSellValues() {
+        Map<String, Integer> effective = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : tierBaseSellValues.entrySet()) {
+            String normalizedTierPath = normalizeTierPathKey(entry.getKey());
+            if (normalizedTierPath == null || effective.containsKey(normalizedTierPath)) {
+                continue;
+            }
+
+            int resolved = resolveSellValueForTierPath(normalizedTierPath);
+            if (resolved > 0) {
+                effective.put(normalizedTierPath, resolved);
+            }
+        }
+        return effective;
+    }
+
     public int resolveSellValue(ItemStack stack, CropTier tier) {
         if (stack == null || stack.isEmpty() || tier == null) {
             return 0;
@@ -231,6 +248,19 @@ public final class MarketEconomyConfig {
 
     private Integer findTierValue(String tierPath) {
         return findIntegerValue(tierBaseSellValues, tierPath);
+    }
+
+    private static String normalizeTierPathKey(String tierPath) {
+        if (tierPath == null) {
+            return null;
+        }
+
+        String trimmed = tierPath.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+
+        return trimmed.toLowerCase(Locale.ROOT);
     }
 
     private static Integer findIntegerValue(Map<String, Integer> values, String key) {
