@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 
 import net.jeremy.gardenkingmod.armor.ModArmorSetEffects;
+import net.jeremy.gardenkingmod.command.EndlessNightCommands;
 import net.jeremy.gardenkingmod.command.GardenMarketCommands;
 import net.jeremy.gardenkingmod.command.SkillDebugCommands;
 import net.jeremy.gardenkingmod.command.CropDebugCommands;
@@ -53,6 +54,7 @@ public class GardenKingMod implements ModInitializer {
                 ModServerNetworking.register();
                 EndlessNightEventManager.register();
                 GardenMarketCommands.register();
+                EndlessNightCommands.register();
                 SkillDebugCommands.register();
                 CropDebugCommands.register();
                 MobDropConfig.reload();

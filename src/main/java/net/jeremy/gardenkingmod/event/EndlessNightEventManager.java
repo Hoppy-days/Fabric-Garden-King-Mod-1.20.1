@@ -69,6 +69,38 @@ public final class EndlessNightEventManager {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, minecraftServer) -> BOSS_BAR.removePlayer(handler.player));
     }
 
+    public static boolean forceStart() {
+        if (active) {
+            return false;
+        }
+        startEvent();
+        return active;
+    }
+
+    public static boolean forceEnd() {
+        if (!active) {
+            return false;
+        }
+        completeEvent();
+        return true;
+    }
+
+    public static boolean isActive() {
+        return active;
+    }
+
+    public static int getProgress() {
+        return progress;
+    }
+
+    public static int getRequiredCount() {
+        return activeTask == null ? 0 : activeTask.requiredCount();
+    }
+
+    public static Text getTaskDescription() {
+        return activeTask == null ? Text.translatable("event.gardenkingmod.endless_night.bossbar.idle") : activeTask.description();
+    }
+
     private static void onServerTick(MinecraftServer minecraftServer) {
         ServerWorld overworld = minecraftServer.getWorld(World.OVERWORLD);
         if (overworld == null) {
@@ -156,8 +188,6 @@ public final class EndlessNightEventManager {
         active = false;
         progress = 0;
         activeTask = null;
-        trackedNight = Long.MIN_VALUE;
-        triggerRolledForNight = false;
         BOSS_BAR.setName(Text.translatable("event.gardenkingmod.endless_night.bossbar.idle"));
         BOSS_BAR.setPercent(0.0F);
         BOSS_BAR.setVisible(false);
