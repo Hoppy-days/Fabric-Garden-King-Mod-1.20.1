@@ -24,4 +24,7 @@ public final class ModPackets {
 
     public static final Identifier MARKET_SELL_VALUES_SYNC =
             new Identifier(GardenKingMod.MOD_ID, "market_sell_values_sync");
+
+    public static final Identifier ENDLESS_NIGHT_SYNC =
+            new Identifier(GardenKingMod.MOD_ID, "endless_night_sync");
 }

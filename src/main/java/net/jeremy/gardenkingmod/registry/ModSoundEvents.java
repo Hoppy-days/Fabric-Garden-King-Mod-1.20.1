@@ -15,6 +15,7 @@ public final class ModSoundEvents {
     public static final SoundEvent CROW_CROP_BREAK = register("entity.crow.crop_break");
     public static final SoundEvent CROW_FLAP = register("entity.crow.flap");
     public static final SoundEvent CROW_WARDED = register("entity.crow.warded");
+    public static final SoundEvent ENDLESS_NIGHT_MUSIC = register("music.endless_night");
 
     private ModSoundEvents() {
     }
