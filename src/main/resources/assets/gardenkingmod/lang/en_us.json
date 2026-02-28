@@ -1,5 +1,4 @@
 {
-
   "item.gardenkingmod.ruby": "Ruby",
   "item.gardenkingmod.blue_sapphire": "Blue Sapphire",
   "item.gardenkingmod.topaz": "Topaz",
@@ -70,9 +69,7 @@
   "item.gardenkingmod.scarecrow_shirt": "Scarecrow Shirt",
   "item.gardenkingmod.scarecrow_head": "Scarecrow Head",
   "item.gardenkingmod.scarecrow_hat": "Scarecrow Hat",
-
   "block.gardenkingmod.ruby_block": "Ruby Block",
-
   "block.gardenkingmod.market_block": "Garden Market",
   "block.gardenkingmod.gear_shop_block": "Gear Shop",
   "block.gardenkingmod.bank_block": "Garden Bank",
@@ -214,7 +211,6 @@
   "item.gardenkingmod.rotten_wheat": "Rotten Wheat",
   "item.gardenkingmod.rotten_yam": "Rotten Yam",
   "item.gardenkingmod.rotten_zucchini": "Rotten Zucchini",
-
   "entity.gardenkingmod.crow": "Crow",
   "block.gardenkingmod.scarecrow": "Field Scarecrow",
   "block.gardenkingmod.iron_sprinkler": "Iron Sprinkler",
@@ -228,7 +224,6 @@
   "item.gardenkingmod.emerald_sprinkler": "Emerald Sprinkler",
   "tooltip.gardenkingmod.sprinkler.radius": "Waters a %s block radius (%s blocks vertically)",
   "item.gardenkingmod.crow_spawn_egg": "Crow Spawn Egg",
-
   "tooltip.gardenkingmod.scarecrow.ward_radius": "Wards crows within %s blocks.",
   "screen.gardenkingmod.scarecrow.slot.hat": "Hat Slot",
   "screen.gardenkingmod.scarecrow.slot.head": "Head Slot",
@@ -238,14 +233,12 @@
   "screen.gardenkingmod.scarecrow.radius.summary": "%1$s x %2$s",
   "screen.gardenkingmod.scarecrow.radius.horizontal": "Horizontal radius: %s blocks",
   "screen.gardenkingmod.scarecrow.radius.vertical": "Vertical radius: %s blocks",
-
   "subtitles.gardenkingmod.entity.crow.caw": "Crow caws",
   "subtitles.gardenkingmod.entity.crow.flap": "Crow wings flap",
   "subtitles.gardenkingmod.entity.crow.crop_break": "Crow tears at crops",
   "subtitles.gardenkingmod.entity.crow.warded": "Crow screeches in fear",
   "subtitles.gardenkingmod.block.scarecrow.activate": "Scarecrow ward pulses",
   "subtitles.gardenkingmod.block.scarecrow.ambient": "Scarecrow ward hums",
-
   "particle.gardenkingmod.scarecrow_ward": "Scarecrow Ward Wisps",
   "item.gardenkingmod.enchanted_almond": "Enchanted Almond",
   "item.gardenkingmod.enchanted_apple": "Enchanted Apple",
@@ -352,6 +345,14 @@
   "key.gardenkingmod.open_skills": "Open Skill Screen",
   "key.gardenkingmod.toggle_leaderboard": "Toggle Leaderboard",
   "message.gardenkingmod.leaderboard.toggled": "Leaderboard: %s",
-  "category.gardenkingmod": "Garden King"
-
+  "category.gardenkingmod": "Garden King",
+  "event.gardenkingmod.endless_night.approaching": "Endless Night Approaching",
+  "event.gardenkingmod.endless_night.completed": "Dawn returns as Endless Night fades.",
+  "event.gardenkingmod.endless_night.bossbar.idle": "Endless Night",
+  "event.gardenkingmod.endless_night.bossbar.progress": "%1$s %2$s/%3$s",
+  "event.gardenkingmod.endless_night.task.kill_zombies": "Slay %s Zombies",
+  "event.gardenkingmod.endless_night.task.kill_skeletons": "Slay %s Skeletons",
+  "event.gardenkingmod.endless_night.task.kill_spiders": "Slay %s Spiders",
+  "subtitles.gardenkingmod.music.endless_night": "Distant haunting melody",
+  "event.gardenkingmod.endless_night.task.kill_generic": "Slay %1$s %2$s"
 }
