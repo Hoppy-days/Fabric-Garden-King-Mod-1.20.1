@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.jeremy.gardenkingmod.client.event.EndlessNightClientController;
 import net.jeremy.gardenkingmod.client.gui.SkillScreen;
 import net.jeremy.gardenkingmod.client.hud.SkillHudOverlay;
 import net.jeremy.gardenkingmod.client.hud.ScoreboardLeaderboardHudOverlay;
@@ -86,6 +87,8 @@ public class GardenKingModClient implements ClientModInitializer {
                 "category.gardenkingmod"));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            EndlessNightClientController.tick(client);
+
             while (openSkillScreenKey.wasPressed()) {
                 if (client != null && client.player != null && client.currentScreen == null) {
                     client.setScreen(new SkillScreen());
@@ -223,6 +226,19 @@ public class GardenKingModClient implements ClientModInitializer {
                         });
                 });
 
+
+        ClientPlayNetworking.registerGlobalReceiver(ModPackets.ENDLESS_NIGHT_SYNC,
+                (client, handler, buf, responseSender) -> {
+                        boolean active = buf.readBoolean();
+                        if (active) {
+                                buf.readText();
+                                buf.readVarInt();
+                                buf.readVarInt();
+                        }
+
+                        client.execute(() -> EndlessNightClientController.updateFromServer(active));
+                });
+
         ClientPlayNetworking.registerGlobalReceiver(ModPackets.MARKET_SELL_VALUES_SYNC,
                 (client, handler, buf, responseSender) -> {
                         int entries = buf.readVarInt();
@@ -238,9 +254,12 @@ public class GardenKingModClient implements ClientModInitializer {
                         client.execute(() -> ServerMarketPricingState.getInstance().update(sellValues));
                 });
 
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> EndlessNightClientController.clear());
+
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
                 SkillState.getInstance().reset();
                 ServerMarketPricingState.getInstance().reset();
+                EndlessNightClientController.clear();
         });
 
         ItemTooltipCallback.EVENT.register((stack, context, lines) -> {
