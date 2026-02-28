@@ -156,6 +156,8 @@ public final class EndlessNightEventManager {
         active = false;
         progress = 0;
         activeTask = null;
+        trackedNight = Long.MIN_VALUE;
+        triggerRolledForNight = false;
         BOSS_BAR.setName(Text.translatable("event.gardenkingmod.endless_night.bossbar.idle"));
         BOSS_BAR.setPercent(0.0F);
         BOSS_BAR.setVisible(false);
