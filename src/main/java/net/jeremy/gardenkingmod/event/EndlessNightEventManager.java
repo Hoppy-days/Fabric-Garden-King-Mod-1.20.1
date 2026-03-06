@@ -241,7 +241,7 @@ public final class EndlessNightEventManager {
             return null;
         }
         EntityType<?> type = Registries.ENTITY_TYPE.get(id);
-        if (type == EntityType.PLAYER || !type.isSpawnable()) {
+        if (type == EntityType.PLAYER || !type.isSummonable()) {
             return null;
         }
 

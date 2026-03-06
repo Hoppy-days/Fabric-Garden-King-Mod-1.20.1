@@ -158,7 +158,7 @@ public final class EndlessNightConfig {
                 continue;
             }
             EntityType<?> type = Registries.ENTITY_TYPE.get(id);
-            if (type == EntityType.PLAYER || !type.isSpawnable()) {
+            if (type == EntityType.PLAYER || !type.isSummonable()) {
                 continue;
             }
             if (!dedupe.add(entry.mobId)) {
