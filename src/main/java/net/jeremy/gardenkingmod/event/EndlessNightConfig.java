@@ -12,6 +12,7 @@ import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.jeremy.gardenkingmod.GardenKingMod;
@@ -83,6 +84,9 @@ public final class EndlessNightConfig {
                 writeConfigFile(loaded);
             }
             instance = loaded;
+        } catch (JsonParseException exception) {
+            GardenKingMod.LOGGER.warn("Malformed Endless Night config; using defaults", exception);
+            instance = defaults;
         } catch (IOException exception) {
             GardenKingMod.LOGGER.warn("Failed to load Endless Night config; using defaults", exception);
             instance = defaults;
