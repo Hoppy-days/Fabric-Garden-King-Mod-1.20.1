@@ -8,6 +8,7 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+import net.jeremy.gardenkingmod.event.EndlessNightConfig;
 import net.jeremy.gardenkingmod.event.EndlessNightEventManager;
 
 public final class EndlessNightCommands {
@@ -27,7 +28,9 @@ public final class EndlessNightCommands {
                 .then(CommandManager.literal("stop")
                         .executes(EndlessNightCommands::stop))
                 .then(CommandManager.literal("status")
-                        .executes(EndlessNightCommands::status)));
+                        .executes(EndlessNightCommands::status))
+                .then(CommandManager.literal("reload")
+                        .executes(EndlessNightCommands::reload)));
     }
 
     private static int start(CommandContext<ServerCommandSource> context) {
@@ -47,6 +50,14 @@ public final class EndlessNightCommands {
         }
 
         context.getSource().sendFeedback(() -> Text.literal("Forced Endless Night event end."), true);
+        return 1;
+    }
+
+    private static int reload(CommandContext<ServerCommandSource> context) {
+        EndlessNightConfig.reload();
+        context.getSource().sendFeedback(
+                () -> Text.literal("Reloaded Endless Night config from " + EndlessNightConfig.configPath()),
+                true);
         return 1;
     }
 

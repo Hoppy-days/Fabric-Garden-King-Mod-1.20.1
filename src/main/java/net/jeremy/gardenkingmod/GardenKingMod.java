@@ -14,6 +14,7 @@ import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.entity.MobDropConfig;
 import net.jeremy.gardenkingmod.entity.MobDropModifier;
+import net.jeremy.gardenkingmod.event.EndlessNightConfig;
 import net.jeremy.gardenkingmod.event.EndlessNightEventManager;
 import net.jeremy.gardenkingmod.item.FertilizerBalanceConfig;
 import net.jeremy.gardenkingmod.item.WalletItem;
@@ -42,6 +43,7 @@ public class GardenKingMod implements ModInitializer {
                 GardenOvenBalanceConfig.reload();
                 HarvestXpConfig.reload();
                 MarketEconomyConfig.reload();
+                EndlessNightConfig.reload();
                 ModItems.registerModItems();
                 ModBlocks.registerModBlocks();
                 ModBlockEntities.registerBlockEntities();
