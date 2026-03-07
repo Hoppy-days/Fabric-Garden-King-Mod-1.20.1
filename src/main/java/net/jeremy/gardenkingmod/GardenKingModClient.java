@@ -32,6 +32,7 @@ import net.jeremy.gardenkingmod.client.render.GearShopBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.MarketBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.ScarecrowBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.SprinklerBlockEntityRenderer;
+import net.jeremy.gardenkingmod.block.entity.MarketBlockEntity;
 import net.jeremy.gardenkingmod.client.skill.SkillState;
 import net.jeremy.gardenkingmod.client.render.item.BankItemRenderer;
 import net.jeremy.gardenkingmod.client.render.item.GearShopItemRenderer;

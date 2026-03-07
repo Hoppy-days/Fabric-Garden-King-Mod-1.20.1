@@ -74,4 +74,54 @@ public final class GardenKingModGameTest implements FabricGameTest {
                         helper.succeed();
                 });
         }
+
+
+        @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+        public void sellingSeedIsRejected(GameTestHelper helper) {
+                helper.setBlock(BlockPos.ORIGIN, ModBlocks.MARKET_BLOCK.getDefaultState());
+
+                helper.runAtTickTime(1, () -> {
+                        MarketBlockEntity blockEntity = helper.getBlockEntity(BlockPos.ORIGIN);
+                        if (blockEntity == null) {
+                                helper.fail("Market block entity was not created");
+                                return;
+                        }
+
+                        Optional<Item> seedOptional = Registries.ITEM.getOrEmpty(new Identifier("croptopia", "tomato_seed"));
+                        if (seedOptional.isEmpty()) {
+                                helper.fail("Croptopia tomato seed item is missing from the registry");
+                                return;
+                        }
+
+                        Item seedItem = seedOptional.get();
+                        blockEntity.setStack(0, new ItemStack(seedItem, 16));
+
+                        ServerPlayerEntity player = helper.spawnPlayer(BlockPos.ORIGIN.up());
+                        boolean sold = blockEntity.sell(player);
+                        if (sold) {
+                                helper.fail("Market should not sell seed items");
+                                return;
+                        }
+
+                        if (!blockEntity.getStack(0).isOf(seedItem) || blockEntity.getStack(0).getCount() != 16) {
+                                helper.fail("Seed stack should remain in the market input when sale is rejected");
+                                return;
+                        }
+
+                        int dollarCount = 0;
+                        for (ItemStack inventoryStack : player.getInventory().main) {
+                                if (inventoryStack.isOf(ModItems.DOLLAR)) {
+                                        dollarCount += inventoryStack.getCount();
+                                }
+                        }
+
+                        if (dollarCount > 0) {
+                                helper.fail("Player should not receive dollars when trying to sell seeds");
+                                return;
+                        }
+
+                        helper.succeed();
+                });
+        }
+
 }

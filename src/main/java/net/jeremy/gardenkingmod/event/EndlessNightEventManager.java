@@ -35,6 +35,11 @@ public final class EndlessNightEventManager {
             BossBar.Color.PURPLE,
             BossBar.Style.PROGRESS);
 
+    static {
+        BOSS_BAR.setPercent(0.0F);
+        BOSS_BAR.setVisible(false);
+    }
+
     private static MinecraftServer server;
     private static boolean active;
     private static TaskDefinition activeTask;
@@ -47,7 +52,10 @@ public final class EndlessNightEventManager {
     }
 
     public static void register() {
-        ServerLifecycleEvents.SERVER_STARTED.register(startedServer -> server = startedServer);
+        ServerLifecycleEvents.SERVER_STARTED.register(startedServer -> {
+            server = startedServer;
+            resetState();
+        });
         ServerLifecycleEvents.SERVER_STOPPED.register(stoppedServer -> {
             server = null;
             resetState();
@@ -75,9 +83,16 @@ public final class EndlessNightEventManager {
     }
 
     public static boolean forceEnd() {
-        if (!active) {
+        if (!active && !BOSS_BAR.isVisible()) {
             return false;
         }
+
+        if (!active) {
+            resetState();
+            syncToAllPlayers();
+            return true;
+        }
+
         completeEvent();
         return true;
     }
