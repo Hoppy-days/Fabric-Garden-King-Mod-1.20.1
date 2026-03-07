@@ -131,12 +131,16 @@ public final class CropTierRegistry {
                         return Optional.empty();
                 }
 
-                if (item instanceof BlockItem blockItem) {
-                        return get(blockItem.getBlock());
-                }
-
                 if (item instanceof AliasedBlockItem aliasedBlockItem) {
-                        return get(aliasedBlockItem.getBlock());
+                        Optional<CropTier> aliasedTier = get(aliasedBlockItem.getBlock());
+                        if (aliasedTier.isPresent()) {
+                                return aliasedTier;
+                        }
+                } else if (item instanceof BlockItem blockItem) {
+                        Optional<CropTier> blockTier = get(blockItem.getBlock());
+                        if (blockTier.isPresent()) {
+                                return blockTier;
+                        }
                 }
 
                 RegistryEntry<Item> entry = Registries.ITEM.getEntry(item);
