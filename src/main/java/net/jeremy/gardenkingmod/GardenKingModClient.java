@@ -32,6 +32,7 @@ import net.jeremy.gardenkingmod.client.render.GearShopBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.MarketBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.ScarecrowBlockEntityRenderer;
 import net.jeremy.gardenkingmod.client.render.SprinklerBlockEntityRenderer;
+import net.jeremy.gardenkingmod.block.entity.MarketBlockEntity;
 import net.jeremy.gardenkingmod.client.skill.SkillState;
 import net.jeremy.gardenkingmod.client.render.item.BankItemRenderer;
 import net.jeremy.gardenkingmod.client.render.item.GearShopItemRenderer;
@@ -294,7 +295,7 @@ public class GardenKingModClient implements ClientModInitializer {
                                 sellValue = Math.max(1,
                                                 Math.round(sellValue * enchantedDefinition.get().effectiveValueMultiplier()));
                         }
-                        if (sellValue > 0) {
+                        if (sellValue > 0 && !MarketBlockEntity.isSeedItem(stack.getItem())) {
                                 lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_value_each",
                                                 sellValue)
                                                 .formatted(pricingColor));
