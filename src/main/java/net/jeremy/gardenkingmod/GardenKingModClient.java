@@ -297,6 +297,7 @@ public class GardenKingModClient implements ClientModInitializer {
                                                 Math.round(sellValue * enchantedDefinition.get().effectiveValueMultiplier()));
                         }
                         boolean showSellValue = sellValue > 0
+                                        && !MarketBlockEntity.isSeedItem(stack.getItem())
                                         && !Registries.ITEM.getEntry(stack.getItem()).isIn(MarketBlockEntity.MARKET_UNSELLABLE);
                         if (showSellValue) {
                                 lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_value_each",
