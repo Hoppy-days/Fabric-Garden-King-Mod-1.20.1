@@ -66,6 +66,10 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                         return false;
                 }
 
+                if (isSeedItem(stack.getItem())) {
+                        return false;
+                }
+
                 if (Registries.ITEM.getEntry(stack.getItem()).isIn(MARKET_UNSELLABLE)) {
                         return false;
                 }
@@ -81,6 +85,20 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
                 String namespace = identifier.getNamespace();
                 return "croptopia".equals(namespace) || "minecraft".equals(namespace);
+        }
+
+        public static boolean isSeedItem(Item item) {
+                if (item == null) {
+                        return false;
+                }
+
+                Identifier identifier = Registries.ITEM.getId(item);
+                if (identifier == null) {
+                        return false;
+                }
+
+                String path = identifier.getPath();
+                return path.endsWith("_seed") || path.endsWith("_seeds");
         }
 
         @Override
