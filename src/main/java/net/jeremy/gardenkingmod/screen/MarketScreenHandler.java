@@ -506,6 +506,19 @@ public class MarketScreenHandler extends ScreenHandler {
                 }
                 return false;
         }
+
+        public int getPendingSaleTotal() {
+                return calculatePendingSaleTotal();
+        }
+
+        private int calculatePendingSaleTotal() {
+                int total = 0;
+                for (int slot = 0; slot < MarketBlockEntity.INVENTORY_SIZE; slot++) {
+                        total += MarketBlockEntity.getSaleValue(this.inventory.getStack(slot));
+                }
+                return Math.max(0, total);
+        }
+
         @Override
         public void onContentChanged(Inventory inventory) {
                 super.onContentChanged(inventory);

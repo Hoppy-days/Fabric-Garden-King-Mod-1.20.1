@@ -411,6 +411,10 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
                 return Optional.of(new SaleDetails(item, resolvedTier, payoutPerItem, totalDollars, itemsSold));
         }
 
+        public static int getSaleValue(ItemStack stack) {
+                return evaluateSale(stack).map(SaleDetails::totalDollars).orElse(0);
+        }
+
         private static Optional<CropTier> resolveTier(EnchantedCropDefinition definition) {
                 if (definition == null) {
                         return Optional.empty();
