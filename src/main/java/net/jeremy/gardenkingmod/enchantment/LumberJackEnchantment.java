@@ -6,7 +6,7 @@ import net.minecraft.entity.EquipmentSlot;
 
 public class LumberJackEnchantment extends Enchantment {
         public LumberJackEnchantment() {
-                super(Rarity.RARE, EnchantmentTarget.AXE, new EquipmentSlot[] { EquipmentSlot.MAINHAND });
+                super(Rarity.RARE, EnchantmentTarget.DIGGER, new EquipmentSlot[] { EquipmentSlot.MAINHAND });
         }
 
         @Override
