@@ -67,7 +67,7 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_TAB_TEXT_X = 54;
         private static final int SCOREBOARD_BAND_TOP = 107;
         private static final int SCOREBOARD_BAND_BOTTOM = 138;
-        private static final int SELL_TOTAL_CENTER_X = 135;
+        private static final int SELL_TOTAL_CENTER_X = 145;
         private static final int SELL_TOTAL_LABEL_Y = 108;
         private static final int SELL_TOTAL_VALUE_Y = 118;
         private static final int SELL_TOTAL_SUFFIX_Y = 128;
