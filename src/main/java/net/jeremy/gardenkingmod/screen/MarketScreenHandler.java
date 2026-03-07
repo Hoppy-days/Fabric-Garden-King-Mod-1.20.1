@@ -74,7 +74,6 @@ public class MarketScreenHandler extends ScreenHandler {
         private List<GearShopOffer> buyOffers;
         private int selectedOfferIndex;
         private long offerRefreshTime;
-        private int pendingSaleTotal;
         private final int marketInventoryEnd;
         private final int costSlotStartIndex;
         private final int costSlotEndIndex;
@@ -135,7 +134,6 @@ public class MarketScreenHandler extends ScreenHandler {
 
                 setMarketSlotsEnabled(true);
                 setBuySlotsEnabled(false);
-                this.pendingSaleTotal = calculatePendingSaleTotal();
         }
 
         public List<GearShopOffer> getBuyOffers() {
@@ -510,7 +508,7 @@ public class MarketScreenHandler extends ScreenHandler {
         }
 
         public int getPendingSaleTotal() {
-                return this.pendingSaleTotal;
+                return calculatePendingSaleTotal();
         }
 
         private int calculatePendingSaleTotal() {
@@ -524,9 +522,6 @@ public class MarketScreenHandler extends ScreenHandler {
         @Override
         public void onContentChanged(Inventory inventory) {
                 super.onContentChanged(inventory);
-                if (inventory == this.inventory) {
-                        this.pendingSaleTotal = calculatePendingSaleTotal();
-                }
                 if (inventory == this.costInventory) {
                         GearShopOffer offer = getSelectedOffer();
                         if (updateResultSlot(offer) && !this.playerInventory.player.getWorld().isClient) {
