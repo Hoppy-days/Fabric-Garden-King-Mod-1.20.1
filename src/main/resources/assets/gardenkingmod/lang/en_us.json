@@ -356,5 +356,6 @@
   "event.gardenkingmod.endless_night.task.kill_skeletons": "Slay %s Skeletons",
   "event.gardenkingmod.endless_night.task.kill_spiders": "Slay %s Spiders",
   "subtitles.gardenkingmod.music.endless_night": "Distant haunting melody",
-  "event.gardenkingmod.endless_night.task.kill_generic": "Slay %1$s %2$s"
+  "event.gardenkingmod.endless_night.task.kill_generic": "Slay %1$s %2$s",
+  "enchantment.gardenkingmod.enchantment_lumberjack": "Lumber Jack"
 }

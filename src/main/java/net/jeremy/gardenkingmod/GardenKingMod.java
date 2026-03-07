@@ -13,6 +13,7 @@ import net.jeremy.gardenkingmod.crop.BonusHarvestDropManager;
 import net.jeremy.gardenkingmod.crop.CropDropModifier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.entity.MobDropConfig;
+import net.jeremy.gardenkingmod.enchantment.ModEnchantments;
 import net.jeremy.gardenkingmod.entity.MobDropModifier;
 import net.jeremy.gardenkingmod.event.EndlessNightConfig;
 import net.jeremy.gardenkingmod.event.EndlessNightEventManager;
@@ -52,6 +53,7 @@ public class GardenKingMod implements ModInitializer {
                 ModSoundEvents.register();
                 ModScreenHandlers.registerScreenHandlers();
                 ModScoreboards.registerScoreboards();
+                ModEnchantments.register();
                 ModArmorSetEffects.register();
                 ModServerNetworking.register();
                 EndlessNightEventManager.register();
