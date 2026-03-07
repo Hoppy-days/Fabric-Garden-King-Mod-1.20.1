@@ -59,6 +59,10 @@ public final class LumberJackTreeChopHandler {
                         BREAKING_TREE.set(Boolean.TRUE);
                         try {
                                 for (BlockPos logPos : connectedLogs) {
+                                        if (!isHoldingEnchantedAxe(serverPlayer)) {
+                                                break;
+                                        }
+
                                         if (world.getBlockState(logPos).isIn(BlockTags.LOGS)) {
                                                 serverPlayer.interactionManager.tryBreakBlock(logPos);
                                         }
@@ -67,6 +71,14 @@ public final class LumberJackTreeChopHandler {
                                 BREAKING_TREE.set(Boolean.FALSE);
                         }
                 });
+        }
+
+        private static boolean isHoldingEnchantedAxe(ServerPlayerEntity player) {
+                if (!(player.getMainHandStack().getItem() instanceof AxeItem)) {
+                        return false;
+                }
+
+                return EnchantmentHelper.getLevel(ModEnchantments.LUMBER_JACK, player.getMainHandStack()) > 0;
         }
 
         private static List<BlockPos> findConnectedLogs(World world, BlockPos origin, int maxAdditionalLogs) {
