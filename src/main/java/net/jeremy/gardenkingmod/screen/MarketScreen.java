@@ -376,9 +376,9 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
         private void drawPendingSellTotal(DrawContext context) {
                 int totalDollars = Math.max(0, handler.getPendingSaleTotal());
-                String prefix = "TOTAL :";
-                String value = Integer.toString(totalDollars);
-                String suffix = "DOLLARS";
+                Text prefix = Text.translatable("screen.gardenkingmod.market.sell_total.prefix");
+                Text value = Text.literal(Integer.toString(totalDollars));
+                Text suffix = Text.translatable("screen.gardenkingmod.market.sell_total.suffix");
 
                 int prefixX = SELL_TOTAL_CENTER_X - textRenderer.getWidth(prefix) / 2;
                 int valueX = SELL_TOTAL_CENTER_X - textRenderer.getWidth(value) / 2;

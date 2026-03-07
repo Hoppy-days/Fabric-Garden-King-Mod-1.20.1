@@ -103,6 +103,8 @@
   "screen.gardenkingmod.market.tab.buy": "Buy",
   "screen.gardenkingmod.market.offers": "OFFERS",
   "screen.gardenkingmod.market.refresh_time": "Refresh Time",
+  "screen.gardenkingmod.market.sell_total.prefix": "Total :",
+  "screen.gardenkingmod.market.sell_total.suffix": "Dollars",
   "screen.gardenkingmod.bank.title": "%s's Bank",
   "screen.gardenkingmod.bank.total": "Total Balance: %s dollars",
   "screen.gardenkingmod.bank.slot.dollar": "Dollars",
