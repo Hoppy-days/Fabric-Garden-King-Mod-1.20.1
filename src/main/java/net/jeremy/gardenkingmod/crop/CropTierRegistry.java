@@ -34,6 +34,7 @@ import net.minecraft.util.Identifier;
  * the system without requiring an extra configuration file.
  */
 public final class CropTierRegistry {
+        private static final String[] ITEM_TIER_DERIVATION_SUFFIXES = new String[] { "_seed", "_sapling" };
         private static final Identifier TIER_1_ID = new Identifier(GardenKingMod.MOD_ID, "crop_tiers/tier_1");
         private static final Identifier TIER_2_ID = new Identifier(GardenKingMod.MOD_ID, "crop_tiers/tier_2");
         private static final Identifier TIER_3_ID = new Identifier(GardenKingMod.MOD_ID, "crop_tiers/tier_3");
@@ -130,12 +131,16 @@ public final class CropTierRegistry {
                         return Optional.empty();
                 }
 
-                if (item instanceof BlockItem blockItem) {
-                        return get(blockItem.getBlock());
-                }
-
                 if (item instanceof AliasedBlockItem aliasedBlockItem) {
-                        return get(aliasedBlockItem.getBlock());
+                        Optional<CropTier> aliasedTier = get(aliasedBlockItem.getBlock());
+                        if (aliasedTier.isPresent()) {
+                                return aliasedTier;
+                        }
+                } else if (item instanceof BlockItem blockItem) {
+                        Optional<CropTier> blockTier = get(blockItem.getBlock());
+                        if (blockTier.isPresent()) {
+                                return blockTier;
+                        }
                 }
 
                 RegistryEntry<Item> entry = Registries.ITEM.getEntry(item);
@@ -153,6 +158,41 @@ public final class CropTierRegistry {
                 }
                 if (entry.isIn(TIER_5_ITEM)) {
                         return get(TIER_5_ID);
+                }
+
+                Optional<CropTier> derivedTier = resolveDerivedItemTier(item);
+                if (derivedTier.isPresent()) {
+                        return derivedTier;
+                }
+
+                return Optional.empty();
+        }
+
+        private static Optional<CropTier> resolveDerivedItemTier(Item item) {
+                Identifier itemId = Registries.ITEM.getId(item);
+                if (itemId == null) {
+                        return Optional.empty();
+                }
+
+                String path = itemId.getPath();
+                for (String suffix : ITEM_TIER_DERIVATION_SUFFIXES) {
+                        if (!path.endsWith(suffix) || path.length() <= suffix.length()) {
+                                continue;
+                        }
+
+                        String basePath = path.substring(0, path.length() - suffix.length());
+                        Identifier baseItemId = new Identifier(itemId.getNamespace(), basePath);
+                        Optional<CropTier> baseItemTier = Registries.ITEM.getOrEmpty(baseItemId).flatMap(CropTierRegistry::get);
+                        if (baseItemTier.isPresent()) {
+                                return baseItemTier;
+                        }
+
+                        Identifier baseCropBlockId = new Identifier(itemId.getNamespace(), basePath + "_crop");
+                        Optional<CropTier> baseCropTier = Registries.BLOCK.getOrEmpty(baseCropBlockId)
+                                        .flatMap(CropTierRegistry::get);
+                        if (baseCropTier.isPresent()) {
+                                return baseCropTier;
+                        }
                 }
 
                 return Optional.empty();

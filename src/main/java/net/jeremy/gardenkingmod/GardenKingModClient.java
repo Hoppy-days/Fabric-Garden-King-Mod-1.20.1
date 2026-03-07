@@ -43,6 +43,7 @@ import net.jeremy.gardenkingmod.registry.ModEntities;
 import net.jeremy.gardenkingmod.ModBlockEntities;
 import net.jeremy.gardenkingmod.ModBlocks;
 import net.jeremy.gardenkingmod.ModScreenHandlers;
+import net.jeremy.gardenkingmod.block.entity.MarketBlockEntity;
 import net.jeremy.gardenkingmod.crop.CropTier;
 import net.jeremy.gardenkingmod.crop.CropTierRegistry;
 import net.jeremy.gardenkingmod.crop.EnchantedCropDefinition;
@@ -295,7 +296,9 @@ public class GardenKingModClient implements ClientModInitializer {
                                 sellValue = Math.max(1,
                                                 Math.round(sellValue * enchantedDefinition.get().effectiveValueMultiplier()));
                         }
-                        if (sellValue > 0 && !MarketBlockEntity.isSeedItem(stack.getItem())) {
+                        boolean showSellValue = sellValue > 0
+                                        && !Registries.ITEM.getEntry(stack.getItem()).isIn(MarketBlockEntity.MARKET_UNSELLABLE);
+                        if (showSellValue) {
                                 lines.add(Text.translatable("tooltip." + GardenKingMod.MOD_ID + ".crop_value_each",
                                                 sellValue)
                                                 .formatted(pricingColor));
