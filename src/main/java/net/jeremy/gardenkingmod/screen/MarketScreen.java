@@ -67,8 +67,10 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
         private static final int BUY_TAB_TEXT_X = 54;
         private static final int SCOREBOARD_BAND_TOP = 107;
         private static final int SCOREBOARD_BAND_BOTTOM = 138;
-        private static final int SELL_TOTAL_LABEL_X = 106;
-        private static final int SELL_TOTAL_LABEL_Y = 116;
+        private static final int SELL_TOTAL_CENTER_X = 135;
+        private static final int SELL_TOTAL_LABEL_Y = 108;
+        private static final int SELL_TOTAL_VALUE_Y = 118;
+        private static final int SELL_TOTAL_SUFFIX_Y = 128;
         private static final int SELL_TOTAL_PREFIX_COLOR = 0x404040;
         private static final int SELL_TOTAL_VALUE_COLOR = 0xE34646;
         private static final int SELL_TOTAL_SUFFIX_COLOR = 0x404040;
@@ -374,16 +376,17 @@ public class MarketScreen extends HandledScreen<MarketScreenHandler> {
 
         private void drawPendingSellTotal(DrawContext context) {
                 int totalDollars = Math.max(0, handler.getPendingSaleTotal());
-                String prefix = "Total: ";
+                String prefix = "TOTAL :";
                 String value = Integer.toString(totalDollars);
-                String suffix = " Dollars";
-                int valueX = SELL_TOTAL_LABEL_X + textRenderer.getWidth(prefix);
-                int suffixX = valueX + textRenderer.getWidth(value);
+                String suffix = "DOLLARS";
 
-                context.drawText(textRenderer, prefix, SELL_TOTAL_LABEL_X, SELL_TOTAL_LABEL_Y, SELL_TOTAL_PREFIX_COLOR,
-                                false);
-                context.drawText(textRenderer, value, valueX, SELL_TOTAL_LABEL_Y, SELL_TOTAL_VALUE_COLOR, false);
-                context.drawText(textRenderer, suffix, suffixX, SELL_TOTAL_LABEL_Y, SELL_TOTAL_SUFFIX_COLOR, false);
+                int prefixX = SELL_TOTAL_CENTER_X - textRenderer.getWidth(prefix) / 2;
+                int valueX = SELL_TOTAL_CENTER_X - textRenderer.getWidth(value) / 2;
+                int suffixX = SELL_TOTAL_CENTER_X - textRenderer.getWidth(suffix) / 2;
+
+                context.drawText(textRenderer, prefix, prefixX, SELL_TOTAL_LABEL_Y, SELL_TOTAL_PREFIX_COLOR, false);
+                context.drawText(textRenderer, value, valueX, SELL_TOTAL_VALUE_Y, SELL_TOTAL_VALUE_COLOR, false);
+                context.drawText(textRenderer, suffix, suffixX, SELL_TOTAL_SUFFIX_Y, SELL_TOTAL_SUFFIX_COLOR, false);
         }
 
         private void showSaleResultToast() {
