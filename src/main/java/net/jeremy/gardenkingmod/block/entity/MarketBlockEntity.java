@@ -3,6 +3,7 @@ package net.jeremy.gardenkingmod.block.entity;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -54,6 +55,9 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
         public static final TagKey<Item> MARKET_UNSELLABLE =
                         TagKey.of(RegistryKeys.ITEM,
                                         new Identifier(GardenKingMod.MOD_ID, "market_unsellable"));
+        private static final Set<Identifier> NON_PLANTABLE_SEED_EXCEPTIONS = Set.of(
+                        new Identifier("croptopia", "roasted_pumpkin_seeds"),
+                        new Identifier("croptopia", "roasted_sunflower_seeds"));
 
         private DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
@@ -94,6 +98,10 @@ public class MarketBlockEntity extends BlockEntity implements ExtendedScreenHand
 
                 Identifier identifier = Registries.ITEM.getId(item);
                 if (identifier == null) {
+                        return false;
+                }
+
+                if (NON_PLANTABLE_SEED_EXCEPTIONS.contains(identifier)) {
                         return false;
                 }
 

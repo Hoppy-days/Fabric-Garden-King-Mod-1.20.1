@@ -124,4 +124,52 @@ public final class GardenKingModGameTest implements FabricGameTest {
                 });
         }
 
+        @GameTest(templateName = FabricGameTest.EMPTY_STRUCTURE)
+        public void sellingRoastedSeedFoodsIsAllowed(GameTestHelper helper) {
+                helper.setBlock(BlockPos.ORIGIN, ModBlocks.MARKET_BLOCK.getDefaultState());
+
+                helper.runAtTickTime(1, () -> {
+                        MarketBlockEntity blockEntity = helper.getBlockEntity(BlockPos.ORIGIN);
+                        if (blockEntity == null) {
+                                helper.fail("Market block entity was not created");
+                                return;
+                        }
+
+                        Optional<Item> roastedPumpkinSeedsOptional =
+                                        Registries.ITEM.getOrEmpty(new Identifier("croptopia", "roasted_pumpkin_seeds"));
+                        Optional<Item> roastedSunflowerSeedsOptional =
+                                        Registries.ITEM.getOrEmpty(new Identifier("croptopia", "roasted_sunflower_seeds"));
+                        if (roastedPumpkinSeedsOptional.isEmpty() || roastedSunflowerSeedsOptional.isEmpty()) {
+                                helper.fail("Expected roasted seed food items are missing from the registry");
+                                return;
+                        }
+
+                        Item roastedPumpkinSeeds = roastedPumpkinSeedsOptional.get();
+                        Item roastedSunflowerSeeds = roastedSunflowerSeedsOptional.get();
+                        blockEntity.setStack(0, new ItemStack(roastedPumpkinSeeds, 8));
+                        blockEntity.setStack(1, new ItemStack(roastedSunflowerSeeds, 8));
+
+                        ServerPlayerEntity player = helper.spawnPlayer(BlockPos.ORIGIN.up());
+                        boolean sold = blockEntity.sell(player);
+                        if (!sold) {
+                                helper.fail("Market should sell roasted seed food outputs");
+                                return;
+                        }
+
+                        int dollarCount = 0;
+                        for (ItemStack inventoryStack : player.getInventory().main) {
+                                if (inventoryStack.isOf(ModItems.DOLLAR)) {
+                                        dollarCount += inventoryStack.getCount();
+                                }
+                        }
+
+                        if (dollarCount <= 0) {
+                                helper.fail("Player should receive dollars when selling roasted seed food outputs");
+                                return;
+                        }
+
+                        helper.succeed();
+                });
+        }
+
 }
