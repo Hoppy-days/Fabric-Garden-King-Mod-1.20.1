@@ -133,3 +133,7 @@ Completion gate config failed: config target differs from trusted target
 ```text
 Completion gate failed: completion refused: status is ready_for_review
 ```
+
+## Publication observation
+
+Observed 2026-10-22T05:54:27.618316+00:00. Non-force push verified remote SHA `0467ee9b7d47c22e7dd636dde877cfc1bf939738`. [Draft PR 504](https://github.com/Hoppy-days/Fabric-Garden-King-Mod-1.20.1/pull/504) targets the recorded default branch. [Hosted completion-gate run 39730582637](https://github.com/Hoppy-days/Fabric-Garden-King-Mod-1.20.1/actions/runs/39730582637) completed successfully at that SHA. This documentation-only follow-up records the observed result without asserting its own future run. No merge, product/human acceptance or required-check settings change occurred.

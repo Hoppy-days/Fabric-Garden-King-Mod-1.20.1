@@ -9,14 +9,16 @@ Canonical branch checkpoint; evidence assertions are not independent verificatio
   "kind": "behavior_change",
   "status": "ready_for_review",
   "implementation": "implemented",
-  "reviewed_at": "2026-10-22T05:51:36.394168+00:00",
+  "reviewed_at": "2026-10-22T05:54:27.637299+00:00",
   "base": "a89e33aeecc0c8182e3f13e775670fe57e3d0875",
   "project_state": "Fabric/Gradle Garden King source and topic docs exist on the inspected master baseline. This maintenance branch adds engineering state checks only. No Gradle build, Minecraft runtime, gameplay or data-pack acceptance was executed; existing source/assets remain unchanged.",
   "integration": {
     "branch": "codex/documentation-completion-gate",
     "target": "master",
     "status": "unmerged",
-    "evidence": []
+    "evidence": [
+      "https://github.com/Hoppy-days/Fabric-Garden-King-Mod-1.20.1/pull/504"
+    ]
   },
   "branch_evidence": [],
   "changes": [
@@ -58,7 +60,7 @@ Canonical branch checkpoint; evidence assertions are not independent verificatio
     },
     {
       "path": "docs/evidence/completion-gate-installation.md",
-      "sha256": "0c7005ba8f8a795fad15b185e932a8e3a2d2883f7143f47bdb21333153a5a195",
+      "sha256": "ee5dbbc5e26ed33694b7c39cc8d9bacd18cbd481601bdd58e441220f46ad0392",
       "mode": "100644",
       "summary": "Record fresh tooling checks and explicit runtime/data limits."
     },
@@ -137,11 +139,14 @@ Canonical branch checkpoint; evidence assertions are not independent verificatio
     },
     {
       "command": "GitHub Actions: Documentation completion gate",
-      "outcome": "not_run",
-      "detail": "Hosted status must be observed after draft publication; local tests are not a hosted result.",
-      "observed_at": null,
-      "scope_digest": null,
-      "evidence": []
+      "outcome": "passed",
+      "detail": "Observed hosted success at 0467ee9b7d47c22e7dd636dde877cfc1bf939738. This documentation-only recording preserves the tested substantive scope; it does not assert a result for its own future commit.",
+      "observed_at": "2026-10-22T05:54:27.618316+00:00",
+      "scope_digest": "a9e6f52057dd445559ae1a5ec2a0434c5f64f09a2efb4072258ab5a6adf55a08",
+      "evidence": [
+        "https://github.com/Hoppy-days/Fabric-Garden-King-Mod-1.20.1/actions/runs/39730582637",
+        "docs/evidence/completion-gate-installation.md"
+      ]
     },
     {
       "command": "Configured run_gate.py check and disposable unrecorded-code/wrong-target/premature-completion fixtures",
@@ -163,7 +168,7 @@ Canonical branch checkpoint; evidence assertions are not independent verificatio
     }
   ],
   "blockers": [],
-  "next_step": "Review the gate/documentation draft against master; retain unverified runtime status and authorize any build/gameplay work separately.",
+  "next_step": "Owner reviews the linked unmerged draft and its gate results. Review the gate/documentation draft against master; retain unverified runtime status and authorize any build/gameplay work separately.",
   "details": [
     "docs/evidence/completion-gate-installation.md",
     "docs/COMPLETION_GATE.md",
