@@ -38,3 +38,7 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
+
+# Completion gate Python cache
+__pycache__/
+*.py[cod]

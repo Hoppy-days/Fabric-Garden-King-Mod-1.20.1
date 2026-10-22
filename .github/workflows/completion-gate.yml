@@ -1,0 +1,36 @@
+name: Documentation completion gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  checkpoint:
+    name: Checkpoint structure and change coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test the gate
+        run: python3 -m unittest discover -s tools/completion-gate -p 'test_*.py' -v
+      - name: Validate the entire pull request
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
+        shell: bash
+        run: |
+          base=$(git merge-base "$BASE_SHA" HEAD)
+          python3 tools/completion-gate/run_gate.py --base "$base" --branch "$HEAD_BRANCH" --target "$TARGET_BRANCH"

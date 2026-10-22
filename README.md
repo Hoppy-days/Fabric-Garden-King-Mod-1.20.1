@@ -119,3 +119,8 @@ Use these operator-only commands to validate whether growth/drop scaling is targ
 5. Run `/reload` after editing tags, then run the command again to confirm the lookup updates.
 
 If you add custom crop UI/item art later, place the `.png` texture under `src/main/resources/assets/gardenkingmod/textures/item/`.
+
+## Engineering handoff
+
+See [PROJECT_STATE.md](PROJECT_STATE.md) for branch-scoped state and
+[the completion gate](docs/COMPLETION_GATE.md) for required documentation/evidence checks.
